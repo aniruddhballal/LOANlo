@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import styles from './profile.module.css'
 
 const Profile = () => {
   const { user, updateUser } = useAuth()
@@ -63,218 +64,226 @@ const Profile = () => {
   }
 
   if (!user) {
-    return <div>Loading...</div>
+    return (
+      <div className={styles.container}>
+        <div className={styles.backgroundAnimation}>
+          <div className={styles.blob1}></div>
+          <div className={styles.blob2}></div>
+          <div className={styles.blob3}></div>
+        </div>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingText}>Loading...</div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div>
-      <h2>Profile</h2>
+    <div className={styles.container}>
+      {/* Animated Background */}
+      <div className={styles.backgroundAnimation}>
+        <div className={styles.blob1}></div>
+        <div className={styles.blob2}></div>
+        <div className={styles.blob3}></div>
+      </div>
+
+      {/* Header */}
+      <div className={styles.header}>
+        <h1 className={styles.mainTitle}>Profile</h1>
+      </div>
       
+      {/* Error Message */}
       {error && (
-        <div style={{ color: 'red', marginBottom: '1rem' }}>
-          {error}
+        <div className={styles.errorContainer}>
+          <span className={styles.errorText}>{error}</span>
         </div>
       )}
 
+      {/* Success Message */}
       {success && (
-        <div style={{ color: 'green', marginBottom: '1rem' }}>
-          {success}
+        <div className={styles.successContainer}>
+          <span className={styles.successText}>{success}</span>
         </div>
       )}
 
-      <div style={{ 
-        border: '1px solid #ddd', 
-        padding: '2rem', 
-        borderRadius: '8px',
-        backgroundColor: '#f9f9f9'
-      }}>
+      {/* Profile Card */}
+      <div className={styles.profileCard}>
         {!isEditing ? (
+          // View Mode
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <h3>Profile Information</h3>
-              <button onClick={() => setIsEditing(true)}>
+            <div className={styles.cardHeader}>
+              <h3 className={styles.cardTitle}>Profile Information</h3>
+              <button 
+                onClick={() => setIsEditing(true)}
+                className={styles.editButton}
+              >
                 Edit Profile
               </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div>
-                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>
-                  First Name:
-                </label>
-                <div style={{ padding: '0.5rem', backgroundColor: 'white', border: '1px solid #ccc' }}>
+            <div className={styles.profileGrid}>
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel}>First Name</label>
+                <div className={styles.fieldValue}>
                   {user.firstName}
                 </div>
               </div>
 
-              <div>
-                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>
-                  Last Name:
-                </label>
-                <div style={{ padding: '0.5rem', backgroundColor: 'white', border: '1px solid #ccc' }}>
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel}>Last Name</label>
+                <div className={styles.fieldValue}>
                   {user.lastName}
                 </div>
               </div>
 
-              <div>
-                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>
-                  Email:
-                </label>
-                <div style={{ padding: '0.5rem', backgroundColor: 'white', border: '1px solid #ccc' }}>
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel}>Email</label>
+                <div className={styles.fieldValue}>
                   {user.email}
                 </div>
               </div>
 
-              <div>
-                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>
-                  Phone:
-                </label>
-                <div style={{ padding: '0.5rem', backgroundColor: 'white', border: '1px solid #ccc' }}>
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel}>Phone</label>
+                <div className={`${styles.fieldValue} ${!user.phone ? styles.fieldValueEmpty : ''}`}>
                   {user.phone || 'Not provided'}
                 </div>
               </div>
 
-              <div>
-                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>
-                  Role:
-                </label>
-                <div style={{ padding: '0.5rem', backgroundColor: 'white', border: '1px solid #ccc' }}>
-                  {user.role.replace('_', ' ').toUpperCase()}
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel}>Role</label>
+                <div className={`${styles.fieldValue} ${styles.fieldValueReadonly} ${styles.fieldValueRole}`}>
+                  {user.role.replace('_', ' ')}
                 </div>
               </div>
 
-              <div>
-                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>
-                  User ID:
-                </label>
-                <div style={{ padding: '0.5rem', backgroundColor: 'white', border: '1px solid #ccc', fontSize: '0.9em' }}>
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel}>User ID</label>
+                <div className={`${styles.fieldValue} ${styles.fieldValueReadonly} ${styles.fieldValueId}`}>
                   {user.id}
                 </div>
               </div>
             </div>
           </div>
         ) : (
+          // Edit Mode
           <form onSubmit={handleSubmit}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <h3>Edit Profile</h3>
-              <div>
-                <button type="button" onClick={cancelEdit} style={{ marginRight: '1rem' }}>
+            <div className={styles.cardHeader}>
+              <h3 className={`${styles.cardTitle} ${styles.editModeTitle}`}>Edit Profile</h3>
+              <div className={styles.headerActions}>
+                <button 
+                  type="button" 
+                  onClick={cancelEdit}
+                  className={styles.cancelButton}
+                >
                   Cancel
                 </button>
-                <button type="submit" disabled={loading}>
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className={styles.saveButton}
+                >
+                  {loading && <span className={styles.spinner}></span>}
                   {loading ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div>
-                <label htmlFor="firstName" style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>
-                  First Name:
+            <div className={styles.profileGrid}>
+              <div className={styles.fieldGroup}>
+                <label htmlFor="firstName" className={styles.fieldLabel}>
+                  First Name
                 </label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  required
-                  style={{ 
-                    width: '100%', 
-                    padding: '0.5rem', 
-                    border: '1px solid #ccc',
-                    borderRadius: '4px'
-                  }}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="lastName" style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>
-                  Last Name:
-                </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  required
-                  style={{ 
-                    width: '100%', 
-                    padding: '0.5rem', 
-                    border: '1px solid #ccc',
-                    borderRadius: '4px'
-                  }}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>
-                  Email:
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  style={{ 
-                    width: '100%', 
-                    padding: '0.5rem', 
-                    border: '1px solid #ccc',
-                    borderRadius: '4px'
-                  }}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="phone" style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>
-                  Phone:
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  style={{ 
-                    width: '100%', 
-                    padding: '0.5rem', 
-                    border: '1px solid #ccc',
-                    borderRadius: '4px'
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>
-                  Role:
-                </label>
-                <div style={{ 
-                  padding: '0.5rem', 
-                  backgroundColor: '#f0f0f0', 
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  color: '#666'
-                }}>
-                  {user.role.replace('_', ' ').toUpperCase()} (Cannot be changed)
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    required
+                    className={styles.formInput}
+                    placeholder="Enter your first name"
+                  />
                 </div>
               </div>
 
-              <div>
-                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>
-                  User ID:
+              <div className={styles.fieldGroup}>
+                <label htmlFor="lastName" className={styles.fieldLabel}>
+                  Last Name
                 </label>
-                <div style={{ 
-                  padding: '0.5rem', 
-                  backgroundColor: '#f0f0f0', 
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  fontSize: '0.9em',
-                  color: '#666'
-                }}>
-                  {user.id} (Cannot be changed)
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    required
+                    className={styles.formInput}
+                    placeholder="Enter your last name"
+                  />
+                </div>
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label htmlFor="email" className={styles.fieldLabel}>
+                  Email
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className={styles.formInput}
+                    placeholder="Enter your email address"
+                  />
+                </div>
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label htmlFor="phone" className={styles.fieldLabel}>
+                  Phone
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className={styles.formInput}
+                    placeholder="Enter your phone number"
+                  />
+                </div>
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel}>Role</label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="text"
+                    value={user.role.replace('_', ' ').toUpperCase()}
+                    disabled
+                    className={`${styles.formInput} ${styles.readonlyInput}`}
+                  />
+                  <div className={styles.readonlyHint}>Cannot be changed</div>
+                </div>
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel}>User ID</label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="text"
+                    value={user.id}
+                    disabled
+                    className={`${styles.formInput} ${styles.readonlyInput} ${styles.fieldValueId}`}
+                  />
+                  <div className={styles.readonlyHint}>Cannot be changed</div>
                 </div>
               </div>
             </div>
@@ -282,9 +291,10 @@ const Profile = () => {
         )}
       </div>
 
-      <div style={{ marginTop: '2rem' }}>
-        <Link to="/dashboard">
-          <button>Back to Dashboard</button>
+      {/* Navigation */}
+      <div className={styles.navigation}>
+        <Link to="/dashboard" className={styles.backButton}>
+          Back to Dashboard
         </Link>
       </div>
     </div>
