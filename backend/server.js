@@ -9,10 +9,11 @@ const fs = require('fs');
 
 const app = express();
 
-const PORT = process.env.PORT;
-
 const dotenv = require('dotenv');
 dotenv.config(); // Load environment variables
+
+const PORT = process.env.PORT;
+
 
 // Middleware
 app.use(cors());
@@ -23,12 +24,6 @@ app.use('/uploads', express.static('uploads')); // Serve uploaded files
 if (!fs.existsSync('uploads')) {
   fs.mkdirSync('uploads');
 }
-
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET;
