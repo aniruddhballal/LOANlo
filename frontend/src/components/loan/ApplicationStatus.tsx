@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import styles from './applicationStatus.module.css'
 
 interface LoanApplication {
   _id: string
@@ -57,13 +58,12 @@ const ApplicationStatus = () => {
     }
   }
 
-  const getStatusColor = (status: string) => {
+  const getStatusClass = (status: string) => {
     switch (status) {
-      case 'approved': return '#28a745'
-      case 'rejected': return '#dc3545'
-      case 'under_review': return '#ffc107'
-      case 'pending': return '#007bff'
-      default: return '#6c757d'
+      case 'approved': return styles.statusApproved
+      case 'rejected': return styles.statusRejected
+      case 'under_review': return styles.statusUnderReview
+      default: return styles.statusPending
     }
   }
 
@@ -82,188 +82,242 @@ const ApplicationStatus = () => {
   }
 
   if (loading) {
-    return <div>Loading applications...</div>
+    return (
+      <div className={styles.container}>
+        <div className={styles.backgroundAnimation}>
+          <div className={styles.blob1}></div>
+          <div className={styles.blob2}></div>
+          <div className={styles.blob3}></div>
+        </div>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingText}>Loading applications...</div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div>
-      <h2>Application Status</h2>
+    <div className={styles.container}>
+      {/* Animated Background */}
+      <div className={styles.backgroundAnimation}>
+        <div className={styles.blob1}></div>
+        <div className={styles.blob2}></div>
+        <div className={styles.blob3}></div>
+      </div>
+
+      {/* Header */}
+      <div className={styles.header}>
+        <h1 className={styles.mainTitle}>Application Status</h1>
+      </div>
       
+      {/* Error State */}
       {error && (
-        <div style={{ color: 'red', marginBottom: '1rem' }}>
-          {error}
+        <div className={styles.errorContainer}>
+          <span className={styles.errorText}>{error}</span>
         </div>
       )}
 
+      {/* Empty State */}
       {applications.length === 0 ? (
-        <div>
-          <p>No loan applications found.</p>
-          <Link to="/apply-loan">
-            <button>Apply for a Loan</button>
+        <div className={styles.emptyState}>
+          <p className={styles.emptyStateText}>No loan applications found.</p>
+          <Link to="/apply-loan" className={styles.emptyStateButton}>
+            Apply for a Loan
           </Link>
         </div>
       ) : (
         <div>
-          <div style={{ marginBottom: '2rem' }}>
-            <h3>All Applications ({applications.length})</h3>
+          {/* Applications List */}
+          <div className={styles.applicationsSection}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>All Applications</h2>
+              <div className={styles.applicationCount}>
+                {applications.length} {applications.length === 1 ? 'Application' : 'Applications'}
+              </div>
+            </div>
             
-            <table border={1} style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f8f9fa' }}>
-                  <th style={{ padding: '12px' }}>Application ID</th>
-                  <th style={{ padding: '12px' }}>Loan Type</th>
-                  <th style={{ padding: '12px' }}>Amount</th>
-                  <th style={{ padding: '12px' }}>Status</th>
-                  <th style={{ padding: '12px' }}>Applied Date</th>
-                  <th style={{ padding: '12px' }}>Documents</th>
-                  <th style={{ padding: '12px' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {applications.map((app) => (
-                  <tr key={app._id}>
-                    <td style={{ padding: '12px' }}>{app._id.slice(-8).toUpperCase()}</td>
-                    <td style={{ padding: '12px' }}>{app.loanType}</td>
-                    <td style={{ padding: '12px' }}>₹{app.amount.toLocaleString()}</td>
-                    <td style={{ padding: '12px' }}>
-                      <span style={{ 
-                        color: getStatusColor(app.status),
-                        fontWeight: 'bold'
-                      }}>
-                        {getStatusIcon(app.status)} {formatStatus(app.status)}
-                      </span>
-                    </td>
-                    <td style={{ padding: '12px' }}>
-                      {new Date(app.createdAt).toLocaleDateString('en-IN')}
-                    </td>
-                    <td style={{ padding: '12px' }}>
-                      {app.documentsUploaded ? (
-                        <span style={{ color: 'green' }}>✓ Complete</span>
-                      ) : (
-                        <span style={{ color: 'red' }}>✗ Pending</span>
-                      )}
-                    </td>
-                    <td style={{ padding: '12px' }}>
-                      <button 
-                        onClick={() => setSelectedApplication(app)}
-                        style={{ marginRight: '0.5rem' }}
-                      >
-                        View Details
-                      </button>
-                      {!app.documentsUploaded && (
-                        <Link to={`/upload-documents/${app._id}`}>
-                          <button>Upload Docs</button>
-                        </Link>
-                      )}
-                    </td>
+            <div className={styles.tableContainer}>
+              <table className={styles.applicationsTable}>
+                <thead className={styles.tableHeader}>
+                  <tr>
+                    <th className={styles.tableHeaderCell}>Application ID</th>
+                    <th className={styles.tableHeaderCell}>Loan Type</th>
+                    <th className={styles.tableHeaderCell}>Amount</th>
+                    <th className={styles.tableHeaderCell}>Status</th>
+                    <th className={styles.tableHeaderCell}>Applied Date</th>
+                    <th className={styles.tableHeaderCell}>Documents</th>
+                    <th className={styles.tableHeaderCell}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {applications.map((app) => (
+                    <tr key={app._id} className={styles.tableRow}>
+                      <td className={styles.tableCell}>
+                        <span className={styles.applicationId}>
+                          {app._id.slice(-8).toUpperCase()}
+                        </span>
+                      </td>
+                      <td className={`${styles.tableCell} ${styles.loanType}`}>
+                        {app.loanType}
+                      </td>
+                      <td className={`${styles.tableCell} ${styles.amount}`}>
+                        ₹{app.amount.toLocaleString()}
+                      </td>
+                      <td className={styles.tableCell}>
+                        <span className={`${styles.statusBadge} ${getStatusClass(app.status)}`}>
+                          {getStatusIcon(app.status)} {formatStatus(app.status)}
+                        </span>
+                      </td>
+                      <td className={styles.tableCell}>
+                        {new Date(app.createdAt).toLocaleDateString('en-IN')}
+                      </td>
+                      <td className={styles.tableCell}>
+                        <div className={styles.documentsStatus}>
+                          {app.documentsUploaded ? (
+                            <span className={styles.documentsComplete}>✓ Complete</span>
+                          ) : (
+                            <span className={styles.documentsPending}>✗ Pending</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className={styles.tableCell}>
+                        <div className={styles.actionButtons}>
+                          <button 
+                            onClick={() => setSelectedApplication(app)}
+                            className={styles.viewDetailsButton}
+                          >
+                            View Details
+                          </button>
+                          {!app.documentsUploaded && (
+                            <Link to={`/upload-documents/${app._id}`} className={styles.uploadDocsButton}>
+                              Upload Docs
+                            </Link>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
+          {/* Details Modal */}
           {selectedApplication && (
-            <div style={{ 
-              border: '2px solid #007bff', 
-              padding: '1.5rem', 
-              marginTop: '2rem',
-              backgroundColor: '#f8f9fa'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3>Application Details</h3>
-                <button onClick={() => setSelectedApplication(null)}>✕ Close</button>
+            <div className={styles.detailsModal}>
+              <div className={styles.modalHeader}>
+                <h3 className={styles.modalTitle}>Application Details</h3>
+                <button 
+                  onClick={() => setSelectedApplication(null)}
+                  className={styles.closeButton}
+                >
+                  ✕ Close
+                </button>
               </div>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-                <div>
-                  <strong>Application ID:</strong> {selectedApplication._id.slice(-8).toUpperCase()}
+              <div className={styles.detailsGrid}>
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>Application ID:</div>
+                  <div className={styles.detailValue}>
+                    <span className={styles.applicationId}>
+                      {selectedApplication._id.slice(-8).toUpperCase()}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <strong>Applicant:</strong> {selectedApplication.applicantName}
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>Applicant:</div>
+                  <div className={styles.detailValue}>{selectedApplication.applicantName}</div>
                 </div>
-                <div>
-                  <strong>Loan Type:</strong> {selectedApplication.loanType}
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>Loan Type:</div>
+                  <div className={styles.detailValue}>{selectedApplication.loanType}</div>
                 </div>
-                <div>
-                  <strong>Requested Amount:</strong> ₹{selectedApplication.amount.toLocaleString()}
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>Requested Amount:</div>
+                  <div className={styles.detailValue}>₹{selectedApplication.amount.toLocaleString()}</div>
                 </div>
-                <div>
-                  <strong>Current Status:</strong> 
-                  <span style={{ 
-                    color: getStatusColor(selectedApplication.status),
-                    fontWeight: 'bold',
-                    marginLeft: '0.5rem'
-                  }}>
-                    {getStatusIcon(selectedApplication.status)} {formatStatus(selectedApplication.status)}
-                  </span>
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>Current Status:</div>
+                  <div className={styles.detailValue}>
+                    <span className={`${styles.statusBadge} ${getStatusClass(selectedApplication.status)}`}>
+                      {getStatusIcon(selectedApplication.status)} {formatStatus(selectedApplication.status)}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <strong>Applied Date:</strong> {new Date(selectedApplication.createdAt).toLocaleDateString('en-IN')}
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>Applied Date:</div>
+                  <div className={styles.detailValue}>
+                    {new Date(selectedApplication.createdAt).toLocaleDateString('en-IN')}
+                  </div>
                 </div>
               </div>
 
+              {/* Approval Details */}
               {selectedApplication.status === 'approved' && selectedApplication.approvalDetails && (
-                <div style={{ 
-                  backgroundColor: '#d4edda', 
-                  border: '1px solid #c3e6cb', 
-                  padding: '1rem', 
-                  marginBottom: '1rem',
-                  borderRadius: '4px'
-                }}>
-                  <h4 style={{ color: '#155724', margin: '0 0 1rem 0' }}>✓ Loan Approved!</h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                    <div><strong>Approved Amount:</strong> ₹{selectedApplication.approvalDetails.approvedAmount.toLocaleString()}</div>
-                    <div><strong>Interest Rate:</strong> {selectedApplication.approvalDetails.interestRate}% per annum</div>
-                    <div><strong>Tenure:</strong> {selectedApplication.approvalDetails.tenure} months</div>
-                    <div><strong>Monthly EMI:</strong> ₹{selectedApplication.approvalDetails.emi.toLocaleString()}</div>
+                <div className={styles.approvalCard}>
+                  <h4 className={styles.approvalTitle}>
+                    ✓ Loan Approved!
+                  </h4>
+                  <div className={styles.approvalGrid}>
+                    <div className={styles.approvalItem}>
+                      <div className={styles.detailLabel}>Approved Amount:</div>
+                      <div>₹{selectedApplication.approvalDetails.approvedAmount.toLocaleString()}</div>
+                    </div>
+                    <div className={styles.approvalItem}>
+                      <div className={styles.detailLabel}>Interest Rate:</div>
+                      <div>{selectedApplication.approvalDetails.interestRate}% per annum</div>
+                    </div>
+                    <div className={styles.approvalItem}>
+                      <div className={styles.detailLabel}>Tenure:</div>
+                      <div>{selectedApplication.approvalDetails.tenure} months</div>
+                    </div>
+                    <div className={styles.approvalItem}>
+                      <div className={styles.detailLabel}>Monthly EMI:</div>
+                      <div>₹{selectedApplication.approvalDetails.emi.toLocaleString()}</div>
+                    </div>
                   </div>
                 </div>
               )}
 
+              {/* Rejection Details */}
               {selectedApplication.status === 'rejected' && selectedApplication.rejectionReason && (
-                <div style={{ 
-                  backgroundColor: '#f8d7da', 
-                  border: '1px solid #f5c6cb', 
-                  padding: '1rem', 
-                  marginBottom: '1rem',
-                  borderRadius: '4px'
-                }}>
-                  <h4 style={{ color: '#721c24', margin: '0 0 0.5rem 0' }}>✗ Application Rejected</h4>
-                  <p style={{ color: '#721c24', margin: 0 }}><strong>Reason:</strong> {selectedApplication.rejectionReason}</p>
+                <div className={styles.rejectionCard}>
+                  <h4 className={styles.rejectionTitle}>
+                    ✗ Application Rejected
+                  </h4>
+                  <p className={styles.rejectionReason}>
+                    <strong>Reason:</strong> {selectedApplication.rejectionReason}
+                  </p>
                 </div>
               )}
 
-              <div>
-                <h4>Status History</h4>
-                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+              {/* Status History */}
+              <div className={styles.historySection}>
+                <h4 className={styles.historyTitle}>Status History</h4>
+                <div className={styles.historyContainer}>
                   {selectedApplication.statusHistory && selectedApplication.statusHistory.length > 0 ? (
                     selectedApplication.statusHistory.map((history, index) => (
-                      <div key={index} style={{ 
-                        borderLeft: '3px solid #007bff', 
-                        paddingLeft: '1rem', 
-                        marginBottom: '1rem',
-                        paddingBottom: '0.5rem'
-                      }}>
-                        <div style={{ fontWeight: 'bold', color: getStatusColor(history.status) }}>
+                      <div key={index} className={styles.historyItem}>
+                        <div className={`${styles.historyStatus} ${getStatusClass(history.status)}`}>
                           {getStatusIcon(history.status)} {formatStatus(history.status)}
                         </div>
-                        <div style={{ fontSize: '0.9em', color: '#666' }}>
+                        <div className={styles.historyTimestamp}>
                           {new Date(history.timestamp).toLocaleString('en-IN')}
                         </div>
                         {history.comment && (
-                          <div style={{ marginTop: '0.25rem', fontStyle: 'italic' }}>
+                          <div className={styles.historyComment}>
                             "{history.comment}"
                           </div>
                         )}
                         {history.updatedBy && (
-                          <div style={{ fontSize: '0.8em', color: '#999' }}>
+                          <div className={styles.historyUpdatedBy}>
                             Updated by: {history.updatedBy}
                           </div>
                         )}
                       </div>
                     ))
                   ) : (
-                    <p style={{ color: '#666', fontStyle: 'italic' }}>No status history available</p>
+                    <p className={styles.noHistory}>No status history available</p>
                   )}
                 </div>
               </div>
@@ -272,12 +326,13 @@ const ApplicationStatus = () => {
         </div>
       )}
 
-      <div style={{ marginTop: '2rem' }}>
-        <Link to="/dashboard">
-          <button>Back to Dashboard</button>
+      {/* Navigation */}
+      <div className={styles.navigation}>
+        <Link to="/dashboard" className={styles.navButton}>
+          Back to Dashboard
         </Link>
-        <Link to="/apply-loan" style={{ marginLeft: '1rem' }}>
-          <button>Apply for New Loan</button>
+        <Link to="/apply-loan" className={`${styles.navButton} ${styles.primaryNavButton}`}>
+          Apply for New Loan
         </Link>
       </div>
     </div>
