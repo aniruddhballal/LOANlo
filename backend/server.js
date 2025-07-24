@@ -9,7 +9,7 @@ const fs = require('fs');
 
 const app = express();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 const dotenv = require('dotenv');
 dotenv.config(); // Load environment variables
@@ -25,13 +25,13 @@ if (!fs.existsSync('uploads')) {
 }
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/LOANalo', {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 // JWT Secret
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -492,7 +492,7 @@ app.post('/api/documents/complete/:applicationId', authenticateToken, async (req
   }
 });
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/LOANalo', {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
