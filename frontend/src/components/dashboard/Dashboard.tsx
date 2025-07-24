@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import styles from './dashboard.module.css'
 
 interface LoanApplication {
   _id: string
@@ -44,97 +45,128 @@ const Dashboard = () => {
     }
   }
 
-  const getStatusColor = (status: string) => {
+  const getStatusClass = (status: string) => {
     switch (status) {
-      case 'approved': return 'green'
-      case 'rejected': return 'red'
-      case 'under_review': return 'orange'
-      default: return 'blue'
+      case 'approved': return styles.statusApproved
+      case 'rejected': return styles.statusRejected
+      case 'under_review': return styles.statusUnderReview
+      default: return styles.statusPending
     }
   }
 
   return (
-    <div>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <div>
+    <div className={styles.container}>
+      {/* Animated Background */}
+      <div className={styles.backgroundAnimation}>
+        <div className={styles.blob1}></div>
+        <div className={styles.blob2}></div>
+        <div className={styles.blob3}></div>
+      </div>
+
+      {/* Header Section */}
+      <header className={styles.header}>
+        <div className={styles.headerContent}>
           <h1>Dashboard</h1>
-          <p>Welcome, {user?.firstName} {user?.lastName}</p>
+          <p className={styles.welcomeText}>Welcome, {user?.firstName} {user?.lastName}</p>
         </div>
-        <nav>
-          <Link to="/profile" style={{ marginRight: '1rem' }}>Profile</Link>
-          <button onClick={logout}>Logout</button>
+        <nav className={styles.navigation}>
+          <Link to="/profile" className={styles.navLink}>Profile</Link>
+          <button onClick={logout} className={styles.logoutButton}>Logout</button>
         </nav>
       </header>
 
-      <div style={{ marginBottom: '2rem' }}>
-        <h2>Quick Actions</h2>
-        <div>
-          <Link to="/apply-loan">
-            <button>Apply for New Loan</button>
+      {/* Quick Actions Section */}
+      <div className={styles.quickActions}>
+        <h2 className={styles.sectionTitle}>Quick Actions</h2>
+        <div className={styles.actionButtons}>
+          <Link to="/apply-loan" className={`${styles.actionButton} ${styles.primaryAction}`}>
+            Apply for New Loan
           </Link>
-          <Link to="/application-status" style={{ marginLeft: '1rem' }}>
-            <button>View All Applications</button>
+          <Link to="/application-status" className={styles.actionButton}>
+            View All Applications
           </Link>
         </div>
       </div>
 
-      <div>
-        <h2>Recent Applications</h2>
-        
-        {loading && <p>Loading applications...</p>}
-        
-        {error && (
-          <div style={{ color: 'red', marginBottom: '1rem' }}>
-            {error}
-          </div>
-        )}
+      {/* Applications Section */}
+      <div className={styles.applicationsSection}>
+        <div className={styles.glassCard}>
+          <h2 className={styles.sectionTitle}>Recent Applications</h2>
+          
+          {loading && <p className={styles.loadingText}>Loading applications...</p>}
+          
+          {error && (
+            <div className={styles.errorContainer}>
+              <span className={styles.errorText}>{error}</span>
+            </div>
+          )}
 
-        {!loading && applications.length === 0 && (
-          <p>No loan applications found. <Link to="/apply-loan">Apply for your first loan</Link></p>
-        )}
+          {!loading && applications.length === 0 && (
+            <div className={styles.emptyState}>
+              No loan applications found.{' '}
+              <Link to="/apply-loan" className={styles.emptyStateLink}>
+                Apply for your first loan
+              </Link>
+            </div>
+          )}
 
-        {!loading && applications.length > 0 && (
-          <table border={1} style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th>Application ID</th>
-                <th>Loan Type</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Applied Date</th>
-                <th>Documents</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {applications.map((app) => (
-                <tr key={app._id}>
-                  <td>{app._id.slice(-6)}</td>
-                  <td>{app.loanType}</td>
-                  <td>₹{app.amount.toLocaleString()}</td>
-                  <td style={{ color: getStatusColor(app.status) }}>
-                    {app.status.replace('_', ' ').toUpperCase()}
-                  </td>
-                  <td>{new Date(app.createdAt).toLocaleDateString()}</td>
-                  <td>
-                    {app.documentsUploaded ? (
-                      <span style={{ color: 'green' }}>✓ Uploaded</span>
-                    ) : (
-                      <span style={{ color: 'red' }}>✗ Pending</span>
-                    )}
-                  </td>
-                  <td>
-                    {!app.documentsUploaded && (
-                      <Link to={`/upload-documents/${app._id}`}>
-                        <button>Upload Documents</button>
-                      </Link>
-                    )}
-                  </td>
+          {!loading && applications.length > 0 && (
+            <table className={styles.applicationsTable}>
+              <thead className={styles.tableHeader}>
+                <tr>
+                  <th className={styles.tableHeaderCell}>Application ID</th>
+                  <th className={styles.tableHeaderCell}>Loan Type</th>
+                  <th className={styles.tableHeaderCell}>Amount</th>
+                  <th className={styles.tableHeaderCell}>Status</th>
+                  <th className={styles.tableHeaderCell}>Applied Date</th>
+                  <th className={styles.tableHeaderCell}>Documents</th>
+                  <th className={styles.tableHeaderCell}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+              </thead>
+              <tbody>
+                {applications.map((app) => (
+                  <tr key={app._id} className={styles.tableRow}>
+                    <td className={styles.tableCell}>
+                      <span className={styles.applicationId}>
+                        {app._id.slice(-6)}
+                      </span>
+                    </td>
+                    <td className={`${styles.tableCell} ${styles.loanType}`}>
+                      {app.loanType}
+                    </td>
+                    <td className={`${styles.tableCell} ${styles.amount}`}>
+                      ₹{app.amount.toLocaleString()}
+                    </td>
+                    <td className={styles.tableCell}>
+                      <span className={`${styles.status} ${getStatusClass(app.status)}`}>
+                        {app.status.replace('_', ' ')}
+                      </span>
+                    </td>
+                    <td className={styles.tableCell}>
+                      {new Date(app.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className={styles.tableCell}>
+                      <div className={styles.documentsStatus}>
+                        {app.documentsUploaded ? (
+                          <span className={styles.documentsUploaded}>✓ Uploaded</span>
+                        ) : (
+                          <span className={styles.documentsPending}>✗ Pending</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className={styles.tableCell}>
+                      {!app.documentsUploaded && (
+                        <Link to={`/upload-documents/${app._id}`} className={styles.uploadButton}>
+                          Upload Documents
+                        </Link>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
     </div>
   )
