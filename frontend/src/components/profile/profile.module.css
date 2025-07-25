@@ -336,13 +336,15 @@
   font-style: italic;
 }
 
+/* UPDATED MODAL STYLES - DARK THEME */
 .modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -350,29 +352,35 @@
 }
 
 .modal {
-  background: white;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
   padding: 2rem;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 
+    0 32px 64px -12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .modalTitle {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #1f2937;
+  color: #ffffff;
+  letter-spacing: -0.025em;
 }
 
 .modalText {
-  color: #6b7280;
+  color: #d1d5db;
   margin-bottom: 1.5rem;
   line-height: 1.5;
 }
 
 .modalInputGroup {
   margin-bottom: 1.5rem;
+  width: 90%;
 }
 
 .modalActions {
@@ -382,25 +390,48 @@
 }
 
 .confirmButton {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  color: white;
+  background: linear-gradient(135deg, #ffffff 0%, #e5e7eb 100%);
+  color: #000000;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
+  padding: 0.875rem 1.75rem;
+  border-radius: 12px;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.confirmButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.confirmButton:hover::before {
+  opacity: 1;
 }
 
 .confirmButton:hover {
-  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -5px rgba(255, 255, 255, 0.2);
 }
 
 .confirmButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
+}
+
+.confirmButton:disabled:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 /* Profile Grid */
