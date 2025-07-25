@@ -14,7 +14,6 @@ dotenv.config(); // Load environment variables
 
 const PORT = process.env.PORT;
 
-
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -169,6 +168,52 @@ const upload = multer({
   }
 });
 
+// Helper function to update user details across all collections
+const updateUserDetailsAcrossCollections = async (userId, updateData) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  
+  try {
+    // Update user collection
+    await User.findByIdAndUpdate(userId, updateData, { session });
+    
+    // Prepare update object for loan applications
+    const loanUpdateData = {};
+    if (updateData.firstName) loanUpdateData.firstName = updateData.firstName;
+    if (updateData.lastName) loanUpdateData.lastName = updateData.lastName;
+    if (updateData.email) loanUpdateData.email = updateData.email;
+    if (updateData.phone) loanUpdateData.phone = updateData.phone;
+    
+    // Update applicantName if first or last name changed
+    if (updateData.firstName || updateData.lastName) {
+      const user = await User.findById(userId).session(session);
+      loanUpdateData.applicantName = `${user.firstName} ${user.lastName}`;
+    }
+    
+    // Update all loan applications for this user
+    if (Object.keys(loanUpdateData).length > 0) {
+      await LoanApplication.updateMany(
+        { userId: userId },
+        { 
+          $set: {
+            ...loanUpdateData,
+            updatedAt: new Date()
+          }
+        },
+        { session }
+      );
+    }
+    
+    await session.commitTransaction();
+    return true;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
+};
+
 // AUTH ROUTES
 
 // Register
@@ -287,20 +332,30 @@ app.get('/api/auth/verify', authenticateToken, async (req, res) => {
   }
 });
 
-// Update profile
+// Update profile - Modified to ensure consistency across collections
 app.put('/api/auth/profile', authenticateToken, async (req, res) => {
   try {
     const { firstName, lastName, email, phone } = req.body;
     
-    const user = await User.findByIdAndUpdate(
-      req.user.userId,
-      { firstName, lastName, email, phone },
-      { new: true, select: '-password' }
-    );
+    // Check if email is being changed and if it already exists
+    if (email && email !== req.user.email) {
+      const existingUser = await User.findOne({ email, _id: { $ne: req.user.userId } });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Email already exists' });
+      }
+    }
+    
+    const updateData = { firstName, lastName, email, phone };
+    
+    // Update user details across all collections using transaction
+    await updateUserDetailsAcrossCollections(req.user.userId, updateData);
+    
+    // Get updated user data
+    const user = await User.findById(req.user.userId).select('-password');
 
     res.json({
       success: true,
-      message: 'Profile updated successfully',
+      message: 'Profile updated successfully across all records',
       user: {
         id: user._id,
         firstName: user.firstName,
@@ -345,15 +400,39 @@ app.post('/api/loans/apply', authenticateToken, async (req, res) => {
   }
 });
 
-// Get user's loan applications
+// Get user's loan applications with populated user data
 app.get('/api/loans/my-applications', authenticateToken, async (req, res) => {
   try {
     const applications = await LoanApplication.find({ userId: req.user.userId })
+      .populate('userId', 'firstName lastName email phone')
       .sort({ createdAt: -1 });
 
     res.json({
       success: true,
       applications
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Get single loan application with populated user data
+app.get('/api/loans/application/:applicationId', authenticateToken, async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+    
+    const application = await LoanApplication.findOne({ 
+      _id: applicationId, 
+      userId: req.user.userId 
+    }).populate('userId', 'firstName lastName email phone');
+    
+    if (!application) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+
+    res.json({
+      success: true,
+      application
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -481,6 +560,44 @@ app.post('/api/documents/complete/:applicationId', authenticateToken, async (req
     res.json({
       success: true,
       message: 'Document submission completed successfully'
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// ADMIN ROUTES (for bulk updates if needed)
+
+// Sync all user data across collections (admin utility route)
+app.post('/api/admin/sync-user-data', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    const users = await User.find({});
+    let syncedCount = 0;
+
+    for (const user of users) {
+      await LoanApplication.updateMany(
+        { userId: user._id },
+        {
+          $set: {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            phone: user.phone,
+            applicantName: `${user.firstName} ${user.lastName}`,
+            updatedAt: new Date()
+          }
+        }
+      );
+      syncedCount++;
+    }
+
+    res.json({
+      success: true,
+      message: `User data synchronized across all collections for ${syncedCount} users`
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
