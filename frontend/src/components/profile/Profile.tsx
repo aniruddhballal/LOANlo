@@ -6,26 +6,34 @@ import styles from './profile.module.css'
 const Profile = () => {
   const { user, updateUser } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    phone: user?.phone || ''
-  })
+const [formData, setFormData] = useState({
+  firstName: user?.firstName || '',
+  lastName: user?.lastName || '',
+  email: user?.email || '',
+  phone: user?.phone || '',
+  // Add these new fields:
+  newPassword: '',
+  confirmPassword: ''
+})
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [confirmationPassword, setConfirmationPassword] = useState('')
+const [showPasswordModal, setShowPasswordModal] = useState(false)
 
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phone: user.phone || ''
-      })
-    }
-  }, [user])
+useEffect(() => {
+  if (user) {
+    setFormData({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone || '',
+      // Add these:
+      newPassword: '',
+      confirmPassword: ''
+    })
+  }
+}, [user])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -34,34 +42,75 @@ const Profile = () => {
     })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setSuccess('')
-    setLoading(true)
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setError('')
+  setSuccess('')
 
-    try {
-      await updateUser(formData)
-      setSuccess('Profile updated successfully!')
-      setIsEditing(false)
-    } catch (err: any) {
-      setError(err.message || 'Failed to update profile')
-    } finally {
-      setLoading(false)
+  // Validate new password if provided
+  if (formData.newPassword || formData.confirmPassword) {
+    if (!formData.newPassword) {
+      setError('New password is required')
+      return
+    }
+    if (formData.newPassword !== formData.confirmPassword) {
+      setError('New passwords do not match')
+      return
+    }
+    if (formData.newPassword.length < 6) {
+      setError('New password must be at least 6 characters long')
+      return
     }
   }
 
-  const cancelEdit = () => {
-    setFormData({
-      firstName: user?.firstName || '',
-      lastName: user?.lastName || '',
-      email: user?.email || '',
-      phone: user?.phone || ''
-    })
-    setIsEditing(false)
-    setError('')
-    setSuccess('')
+  // Show password confirmation modal
+  setShowPasswordModal(true)
+}
+
+const handlePasswordConfirmation = async () => {
+  if (!confirmationPassword) {
+    setError('Please enter your current password to confirm changes')
+    return
   }
+
+  setLoading(true)
+  setShowPasswordModal(false)
+
+  try {
+    const updateData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      currentPassword: confirmationPassword,
+      ...(formData.newPassword && { newPassword: formData.newPassword })
+    }
+
+    await updateUser(updateData)
+    setSuccess('Profile updated successfully!')
+    setIsEditing(false)
+    setConfirmationPassword('')
+  } catch (err: any) {
+    setError(err.message || 'Failed to update profile')
+  } finally {
+    setLoading(false)
+  }
+}
+
+const cancelEdit = () => {
+  setFormData({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    // Add these:
+    newPassword: '',
+    confirmPassword: ''
+  })
+  setIsEditing(false)
+  setError('')
+  setSuccess('')
+}
 
   if (!user) {
     return (
@@ -149,7 +198,6 @@ const Profile = () => {
                   {user.phone || 'Not provided'}
                 </div>
               </div>
-
               <div className={styles.fieldGroup}>
                 <label className={styles.fieldLabel}>Role</label>
                 <div className={`${styles.fieldValue} ${styles.fieldValueReadonly} ${styles.fieldValueRole}`}>
@@ -261,6 +309,43 @@ const Profile = () => {
                 </div>
               </div>
 
+<div className={styles.fieldGroup}>
+                <label htmlFor="newPassword" className={styles.fieldLabel}>
+                  New Password
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="password"
+                    id="newPassword"
+                    name="newPassword"
+                    value={formData.newPassword}
+                    onChange={handleChange}
+                    className={styles.formInput}
+                    placeholder="Enter new password (leave blank to keep current)"
+                  />
+                </div>
+                <div className={styles.passwordHint}>
+                  Leave blank if you don't want to change password
+                </div>
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label htmlFor="confirmPassword" className={styles.fieldLabel}>
+                  Confirm New Password
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className={styles.formInput}
+                    placeholder="Re-enter new password"
+                  />
+                </div>
+              </div>
+
               <div className={styles.fieldGroup}>
                 <label className={styles.fieldLabel}>Role</label>
                 <div className={styles.inputWrapper}>
@@ -297,6 +382,62 @@ const Profile = () => {
           Back to Dashboard
         </Link>
       </div>
+
+      {/* Password Confirmation Modal */}
+      {showPasswordModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <h3 className={styles.modalTitle}>Confirm Changes</h3>
+            <p className={styles.modalText}>
+              Please enter your current password to confirm these changes:
+            </p>
+            
+            {error && (
+              <div className={styles.errorContainer}>
+                <span className={styles.errorText}>{error}</span>
+              </div>
+            )}
+            
+            <div className={styles.modalInputGroup}>
+              <label htmlFor="confirmationPassword" className={styles.fieldLabel}>
+                Current Password
+              </label>
+              <input
+                type="password"
+                id="confirmationPassword"
+                value={confirmationPassword}
+                onChange={(e) => setConfirmationPassword(e.target.value)}
+                className={styles.formInput}
+                placeholder="Enter your current password"
+                autoFocus
+              />
+            </div>
+            
+            <div className={styles.modalActions}>
+              <button 
+                type="button"
+                onClick={() => {
+                  setShowPasswordModal(false)
+                  setConfirmationPassword('')
+                  setError('')
+                }}
+                className={styles.cancelButton}
+              >
+                Cancel
+              </button>
+              <button 
+                type="button"
+                onClick={handlePasswordConfirmation}
+                disabled={loading}
+                className={styles.confirmButton}
+              >
+                {loading && <span className={styles.spinner}></span>}
+                {loading ? 'Confirming...' : 'Confirm Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

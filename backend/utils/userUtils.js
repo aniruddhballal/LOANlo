@@ -8,10 +8,10 @@ const updateUserDetailsAcrossCollections = async (userId, updateData) => {
   session.startTransaction();
   
   try {
-    // Update user collection
+    // Update user collection (including password if provided)
     await User.findByIdAndUpdate(userId, updateData, { session });
     
-    // Prepare update object for loan applications
+    // Prepare update object for loan applications (exclude password)
     const loanUpdateData = {};
     if (updateData.firstName) loanUpdateData.firstName = updateData.firstName;
     if (updateData.lastName) loanUpdateData.lastName = updateData.lastName;
@@ -24,7 +24,7 @@ const updateUserDetailsAcrossCollections = async (userId, updateData) => {
       loanUpdateData.applicantName = `${user.firstName} ${user.lastName}`;
     }
     
-    // Update all loan applications for this user
+    // Update all loan applications for this user (don't include password)
     if (Object.keys(loanUpdateData).length > 0) {
       await LoanApplication.updateMany(
         { userId: userId },

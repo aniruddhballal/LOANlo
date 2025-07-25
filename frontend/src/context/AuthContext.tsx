@@ -137,10 +137,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Update failed')
+      throw new Error(data.message || 'Failed to update profile')
       }
 
       setUser(data.user)
+      return data
     } catch (error) {
       throw error
     }
