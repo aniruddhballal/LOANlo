@@ -260,7 +260,7 @@
 }
 
 .editButton:hover::before {
-  opacity: 1;
+  opacity: 0.2;
 }
 
 .editButton:hover {
@@ -278,12 +278,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
 }
 
 .cancelButton:hover {
   background: rgba(156, 163, 175, 0.3);
   color: white;
-  transform: translateY(-2px);
+  border: #000000;
 }
 
 .saveButton {
@@ -310,7 +311,7 @@
 }
 
 .saveButton:hover::before {
-  opacity: 1;
+  opacity: 0.2;
 }
 
 .saveButton:hover {
@@ -329,12 +330,12 @@
   box-shadow: none;
 }
 
-.passwordHint {
+/* .passwordHint {
   font-size: 0.75rem;
   color: #6b7280;
   margin-top: 0.25rem;
   font-style: italic;
-}
+} */
 
 /* UPDATED MODAL STYLES - DARK THEME */
 .modalOverlay {
@@ -380,7 +381,7 @@
 
 .modalInputGroup {
   margin-bottom: 1.5rem;
-  width: 90%;
+  width: 100%;
 }
 
 .modalActions {
@@ -415,7 +416,7 @@
 }
 
 .confirmButton:hover::before {
-  opacity: 1;
+  opacity: 0.2;
 }
 
 .confirmButton:hover {
@@ -453,6 +454,8 @@
   font-size: 0.875rem;
   letter-spacing: 0.025em;
   text-transform: uppercase;
+  display: block;
+  margin-bottom: 1rem; /* or 3rem if you want more space */
 }
 
 .fieldValue {
@@ -502,6 +505,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .formInput {
@@ -509,13 +513,29 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
-  padding: 1rem 1.25rem;
+  padding: 1rem 2.75rem 1rem 1.25rem; /* right padding for eye icon */
   color: white;
   font-size: 1rem;
   font-weight: 500;
   outline: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.passwordToggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
 
 .formInput::placeholder {
   color: #9ca3af;
@@ -549,12 +569,12 @@
   box-shadow: none;
 }
 
-.readonlyHint {
+/* .readonlyHint {
   font-size: 0.75rem;
   color: #9ca3af;
   margin-top: 0.25rem;
   font-style: italic;
-}
+} */
 
 /* Navigation */
 .navigation {
@@ -586,7 +606,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+  background: rgba(255, 255, 255, 0.08); /* subtle white tint */
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -596,11 +616,17 @@
 }
 
 .backButton:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12); /* slightly brighter for hover */
   border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0, 0, 0, 0.4); /* dual shadow for depth */
 }
+.backButton,
+.backButton:hover,
+.backButton:focus {
+  color: white; /* or any grayscale color you prefer */
+}
+
 
 /* Loading Spinner */
 .spinner {

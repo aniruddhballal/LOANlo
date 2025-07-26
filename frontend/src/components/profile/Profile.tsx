@@ -2,24 +2,26 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import styles from './profile.module.css'
+import { Eye, EyeOff} from 'lucide-react'
 
 const Profile = () => {
   const { user, updateUser } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
-const [formData, setFormData] = useState({
-  firstName: user?.firstName || '',
-  lastName: user?.lastName || '',
-  email: user?.email || '',
-  phone: user?.phone || '',
-  // Add these new fields:
-  newPassword: '',
-  confirmPassword: ''
-})
+  const [formData, setFormData] = useState({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    // Add these new fields:
+    newPassword: '',
+    confirmPassword: ''
+  })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [confirmationPassword, setConfirmationPassword] = useState('')
-const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
 useEffect(() => {
   if (user) {
@@ -324,9 +326,9 @@ const cancelEdit = () => {
                     placeholder="Enter new password (leave blank to keep current)"
                   />
                 </div>
-                <div className={styles.passwordHint}>
+                {/* <div className={styles.passwordHint}>
                   Leave blank if you don't want to change password
-                </div>
+                </div> */}
               </div>
 
               <div className={styles.fieldGroup}>
@@ -355,7 +357,7 @@ const cancelEdit = () => {
                     disabled
                     className={`${styles.formInput} ${styles.readonlyInput}`}
                   />
-                  <div className={styles.readonlyHint}>Cannot be changed</div>
+                  {/* <div className={styles.readonlyHint}>Cannot be changed</div> */}
                 </div>
               </div>
 
@@ -368,7 +370,7 @@ const cancelEdit = () => {
                     disabled
                     className={`${styles.formInput} ${styles.readonlyInput} ${styles.fieldValueId}`}
                   />
-                  <div className={styles.readonlyHint}>Cannot be changed</div>
+                  {/* <div className={styles.readonlyHint}>Cannot be changed</div> */}
                 </div>
               </div>
             </div>
@@ -398,21 +400,33 @@ const cancelEdit = () => {
               </div>
             )}
             
-            <div className={styles.modalInputGroup}>
-              <label htmlFor="confirmationPassword" className={styles.fieldLabel}>
-                Current Password
-              </label>
-              <input
-                type="password"
-                id="confirmationPassword"
-                value={confirmationPassword}
-                onChange={(e) => setConfirmationPassword(e.target.value)}
-                className={styles.formInput}
-                placeholder="Enter your current password"
-                autoFocus
-              />
-            </div>
-            
+<div className={styles.modalInputGroup}>
+  <label htmlFor="confirmationPassword" className={styles.fieldLabel}>
+    Current Password
+  </label>
+
+  <div className={styles.inputWrapper}>
+    <input
+      type={showPassword ? 'text' : 'password'}
+      id="confirmationPassword"
+      value={confirmationPassword}
+      onChange={(e) => setConfirmationPassword(e.target.value)}
+      className={styles.formInput}
+      placeholder="Enter your current password"
+      autoFocus
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className={styles.passwordToggle}
+      tabIndex={-1}
+    >
+      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+    </button>
+  </div>
+</div>
+
             <div className={styles.modalActions}>
               <button 
                 type="button"
