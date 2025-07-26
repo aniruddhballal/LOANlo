@@ -121,9 +121,9 @@ const ApplicationStatus = () => {
       {applications.length === 0 ? (
         <div className={styles.emptyState}>
           <p className={styles.emptyStateText}>No loan applications found.</p>
-          <Link to="/apply-loan" className={styles.emptyStateButton}>
+          {/* <Link to="/apply-loan" className={styles.emptyStateButton}>
             Apply for a Loan
-          </Link>
+          </Link> */}
         </div>
       ) : (
         <div>
