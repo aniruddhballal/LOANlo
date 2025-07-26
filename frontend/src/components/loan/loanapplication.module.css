@@ -372,12 +372,21 @@
   font-weight: 400;
   transition: all 0.2s ease;
   cursor: pointer;
+  padding-right: 0rem;
+    background-color: #1a1a1a;
 }
 
 .select option {
   background: #1a1a1a;
   color: white;
   padding: 0.5rem;
+}
+
+/* Fix highlight for hovered/selected options in dropdown */
+.select option:checked,
+.select option:hover {
+  background-color: #333333;
+  color: white;
 }
 
 .textarea {
