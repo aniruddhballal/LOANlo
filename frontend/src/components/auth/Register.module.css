@@ -289,8 +289,21 @@
   color: #9ca3af;
 }
 
-.passwordToggle {
+.passwordActions {
   position: absolute;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  z-index: 1;
+}
+
+.successIcon {
+  color: #22c55e;
+  animation: checkmark 0.3s ease-in-out;
+}
+
+.passwordToggle {
   right: 1rem;
   background: none;
   border: none;
@@ -305,20 +318,6 @@
 .passwordToggle:hover {
   color: #e5e7eb;
   background: rgba(255, 255, 255, 0.1);
-}
-
-.passwordActions {
-  position: absolute;
-  right: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  z-index: 1;
-}
-
-.successIcon {
-  color: #22c55e;
-  animation: checkmark 0.3s ease-in-out;
 }
 
 @keyframes checkmark {

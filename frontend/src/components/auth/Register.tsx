@@ -125,7 +125,7 @@ const Register = () => {
                     onFocus={() => setFocusedField('firstName')}
                     onBlur={() => setFocusedField('')}
                     className={styles.input}
-                    placeholder="John"
+                    placeholder="Aditya"
                     required
                   />
                 </div>
@@ -144,7 +144,7 @@ const Register = () => {
                     onFocus={() => setFocusedField('lastName')}
                     onBlur={() => setFocusedField('')}
                     className={styles.input}
-                    placeholder="Doe"
+                    placeholder="Kumar"
                     required
                   />
                 </div>
@@ -165,7 +165,7 @@ const Register = () => {
                   onFocus={() => setFocusedField('email')}
                   onBlur={() => setFocusedField('')}
                   className={styles.input}
-                  placeholder="john.doe@example.com"
+                  placeholder="aditya.kumar@example.com"
                   required
                 />
               </div>
@@ -208,13 +208,15 @@ const Register = () => {
                   required
                   minLength={6}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className={styles.passwordToggle}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+                <div className={styles.passwordActions}>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className={styles.passwordToggle}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
               {/* Password Strength Indicator */}
               {formData.password && (
@@ -258,7 +260,7 @@ const Register = () => {
                   required
                 />
                 <div className={styles.passwordActions}>
-                  {isPasswordMatch && <Check className={styles.successIcon} size={18} />}
+                  {isPasswordMatch && <Check className={styles.successIcon} size={20} />}
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
