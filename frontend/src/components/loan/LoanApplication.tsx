@@ -55,17 +55,45 @@ const LoanApplication = () => {
     setFocusedField('')
   }
 
-  const nextStep = () => {
-    if (currentStep < 4) {
-      setCurrentStep(currentStep + 1)
+  const nextStep = async () => {
+    if (currentStep === 1) {
+      await saveKYC();
     }
-  }
+    if (currentStep < 4) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
 
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1)
     }
   }
+
+  const saveKYC = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const kycFields = [
+        'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
+        'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city',
+        'state', 'pincode', 'employmentType', 'companyName', 'designation',
+        'workExperience', 'monthlyIncome'
+      ];
+      const kycData: any = {};
+      kycFields.forEach(field => kycData[field] = formData[field as keyof typeof formData]);
+
+      await fetch('http://localhost:5000/api/kyc/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(kycData)
+      });
+    } catch (err) {
+      // Optionally handle error
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

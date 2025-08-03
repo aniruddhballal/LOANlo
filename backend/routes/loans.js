@@ -2,13 +2,34 @@ const express = require('express');
 const LoanApplication = require('../models/LoanApplication');
 const { authenticateToken } = require('../middleware/auth');
 
+const UserKYC = require('../models/UserKYC'); // Add this line
+
 const router = express.Router();
 
 // Submit loan application
 router.post('/apply', authenticateToken, async (req, res) => {
   try {
     const loanData = req.body;
-    
+
+    // Extract KYC fields
+    const kycFields = [
+      'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
+      'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city',
+      'state', 'pincode', 'employmentType', 'companyName', 'designation',
+      'workExperience', 'monthlyIncome'
+    ];
+    const kycData = { userId: req.user.userId };
+    kycFields.forEach(field => {
+      if (loanData[field]) kycData[field] = loanData[field];
+    });
+
+    // Upsert KYC details
+    await UserKYC.findOneAndUpdate(
+      { userId: req.user.userId },
+      kycData,
+      { upsert: true, new: true }
+    );
+
     const loanApplication = new LoanApplication({
       ...loanData,
       userId: req.user.userId,

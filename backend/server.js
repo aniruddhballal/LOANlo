@@ -8,6 +8,8 @@ const authRoutes = require('./routes/auth');
 const loanRoutes = require('./routes/loans');
 const documentRoutes = require('./routes/documents');
 const adminRoutes = require('./routes/admin');
+const kycRoutes = require('./routes/kyc');
+
 
 const app = express();
 const PORT = config.PORT;
@@ -16,6 +18,7 @@ const PORT = config.PORT;
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
+app.use('/api/kyc', kycRoutes);
 
 // Create uploads directory if it doesn't exist
 if (!fs.existsSync('uploads')) {
