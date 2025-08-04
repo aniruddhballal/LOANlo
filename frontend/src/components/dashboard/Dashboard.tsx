@@ -34,12 +34,22 @@ const Dashboard = () => {
         }
       })
       const data = await response.json()
-      setHasKYC(!!data.kyc) // true if KYC exists, false otherwise
+      // List all required KYC fields
+      const requiredFields = [
+        'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
+        'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city',
+        'state', 'pincode', 'employmentType', 'companyName', 'designation',
+        'workExperience', 'monthlyIncome'
+      ]
+      // Check if KYC exists and all required fields are non-empty
+      const kyc = data.kyc
+      const allFieldsFilled = kyc && requiredFields.every(field => kyc[field] && kyc[field].toString().trim() !== '')
+      setHasKYC(!!kyc && allFieldsFilled)
     } catch (err) {
-      setHasKYC(false)
+      console.error('Failed to check KYC status:', err)
+      setHasKYC(false) // Default to false if there's an error
     }
   }
-
   const fetchApplications = async () => {
     try {
       const token = localStorage.getItem('token')
