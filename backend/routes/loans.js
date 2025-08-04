@@ -1,39 +1,31 @@
 const express = require('express');
 const LoanApplication = require('../models/LoanApplication');
 const { authenticateToken } = require('../middleware/auth');
-
-const UserKYC = require('../models/UserKYC'); // Add this line
-
+const UserKYC = require('../models/UserKYC');
 const router = express.Router();
 
 // Submit loan application
 router.post('/apply', authenticateToken, async (req, res) => {
   try {
-    const loanData = req.body;
-
-    // Extract KYC fields
-    const kycFields = [
-      'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
-      'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city',
-      'state', 'pincode', 'employmentType', 'companyName', 'designation',
-      'workExperience', 'monthlyIncome'
-    ];
-    const kycData = { userId: req.user.userId };
-    kycFields.forEach(field => {
-      if (loanData[field]) kycData[field] = loanData[field];
-    });
-
-    // Upsert KYC details
-    await UserKYC.findOneAndUpdate(
-      { userId: req.user.userId },
-      kycData,
-      { upsert: true, new: true }
-    );
+    const { loanType, amount, purpose, tenure } = req.body;
+    
+    // Get user's KYC details to populate applicant name
+    const userKYC = await UserKYC.findOne({ userId: req.user.userId });
+    
+    if (!userKYC) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'KYC details not found. Please complete KYC first.' 
+      });
+    }
 
     const loanApplication = new LoanApplication({
-      ...loanData,
+      loanType,
+      amount,
+      purpose,
+      tenure,
       userId: req.user.userId,
-      applicantName: `${loanData.firstName} ${loanData.lastName}`,
+      applicantName: `${userKYC.firstName} ${userKYC.lastName}`,
       statusHistory: [{
         status: 'pending',
         timestamp: new Date(),
@@ -49,7 +41,11 @@ router.post('/apply', authenticateToken, async (req, res) => {
       applicationId: loanApplication._id
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error', 
+      error: error.message 
+    });
   }
 });
 
@@ -73,12 +69,12 @@ router.get('/my-applications', authenticateToken, async (req, res) => {
 router.get('/application/:applicationId', authenticateToken, async (req, res) => {
   try {
     const { applicationId } = req.params;
-    
-    const application = await LoanApplication.findOne({ 
-      _id: applicationId, 
-      userId: req.user.userId 
+   
+    const application = await LoanApplication.findOne({
+      _id: applicationId,
+      userId: req.user.userId
     }).populate('userId', 'firstName lastName email phone');
-    
+   
     if (!application) {
       return res.status(404).json({ message: 'Application not found' });
     }
@@ -96,14 +92,17 @@ router.get('/application/:applicationId', authenticateToken, async (req, res) =>
 router.delete('/:applicationId', authenticateToken, async (req, res) => {
   try {
     const { applicationId } = req.params;
+
     // Only allow the owner to delete their application
     const deleted = await LoanApplication.findOneAndDelete({
       _id: applicationId,
       userId: req.user.userId
     });
+
     if (!deleted) {
       return res.status(404).json({ message: 'Application not found or not authorized' });
     }
+
     res.json({ success: true, message: 'Application deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

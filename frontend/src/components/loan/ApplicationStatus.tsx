@@ -7,6 +7,8 @@ interface LoanApplication {
   applicantName: string
   loanType: string
   amount: number
+  purpose: string  // Add this
+  tenure: number   // Add this
   status: 'pending' | 'under_review' | 'approved' | 'rejected'
   createdAt: string
   documentsUploaded: boolean
@@ -237,7 +239,7 @@ const ApplicationStatus = () => {
                 </button>
               </div>
               
-              <div className={styles.detailsGrid}>
+<div className={styles.detailsGrid}>
                 <div className={styles.detailItem}>
                   <div className={styles.detailLabel}>Application ID:</div>
                   <div className={styles.detailValue}>
@@ -257,6 +259,14 @@ const ApplicationStatus = () => {
                 <div className={styles.detailItem}>
                   <div className={styles.detailLabel}>Requested Amount:</div>
                   <div className={styles.detailValue}>₹{selectedApplication.amount.toLocaleString()}</div>
+                </div>
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>Purpose:</div>
+                  <div className={styles.detailValue}>{selectedApplication.purpose}</div>
+                </div>
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>Tenure:</div>
+                  <div className={styles.detailValue}>{selectedApplication.tenure} months</div>
                 </div>
                 <div className={styles.detailItem}>
                   <div className={styles.detailLabel}>Current Status:</div>
