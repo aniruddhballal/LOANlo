@@ -220,6 +220,14 @@
   letter-spacing: -0.025em;
 }
 
+.sectionSubTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.025em;
+}
+
 .actionButtons {
   display: flex;
   gap: 1.5rem;

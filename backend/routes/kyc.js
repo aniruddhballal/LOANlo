@@ -22,4 +22,13 @@ router.post('/save', authenticateToken, async (req, res) => {
   }
 });
 
+router.get('/me', authenticateToken, async (req, res) => {
+  try {
+    const kyc = await UserKYC.findOne({ userId: req.user.userId });
+    res.json({ kyc });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch KYC', error: err.message });
+  }
+});
+
 module.exports = router;

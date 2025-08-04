@@ -51,7 +51,7 @@ function AppContent() {
               <Dashboard />
             </ProtectedRoute>
           } />
-          <Route path="/apply-loan" element={
+          <Route path="/kyc" element={
             <ProtectedRoute>
               <LoanApplication />
             </ProtectedRoute>
