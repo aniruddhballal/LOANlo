@@ -92,4 +92,22 @@ router.get('/application/:applicationId', authenticateToken, async (req, res) =>
   }
 });
 
+// Delete a loan application
+router.delete('/:applicationId', authenticateToken, async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+    // Only allow the owner to delete their application
+    const deleted = await LoanApplication.findOneAndDelete({
+      _id: applicationId,
+      userId: req.user.userId
+    });
+    if (!deleted) {
+      return res.status(404).json({ message: 'Application not found or not authorized' });
+    }
+    res.json({ success: true, message: 'Application deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 module.exports = router;

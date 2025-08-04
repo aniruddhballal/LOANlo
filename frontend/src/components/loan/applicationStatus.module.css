@@ -668,6 +668,25 @@
   padding: 2rem;
 }
 
+.deleteSection {
+  margin-top: 2rem;
+  text-align: right;
+}
+
+.deleteButton {
+  background: #e53935;
+  color: #fff;
+  border: none;
+  padding: 0.7em 1.5em;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.deleteButton:hover {
+  background: #b71c1c;
+}
+
 /* Navigation */
 .navigation {
   display: flex;

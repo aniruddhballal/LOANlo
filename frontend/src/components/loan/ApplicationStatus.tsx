@@ -81,6 +81,28 @@ const ApplicationStatus = () => {
     return status.replace('_', ' ').toUpperCase()
   }
 
+  const handleDeleteApplication = async (applicationId: string) => {
+  if (!window.confirm('Are you sure you want to delete this application? This action cannot be undone.')) return;
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://localhost:5000/api/loans/${applicationId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (response.ok) {
+      setApplications(applications.filter(app => app._id !== applicationId));
+      setSelectedApplication(null);
+    } else {
+      const data = await response.json();
+      alert(data.message || 'Failed to delete application');
+    }
+  } catch (err) {
+    alert('Failed to delete application');
+  }
+};
+
   if (loading) {
     return (
       <div className={styles.container}>
@@ -321,6 +343,17 @@ const ApplicationStatus = () => {
                   )}
                 </div>
               </div>
+
+              {/* Delete Button */}
+    <div className={styles.deleteSection}>
+      <button
+        className={styles.deleteButton}
+        onClick={() => handleDeleteApplication(selectedApplication._id)}
+      >
+        🗑 Delete Application
+      </button>
+    </div>
+
             </div>
           )}
         </div>
@@ -331,7 +364,7 @@ const ApplicationStatus = () => {
         <Link to="/dashboard" className={styles.navButton}>
           Back to Dashboard
         </Link>
-        <Link to="/apply-loan" className={`${styles.navButton} ${styles.primaryNavButton}`}>
+        <Link to="/kyc" className={`${styles.navButton} ${styles.primaryNavButton}`}>
           Apply for New Loan
         </Link>
       </div>
