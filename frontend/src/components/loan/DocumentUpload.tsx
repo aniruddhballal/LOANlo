@@ -298,7 +298,7 @@ const DocumentUpload = () => {
       <div className={styles.mainCard}>
         {/* Header */}
         <div className={styles.header}>
-          <h1 className={styles.logo}>DocumentVault</h1>
+          <h1 className={styles.logo}>Document Vault</h1>
           <p className={styles.subtitle}>Secure Document Management</p>
         </div>
 
