@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './loanapplication.module.css'
 
@@ -40,6 +40,47 @@ const LoanApplication = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Fetch KYC details on mount and prefill formData if available
+  useEffect(() => {
+    const fetchKYC = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await fetch('http://localhost:5000/api/kyc/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        const data = await response.json()
+        if (data.kyc) {
+          setFormData((prev) => ({
+            ...prev,
+            ...data.kyc
+          }))
+        }
+      } catch (err) {
+        // Optionally handle error
+      }
+    }
+    fetchKYC()
+  }, [])
+
+  // Required fields validation by step
+  const requiredFieldsByStep: { [key: number]: string[] } = {
+    1: ['firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus', 'aadhaarNumber', 'panNumber'],
+    2: ['email', 'phone', 'address', 'city', 'state', 'pincode'],
+    3: ['employmentType', 'companyName', 'designation', 'workExperience', 'monthlyIncome'],
+    4: ['loanType', 'amount', 'purpose', 'tenure'],
+  };
+
+  const isStepValid = (step: number) => {
+    return requiredFieldsByStep[step].every(
+      (field) => {
+        const value = formData[field as keyof typeof formData]?.toString().trim();
+        return value !== '' && value !== undefined && value !== null;
+      }
+    );
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
@@ -55,8 +96,20 @@ const LoanApplication = () => {
     setFocusedField('')
   }
 
-  const nextStep = async () => {
-    if (currentStep === 1) {
+  const nextStep = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Prevent navigation if current step is not valid
+    if (!isStepValid(currentStep)) {
+      setError('Please fill in all required fields before proceeding.');
+      return;
+    }
+    
+    // Clear any previous errors
+    setError('');
+    
+    // Save KYC on every step except the last (loan info)
+    if (currentStep >= 1 && currentStep <= 3) {
       await saveKYC();
     }
     if (currentStep < 4) {
@@ -97,6 +150,13 @@ const LoanApplication = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Prevent submission if current step is not valid
+    if (!isStepValid(currentStep)) {
+      setError('Please fill in all required fields before submitting.');
+      return;
+    }
+    
     setError('')
     setLoading(true)
 
@@ -360,7 +420,7 @@ const LoanApplication = () => {
           {/* Progress Section */}
           <div className={styles.progressSection}>
             <div className={styles.progressHeader}>
-              <h2 className={styles.progressTitle}>Application Progress</h2>
+              <h2 className={styles.progressTitle}>KYC Progress</h2>
               <div className={styles.stepIndicator}>
                 Step {currentStep} of 4
               </div>
@@ -422,6 +482,7 @@ const LoanApplication = () => {
                   type="button" 
                   onClick={nextStep}
                   className={`${styles.navButton} ${styles.nextButton}`}
+                  disabled={!isStepValid(currentStep)}
                 >
                   <span className={styles.buttonText}>Next</span>
                   <svg className={styles.buttonIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -431,8 +492,8 @@ const LoanApplication = () => {
               ) : (
                 <button 
                   type="submit" 
-                  disabled={loading}
-                  className={`${styles.navButton} ${styles.submitButton}`}
+                  disabled={loading || !isStepValid(currentStep)}
+                  className={`${styles.submitButton}`}
                 >
                   {loading ? (
                     <>
@@ -441,10 +502,10 @@ const LoanApplication = () => {
                     </>
                   ) : (
                     <>
-                      <span className={styles.buttonText}>Submit Application</span>
-                      <svg className={styles.buttonIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <span className={styles.buttonText}>Submit KYC Application</span>
+                      <svg className={styles.buttonIcon} fill="none" stroke="currentColor" viewBox="0 2 21 20">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
+                      </svg>                      
                     </>
                   )}
                 </button>
