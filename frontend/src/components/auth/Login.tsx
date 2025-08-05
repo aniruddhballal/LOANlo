@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   
+  const { login } = useAuth()
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -18,20 +21,18 @@ const Login = () => {
     if (error) setError('')
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    setTimeout(() => {
-      if (formData.email && formData.password) {
-        console.log('Login successful:', formData)
-        setLoading(false)
-      } else {
-        setError('Please fill in all fields')
-        setLoading(false)
-      }
-    }, 1500)
+     try {
+      await login(formData.email, formData.password)
+    } catch (err: any) {
+      setError(err.message || 'Login failed')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -66,7 +67,7 @@ const Login = () => {
               </div>
             )}
             
-            <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
               <div>
                 <label htmlFor="email" className="block text-sm font-semibold text-black mb-2">
@@ -121,11 +122,10 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Submit Button - Stylish minimalistic animation */}
+              {/* Submit Button - Removed onClick, kept type="submit" */}
               <button 
                 type="submit"
                 disabled={loading}
-                onClick={handleSubmit}
                 className="group relative w-full flex items-center justify-center py-3 px-4 border-2 border-black rounded-lg text-white bg-black font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden hover:shadow-lg"
                 style={{ 
                   outline: 'none !important',
@@ -167,7 +167,7 @@ const Login = () => {
                   )}
                 </div>
               </button>
-            </div>
+            </form>
 
             {/* Sign Up Link */}
             <div className="mt-8 pt-6 border-t border-gray-200 text-center">
