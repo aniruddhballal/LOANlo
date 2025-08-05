@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, AlertCircle, Check } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, AlertCircle, Check, X } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,8 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState(0)
+  
+  const { register } = useAuth()
   
   const calculatePasswordStrength = (password: string): number => {
     let strength = 0
@@ -40,8 +43,7 @@ const Register = () => {
     if (error) setError('')
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
     setError('')
   
     if (formData.password !== formData.confirmPassword) {
@@ -55,18 +57,27 @@ const Register = () => {
   
     setLoading(true)
     try {
-      // Simulate API call
-      setTimeout(() => {
-        console.log('Registration successful:', formData)
-        setLoading(false)
-      }, 2000)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed')
+      await register({
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone
+      })
+    } catch (err: any) {
+      setError(err.message || 'Registration failed')
+    } finally {
       setLoading(false)
     }
   }
 
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    handleSubmit()
+  }
+
   const isPasswordMatch = formData.confirmPassword && formData.password === formData.confirmPassword
+  const isPasswordMismatch = formData.confirmPassword && formData.password !== formData.confirmPassword
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4 relative overflow-hidden">
@@ -100,7 +111,7 @@ const Register = () => {
               </div>
             )}
             
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-6">
               {/* Name Fields Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -256,7 +267,7 @@ const Register = () => {
                 <label htmlFor="confirmPassword" className="block text-sm font-semibold text-black mb-2">
                   Confirm Password
                 </label>
-                <div className={`relative ${isPasswordMatch ? 'ring-2 ring-green-500 rounded-lg' : ''}`}>
+                <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-500" />
                   </div>
@@ -266,13 +277,22 @@ const Register = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="block w-full pl-10 pr-16 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
+                    className={`block w-full pl-10 pr-16 py-3 border-2 rounded-lg focus:ring-0 focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200 ${
+                      isPasswordMatch 
+                        ? 'border-green-500 focus:border-green-500' 
+                        : isPasswordMismatch 
+                        ? 'border-red-500 focus:border-red-500'
+                        : 'border-gray-300 focus:border-black'
+                    }`}
                     placeholder="Confirm your password"
                     required
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center space-x-2">
                     {isPasswordMatch && (
                       <Check className="h-5 w-5 text-green-500" />
+                    )}
+                    {isPasswordMismatch && (
+                      <X className="h-5 w-5 text-red-500" />
                     )}
                     <div
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -286,12 +306,24 @@ const Register = () => {
                     </div>
                   </div>
                 </div>
+                
+                {/* Password match status text */}
+                {formData.confirmPassword && (
+                  <div className="mt-1">
+                    {isPasswordMatch ? (
+                      <span className="text-xs font-medium text-green-600">Passwords match</span>
+                    ) : (
+                      <span className="text-xs font-medium text-red-600">Passwords do not match</span>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Submit Button */}
               <button 
                 type="submit"
                 disabled={loading}
+                onClick={handleButtonClick}
                 className="group relative w-full flex items-center justify-center py-3 px-4 border-2 border-black rounded-lg text-white bg-black font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden hover:shadow-lg"
                 style={{ 
                   outline: 'none !important',
@@ -333,7 +365,7 @@ const Register = () => {
                   )}
                 </div>
               </button>
-            </form>
+            </div>
 
             {/* Login Link */}
             <div className="mt-8 pt-6 border-t border-gray-200 text-center">
