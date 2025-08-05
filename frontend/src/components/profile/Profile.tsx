@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import styles from './profile.module.css'
-import { Eye, EyeOff, Trash2, AlertTriangle } from 'lucide-react'
+import { Eye, EyeOff, Trash2, AlertTriangle, User, Mail, Phone, Key, Shield, Hash, Edit3, Save, X, ArrowLeft } from 'lucide-react'
 
 const Profile = () => {
   const { user, updateUser, deleteAccount } = useAuth()
@@ -13,7 +12,6 @@ const Profile = () => {
     lastName: user?.lastName || '',
     email: user?.email || '',
     phone: user?.phone || '',
-    // Add these new fields:
     newPassword: '',
     confirmPassword: ''
   })
@@ -29,19 +27,18 @@ const Profile = () => {
   const [deletePassword, setDeletePassword] = useState('')
   const [showDeletePassword, setShowDeletePassword] = useState(false)
 
-useEffect(() => {
-  if (user) {
-    setFormData({
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phone: user.phone || '',
-      // Add these:
-      newPassword: '',
-      confirmPassword: ''
-    })
-  }
-}, [user])
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone || '',
+        newPassword: '',
+        confirmPassword: ''
+      })
+    }
+  }, [user])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -50,438 +47,476 @@ useEffect(() => {
     })
   }
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setError('')
-  setSuccess('')
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setError('')
+    setSuccess('')
 
-  // Validate new password if provided
-  if (formData.newPassword || formData.confirmPassword) {
-    if (!formData.newPassword) {
-      setError('New password is required')
+    // Validate new password if provided
+    if (formData.newPassword || formData.confirmPassword) {
+      if (!formData.newPassword) {
+        setError('New password is required')
+        return
+      }
+      if (formData.newPassword !== formData.confirmPassword) {
+        setError('New passwords do not match')
+        return
+      }
+      if (formData.newPassword.length < 6) {
+        setError('New password must be at least 6 characters long')
+        return
+      }
+    }
+
+    // Show password confirmation modal
+    setShowPasswordModal(true)
+  }
+
+  const handlePasswordConfirmation = async () => {
+    if (!confirmationPassword) {
+      setError('Please enter your current password to confirm changes')
       return
     }
-    if (formData.newPassword !== formData.confirmPassword) {
-      setError('New passwords do not match')
-      return
-    }
-    if (formData.newPassword.length < 6) {
-      setError('New password must be at least 6 characters long')
-      return
+
+    setLoading(true)
+    setShowPasswordModal(false)
+
+    try {
+      const updateData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        currentPassword: confirmationPassword,
+        ...(formData.newPassword && { newPassword: formData.newPassword })
+      }
+
+      await updateUser(updateData)
+      setSuccess('Profile updated successfully!')
+      setIsEditing(false)
+      setConfirmationPassword('')
+      setFormData({
+        ...formData,
+        newPassword: '',
+        confirmPassword: ''
+      })
+    } catch (err) {
+      let msg = 'Failed to update profile';
+      if (err && typeof err === 'object' && 'message' in err) {
+        msg = (err as { message?: string }).message || msg;
+      } else if (typeof err === 'string') {
+        msg = err;
+      }
+      setError(msg);
+    } finally {
+      setLoading(false)
     }
   }
 
-  // Show password confirmation modal
-  setShowPasswordModal(true)
-}
-
-const handlePasswordConfirmation = async () => {
-  if (!confirmationPassword) {
-    setError('Please enter your current password to confirm changes')
-    return
-  }
-
-  setLoading(true)
-  setShowPasswordModal(false)
-
-  try {
-    const updateData = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phone: formData.phone,
-      currentPassword: confirmationPassword,
-      ...(formData.newPassword && { newPassword: formData.newPassword })
+  const handleDeleteAccount = async () => {
+    if (!deletePassword) {
+      setError('Please enter your password to confirm account deletion')
+      return
     }
 
-    await updateUser(updateData)
-    setSuccess('Profile updated successfully!')
+    if (deleteConfirmationText.toLowerCase() !== 'delete my account') {
+      setError('Please type "DELETE MY ACCOUNT" to confirm')
+      return
+    }
+
+    setDeleteLoading(true)
+    setError('')
+
+    try {
+      await deleteAccount(deletePassword)
+      navigate('/')
+    } catch (err) {
+      let msg = 'Failed to delete account';
+      if (err && typeof err === 'object' && 'message' in err) {
+        msg = (err as { message?: string }).message || msg;
+      } else if (typeof err === 'string') {
+        msg = err;
+      }
+      setError(msg);
+      setDeleteLoading(false);
+    }
+  }
+
+  const cancelEdit = () => {
+    setFormData({
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      newPassword: '',
+      confirmPassword: ''
+    })
     setIsEditing(false)
-    setConfirmationPassword('')
-  } catch (err: any) {
-    setError(err.message || 'Failed to update profile')
-  } finally {
-    setLoading(false)
-  }
-}
-
-const handleDeleteAccount = async () => {
-  if (!deletePassword) {
-    setError('Please enter your password to confirm account deletion')
-    return
+    setError('')
+    setSuccess('')
   }
 
-  if (deleteConfirmationText.toLowerCase() !== 'delete my account') {
-    setError('Please type "DELETE MY ACCOUNT" to confirm')
-    return
+  const openDeleteModal = () => {
+    setShowDeleteModal(true)
+    setDeleteConfirmationText('')
+    setDeletePassword('')
+    setError('')
   }
 
-  setDeleteLoading(true)
-  setError('')
-
-  try {
-    await deleteAccount(deletePassword)
-    // Account deleted successfully, user will be logged out automatically
-    // Navigate to home page or login page
-    navigate('/')
-  } catch (err: any) {
-    setError(err.message || 'Failed to delete account')
-    setDeleteLoading(false)
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false)
+    setDeleteConfirmationText('')
+    setDeletePassword('')
+    setError('')
   }
-}
-
-const cancelEdit = () => {
-  setFormData({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    // Add these:
-    newPassword: '',
-    confirmPassword: ''
-  })
-  setIsEditing(false)
-  setError('')
-  setSuccess('')
-}
-
-const openDeleteModal = () => {
-  setShowDeleteModal(true)
-  setDeleteConfirmationText('')
-  setDeletePassword('')
-  setError('')
-}
-
-const closeDeleteModal = () => {
-  setShowDeleteModal(false)
-  setDeleteConfirmationText('')
-  setDeletePassword('')
-  setError('')
-}
 
   if (!user) {
     return (
-      <div className={styles.container}>
-        <div className={styles.backgroundAnimation}>
-          <div className={styles.blob1}></div>
-          <div className={styles.blob2}></div>
-          <div className={styles.blob3}></div>
-        </div>
-        <div className={styles.loadingContainer}>
-          <div className={styles.loadingText}>Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className={styles.container}>
-      {/* Animated Background */}
-      <div className={styles.backgroundAnimation}>
-        <div className={styles.blob1}></div>
-        <div className={styles.blob2}></div>
-        <div className={styles.blob3}></div>
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Header */}
-      <div className={styles.header}>
-        <h1 className={styles.mainTitle}>Profile</h1>
-      </div>
-      
-      {/* Error Message */}
-      {error && (
-        <div className={styles.errorContainer}>
-          <span className={styles.errorText}>{error}</span>
-        </div>
-      )}
-
-      {/* Success Message */}
-      {success && (
-        <div className={styles.successContainer}>
-          <span className={styles.successText}>{success}</span>
-        </div>
-      )}
-
-      {/* Profile Card */}
-      <div className={styles.profileCard}>
-        {!isEditing ? (
-          // View Mode
-          <div>
-            <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}>Profile Information</h3>
-              <div className={styles.headerActions}>
-                <button 
-                  onClick={() => setIsEditing(true)}
-                  className={styles.editButton}
-                >
-                  Edit Profile
-                </button>
-                <button 
-                  onClick={openDeleteModal}
-                  className={styles.deleteAccountButton}
-                >
-                  <Trash2 size={16} />
-                  Delete Account
-                </button>
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gray-100 rounded-lg">
+                <User className="h-6 w-6 text-gray-700" />
               </div>
+              <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
             </div>
-
-            <div className={styles.profileGrid}>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>First Name</label>
-                <div className={styles.fieldValue}>
-                  {user.firstName}
-                </div>
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Last Name</label>
-                <div className={styles.fieldValue}>
-                  {user.lastName}
-                </div>
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Email</label>
-                <div className={styles.fieldValue}>
-                  {user.email}
-                </div>
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Phone</label>
-                <div className={`${styles.fieldValue} ${!user.phone ? styles.fieldValueEmpty : ''}`}>
-                  {user.phone || 'Not provided'}
-                </div>
-              </div>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Role</label>
-                <div className={`${styles.fieldValue} ${styles.fieldValueReadonly} ${styles.fieldValueRole}`}>
-                  {user.role.replace('_', ' ')}
-                </div>
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>User ID</label>
-                <div className={`${styles.fieldValue} ${styles.fieldValueReadonly} ${styles.fieldValueId}`}>
-                  {user.id}
-                </div>
-              </div>
-            </div>
+            <Link 
+              to="/dashboard" 
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Dashboard</span>
+            </Link>
           </div>
-        ) : (
-          // Edit Mode
-          <form onSubmit={handleSubmit}>
-            <div className={styles.cardHeader}>
-              <h3 className={`${styles.cardTitle} ${styles.editModeTitle}`}>Edit Profile</h3>
-              <div className={styles.headerActions}>
-                <button 
-                  type="button" 
-                  onClick={cancelEdit}
-                  className={styles.cancelButton}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  disabled={loading}
-                  className={styles.saveButton}
-                >
-                  {loading && <span className={styles.spinner}></span>}
-                  {loading ? 'Saving...' : 'Save Changes'}
-                </button>
-              </div>
-            </div>
-
-            <div className={styles.profileGrid}>
-              <div className={styles.fieldGroup}>
-                <label htmlFor="firstName" className={styles.fieldLabel}>
-                  First Name
-                </label>
-                <div className={styles.inputWrapper}>
-                  <input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    required
-                    className={styles.formInput}
-                    placeholder="Enter your first name"
-                  />
-                </div>
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label htmlFor="lastName" className={styles.fieldLabel}>
-                  Last Name
-                </label>
-                <div className={styles.inputWrapper}>
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    required
-                    className={styles.formInput}
-                    placeholder="Enter your last name"
-                  />
-                </div>
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label htmlFor="email" className={styles.fieldLabel}>
-                  Email
-                </label>
-                <div className={styles.inputWrapper}>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className={styles.formInput}
-                    placeholder="Enter your email address"
-                  />
-                </div>
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label htmlFor="phone" className={styles.fieldLabel}>
-                  Phone
-                </label>
-                <div className={styles.inputWrapper}>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className={styles.formInput}
-                    placeholder="Enter your phone number"
-                  />
-                </div>
-              </div>
-
-<div className={styles.fieldGroup}>
-                <label htmlFor="newPassword" className={styles.fieldLabel}>
-                  New Password
-                </label>
-                <div className={styles.inputWrapper}>
-                  <input
-                    type="password"
-                    id="newPassword"
-                    name="newPassword"
-                    value={formData.newPassword}
-                    onChange={handleChange}
-                    className={styles.formInput}
-                    placeholder="Enter new password (leave blank to keep current)"
-                  />
-                </div>
-                {/* <div className={styles.passwordHint}>
-                  Leave blank if you don't want to change password
-                </div> */}
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label htmlFor="confirmPassword" className={styles.fieldLabel}>
-                  Confirm New Password
-                </label>
-                <div className={styles.inputWrapper}>
-                  <input
-                    type="password"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className={styles.formInput}
-                    placeholder="Re-enter new password"
-                  />
-                </div>
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Role</label>
-                <div className={styles.inputWrapper}>
-                  <input
-                    type="text"
-                    value={user.role.replace('_', ' ').toUpperCase()}
-                    disabled
-                    className={`${styles.formInput} ${styles.readonlyInput}`}
-                  />
-                  {/* <div className={styles.readonlyHint}>Cannot be changed</div> */}
-                </div>
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>User ID</label>
-                <div className={styles.inputWrapper}>
-                  <input
-                    type="text"
-                    value={user.id}
-                    disabled
-                    className={`${styles.formInput} ${styles.readonlyInput} ${styles.fieldValueId}`}
-                  />
-                  {/* <div className={styles.readonlyHint}>Cannot be changed</div> */}
-                </div>
-              </div>
-            </div>
-          </form>
-        )}
+        </div>
       </div>
 
-      {/* Navigation */}
-      <div className={styles.navigation}>
-        <Link to="/dashboard" className={styles.backButton}>
-          Back to Dashboard
-        </Link>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Status Messages */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center space-x-2 animate-fade-in">
+            <AlertTriangle className="h-5 w-5 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg animate-fade-in">
+            <span>{success}</span>
+          </div>
+        )}
+
+        {/* Profile Card */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+          {!isEditing ? (
+            // View Mode
+            <div>
+              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-semibold text-gray-900">Profile Information</h3>
+                  <div className="flex items-center space-x-3">
+                    <button 
+                      onClick={() => setIsEditing(true)}
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-colors duration-200"
+                    >
+                      <Edit3 className="h-4 w-4" />
+                      <span>Edit Profile</span>
+                    </button>
+                    <button 
+                      onClick={openDeleteModal}
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span>Delete Account</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <User className="h-4 w-4" />
+                      <span>First Name</span>
+                    </label>
+                    <div className="text-gray-900 text-lg font-medium">
+                      {user.firstName}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <User className="h-4 w-4" />
+                      <span>Last Name</span>
+                    </label>
+                    <div className="text-gray-900 text-lg font-medium">
+                      {user.lastName}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <Mail className="h-4 w-4" />
+                      <span>Email</span>
+                    </label>
+                    <div className="text-gray-900 text-lg font-medium">
+                      {user.email}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <Phone className="h-4 w-4" />
+                      <span>Phone</span>
+                    </label>
+                    <div className={`text-lg font-medium ${!user.phone ? 'text-gray-400 italic' : 'text-gray-900'}`}>
+                      {user.phone || 'Not provided'}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <Shield className="h-4 w-4" />
+                      <span>Role</span>
+                    </label>
+                    <div className="text-gray-900 text-lg font-medium">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
+                        {user.role.replace('_', ' ')}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <Hash className="h-4 w-4" />
+                      <span>User ID</span>
+                    </label>
+                    <div className="text-gray-600 text-sm font-mono bg-gray-50 px-3 py-2 rounded-lg">
+                      {user.id}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            // Edit Mode
+            <form onSubmit={handleSubmit}>
+              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-semibold text-gray-900">Edit Profile</h3>
+                  <div className="flex items-center space-x-3">
+                    <button 
+                      type="button" 
+                      onClick={cancelEdit}
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+                    >
+                      <X className="h-4 w-4" />
+                      <span>Cancel</span>
+                    </button>
+                    <button 
+                      type="submit" 
+                      disabled={loading}
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200"
+                    >
+                      {loading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      ) : (
+                        <Save className="h-4 w-4" />
+                      )}
+                      <span>{loading ? 'Saving...' : 'Save Changes'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label htmlFor="firstName" className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <User className="h-4 w-4" />
+                      <span>First Name</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Enter your first name"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="lastName" className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <User className="h-4 w-4" />
+                      <span>Last Name</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Enter your last name"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <Mail className="h-4 w-4" />
+                      <span>Email</span>
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Enter your email address"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="phone" className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <Phone className="h-4 w-4" />
+                      <span>Phone</span>
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="newPassword" className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <Key className="h-4 w-4" />
+                      <span>New Password</span>
+                    </label>
+                    <input
+                      type="password"
+                      id="newPassword"
+                      name="newPassword"
+                      value={formData.newPassword}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Enter new password (leave blank to keep current)"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <Key className="h-4 w-4" />
+                      <span>Confirm New Password</span>
+                    </label>
+                    <input
+                      type="password"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Re-enter new password"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <Shield className="h-4 w-4" />
+                      <span>Role</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={user.role.replace('_', ' ').toUpperCase()}
+                      disabled
+                      className="w-full px-4 py-3 border border-gray-200 bg-gray-50 text-gray-500 rounded-lg cursor-not-allowed"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide flex items-center space-x-2">
+                      <Hash className="h-4 w-4" />
+                      <span>User ID</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={user.id}
+                      disabled
+                      className="w-full px-4 py-3 border border-gray-200 bg-gray-50 text-gray-500 rounded-lg cursor-not-allowed font-mono text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+            </form>
+          )}
+        </div>
       </div>
 
       {/* Password Confirmation Modal */}
       {showPasswordModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
-            <h3 className={styles.modalTitle}>Confirm Changes</h3>
-            <p className={styles.modalText}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Confirm Changes</h3>
+            <p className="text-gray-600 mb-6">
               Please enter your current password to confirm these changes:
             </p>
             
             {error && (
-              <div className={styles.errorContainer}>
-                <span className={styles.errorText}>{error}</span>
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center space-x-2">
+                <AlertTriangle className="h-5 w-5 flex-shrink-0" />
+                <span>{error}</span>
               </div>
             )}
             
-<div className={styles.modalInputGroup}>
-  <label htmlFor="confirmationPassword" className={styles.fieldLabel}>
-    Current Password
-  </label>
+            <div className="mb-6">
+              <label htmlFor="confirmationPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                Current Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="confirmationPassword"
+                  value={confirmationPassword}
+                  onChange={(e) => setConfirmationPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your current password"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
 
-  <div className={styles.inputWrapper}>
-    <input
-      type={showPassword ? 'text' : 'password'}
-      id="confirmationPassword"
-      value={confirmationPassword}
-      onChange={(e) => setConfirmationPassword(e.target.value)}
-      className={styles.formInput}
-      placeholder="Enter your current password"
-      autoFocus
-    />
-
-    <button
-      type="button"
-      onClick={() => setShowPassword(!showPassword)}
-      className={styles.passwordToggle}
-      tabIndex={-1}
-    >
-      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-    </button>
-  </div>
-</div>
-
-            <div className={styles.modalActions}>
+            <div className="flex space-x-3">
               <button 
                 type="button"
                 onClick={() => {
@@ -489,7 +524,7 @@ const closeDeleteModal = () => {
                   setConfirmationPassword('')
                   setError('')
                 }}
-                className={styles.cancelButton}
+                className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
               >
                 Cancel
               </button>
@@ -497,10 +532,10 @@ const closeDeleteModal = () => {
                 type="button"
                 onClick={handlePasswordConfirmation}
                 disabled={loading}
-                className={styles.confirmButton}
+                className="flex-1 px-4 py-2 bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
               >
-                {loading && <span className={styles.spinner}></span>}
-                {loading ? 'Confirming...' : 'Confirm Changes'}
+                {loading && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
+                <span>{loading ? 'Confirming...' : 'Confirm Changes'}</span>
               </button>
             </div>
           </div>
@@ -509,34 +544,37 @@ const closeDeleteModal = () => {
 
       {/* Delete Account Modal */}
       {showDeleteModal && (
-        <div className={styles.modalOverlay}>
-          <div className={`${styles.modal} ${styles.deleteModal}`}>
-            <div className={styles.deleteModalHeader}>
-              <AlertTriangle className={styles.warningIcon} size={24} />
-              <h3 className={styles.modalTitle}>Delete Account</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 animate-fade-in">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="p-2 bg-red-100 rounded-full">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900">Delete Account</h3>
             </div>
             
-            <div className={styles.deleteWarning}>
-              <p className={styles.modalText}>
+            <div className="mb-6">
+              <p className="text-gray-600 mb-4">
                 <strong>This action cannot be undone.</strong> This will permanently delete your account and remove all associated data including:
               </p>
-              <ul className={styles.deleteWarningList}>
-                <li>Your profile information</li>
-                <li>All your posts and comments</li>
-                <li>Your activity history</li>
-                <li>Any uploaded files or documents</li>
-                <li>All related data across the platform</li>
+              <ul className="text-gray-600 space-y-1 ml-4">
+                <li>• Your profile information</li>
+                <li>• All your posts and comments</li>
+                <li>• Your activity history</li>
+                <li>• Any uploaded files or documents</li>
+                <li>• All related data across the platform</li>
               </ul>
             </div>
             
             {error && (
-              <div className={styles.errorContainer}>
-                <span className={styles.errorText}>{error}</span>
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center space-x-2">
+                <AlertTriangle className="h-5 w-5 flex-shrink-0" />
+                <span>{error}</span>
               </div>
             )}
             
-            <div className={styles.modalInputGroup}>
-              <label htmlFor="deleteConfirmation" className={styles.fieldLabel}>
+            <div className="mb-4">
+              <label htmlFor="deleteConfirmation" className="block text-sm font-medium text-gray-700 mb-2">
                 Type "DELETE MY ACCOUNT" to confirm:
               </label>
               <input
@@ -544,40 +582,39 @@ const closeDeleteModal = () => {
                 id="deleteConfirmation"
                 value={deleteConfirmationText}
                 onChange={(e) => setDeleteConfirmationText(e.target.value)}
-                className={styles.formInput}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
                 placeholder="DELETE MY ACCOUNT"
               />
             </div>
 
-            <div className={styles.modalInputGroup}>
-              <label htmlFor="deletePassword" className={styles.fieldLabel}>
+            <div className="mb-6">
+              <label htmlFor="deletePassword" className="block text-sm font-medium text-gray-700 mb-2">
                 Current Password
               </label>
-              <div className={styles.inputWrapper}>
+              <div className="relative">
                 <input
                   type={showDeletePassword ? 'text' : 'password'}
                   id="deletePassword"
                   value={deletePassword}
                   onChange={(e) => setDeletePassword(e.target.value)}
-                  className={styles.formInput}
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter your current password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowDeletePassword(!showDeletePassword)}
-                  className={styles.passwordToggle}
-                  tabIndex={-1}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                 >
-                  {showDeletePassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showDeletePassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
 
-            <div className={styles.modalActions}>
+            <div className="flex space-x-3">
               <button 
                 type="button"
                 onClick={closeDeleteModal}
-                className={styles.cancelButton}
+                className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
                 disabled={deleteLoading}
               >
                 Cancel
@@ -586,15 +623,32 @@ const closeDeleteModal = () => {
                 type="button"
                 onClick={handleDeleteAccount}
                 disabled={deleteLoading || deleteConfirmationText.toLowerCase() !== 'delete my account' || !deletePassword}
-                className={styles.deleteButton}
+                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
               >
-                {deleteLoading && <span className={styles.spinner}></span>}
-                {deleteLoading ? 'Deleting...' : 'Delete Account'}
+                {deleteLoading && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
+                <span>{deleteLoading ? 'Deleting...' : 'Delete Account'}</span>
               </button>
             </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+      `}</style>
     </div>
   )
 }
