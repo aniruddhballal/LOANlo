@@ -18,7 +18,7 @@ const Login = () => {
     if (error) setError('')
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault()
     setError('')
     setLoading(true)
@@ -66,7 +66,7 @@ const Login = () => {
               </div>
             )}
             
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-6">
               {/* Email Field */}
               <div>
                 <label htmlFor="email" className="block text-sm font-semibold text-black mb-2">
@@ -82,7 +82,7 @@ const Login = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="block w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black bg-white text-black placeholder-gray-500 transition-all duration-200"
+                    className="block w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
                     placeholder="Enter your email address"
                     required
                   />
@@ -104,13 +104,13 @@ const Login = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="block w-full pl-10 pr-12 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black bg-white text-black placeholder-gray-500 transition-all duration-200"
+                    className="block w-full pl-10 pr-12 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
                     placeholder="Enter your password"
                     required
                   />
                   <div
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer focus:outline-none"
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5 text-gray-500 hover:text-black transition-colors duration-200" />
@@ -121,11 +121,28 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* Submit Button - Fixed styling to remove blue border */}
               <button 
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center py-3 px-4 border-2 border-black rounded-lg shadow-sm text-white bg-black hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
+                onClick={handleSubmit}
+                className="w-full flex items-center justify-center py-3 px-4 border-2 border-black rounded-lg text-white bg-black hover:bg-gray-900 font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
+                style={{ 
+                  outline: 'none !important',
+                  boxShadow: 'none !important',
+                  WebkitTapHighlightColor: 'transparent'
+                }}
+                onFocus={(e: React.FocusEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.outline = 'none'
+                  e.currentTarget.style.boxShadow = 'none'
+                  e.currentTarget.style.border = '2px solid black'
+                }}
+                onBlur={(e: React.FocusEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.border = '2px solid black'
+                }}
+                onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.border = '2px solid black'
+                }}
               >
                 {loading ? (
                   <>
@@ -139,7 +156,7 @@ const Login = () => {
                   </>
                 )}
               </button>
-            </form>
+            </div>
 
             {/* Sign Up Link */}
             <div className="mt-8 pt-6 border-t border-gray-200 text-center">
@@ -147,7 +164,7 @@ const Login = () => {
                 Don't have an account?{' '}
                 <a 
                   href="/register"
-                  className="text-blue-600 font-semibold hover:text-blue-700 hover:underline transition-all duration-200"
+                  className="text-blue-600 font-semibold hover:text-blue-700 hover:underline transition-all duration-200 focus:outline-none"
                 >
                   Create one here
                 </a>
