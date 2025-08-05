@@ -5,7 +5,7 @@ import styles from './profile.module.css'
 import { Eye, EyeOff, Trash2, AlertTriangle } from 'lucide-react'
 
 const Profile = () => {
-  const { user, updateUser, deleteAccount, logout } = useAuth()
+  const { user, updateUser, deleteAccount } = useAuth()
   const navigate = useNavigate()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
