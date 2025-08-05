@@ -10,7 +10,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -18,7 +18,7 @@ const Login = () => {
     if (error) setError('')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
     setLoading(true)
@@ -66,7 +66,7 @@ const Login = () => {
               </div>
             )}
             
-            <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
               <div>
                 <label htmlFor="email" className="block text-sm font-semibold text-black mb-2">
@@ -139,7 +139,7 @@ const Login = () => {
                   </>
                 )}
               </button>
-            </div>
+            </form>
 
             {/* Sign Up Link */}
             <div className="mt-8 pt-6 border-t border-gray-200 text-center">
