@@ -16,6 +16,7 @@ interface AuthContextType {
   register: (userData: RegisterData) => Promise<void>
   logout: () => void
   updateUser: (userData: Partial<User>) => Promise<void>
+  deleteAccount: (password: string) => Promise<void>
 }
 
 interface RegisterData {
@@ -137,10 +138,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await response.json()
 
       if (!response.ok) {
-      throw new Error(data.message || 'Failed to update profile')
+        throw new Error(data.message || 'Failed to update profile')
       }
 
       setUser(data.user)
+      return data
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const deleteAccount = async (password: string) => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${API_BASE_URL}/auth/delete-account`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ password })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete account')
+      }
+
+      // Clear local storage and user state
+      localStorage.removeItem('token')
+      setUser(null)
+      
       return data
     } catch (error) {
       throw error
@@ -153,7 +182,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     login,
     register,
     logout,
-    updateUser
+    updateUser,
+    deleteAccount
   }
 
   return (

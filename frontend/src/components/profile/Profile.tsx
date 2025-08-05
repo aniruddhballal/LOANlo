@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import styles from './profile.module.css'
-import { Eye, EyeOff} from 'lucide-react'
+import { Eye, EyeOff, Trash2, AlertTriangle } from 'lucide-react'
 
 const Profile = () => {
-  const { user, updateUser } = useAuth()
+  const { user, updateUser, deleteAccount, logout } = useAuth()
+  const navigate = useNavigate()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
@@ -17,11 +18,16 @@ const Profile = () => {
     confirmPassword: ''
   })
   const [loading, setLoading] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [confirmationPassword, setConfirmationPassword] = useState('')
   const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState('')
+  const [deletePassword, setDeletePassword] = useState('')
+  const [showDeletePassword, setShowDeletePassword] = useState(false)
 
 useEffect(() => {
   if (user) {
@@ -99,6 +105,31 @@ const handlePasswordConfirmation = async () => {
   }
 }
 
+const handleDeleteAccount = async () => {
+  if (!deletePassword) {
+    setError('Please enter your password to confirm account deletion')
+    return
+  }
+
+  if (deleteConfirmationText.toLowerCase() !== 'delete my account') {
+    setError('Please type "DELETE MY ACCOUNT" to confirm')
+    return
+  }
+
+  setDeleteLoading(true)
+  setError('')
+
+  try {
+    await deleteAccount(deletePassword)
+    // Account deleted successfully, user will be logged out automatically
+    // Navigate to home page or login page
+    navigate('/')
+  } catch (err: any) {
+    setError(err.message || 'Failed to delete account')
+    setDeleteLoading(false)
+  }
+}
+
 const cancelEdit = () => {
   setFormData({
     firstName: user?.firstName || '',
@@ -112,6 +143,20 @@ const cancelEdit = () => {
   setIsEditing(false)
   setError('')
   setSuccess('')
+}
+
+const openDeleteModal = () => {
+  setShowDeleteModal(true)
+  setDeleteConfirmationText('')
+  setDeletePassword('')
+  setError('')
+}
+
+const closeDeleteModal = () => {
+  setShowDeleteModal(false)
+  setDeleteConfirmationText('')
+  setDeletePassword('')
+  setError('')
 }
 
   if (!user) {
@@ -164,12 +209,21 @@ const cancelEdit = () => {
           <div>
             <div className={styles.cardHeader}>
               <h3 className={styles.cardTitle}>Profile Information</h3>
-              <button 
-                onClick={() => setIsEditing(true)}
-                className={styles.editButton}
-              >
-                Edit Profile
-              </button>
+              <div className={styles.headerActions}>
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className={styles.editButton}
+                >
+                  Edit Profile
+                </button>
+                <button 
+                  onClick={openDeleteModal}
+                  className={styles.deleteAccountButton}
+                >
+                  <Trash2 size={16} />
+                  Delete Account
+                </button>
+              </div>
             </div>
 
             <div className={styles.profileGrid}>
@@ -447,6 +501,95 @@ const cancelEdit = () => {
               >
                 {loading && <span className={styles.spinner}></span>}
                 {loading ? 'Confirming...' : 'Confirm Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account Modal */}
+      {showDeleteModal && (
+        <div className={styles.modalOverlay}>
+          <div className={`${styles.modal} ${styles.deleteModal}`}>
+            <div className={styles.deleteModalHeader}>
+              <AlertTriangle className={styles.warningIcon} size={24} />
+              <h3 className={styles.modalTitle}>Delete Account</h3>
+            </div>
+            
+            <div className={styles.deleteWarning}>
+              <p className={styles.modalText}>
+                <strong>This action cannot be undone.</strong> This will permanently delete your account and remove all associated data including:
+              </p>
+              <ul className={styles.deleteWarningList}>
+                <li>Your profile information</li>
+                <li>All your posts and comments</li>
+                <li>Your activity history</li>
+                <li>Any uploaded files or documents</li>
+                <li>All related data across the platform</li>
+              </ul>
+            </div>
+            
+            {error && (
+              <div className={styles.errorContainer}>
+                <span className={styles.errorText}>{error}</span>
+              </div>
+            )}
+            
+            <div className={styles.modalInputGroup}>
+              <label htmlFor="deleteConfirmation" className={styles.fieldLabel}>
+                Type "DELETE MY ACCOUNT" to confirm:
+              </label>
+              <input
+                type="text"
+                id="deleteConfirmation"
+                value={deleteConfirmationText}
+                onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                className={styles.formInput}
+                placeholder="DELETE MY ACCOUNT"
+              />
+            </div>
+
+            <div className={styles.modalInputGroup}>
+              <label htmlFor="deletePassword" className={styles.fieldLabel}>
+                Current Password
+              </label>
+              <div className={styles.inputWrapper}>
+                <input
+                  type={showDeletePassword ? 'text' : 'password'}
+                  id="deletePassword"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  className={styles.formInput}
+                  placeholder="Enter your current password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowDeletePassword(!showDeletePassword)}
+                  className={styles.passwordToggle}
+                  tabIndex={-1}
+                >
+                  {showDeletePassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.modalActions}>
+              <button 
+                type="button"
+                onClick={closeDeleteModal}
+                className={styles.cancelButton}
+                disabled={deleteLoading}
+              >
+                Cancel
+              </button>
+              <button 
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deleteLoading || deleteConfirmationText.toLowerCase() !== 'delete my account' || !deletePassword}
+                className={styles.deleteButton}
+              >
+                {deleteLoading && <span className={styles.spinner}></span>}
+                {deleteLoading ? 'Deleting...' : 'Delete Account'}
               </button>
             </div>
           </div>
