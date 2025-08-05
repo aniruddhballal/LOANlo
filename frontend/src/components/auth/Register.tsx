@@ -76,6 +76,14 @@ const Register = () => {
     handleSubmit()
   }
 
+  // Handle Enter key press on form inputs
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSubmit()
+    }
+  }
+
   const isPasswordMatch = formData.confirmPassword && formData.password === formData.confirmPassword
   const isPasswordMismatch = formData.confirmPassword && formData.password !== formData.confirmPassword
 
@@ -128,6 +136,7 @@ const Register = () => {
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleChange}
+                      onKeyPress={handleKeyPress}
                       className="block w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
                       placeholder="Aditya"
                       required
@@ -149,6 +158,7 @@ const Register = () => {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleChange}
+                      onKeyPress={handleKeyPress}
                       className="block w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
                       placeholder="Kumar"
                       required
@@ -172,6 +182,7 @@ const Register = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
+                    onKeyPress={handleKeyPress}
                     className="block w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
                     placeholder="aditya.kumar@example.com"
                     required
@@ -194,6 +205,7 @@ const Register = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
+                    onKeyPress={handleKeyPress}
                     className="block w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
                     placeholder="+91 98765 43210"
                   />
@@ -215,6 +227,7 @@ const Register = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
+                    onKeyPress={handleKeyPress}
                     className="block w-full pl-10 pr-12 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
                     placeholder="Create a strong password"
                     required
@@ -277,6 +290,7 @@ const Register = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
+                    onKeyPress={handleKeyPress}
                     className={`block w-full pl-10 pr-16 py-3 border-2 rounded-lg focus:ring-0 focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200 ${
                       isPasswordMatch 
                         ? 'border-green-500 focus:border-green-500' 
