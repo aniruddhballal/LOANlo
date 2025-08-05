@@ -121,12 +121,12 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Submit Button - Fixed styling to remove blue border */}
+              {/* Submit Button - Stylish minimalistic animation */}
               <button 
                 type="submit"
                 disabled={loading}
                 onClick={handleSubmit}
-                className="w-full flex items-center justify-center py-3 px-4 border-2 border-black rounded-lg text-white bg-black hover:bg-gray-900 font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
+                className="group relative w-full flex items-center justify-center py-3 px-4 border-2 border-black rounded-lg text-white bg-black font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden hover:shadow-lg"
                 style={{ 
                   outline: 'none !important',
                   boxShadow: 'none !important',
@@ -144,17 +144,28 @@ const Login = () => {
                   e.currentTarget.style.border = '2px solid black'
                 }}
               >
-                {loading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2"></div>
-                    Signing in...
-                  </>
-                ) : (
-                  <>
-                    Sign In
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-                  </>
-                )}
+                {/* Subtle slide effect background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-black translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                
+                {/* Button content */}
+                <div className="relative z-10 flex items-center justify-center">
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2"></div>
+                      <span className="tracking-wide">Signing in</span>
+                      <div className="ml-2 flex space-x-1">
+                        <div className="w-1 h-1 bg-white rounded-full animate-bounce"></div>
+                        <div className="w-1 h-1 bg-white rounded-full animate-bounce delay-100"></div>
+                        <div className="w-1 h-1 bg-white rounded-full animate-bounce delay-200"></div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span className="tracking-wide transition-all duration-300 group-hover:tracking-wider">Sign In</span>
+                      <ArrowRight className="ml-2 h-4 w-4 transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:scale-110" />
+                    </>
+                  )}
+                </div>
               </button>
             </div>
 
@@ -164,9 +175,11 @@ const Login = () => {
                 Don't have an account?{' '}
                 <a 
                   href="/register"
-                  className="text-blue-600 font-semibold hover:text-blue-700 hover:underline transition-all duration-200 focus:outline-none"
+                  className="relative text-black font-semibold transition-all duration-300 focus:outline-none group no-underline"
+                  style={{ color: 'black', textDecoration: 'none' }}
                 >
                   Create one here
+                  <span className="absolute left-0 bottom-[-2px] w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
                 </a>
               </p>
             </div>
