@@ -1,8 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
 import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, AlertCircle, Check } from 'lucide-react'
-import styles from './Register.module.css'
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -17,12 +14,9 @@ const Register = () => {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [focusedField, setFocusedField] = useState('')
   const [passwordStrength, setPasswordStrength] = useState(0)
- 
-  const { register } = useAuth()
   
-  const calculatePasswordStrength = (password: string) => {
+  const calculatePasswordStrength = (password: string): number => {
     let strength = 0
     if (password.length >= 6) strength += 1
     if (password.length >= 8) strength += 1
@@ -38,18 +32,18 @@ const Register = () => {
       ...formData,
       [name]: value
     })
-    
+  
     if (name === 'password') {
       setPasswordStrength(calculatePasswordStrength(value))
     }
-    
+  
     if (error) setError('')
   }
-  
-  const handleSubmit = async (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
-    
+  
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match')
       return
@@ -58,19 +52,16 @@ const Register = () => {
       setError('Password must be at least 6 characters long')
       return
     }
-    
+  
     setLoading(true)
     try {
-      await register({
-        email: formData.email,
-        password: formData.password,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone
-      })
-    } catch (err: any) {
-      setError(err.message || 'Registration failed')
-    } finally {
+      // Simulate API call
+      setTimeout(() => {
+        console.log('Registration successful:', formData)
+        setLoading(false)
+      }, 2000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed')
       setLoading(false)
     }
   }
@@ -78,222 +69,286 @@ const Register = () => {
   const isPasswordMatch = formData.confirmPassword && formData.password === formData.confirmPassword
 
   return (
-    <div className={styles.container}>
+    <div className="min-h-screen bg-white flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated background elements */}
-      <div className={styles.backgroundAnimation}>
-        <div className={styles.blob1}></div>
-        <div className={styles.blob2}></div>
-        <div className={styles.blob3}></div>
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gray-50 rounded-full blur-3xl animate-pulse opacity-30"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gray-100 rounded-full blur-3xl animate-pulse delay-1000 opacity-40"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gray-50 rounded-full blur-3xl animate-pulse delay-500 opacity-20"></div>
       </div>
       
-      {/* Main container */}
-      <div className={styles.mainCard}>
-        {/* Logo/Header */}
-        <div className={styles.header}>
-          <h1 className={styles.logo}>LOANalo</h1>
-          <p className={styles.subtitle}>Loan Origination System</p>
+      <div className="w-full max-w-2xl relative z-10">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-5xl font-bold text-black mb-3 tracking-tight">LOANalo</h1>
+          <p className="text-gray-700 text-lg font-medium">Loan Origination System</p>
         </div>
         
-        {/* Glass card */}
-        <div className={styles.glassCard}>
-          <div className={styles.cardHeader}>
-            <h2 className={styles.title}>Create Account</h2>
-            <p className={styles.description}>Join us and start your loan journey</p>
-          </div>
-          
-          {/* Error display */}
-          {error && (
-            <div className={styles.errorContainer}>
-              <AlertCircle className={styles.errorIcon} />
-              <span className={styles.errorText}>{error}</span>
+        {/* Register Card */}
+        <div className="bg-white rounded-2xl border-2 border-black shadow-2xl">
+          <div className="p-8">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-black mb-2">Create Account</h2>
+              <p className="text-gray-600">Join us and start your loan journey</p>
             </div>
-          )}
-          
-          <form onSubmit={handleSubmit} className={styles.form}>
-            {/* Name Fields Row */}
-            <div className={styles.nameRow}>
-              <div className={styles.inputGroup}>
-                <label htmlFor="firstName" className={styles.label}>First Name</label>
-                <div className={`${styles.inputWrapper} ${focusedField === 'firstName' ? styles.focused : ''}`}>
-                  <User className={styles.inputIcon} />
-                  <input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    onFocus={() => setFocusedField('firstName')}
-                    onBlur={() => setFocusedField('')}
-                    className={styles.input}
-                    placeholder="Aditya"
-                    required
-                  />
-                </div>
+            
+            {/* Error Alert */}
+            {error && (
+              <div className="mb-6 p-4 rounded-lg border-2 border-black bg-gray-50 flex items-start space-x-3">
+                <AlertCircle className="h-5 w-5 text-black flex-shrink-0 mt-0.5" />
+                <div className="text-black font-medium text-sm">{error}</div>
               </div>
-
-              <div className={styles.inputGroup}>
-                <label htmlFor="lastName" className={styles.label}>Last Name</label>
-                <div className={`${styles.inputWrapper} ${focusedField === 'lastName' ? styles.focused : ''}`}>
-                  <User className={styles.inputIcon} />
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    onFocus={() => setFocusedField('lastName')}
-                    onBlur={() => setFocusedField('')}
-                    className={styles.input}
-                    placeholder="Kumar"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Email Field */}
-            <div className={styles.inputGroup}>
-              <label htmlFor="email" className={styles.label}>Email Address</label>
-              <div className={`${styles.inputWrapper} ${focusedField === 'email' ? styles.focused : ''}`}>
-                <Mail className={styles.inputIcon} />
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  onFocus={() => setFocusedField('email')}
-                  onBlur={() => setFocusedField('')}
-                  className={styles.input}
-                  placeholder="aditya.kumar@example.com"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Phone Field */}
-            <div className={styles.inputGroup}>
-              <label htmlFor="phone" className={styles.label}>Phone Number <span className={styles.optional}>(Optional)</span></label>
-              <div className={`${styles.inputWrapper} ${focusedField === 'phone' ? styles.focused : ''}`}>
-                <Phone className={styles.inputIcon} />
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  onFocus={() => setFocusedField('phone')}
-                  onBlur={() => setFocusedField('')}
-                  className={styles.input}
-                  placeholder="+91 98765 43210"
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div className={styles.inputGroup}>
-              <label htmlFor="password" className={styles.label}>Password</label>
-              <div className={`${styles.inputWrapper} ${focusedField === 'password' ? styles.focused : ''}`}>
-                <Lock className={styles.inputIcon} />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  onFocus={() => setFocusedField('password')}
-                  onBlur={() => setFocusedField('')}
-                  className={styles.input}
-                  placeholder="Create a strong password"
-                  required
-                  minLength={6}
-                />
-                <div className={styles.passwordActions}>
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className={styles.passwordToggle}
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </div>
-              {/* Password Strength Indicator */}
-              {formData.password && (
-                <div className={styles.passwordStrength}>
-                  <div className={styles.strengthBars}>
-                    {[1, 2, 3, 4, 5].map((level) => (
-                      <div
-                        key={level}
-                        className={`${styles.strengthBar} ${
-                          passwordStrength >= level ? styles.active : ''
-                        } ${
-                          passwordStrength >= 4 ? styles.strong : 
-                          passwordStrength >= 2 ? styles.medium : styles.weak
-                        }`}
-                      />
-                    ))}
+            )}
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Name Fields Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-semibold text-black mb-2">
+                    First Name
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="h-5 w-5 text-gray-500" />
+                    </div>
+                    <input
+                      type="text"
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      className="block w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
+                      placeholder="Aditya"
+                      required
+                    />
                   </div>
-                  <span className={styles.strengthText}>
-                    {passwordStrength >= 4 ? 'Strong' : 
-                     passwordStrength >= 2 ? 'Medium' : 'Weak'}
-                  </span>
                 </div>
-              )}
-            </div>
 
-            {/* Confirm Password Field */}
-            <div className={styles.inputGroup}>
-              <label htmlFor="confirmPassword" className={styles.label}>Confirm Password</label>
-              <div className={`${styles.inputWrapper} ${focusedField === 'confirmPassword' ? styles.focused : ''} ${isPasswordMatch ? styles.success : ''}`}>
-                <Lock className={styles.inputIcon} />
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  onFocus={() => setFocusedField('confirmPassword')}
-                  onBlur={() => setFocusedField('')}
-                  className={styles.input}
-                  placeholder="Confirm your password"
-                  required
-                />
-                <div className={styles.passwordActions}>
-                  {isPasswordMatch && <Check className={styles.successIcon} size={20} />}
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className={styles.passwordToggle}
-                  >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-semibold text-black mb-2">
+                    Last Name
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="h-5 w-5 text-gray-500" />
+                    </div>
+                    <input
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      className="block w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
+                      placeholder="Kumar"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
+
+              {/* Email Field */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold text-black mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-gray-500" />
+                  </div>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="block w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
+                    placeholder="aditya.kumar@example.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Phone Field */}
+              <div>
+                <label htmlFor="phone" className="block text-sm font-semibold text-black mb-2">
+                  Phone Number <span className="text-gray-500 font-normal">(Optional)</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Phone className="h-5 w-5 text-gray-500" />
+                  </div>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="block w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
+                    placeholder="+91 98765 43210"
+                  />
+                </div>
+              </div>
+
+              {/* Password Field */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-semibold text-black mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-500" />
+                  </div>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="block w-full pl-10 pr-12 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
+                    placeholder="Create a strong password"
+                    required
+                    minLength={6}
+                  />
+                  <div
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-500 hover:text-black transition-colors duration-200" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-500 hover:text-black transition-colors duration-200" />
+                    )}
+                  </div>
+                </div>
+                
+                {/* Password Strength Indicator */}
+                {formData.password && (
+                  <div className="mt-2">
+                    <div className="flex space-x-1 mb-1">
+                      {[1, 2, 3, 4, 5].map((level) => (
+                        <div
+                          key={level}
+                          className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                            passwordStrength >= level 
+                              ? passwordStrength >= 4 
+                                ? 'bg-green-500' 
+                                : passwordStrength >= 2 
+                                ? 'bg-yellow-500' 
+                                : 'bg-red-500'
+                              : 'bg-gray-200'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className={`text-xs font-medium ${
+                      passwordStrength >= 4 ? 'text-green-600' : 
+                      passwordStrength >= 2 ? 'text-yellow-600' : 'text-red-600'
+                    }`}>
+                      {passwordStrength >= 4 ? 'Strong' : 
+                       passwordStrength >= 2 ? 'Medium' : 'Weak'}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Confirm Password Field */}
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-black mb-2">
+                  Confirm Password
+                </label>
+                <div className={`relative ${isPasswordMatch ? 'ring-2 ring-green-500 rounded-lg' : ''}`}>
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-500" />
+                  </div>
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="block w-full pl-10 pr-16 py-3 border-2 border-gray-300 rounded-lg focus:ring-0 focus:border-black focus:outline-none bg-white text-black placeholder-gray-500 transition-all duration-200"
+                    placeholder="Confirm your password"
+                    required
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center space-x-2">
+                    {isPasswordMatch && (
+                      <Check className="h-5 w-5 text-green-500" />
+                    )}
+                    <div
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="cursor-pointer focus:outline-none"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-500 hover:text-black transition-colors duration-200" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-500 hover:text-black transition-colors duration-200" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button 
+                type="submit"
+                disabled={loading}
+                className="group relative w-full flex items-center justify-center py-3 px-4 border-2 border-black rounded-lg text-white bg-black font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden hover:shadow-lg"
+                style={{ 
+                  outline: 'none !important',
+                  boxShadow: 'none !important',
+                  WebkitTapHighlightColor: 'transparent'
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.outline = 'none'
+                  e.currentTarget.style.boxShadow = 'none'
+                  e.currentTarget.style.border = '2px solid black'
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.border = '2px solid black'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.border = '2px solid black'
+                }}
+              >
+                {/* Subtle slide effect background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-black translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                
+                {/* Button content */}
+                <div className="relative z-10 flex items-center justify-center">
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2"></div>
+                      <span className="tracking-wide">Creating Account</span>
+                      <div className="ml-2 flex space-x-1">
+                        <div className="w-1 h-1 bg-white rounded-full animate-bounce"></div>
+                        <div className="w-1 h-1 bg-white rounded-full animate-bounce delay-100"></div>
+                        <div className="w-1 h-1 bg-white rounded-full animate-bounce delay-200"></div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span className="tracking-wide transition-all duration-300 group-hover:tracking-wider">Create Account</span>
+                      <ArrowRight className="ml-2 h-4 w-4 transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:scale-110" />
+                    </>
+                  )}
+                </div>
+              </button>
+            </form>
+
+            {/* Login Link */}
+            <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+              <p className="text-gray-600 text-sm">
+                Already have an account?{' '}
+                <a 
+                  href="/login"
+                  className="relative text-black font-semibold transition-all duration-300 focus:outline-none group no-underline"
+                  style={{ color: 'black', textDecoration: 'none' }}
+                >
+                  Sign in here
+                  <span className="absolute left-0 bottom-[-2px] w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                </a>
+              </p>
             </div>
-
-            {/* Submit Button */}
-            <button 
-              type="submit" 
-              disabled={loading}
-              className={`${styles.submitButton} ${loading ? styles.loading : ''}`}
-            >
-              <span className={styles.buttonText}>
-                {loading ? 'Creating Account...' : 'Create Account'}
-              </span>
-              {!loading && <ArrowRight className={styles.buttonIcon} />}
-              {loading && <div className={styles.spinner}></div>}
-            </button>
-          </form>
-
-          {/* Login Link */}
-          <div className={styles.footer}>
-            <p className={styles.footerText}>
-              Already have an account?{' '}
-              <Link to="/login" className={styles.link}>
-                Sign in here
-              </Link>
-            </p>
           </div>
         </div>
       </div>
