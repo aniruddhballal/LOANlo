@@ -376,8 +376,7 @@ const Profile = () => {
                         value={formData[name as keyof typeof formData]}
                         onChange={handleChange}
                         required={required}
-                        className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm hover:shadow-md font-medium"
-                        placeholder={`Enter your ${label.toLowerCase()}${!required ? ' (optional)' : ''}`}
+                        className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-black transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm hover:shadow-md font-medium"                        placeholder={`Enter your ${label.toLowerCase()}${!required ? ' (optional)' : ''}`}
                       />
                     </div>
                   ))}
@@ -452,7 +451,7 @@ const Profile = () => {
                   id="confirmationPassword"
                   value={confirmationPassword}
                   onChange={(e) => setConfirmationPassword(e.target.value)}
-                  className="w-full px-5 py-4 pr-14 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
+                  className="w-full px-5 py-4 pr-14 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-black transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
                   placeholder="Enter your current password"
                   autoFocus
                 />
@@ -553,7 +552,7 @@ const Profile = () => {
                   id="deleteConfirmation"
                   value={deleteConfirmationText}
                   onChange={(e) => setDeleteConfirmationText(e.target.value)}
-                  className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
+                  className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-red-600 transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
                   placeholder="DELETE MY ACCOUNT"
                 />
               </div>
@@ -568,7 +567,7 @@ const Profile = () => {
                     id="deletePassword"
                     value={deletePassword}
                     onChange={(e) => setDeletePassword(e.target.value)}
-                    className="w-full px-5 py-4 pr-14 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
+                    className="w-full px-5 py-4 pr-14 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-red-600 transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
                     placeholder="Enter your current password"
                   />
                   <button
