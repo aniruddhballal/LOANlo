@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import styles from './dashboard.module.css'
 
 interface LoanApplication {
   _id: string
@@ -17,7 +16,7 @@ const Dashboard = () => {
   const [applications, setApplications] = useState<LoanApplication[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [hasKYC, setHasKYC] = useState<boolean | null>(null) // <-- Add this
+  const [hasKYC, setHasKYC] = useState<boolean | null>(null)
 
   useEffect(() => {
     fetchApplications()
@@ -50,6 +49,7 @@ const Dashboard = () => {
       setHasKYC(false) // Default to false if there's an error
     }
   }
+
   const fetchApplications = async () => {
     try {
       const token = localStorage.getItem('token')
@@ -75,144 +75,172 @@ const Dashboard = () => {
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'approved': return styles.statusApproved
-      case 'rejected': return styles.statusRejected
-      case 'under_review': return styles.statusUnderReview
-      default: return styles.statusPending
+      case 'approved': return 'bg-white text-black border border-black'
+      case 'rejected': return 'bg-black text-white border border-black'
+      case 'under_review': return 'bg-gray-200 text-black border border-gray-400'
+      default: return 'bg-gray-100 text-gray-700 border border-gray-300'
     }
   }
 
   return (
-    <div className={styles.container}>
+    <div className="min-h-screen bg-white relative overflow-hidden">
       {/* Animated Background */}
-      <div className={styles.backgroundAnimation}>
-        <div className={styles.blob1}></div>
-        <div className={styles.blob2}></div>
-        <div className={styles.blob3}></div>
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-10 left-10 w-64 h-64 bg-gray-100 rounded-full opacity-30 animate-pulse"></div>
+        <div className="absolute top-1/2 right-10 w-96 h-96 bg-gray-200 rounded-full opacity-20 animate-pulse delay-150"></div>
+        <div className="absolute bottom-10 left-1/2 w-48 h-48 bg-gray-150 rounded-full opacity-25 animate-pulse delay-300"></div>
       </div>
 
       {/* Header Section */}
-      <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <h1>Dashboard</h1>
-          <p className={styles.welcomeText}>Welcome, {user?.firstName} {user?.lastName}</p>
+      <header className="relative z-10 bg-white border-b border-black px-6 py-8">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold text-black mb-2">Dashboard</h1>
+            <p className="text-lg text-gray-600">Welcome, {user?.firstName} {user?.lastName}</p>
+          </div>
+          <nav className="flex items-center space-x-4">
+            <Link 
+              to="/profile" 
+              className="px-4 py-2 text-black hover:bg-black hover:text-white border border-black transition-colors duration-200"
+            >
+              Profile
+            </Link>
+            <button 
+              onClick={logout} 
+              className="px-4 py-2 bg-black text-white hover:bg-white hover:text-black border border-black transition-colors duration-200"
+            >
+              Logout
+            </button>
+          </nav>
         </div>
-        <nav className={styles.navigation}>
-          <Link to="/profile" className={styles.navLink}>Profile</Link>
-          <button onClick={logout} className={styles.logoutButton}>Logout</button>
-        </nav>
       </header>
 
-      {/* Quick Actions Section */}
-      <div className={styles.quickActions}>
-        <h2 className={styles.sectionTitle}>Quick Actions</h2>
-        <div className={styles.actionButtons}>
-          {/* Show Fill KYC only if hasKYC === false */}
-          {hasKYC === false && (
-            <>
-            <h2 className={styles.sectionSubTitle}>Kindly Fill KYC to apply for a loan</h2>
-
-            <Link to="/kyc" className={styles.actionButton}>
-              Fill User KYC
-            </Link>
-            </>
-            
-          )}
-          {hasKYC === true && (
-            <>
-              <Link to="/kyc" className={`${styles.actionButton} ${styles.primaryAction}`}>
-                Apply for New Loan
-              </Link>
-              <Link to="/application-status" className={styles.actionButton}>
-                View All Applications
-              </Link>
-            </> 
-          )}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
+        {/* Quick Actions Section */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-black mb-6">Quick Actions</h2>
+          <div className="flex flex-wrap gap-4">
+            {/* Show Fill KYC only if hasKYC === false */}
+            {hasKYC === false && (
+              <div className="w-full">
+                <h3 className="text-xl font-semibold text-black mb-4">Kindly Fill KYC to apply for a loan</h3>
+                <Link 
+                  to="/kyc" 
+                  className="inline-block px-8 py-4 bg-black text-white hover:bg-white hover:text-black border-2 border-black transition-colors duration-200 font-semibold"
+                >
+                  Fill User KYC
+                </Link>
+              </div>
+            )}
+            {hasKYC === true && (
+              <>
+                <Link 
+                  to="/kyc" 
+                  className="px-8 py-4 bg-black text-white hover:bg-white hover:text-black border-2 border-black transition-colors duration-200 font-semibold"
+                >
+                  Apply for New Loan
+                </Link>
+                <Link 
+                  to="/application-status" 
+                  className="px-8 py-4 bg-white text-black hover:bg-black hover:text-white border-2 border-black transition-colors duration-200 font-semibold"
+                >
+                  View All Applications
+                </Link>
+              </>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Applications Section */}
-      {hasKYC === true && (
-        <div className={styles.applicationsSection}>
-          <div className={styles.glassCard}>
-            <h2 className={styles.sectionTitle}>Recent Applications</h2>
+        {/* Applications Section */}
+        {hasKYC === true && (
+          <div className="bg-white border-2 border-black p-8">
+            <h2 className="text-2xl font-bold text-black mb-6">Recent Applications</h2>
             
-            {loading && <p className={styles.loadingText}>Loading applications...</p>}
+            {loading && <p className="text-gray-600 text-center py-8">Loading applications...</p>}
             
             {error && (
-              <div className={styles.errorContainer}>
-                <span className={styles.errorText}>{error}</span>
+              <div className="bg-red-50 border border-red-200 p-4 mb-6">
+                <span className="text-red-800">{error}</span>
               </div>
             )}
 
             {!loading && applications.length === 0 && (
-              <div className={styles.emptyState}>
-                No loan applications found.{' '}
-                <Link to="/kyc" className={styles.emptyStateLink}>
+              <div className="text-center py-12">
+                <p className="text-gray-600 mb-4">No loan applications found.</p>
+                <Link 
+                  to="/kyc" 
+                  className="text-black hover:underline font-semibold"
+                >
                   Apply for your first loan
                 </Link>
               </div>
             )}
 
             {!loading && applications.length > 0 && (
-              <table className={styles.applicationsTable}>
-                <thead className={styles.tableHeader}>
-                  <tr>
-                    <th className={styles.tableHeaderCell}>Application ID</th>
-                    <th className={styles.tableHeaderCell}>Loan Type</th>
-                    <th className={styles.tableHeaderCell}>Amount</th>
-                    <th className={styles.tableHeaderCell}>Status</th>
-                    <th className={styles.tableHeaderCell}>Applied Date</th>
-                    <th className={styles.tableHeaderCell}>Documents</th>
-                    <th className={styles.tableHeaderCell}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {applications.map((app) => (
-                    <tr key={app._id} className={styles.tableRow}>
-                      <td className={styles.tableCell}>
-                        <span className={styles.applicationId}>
-                          {app._id.slice(-6)}
-                        </span>
-                      </td>
-                      <td className={`${styles.tableCell} ${styles.loanType}`}>
-                        {app.loanType}
-                      </td>
-                      <td className={`${styles.tableCell} ${styles.amount}`}>
-                        ₹{app.amount.toLocaleString()}
-                      </td>
-                      <td className={styles.tableCell}>
-                        <span className={`${styles.status} ${getStatusClass(app.status)}`}>
-                          {app.status.replace('_', ' ')}
-                        </span>
-                      </td>
-                      <td className={styles.tableCell}>
-                        {new Date(app.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className={styles.tableCell}>
-                        <div className={styles.documentsStatus}>
-                          {app.documentsUploaded ? (
-                            <span className={styles.documentsUploaded}>✓ Uploaded</span>
-                          ) : (
-                            <span className={styles.documentsPending}>✗ Pending</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className={styles.tableCell}>
-                        {!app.documentsUploaded && (
-                          <Link to={`/upload-documents/${app._id}`} className={styles.uploadButton}>
-                            Upload Documents
-                          </Link>
-                        )}
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b-2 border-black">
+                      <th className="text-left py-4 px-4 font-bold text-black">Application ID</th>
+                      <th className="text-left py-4 px-4 font-bold text-black">Loan Type</th>
+                      <th className="text-left py-4 px-4 font-bold text-black">Amount</th>
+                      <th className="text-left py-4 px-4 font-bold text-black">Status</th>
+                      <th className="text-left py-4 px-4 font-bold text-black">Applied Date</th>
+                      <th className="text-left py-4 px-4 font-bold text-black">Documents</th>
+                      <th className="text-left py-4 px-4 font-bold text-black">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {applications.map((app, index) => (
+                      <tr 
+                        key={app._id} 
+                        className={`border-b border-gray-200 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
+                      >
+                        <td className="py-4 px-4">
+                          <span className="font-mono text-sm bg-gray-100 px-2 py-1 border">
+                            {app._id.slice(-6)}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 font-semibold text-black">
+                          {app.loanType}
+                        </td>
+                        <td className="py-4 px-4 font-bold text-black">
+                          ₹{app.amount.toLocaleString()}
+                        </td>
+                        <td className="py-4 px-4">
+                          <span className={`px-3 py-1 text-sm font-semibold ${getStatusClass(app.status)}`}>
+                            {app.status.replace('_', ' ')}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-gray-700">
+                          {new Date(app.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="py-4 px-4">
+                          {app.documentsUploaded ? (
+                            <span className="text-black font-semibold">✓ Uploaded</span>
+                          ) : (
+                            <span className="text-gray-500">✗ Pending</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-4">
+                          {!app.documentsUploaded && (
+                            <Link 
+                              to={`/upload-documents/${app._id}`} 
+                              className="px-4 py-2 bg-white text-black border border-black hover:bg-black hover:text-white transition-colors duration-200 text-sm font-semibold"
+                            >
+                              Upload Documents
+                            </Link>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
