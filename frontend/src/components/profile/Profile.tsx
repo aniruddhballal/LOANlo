@@ -172,72 +172,100 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
-          <p className="text-gray-700 text-lg">Loading...</p>
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-black mx-auto mb-6"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-gray-100"></div>
+          </div>
+          <p className="text-gray-700 text-lg font-medium tracking-wide">Loading Profile...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Elegant Header with Shadow */}
+      <div className="bg-white shadow-xl border-b border-gray-200 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <User className="h-6 w-6 text-black" />
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl shadow-inner border border-gray-300">
+                <User className="h-7 w-7 text-black" />
               </div>
-              <h1 className="text-3xl font-bold text-black">Profile</h1>
+              <div>
+                <h1 className="text-4xl font-light text-black tracking-wide">Account Profile</h1>
+                <p className="text-gray-600 text-sm font-medium mt-1">Manage your personal information and settings</p>
+              </div>
             </div>
             <Link 
               to="/dashboard" 
-              className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black rounded-lg transition-colors duration-200"
+              className="inline-flex items-center space-x-3 px-6 py-3 bg-white hover:bg-gray-50 text-black rounded-xl border-2 border-gray-300 hover:border-gray-400 transition-all duration-300 shadow-sm hover:shadow-md font-medium"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Dashboard</span>
+              <span className="tracking-wide">Return to Dashboard</span>
             </Link>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Status Messages */}
+      <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
+        {/* Elegant Status Messages */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-lg flex items-center space-x-2 animate-fade-in">
-            <AlertTriangle className="h-5 w-5 flex-shrink-0" />
-            <span>{error}</span>
+          <div className="mb-8 bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-400 shadow-lg rounded-r-xl p-6 animate-fade-in">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <div className="p-2 bg-red-200 rounded-full">
+                  <AlertTriangle className="h-5 w-5 text-red-700" />
+                </div>
+              </div>
+              <div>
+                <p className="text-red-800 font-medium">{error}</p>
+              </div>
+            </div>
           </div>
         )}
 
         {success && (
-          <div className="mb-6 bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-lg animate-fade-in">
-            <span>{success}</span>
+          <div className="mb-8 bg-gradient-to-r from-emerald-50 to-emerald-100 border-l-4 border-emerald-400 shadow-lg rounded-r-xl p-6 animate-fade-in">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <div className="p-2 bg-emerald-200 rounded-full">
+                  <div className="h-5 w-5 bg-emerald-600 rounded-full flex items-center justify-center">
+                    <div className="h-2 w-2 bg-white rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <p className="text-emerald-800 font-medium">{success}</p>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Profile Card */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-300 overflow-hidden">
+        {/* Sophisticated Profile Card */}
+        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden backdrop-blur-sm">
           {!isEditing ? (
-            // View Mode
+            // Elegant View Mode
             <div>
-              <div className="px-6 py-4 bg-gray-100 border-b border-gray-300">
+              <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-semibold text-black">Profile Information</h3>
-                  <div className="flex items-center space-x-3">
+                  <div>
+                    <h2 className="text-2xl font-light text-black tracking-wide">Personal Information</h2>
+                    <p className="text-gray-600 text-sm mt-1">Your account details and preferences</p>
+                  </div>
+                  <div className="flex items-center space-x-4">
                     <button 
                       onClick={() => setIsEditing(true)}
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors duration-200"
+                      className="inline-flex items-center space-x-2 px-6 py-3 bg-black hover:bg-gray-800 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl font-medium tracking-wide"
                     >
                       <Edit3 className="h-4 w-4" />
                       <span>Edit Profile</span>
                     </button>
                     <button 
                       onClick={openDeleteModal}
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
+                      className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl font-medium tracking-wide"
                     >
                       <Trash2 className="h-4 w-4" />
                       <span>Delete Account</span>
@@ -246,83 +274,63 @@ const Profile = () => {
                 </div>
               </div>
 
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <User className="h-4 w-4" />
-                      <span>First Name</span>
-                    </label>
-                    <div className="text-black text-lg font-medium">
-                      {user.firstName}
+              <div className="p-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {[
+                    { icon: User, label: 'First Name', value: user.firstName, key: 'firstName' },
+                    { icon: User, label: 'Last Name', value: user.lastName, key: 'lastName' },
+                    { icon: Mail, label: 'Email Address', value: user.email, key: 'email' },
+                    { icon: Phone, label: 'Phone Number', value: user.phone || 'Not provided', key: 'phone' },
+                    { icon: Shield, label: 'Account Role', value: user.role.replace('_', ' '), key: 'role' },
+                    { icon: Hash, label: 'User Identifier', value: user.id, key: 'id' }
+                  ].map(({ icon: Icon, label, value, key }) => (
+                    <div key={key} className="group">
+                      <div className="p-6 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="flex items-center space-x-3 mb-3">
+                          <div className="p-2 bg-gray-200 rounded-lg group-hover:bg-gray-300 transition-colors duration-200">
+                            <Icon className="h-4 w-4 text-gray-700" />
+                          </div>
+                          <label className="text-sm font-semibold text-gray-600 uppercase tracking-widest">
+                            {label}
+                          </label>
+                        </div>
+                        <div className={`text-lg font-medium tracking-wide ${
+                          key === 'phone' && !user.phone 
+                            ? 'text-gray-500 italic' 
+                            : key === 'id' 
+                            ? 'text-gray-700 font-mono text-sm bg-gray-100 px-3 py-2 rounded-lg border' 
+                            : key === 'role'
+                            ? 'text-black'
+                            : 'text-black'
+                        }`}>
+                          {key === 'role' ? (
+                            <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-gray-200 to-gray-300 text-black border border-gray-300">
+                              {value.charAt(0).toUpperCase() + value.slice(1)}
+                            </span>
+                          ) : (
+                            value
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <User className="h-4 w-4" />
-                      <span>Last Name</span>
-                    </label>
-                    <div className="text-black text-lg font-medium">
-                      {user.lastName}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <Mail className="h-4 w-4" />
-                      <span>Email</span>
-                    </label>
-                    <div className="text-black text-lg font-medium">
-                      {user.email}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <Phone className="h-4 w-4" />
-                      <span>Phone</span>
-                    </label>
-                    <div className={`text-lg font-medium ${!user.phone ? 'text-gray-500 italic' : 'text-black'}`}>
-                      {user.phone || 'Not provided'}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <Shield className="h-4 w-4" />
-                      <span>Role</span>
-                    </label>
-                    <div className="text-black text-lg font-medium">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-200 text-black">
-                        {user.role.replace('_', ' ')}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <Hash className="h-4 w-4" />
-                      <span>User ID</span>
-                    </label>
-                    <div className="text-gray-700 text-sm font-mono bg-gray-100 px-3 py-2 rounded-lg">
-                      {user.id}
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
           ) : (
-            // Edit Mode
+            // Refined Edit Mode
             <form onSubmit={handleSubmit}>
-              <div className="px-6 py-4 bg-gray-100 border-b border-gray-300">
+              <div className="px-8 py-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-semibold text-black">Edit Profile</h3>
-                  <div className="flex items-center space-x-3">
+                  <div>
+                    <h2 className="text-2xl font-light text-black tracking-wide">Edit Profile</h2>
+                    <p className="text-gray-600 text-sm mt-1">Update your personal information</p>
+                  </div>
+                  <div className="flex items-center space-x-4">
                     <button 
                       type="button" 
                       onClick={cancelEdit}
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black rounded-lg transition-colors duration-200"
+                      className="inline-flex items-center space-x-2 px-6 py-3 bg-white hover:bg-gray-50 text-black rounded-xl border-2 border-gray-300 hover:border-gray-400 transition-all duration-300 shadow-sm font-medium tracking-wide"
                     >
                       <X className="h-4 w-4" />
                       <span>Cancel</span>
@@ -330,143 +338,78 @@ const Profile = () => {
                     <button 
                       type="submit" 
                       disabled={loading}
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200"
+                      className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl font-medium tracking-wide"
                     >
                       {loading ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
                       ) : (
                         <Save className="h-4 w-4" />
                       )}
-                      <span>{loading ? 'Saving...' : 'Save Changes'}</span>
+                      <span>{loading ? 'Saving Changes...' : 'Save Changes'}</span>
                     </button>
                   </div>
                 </div>
               </div>
 
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label htmlFor="firstName" className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <User className="h-4 w-4" />
-                      <span>First Name</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="firstName"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 text-black bg-white placeholder-gray-500"
-                      placeholder="Enter your first name"
-                    />
-                  </div>
+              <div className="p-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {[
+                    { name: 'firstName', label: 'First Name', icon: User, type: 'text', required: true },
+                    { name: 'lastName', label: 'Last Name', icon: User, type: 'text', required: true },
+                    { name: 'email', label: 'Email Address', icon: Mail, type: 'email', required: true },
+                    { name: 'phone', label: 'Phone Number', icon: Phone, type: 'tel', required: false },
+                    { name: 'newPassword', label: 'New Password', icon: Key, type: 'password', required: false },
+                    { name: 'confirmPassword', label: 'Confirm New Password', icon: Key, type: 'password', required: false }
+                  ].map(({ name, label, icon: Icon, type, required }) => (
+                    <div key={name} className="space-y-3">
+                      <label htmlFor={name} className="flex items-center space-x-3 text-sm font-semibold text-gray-600 uppercase tracking-widest">
+                        <div className="p-2 bg-gray-200 rounded-lg">
+                          <Icon className="h-4 w-4 text-gray-700" />
+                        </div>
+                        <span>{label}</span>
+                        {required && <span className="text-red-500">*</span>}
+                      </label>
+                      <input
+                        type={type}
+                        id={name}
+                        name={name}
+                        value={formData[name as keyof typeof formData]}
+                        onChange={handleChange}
+                        required={required}
+                        className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm hover:shadow-md font-medium"
+                        placeholder={`Enter your ${label.toLowerCase()}${!required ? ' (optional)' : ''}`}
+                      />
+                    </div>
+                  ))}
 
-                  <div className="space-y-2">
-                    <label htmlFor="lastName" className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <User className="h-4 w-4" />
-                      <span>Last Name</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="lastName"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 text-black bg-white placeholder-gray-500"
-                      placeholder="Enter your last name"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <Mail className="h-4 w-4" />
-                      <span>Email</span>
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 text-black bg-white placeholder-gray-500"
-                      placeholder="Enter your email address"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="phone" className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <Phone className="h-4 w-4" />
-                      <span>Phone</span>
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 text-black bg-white placeholder-gray-500"
-                      placeholder="Enter your phone number"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="newPassword" className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <Key className="h-4 w-4" />
-                      <span>New Password</span>
-                    </label>
-                    <input
-                      type="password"
-                      id="newPassword"
-                      name="newPassword"
-                      value={formData.newPassword}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 text-black bg-white placeholder-gray-500"
-                      placeholder="Enter new password (leave blank to keep current)"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <Key className="h-4 w-4" />
-                      <span>Confirm New Password</span>
-                    </label>
-                    <input
-                      type="password"
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 text-black bg-white placeholder-gray-500"
-                      placeholder="Re-enter new password"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <Shield className="h-4 w-4" />
-                      <span>Role</span>
+                  {/* Read-only fields */}
+                  <div className="space-y-3">
+                    <label className="flex items-center space-x-3 text-sm font-semibold text-gray-600 uppercase tracking-widest">
+                      <div className="p-2 bg-gray-200 rounded-lg">
+                        <Shield className="h-4 w-4 text-gray-700" />
+                      </div>
+                      <span>Account Role</span>
                     </label>
                     <input
                       type="text"
                       value={user.role.replace('_', ' ').toUpperCase()}
                       disabled
-                      className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg cursor-not-allowed"
+                      className="w-full px-5 py-4 border-2 border-gray-200 bg-gray-100 text-gray-600 rounded-xl cursor-not-allowed font-medium"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide flex items-center space-x-2">
-                      <Hash className="h-4 w-4" />
-                      <span>User ID</span>
+                  <div className="space-y-3">
+                    <label className="flex items-center space-x-3 text-sm font-semibold text-gray-600 uppercase tracking-widest">
+                      <div className="p-2 bg-gray-200 rounded-lg">
+                        <Hash className="h-4 w-4 text-gray-700" />
+                      </div>
+                      <span>User Identifier</span>
                     </label>
                     <input
                       type="text"
                       value={user.id}
                       disabled
-                      className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg cursor-not-allowed font-mono text-sm"
+                      className="w-full px-5 py-4 border-2 border-gray-200 bg-gray-100 text-gray-600 rounded-xl cursor-not-allowed font-mono text-sm"
                     />
                   </div>
                 </div>
@@ -476,24 +419,31 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Password Confirmation Modal */}
+      {/* Sophisticated Password Confirmation Modal */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-fade-in border border-gray-300">
-            <h3 className="text-xl font-semibold text-black mb-4">Confirm Changes</h3>
-            <p className="text-gray-700 mb-6">
-              Please enter your current password to confirm these changes:
-            </p>
+        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 animate-fade-in border border-gray-200">
+            <div className="text-center mb-6">
+              <div className="p-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <Shield className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="text-2xl font-light text-black tracking-wide">Confirm Changes</h3>
+              <p className="text-gray-600 mt-2 leading-relaxed">
+                Please verify your identity by entering your current password to proceed with these changes.
+              </p>
+            </div>
             
             {error && (
-              <div className="mb-4 bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-lg flex items-center space-x-2">
-                <AlertTriangle className="h-5 w-5 flex-shrink-0" />
-                <span>{error}</span>
+              <div className="mb-6 bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-400 p-4 rounded-r-lg">
+                <div className="flex items-center space-x-3">
+                  <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                  <span className="text-red-800 font-medium">{error}</span>
+                </div>
               </div>
             )}
             
-            <div className="mb-6">
-              <label htmlFor="confirmationPassword" className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="mb-8">
+              <label htmlFor="confirmationPassword" className="block text-sm font-semibold text-gray-600 uppercase tracking-widest mb-3">
                 Current Password
               </label>
               <div className="relative">
@@ -502,21 +452,21 @@ const Profile = () => {
                   id="confirmationPassword"
                   value={confirmationPassword}
                   onChange={(e) => setConfirmationPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 border border-gray-400 rounded-lg focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 text-black bg-white placeholder-gray-500"
+                  className="w-full px-5 py-4 pr-14 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
                   placeholder="Enter your current password"
                   autoFocus
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black transition-colors duration-200"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black transition-colors duration-200 p-1"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
 
-            <div className="flex space-x-3">
+            <div className="flex space-x-4">
               <button 
                 type="button"
                 onClick={() => {
@@ -524,7 +474,7 @@ const Profile = () => {
                   setConfirmationPassword('')
                   setError('')
                 }}
-                className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black rounded-lg transition-colors duration-200"
+                className="flex-1 px-6 py-3 bg-white hover:bg-gray-50 text-black rounded-xl border-2 border-gray-300 hover:border-gray-400 transition-all duration-300 shadow-sm font-medium tracking-wide"
               >
                 Cancel
               </button>
@@ -532,9 +482,9 @@ const Profile = () => {
                 type="button"
                 onClick={handlePasswordConfirmation}
                 disabled={loading}
-                className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl font-medium tracking-wide flex items-center justify-center space-x-2"
               >
-                {loading && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
+                {loading && <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>}
                 <span>{loading ? 'Confirming...' : 'Confirm Changes'}</span>
               </button>
             </div>
@@ -542,79 +492,101 @@ const Profile = () => {
         </div>
       )}
 
-      {/* Delete Account Modal */}
+      {/* Elegant Delete Account Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 animate-fade-in border border-gray-300">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="p-2 bg-red-100 rounded-full">
-                <AlertTriangle className="h-6 w-6 text-red-600" />
+        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 animate-fade-in border border-gray-200">
+            <div className="text-center mb-8">
+              <div className="p-4 bg-gradient-to-br from-red-100 to-red-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                <AlertTriangle className="h-10 w-10 text-red-600" />
               </div>
-              <h3 className="text-xl font-semibold text-black">Delete Account</h3>
+              <h3 className="text-3xl font-light text-black tracking-wide">Delete Account</h3>
+              <p className="text-gray-600 mt-2 leading-relaxed">
+                This action is permanent and cannot be undone
+              </p>
             </div>
             
-            <div className="mb-6">
-              <p className="text-gray-700 mb-4">
-                <strong>This action cannot be undone.</strong> This will permanently delete your account and remove all associated data including:
+            <div className="mb-8 p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+              <p className="text-gray-800 mb-4 font-medium">
+                <strong>Warning:</strong> Deleting your account will permanently remove:
               </p>
-              <ul className="text-gray-700 space-y-1 ml-4">
-                <li>• Your profile information</li>
-                <li>• All your posts and comments</li>
-                <li>• Your activity history</li>
-                <li>• Any uploaded files or documents</li>
-                <li>• All related data across the platform</li>
-              </ul>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-700">
+                <div className="flex items-center space-x-2">
+                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                  <span>Profile information</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                  <span>Posts and comments</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                  <span>Activity history</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                  <span>Uploaded files</span>
+                </div>
+                <div className="flex items-center space-x-2 md:col-span-2">
+                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                  <span>All associated platform data</span>
+                </div>
+              </div>
             </div>
             
             {error && (
-              <div className="mb-4 bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-lg flex items-center space-x-2">
-                <AlertTriangle className="h-5 w-5 flex-shrink-0" />
-                <span>{error}</span>
+              <div className="mb-6 bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-400 p-4 rounded-r-lg">
+                <div className="flex items-center space-x-3">
+                  <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                  <span className="text-red-800 font-medium">{error}</span>
+                </div>
               </div>
             )}
             
-            <div className="mb-4">
-              <label htmlFor="deleteConfirmation" className="block text-sm font-medium text-gray-700 mb-2">
-                Type "DELETE MY ACCOUNT" to confirm:
-              </label>
-              <input
-                type="text"
-                id="deleteConfirmation"
-                value={deleteConfirmationText}
-                onChange={(e) => setDeleteConfirmationText(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all duration-200 text-black bg-white placeholder-gray-500"
-                placeholder="DELETE MY ACCOUNT"
-              />
-            </div>
-
-            <div className="mb-6">
-              <label htmlFor="deletePassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Current Password
-              </label>
-              <div className="relative">
+            <div className="space-y-6">
+              <div>
+                <label htmlFor="deleteConfirmation" className="block text-sm font-semibold text-gray-600 uppercase tracking-widest mb-3">
+                  Type "DELETE MY ACCOUNT" to confirm:
+                </label>
                 <input
-                  type={showDeletePassword ? 'text' : 'password'}
-                  id="deletePassword"
-                  value={deletePassword}
-                  onChange={(e) => setDeletePassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all duration-200 text-black bg-white placeholder-gray-500"
-                  placeholder="Enter your current password"
+                  type="text"
+                  id="deleteConfirmation"
+                  value={deleteConfirmationText}
+                  onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                  className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
+                  placeholder="DELETE MY ACCOUNT"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowDeletePassword(!showDeletePassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black transition-colors duration-200"
-                >
-                  {showDeletePassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
+              </div>
+
+              <div>
+                <label htmlFor="deletePassword" className="block text-sm font-semibold text-gray-600 uppercase tracking-widest mb-3">
+                  Current Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showDeletePassword ? 'text' : 'password'}
+                    id="deletePassword"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    className="w-full px-5 py-4 pr-14 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
+                    placeholder="Enter your current password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowDeletePassword(!showDeletePassword)}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black transition-colors duration-200 p-1"
+                  >
+                    {showDeletePassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="flex space-x-3">
+            <div className="flex space-x-4 mt-8">
               <button 
                 type="button"
                 onClick={closeDeleteModal}
-                className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black rounded-lg transition-colors duration-200"
+                className="flex-1 px-6 py-3 bg-white hover:bg-gray-50 text-black rounded-xl border-2 border-gray-300 hover:border-gray-400 transition-all duration-300 shadow-sm font-medium tracking-wide"
                 disabled={deleteLoading}
               >
                 Cancel
