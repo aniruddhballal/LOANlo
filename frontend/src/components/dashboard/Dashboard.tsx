@@ -75,9 +75,10 @@ const Dashboard = () => {
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'approved': return 'bg-black text-white'
-      case 'rejected': return 'bg-gray-800 text-white'
-      case 'under_review': return 'bg-gray-600 text-white'
+      case 'approved': return 'bg-green-600 text-white'
+      case 'rejected': return 'bg-red-600 text-white'
+      case 'under_review': return 'bg-yellow-500 text-black'
+      case 'pending': return 'bg-yellow-500 text-black'
       default: return 'bg-gray-400 text-white'
     }
   }
@@ -129,7 +130,6 @@ const Dashboard = () => {
       </header>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
-  
         {/* KYC Status Card */}
         {hasKYC !== null && (
           <div className={`mb-8 rounded-2xl p-8 shadow-2xl backdrop-blur-xl border transition-all duration-200 hover:shadow-3xl ${
