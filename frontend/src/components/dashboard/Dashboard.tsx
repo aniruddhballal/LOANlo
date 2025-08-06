@@ -73,14 +73,59 @@ const Dashboard = () => {
     }
   }
 
-  const getStatusClass = (status: string) => {
+  const getStatusClasses = (status: string) => {
     switch (status) {
-      case 'approved': return 'bg-green-600 text-white'
-      case 'rejected': return 'bg-red-600 text-white'
-      case 'under_review': return 'bg-yellow-500 text-black'
-      case 'pending': return 'bg-yellow-500 text-black'
-      default: return 'bg-gray-400 text-white'
+      case 'approved': return 'bg-green-100 text-green-800 border-green-200'
+      case 'rejected': return 'bg-red-100 text-red-800 border-red-200'
+      case 'under_review': return 'bg-blue-100 text-blue-800 border-blue-200'
+      default: return 'bg-yellow-100 text-yellow-800 border-yellow-200'
     }
+  }
+
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case 'approved':
+      return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2"/>
+          <path d="M7 13l3 3 7-7" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      );
+    case 'rejected':
+      return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#ef4444" strokeWidth="2"/>
+          <path d="M15 9l-6 6M9 9l6 6" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round"/>
+        </svg>
+      );
+    case 'under_review':
+      return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#3b82f6" strokeWidth="2"/>
+          <circle cx="12" cy="12" r="4" stroke="#3b82f6" strokeWidth="2"/>
+          <circle cx="12" cy="12" r="1.5" fill="#3b82f6"/>
+        </svg>
+      );
+    case 'pending':
+      return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#f59e42" strokeWidth="2"/>
+          <path d="M12 7v5l3 3" stroke="#f59e42" strokeWidth="2.5" strokeLinecap="round"/>
+        </svg>
+      );
+    default:
+      return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#6b7280" strokeWidth="2"/>
+          <text x="12" y="16" textAnchor="middle" fontSize="12" fill="#6b7280">?</text>
+        </svg>
+      );
+  }
+};
+  
+
+  const formatStatus = (status: string) => {
+    return status.replace('_', ' ').toUpperCase()
   }
 
   const formatCurrency = (amount: number) => {
@@ -93,18 +138,12 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 relative">
-      {/* Subtle Background Elements */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-20 left-20 w-64 h-64 bg-white/30 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gray-100/40 rounded-full blur-3xl"></div>
-      </div>
 
-      {/* Header Section */}
-      <header className="relative z-10 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-6 py-8">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-6">
-            <div className="w-14 h-14 bg-black rounded-full flex items-center justify-center text-white font-bold text-xl shadow-2xl">
+      <div className="relative z-10 container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8 flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white font-bold text-lg">
               {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
             </div>
             <div>
@@ -112,43 +151,51 @@ const Dashboard = () => {
               <p className="text-lg text-gray-600">Welcome back, <span className="font-semibold text-black">{user?.firstName} {user?.lastName}</span></p>
             </div>
           </div>
-          <nav className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <Link 
               to="/profile" 
-              className="px-6 py-3 text-black hover:bg-black hover:text-white bg-white/80 backdrop-blur-sm border border-gray-300 transition-all duration-200 rounded-lg font-medium shadow-lg hover:shadow-xl"
+              className="px-4 py-2 text-sm font-medium text-black border border-black rounded hover:bg-black hover:text-white transition-colors"
             >
               Profile
             </Link>
             <button 
               onClick={logout} 
-              className="px-6 py-3 bg-black text-white hover:bg-gray-800 border border-black transition-all duration-200 rounded-lg font-medium shadow-lg hover:shadow-xl"
+              className="px-4 py-2 text-sm font-medium bg-black text-white rounded hover:bg-gray-800 transition-colors"
             >
               Logout
             </button>
-          </nav>
+          </div>
         </div>
-      </header>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
         {/* KYC Status Card */}
         {hasKYC !== null && (
-          <div className={`mb-8 rounded-2xl p-8 shadow-2xl backdrop-blur-xl border transition-all duration-200 hover:shadow-3xl ${
+          <div className={`mb-8 rounded-lg p-6 shadow-sm border ${
             hasKYC 
-              ? 'bg-black/90 text-white border-black/20' 
-              : 'bg-white/80 text-black border-gray-300/50'
+              ? 'bg-black text-white border-gray-200' 
+              : 'bg-white text-black border-gray-200'
           }`}>
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-6">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
-                  hasKYC ? 'bg-white/20 text-white' : 'bg-gray-100 text-black'
-                }`}>
-                  {hasKYC ? 'V' : 'K'}
-                </div>
+              <div className="flex items-center space-x-4">
+<div className="w-10 h-10 rounded-full flex items-center justify-center bg-black text-white">
+  {hasKYC ? (
+    // Professional Tick SVG
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M6 12.5L10.5 17L18 9.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ) : (
+    // Professional Exclamation SVG
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2"/>
+      <rect x="11" y="7" width="2" height="7" rx="1" fill="white"/>
+      <rect x="11" y="16" width="2" height="2" rx="1" fill="white"/>
+    </svg>
+  )}
+</div>
                 <div>
-                  <h3 className="text-2xl font-bold mb-2">
+                  <h3 className="text-xl font-semibold mb-1">
                     {hasKYC ? 'KYC Verified' : 'KYC Required'}
                   </h3>
-                  <p className={`text-lg ${hasKYC ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <p className={`text-sm ${hasKYC ? 'text-gray-300' : 'text-gray-600'}`}>
                     {hasKYC ? 'You can now apply for loans and access all features.' : 'Complete your KYC to unlock loan applications.'}
                   </p>
                 </div>
@@ -156,7 +203,7 @@ const Dashboard = () => {
               {!hasKYC && (
                 <Link 
                   to="/kyc" 
-                  className="px-8 py-4 bg-black text-white hover:bg-gray-800 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="px-6 py-2 bg-black text-white rounded font-medium hover:bg-gray-800 transition-colors"
                 >
                   Complete KYC
                 </Link>
@@ -166,130 +213,159 @@ const Dashboard = () => {
         )}
 
         {/* Quick Actions Section */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-bold text-black mb-8 tracking-tight">
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {hasKYC === true && (
-              <>
-                <Link 
-                  to="/kyc" 
-                  className="group bg-black/90 backdrop-blur-xl text-white p-6 rounded-xl shadow-lg hover:shadow-xl border border-black/20 transition-all duration-200"
-                >
-                  <h3 className="text-lg font-semibold mb-2 text-white">Apply for New Loan</h3>
-                  <p className="text-gray-300">
-                    Start a new loan application with competitive rates
-                  </p>
-                </Link>
-                <Link 
-                  to="/application-status" 
-                  className="group bg-white/80 backdrop-blur-xl text-black p-6 rounded-xl shadow-lg border border-gray-200/50 hover:shadow-xl transition-all duration-200"
-                >
-                  <h3 className="text-lg font-semibold mb-2 text-black">View All Applications</h3>
-                  <p className="text-gray-600">
-                    Track the status of all your loan applications
-                  </p>
-                </Link>
-              </>
-            )}
+        {hasKYC === true && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-black mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Link 
+                to="/kyc" 
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              >
+                <h3 className="text-lg font-semibold mb-2 text-black">Apply for New Loan</h3>
+                <p className="text-gray-600 text-sm">
+                  Start a new loan application with competitive rates
+                </p>
+              </Link>
+              <Link 
+                to="/application-status" 
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              >
+                <h3 className="text-lg font-semibold mb-2 text-black">View All Applications</h3>
+                <p className="text-gray-600 text-sm">
+                  Track the status of all your loan applications
+                </p>
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Applications Section */}
         {hasKYC === true && (
-          <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/30">
-            <h2 className="text-3xl font-bold text-black mb-8 tracking-tight">
-              Recent Applications
-            </h2>
-            
-            {loading && (
-              <div className="flex justify-center items-center py-16">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent"></div>
-                <span className="ml-4 text-black text-lg font-medium">Loading applications...</span>
-              </div>
-            )}
-            
-            {error && (
-              <div className="bg-gray-100/80 backdrop-blur-sm border border-gray-300 rounded-lg p-4 mb-6">
-                <div className="flex items-center">
-                  <span className="text-black font-semibold">{error}</span>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-semibold text-black">Recent Applications</h2>
+                <div className="px-3 py-1 bg-black text-white rounded-full text-sm font-medium">
+                  {applications.length} {applications.length === 1 ? 'Application' : 'Applications'}
                 </div>
               </div>
-            )}
+            </div>
+            
+            <div className="p-6">
+              {loading && (
+                <div className="flex justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-black"></div>
+                  <span className="ml-3 text-black font-medium">Loading applications...</span>
+                </div>
+              )}
+              
+              {error && (
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <span className="text-red-800 font-medium">{error}</span>
+                </div>
+              )}
 
-            {!loading && applications.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-gray-600 text-lg mb-4 font-medium">No loan applications found.</p>
-                <Link 
-                  to="/kyc" 
-                  className="inline-block px-6 py-3 bg-black text-white rounded-lg font-semibold shadow-lg hover:shadow-xl hover:bg-gray-800 transition-all duration-200"
-                >
-                  Apply for your first loan
-                </Link>
-              </div>
-            )}
-
-            {!loading && applications.length > 0 && (
-              <div className="space-y-4">
-                {applications.map((app) => (
-                  <div 
-                    key={app._id} 
-                    className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 hover:shadow-xl transition-all duration-200 p-6 hover:bg-white"
+              {!loading && applications.length === 0 && (
+                <div className="text-center py-8">
+                  <div className="mb-4">
+                    <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-600 mb-4">No loan applications found.</p>
+                  <Link 
+                    to="/kyc" 
+                    className="px-4 py-2 bg-black text-white rounded font-medium hover:bg-gray-800 transition-colors"
                   >
-                    <div className="flex flex-wrap items-center justify-between gap-4">
-                      <div className="flex items-center space-x-6 min-w-0 flex-1">
-                        <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center text-white font-bold flex-shrink-0">
-                          {app.status === 'approved' ? 'A' : app.status === 'rejected' ? 'R' : app.status === 'under_review' ? 'U' : 'P'}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center space-x-4 mb-2">
-                            <h3 className="font-bold text-black text-lg">{app.loanType}</h3>
-                            <span className={`px-4 py-2 text-sm font-bold rounded-lg ${getStatusClass(app.status)}`}>
-                              {app.status.replace('_', ' ').toUpperCase()}
-                            </span>
+                    Apply for your first loan
+                  </Link>
+                </div>
+              )}
+
+              {!loading && applications.length > 0 && (
+                <div className="space-y-4">
+                  {applications.map((app) => (
+                    <div 
+                      key={app._id} 
+                      className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-4">
+                        <div className="flex items-center space-x-4 min-w-0 flex-1">
+                          <div className="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                            {getStatusIcon(app.status)}
                           </div>
-                          <div className="flex items-center space-x-6 text-gray-600">
-                            <span className="font-bold text-2xl text-black">{formatCurrency(app.amount)}</span>
-                            <span className="text-sm bg-gray-100 px-3 py-1 rounded font-mono text-black">
-                              ID: {app._id.slice(-8)}
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              {new Date(app.createdAt).toLocaleDateString('en-IN')}
-                            </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <h3 className="font-semibold text-black">{app.loanType}</h3>
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold border ${getStatusClasses(app.status)}`}>
+                                {formatStatus(app.status)}
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-4 text-sm text-gray-600">
+                              <span className="font-semibold text-lg text-black">{formatCurrency(app.amount)}</span>
+                              <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs">
+                                ID: {app._id.slice(-8)}
+                              </span>
+                              <span>
+                                {new Date(app.createdAt).toLocaleDateString('en-IN')}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-6">
-                        <div className="text-center">
-                          {app.documentsUploaded ? (
-                            <div className="flex items-center text-black font-semibold">
-                              <span className="mr-2">Documents Uploaded</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-center text-gray-600 font-semibold">
-                              <span className="mr-2">Documents Pending</span>
-                            </div>
-                          )}
                         </div>
                         
-                        {!app.documentsUploaded && (
-                          <Link 
-                            to={`/upload-documents/${app._id}`} 
-                            className="px-6 py-3 bg-black text-white rounded-lg font-semibold shadow-lg hover:shadow-xl hover:bg-gray-800 transition-all duration-200"
-                          >
-                            Upload Documents
-                          </Link>
-                        )}
+                        <div className="flex items-center space-x-4">
+                          <div className="text-sm">
+                            {app.documentsUploaded ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                ✓ Complete
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                ✗ Pending
+                              </span>
+                            )}
+                          </div>
+                          
+                          {!app.documentsUploaded && (
+                            <Link 
+                              to={`/upload-documents/${app._id}`} 
+                              className="px-3 py-1 text-sm font-medium bg-black text-white rounded hover:bg-gray-800 transition-colors"
+                            >
+                              Upload Documents
+                            </Link>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                  
+                  {applications.length > 3 && (
+                    <div className="text-center pt-4 border-t border-gray-200">
+                      <Link 
+                        to="/application-status" 
+                        className="text-black font-medium hover:underline"
+                      >
+                        View All Applications →
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         )}
+
+        {/* Navigation */}
+        <div className="mt-8 flex justify-center">
+          {hasKYC === true && (
+            <Link 
+              to="/application-status" 
+              className="px-6 py-3 bg-black text-white rounded font-medium hover:bg-gray-800 transition-colors"
+            >
+              View All Applications
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   )
