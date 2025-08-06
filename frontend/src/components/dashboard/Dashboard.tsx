@@ -75,10 +75,10 @@ const Dashboard = () => {
 
   const getStatusClasses = (status: string) => {
     switch (status) {
-      case 'approved': return 'bg-green-100 text-green-800 border-green-200'
-      case 'rejected': return 'bg-red-100 text-red-800 border-red-200'
-      case 'under_review': return 'bg-blue-100 text-blue-800 border-blue-200'
-      default: return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'approved': return 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      case 'rejected': return 'bg-red-50 text-red-700 border-red-200'
+      case 'under_review': return 'bg-blue-50 text-blue-700 border-blue-200'
+      default: return 'bg-amber-50 text-amber-700 border-amber-200'
     }
   }
 
@@ -86,38 +86,38 @@ const Dashboard = () => {
     switch (status) {
       case 'approved':
         return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2"/>
-            <path d="M7 13l3 3 7-7" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-emerald-600">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M7 13l3 3 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         );
       case 'rejected':
         return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#ef4444" strokeWidth="2"/>
-            <path d="M15 9l-6 6M9 9l6 6" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-red-600">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
         );
       case 'under_review':
         return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#3b82f6" strokeWidth="2"/>
-            <circle cx="12" cy="12" r="4" stroke="#3b82f6" strokeWidth="2"/>
-            <circle cx="12" cy="12" r="1.5" fill="#3b82f6"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-blue-600">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+            <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5"/>
+            <circle cx="12" cy="12" r="1" fill="currentColor"/>
           </svg>
         );
       case 'pending':
         return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#f59e42" strokeWidth="2"/>
-            <path d="M12 7v5l3 3" stroke="#f59e42" strokeWidth="2.5" strokeLinecap="round"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-amber-600">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
         );
       default:
         return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#6b7280" strokeWidth="2"/>
-            <text x="12" y="16" textAnchor="middle" fontSize="12" fill="#6b7280">?</text>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-gray-500">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+            <text x="12" y="16" textAnchor="middle" fontSize="10" fill="currentColor">?</text>
           </svg>
         );
     }
@@ -136,235 +136,332 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 relative">
-
-      <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white font-bold text-lg">
-              {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-black mb-1 tracking-tight">Dashboard</h1>
-              <p className="text-lg text-gray-600">Welcome back, <span className="font-semibold text-black">{user?.firstName} {user?.lastName}</span></p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Link 
-              to="/profile" 
-              className="px-4 py-2 text-sm font-medium text-black border border-black rounded hover:bg-black hover:text-white transition-colors"
-            >
-              Profile
-            </Link>
-            <button 
-              onClick={logout} 
-              className="px-4 py-2 text-sm font-medium bg-black text-white rounded hover:bg-gray-800 transition-colors"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-
-        {/* KYC Status Card */}
-        {hasKYC !== null && (
-          <div className={`mb-8 rounded-lg p-6 shadow-sm border ${
-            hasKYC 
-              ? 'bg-black text-white border-gray-200' 
-              : 'bg-white text-black border-gray-200'
-          }`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-black text-white">
-                  {hasKYC ? (
-                    // Professional Tick SVG
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M6 12.5L10.5 17L18 9.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  ) : (
-                    // Professional Exclamation SVG
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2"/>
-                      <rect x="11" y="7" width="2" height="7" rx="1" fill="white"/>
-                      <rect x="11" y="16" width="2" height="2" rx="1" fill="white"/>
-                    </svg>
-                  )}
+    <div className="min-h-screen bg-slate-50">
+      {/* Subtle gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 opacity-60"></div>
+      
+      <div className="relative z-10">
+        {/* Header Section */}
+        <header className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-6">
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-semibold text-lg tracking-wider shadow-lg">
+                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white"></div>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-1">
-                    {hasKYC ? 'KYC Verified' : 'KYC Required'}
-                  </h3>
-                  <p className={`text-sm ${hasKYC ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {hasKYC ? 'You can now apply for loans and access all features.' : 'Complete your KYC to unlock loan applications.'}
+                  <h1 className="text-3xl font-light text-gray-900 mb-1 tracking-tight">
+                    Client Dashboard
+                  </h1>
+                  <p className="text-base text-gray-600 font-light">
+                    Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 17 ? 'Afternoon' : 'Evening'}, 
+                    <span className="font-medium text-gray-900 ml-1">
+                      {user?.firstName} {user?.lastName}
+                    </span>
                   </p>
                 </div>
               </div>
-              {!hasKYC && (
+              <div className="flex items-center space-x-3">
                 <Link 
-                  to="/kyc" 
-                  className="px-6 py-2 bg-black text-white rounded font-medium hover:bg-gray-800 transition-colors"
+                  to="/profile" 
+                  className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm"
                 >
-                  Complete KYC
+                  Account Settings
                 </Link>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Quick Actions Section */}
-        {hasKYC === true && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-black mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Link 
-                to="/kyc" 
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
-              >
-                <h3 className="text-lg font-semibold mb-2 text-black">Apply for New Loan</h3>
-                <p className="text-gray-600 text-sm">
-                  Start a new loan application with competitive rates
-                </p>
-              </Link>
-              <Link 
-                to="/application-status" 
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
-              >
-                <h3 className="text-lg font-semibold mb-2 text-black">View All Applications</h3>
-                <p className="text-gray-600 text-sm">
-                  Track the status of all your loan applications
-                </p>
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {/* Applications Section */}
-        {hasKYC === true && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-semibold text-black">Recent Applications</h2>
-                <div className="px-3 py-1 bg-black text-white rounded-full text-sm font-medium">
-                  {applications.length} {applications.length === 1 ? 'Application' : 'Applications'}
-                </div>
+                <button 
+                  onClick={logout} 
+                  className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                  Sign Out
+                </button>
               </div>
             </div>
-            
-            <div className="p-6">
-              {loading && (
-                <div className="flex justify-center items-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-black"></div>
-                  <span className="ml-3 text-black font-medium">Loading applications...</span>
-                </div>
-              )}
-              
-              {error && (
-                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <span className="text-red-800 font-medium">{error}</span>
-                </div>
-              )}
+          </div>
+        </header>
 
-              {!loading && applications.length === 0 && (
-                <div className="text-center py-8">
-                  <div className="mb-4">
-                    <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+        {/* Main Content */}
+        <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+          {/* KYC Status Section */}
+          {hasKYC !== null && (
+            <div className={`mb-8 rounded-xl p-6 shadow-sm border transition-all duration-300 ${
+              hasKYC 
+                ? 'bg-gradient-to-r from-gray-900 to-black text-white border-gray-300 shadow-md' 
+                : 'bg-white text-gray-900 border-amber-200 shadow-amber-100'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-5">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    hasKYC ? 'bg-white/10 backdrop-blur' : 'bg-amber-100'
+                  }`}>
+                    {hasKYC ? (
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M6 12.5L10.5 17L18 9.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    ) : (
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="#D97706" strokeWidth="1.5"/>
+                        <rect x="11" y="7" width="2" height="7" rx="1" fill="#D97706"/>
+                        <rect x="11" y="16" width="2" height="2" rx="1" fill="#D97706"/>
+                      </svg>
+                    )}
                   </div>
-                  <p className="text-gray-600 mb-4">No loan applications found.</p>
+                  <div>
+                    <h2 className="text-xl font-semibold mb-1">
+                      {hasKYC ? 'Identity Verification Complete' : 'Identity Verification Required'}
+                    </h2>
+                    <p className={`text-sm font-light ${hasKYC ? 'text-gray-200' : 'text-gray-600'}`}>
+                      {hasKYC 
+                        ? 'Your account is fully verified and ready for all banking services.' 
+                        : 'Complete your identity verification to access loan application services.'}
+                    </p>
+                  </div>
+                </div>
+                {!hasKYC && (
                   <Link 
                     to="/kyc" 
-                    className="px-4 py-2 bg-black text-white rounded font-medium hover:bg-gray-800 transition-colors"
+                    className="px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
                   >
-                    Apply for your first loan
+                    Begin Verification
                   </Link>
-                </div>
-              )}
+                )}
+              </div>
+            </div>
+          )}
 
-              {!loading && applications.length > 0 && (
-                <div className="space-y-4">
-                  {applications.map((app) => (
-                    <div 
-                      key={app._id} 
-                      className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+          {/* Service Actions */}
+          {hasKYC === true && (
+            <section className="mb-10">
+              <div className="mb-6">
+                <h2 className="text-2xl font-light text-gray-900 mb-2">Available Services</h2>
+                <div className="w-16 h-0.5 bg-gradient-to-r from-gray-900 to-gray-600"></div>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Link 
+                  to="/kyc" 
+                  className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
+                        New Loan Application
+                      </h3>
+                      <p className="text-gray-600 text-sm font-light leading-relaxed">
+                        Submit a new loan application with competitive interest rates and flexible terms tailored to your requirements.
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+                
+                <Link 
+                  to="/application-status" 
+                  className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                        <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 21c0-1-1-3-3-3s-3 2-3 3 1 3 3 3 3-2 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
+                        Application Portfolio
+                      </h3>
+                      <p className="text-gray-600 text-sm font-light leading-relaxed">
+                        Monitor and track the comprehensive status of all your submitted loan applications in one centralized location.
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            </section>
+          )}
+
+          {/* Applications Overview */}
+          {hasKYC === true && (
+            <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-2xl font-light text-gray-900 mb-1">Recent Applications</h2>
+                    <p className="text-sm text-gray-600 font-light">Overview of your latest loan applications</p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm">
+                      <span className="text-sm font-medium text-gray-700">
+                        {applications.length} {applications.length === 1 ? 'Application' : 'Applications'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </header>
+              
+              <div className="p-8">
+                {loading && (
+                  <div className="flex justify-center items-center py-16">
+                    <div className="relative">
+                      <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-300 border-t-gray-900"></div>
+                      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-gray-200"></div>
+                    </div>
+                    <span className="ml-4 text-gray-700 font-medium">Loading applications...</span>
+                  </div>
+                )}
+                
+                {error && (
+                  <div className="mb-6 p-5 bg-red-50 border border-red-200 rounded-xl">
+                    <div className="flex items-center space-x-3">
+                      <svg width="20" height="20" className="text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                      <span className="text-red-800 font-medium">{error}</span>
+                    </div>
+                  </div>
+                )}
+
+                {!loading && applications.length === 0 && (
+                  <div className="text-center py-16">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No Applications Found</h3>
+                    <p className="text-gray-600 mb-8 font-light">You haven't submitted any loan applications yet. Start your financial journey today.</p>
+                    <Link 
+                      to="/kyc" 
+                      className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-4">
-                        <div className="flex items-center space-x-4 min-w-0 flex-1">
-                          <div className="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                            {getStatusIcon(app.status)}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <h3 className="font-semibold text-black">{app.loanType}</h3>
-                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold border ${getStatusClasses(app.status)}`}>
-                                {formatStatus(app.status)}
-                              </span>
+                      Submit First Application
+                    </Link>
+                  </div>
+                )}
+
+                {!loading && applications.length > 0 && (
+                  <div className="space-y-4">
+                    {applications.map((app) => (
+                      <div 
+                        key={app._id} 
+                        className="border border-gray-200 rounded-xl p-6 hover:bg-gray-50/50 hover:border-gray-300 transition-all duration-200 group"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-6 flex-1 min-w-0">
+                            <div className="flex-shrink-0">
+                              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                                {getStatusIcon(app.status)}
+                              </div>
                             </div>
-                            <div className="flex items-center space-x-4 text-sm text-gray-600">
-                              <span className="font-semibold text-lg text-black">{formatCurrency(app.amount)}</span>
-                              <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs">
-                                ID: {app._id.slice(-8)}
-                              </span>
-                              <span>
-                                {new Date(app.createdAt).toLocaleDateString('en-IN')}
-                              </span>
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center space-x-4 mb-3">
+                                <h3 className="font-semibold text-gray-900 text-lg">{app.loanType}</h3>
+                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusClasses(app.status)}`}>
+                                  {formatStatus(app.status)}
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center space-x-6 text-sm text-gray-600">
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-light">Amount:</span>
+                                  <span className="font-semibold text-gray-900 text-lg">{formatCurrency(app.amount)}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-light">Reference:</span>
+                                  <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs font-medium">
+                                    #{app._id.slice(-8).toUpperCase()}
+                                  </span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-light">Submitted:</span>
+                                  <span className="font-medium">
+                                    {new Date(app.createdAt).toLocaleDateString('en-IN', {
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric'
+                                    })}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-4">
-                          <div className="text-sm">
-                            {app.documentsUploaded ? (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                ✓ Complete
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                ✗ Pending
-                              </span>
-                            )}
                           </div>
                           
-                          {!app.documentsUploaded && (
-                            <Link 
-                              to={`/upload-documents/${app._id}`} 
-                              className="px-3 py-1 text-sm font-medium bg-black text-white rounded hover:bg-gray-800 transition-colors"
-                            >
-                              Upload Documents
-                            </Link>
-                          )}
+                          <div className="flex items-center space-x-4 flex-shrink-0">
+                            <div className="text-sm">
+                              {app.documentsUploaded ? (
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                  <svg width="14" height="14" className="mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+                                  </svg>
+                                  Documentation Complete
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                                  <svg width="14" height="14" className="mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                  </svg>
+                                  Documentation Pending
+                                </span>
+                              )}
+                            </div>
+                            
+                            {!app.documentsUploaded && (
+                              <Link 
+                                to={`/upload-documents/${app._id}`} 
+                                className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
+                              >
+                                Upload Documents
+                              </Link>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                  
-                  {applications.length > 3 && (
-                    <div className="text-center pt-4 border-t border-gray-200">
-                      <Link 
-                        to="/application-status" 
-                        className="text-black font-medium hover:underline"
-                      >
-                        View All Applications →
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Navigation */}
-        <div className="mt-8 flex justify-center">
-          {hasKYC === true && (
-            <Link 
-              to="/application-status" 
-              className="px-6 py-3 bg-black text-white rounded font-medium hover:bg-gray-800 transition-colors"
-            >
-              View All Applications
-            </Link>
+                    ))}
+                    
+                    {applications.length > 3 && (
+                      <div className="text-center pt-6 border-t border-gray-200 mt-8">
+                        <Link 
+                          to="/application-status" 
+                          className="inline-flex items-center text-gray-700 font-medium hover:text-gray-900 transition-colors group"
+                        >
+                          View Complete Application Portfolio
+                          <svg width="16" height="16" className="ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                          </svg>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </section>
           )}
-        </div>
+
+          {/* Call to Action */}
+          {hasKYC === true && (
+            <div className="mt-12 text-center">
+              <Link 
+                to="/application-status" 
+                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-gray-900 to-black text-white rounded-xl font-medium hover:from-black hover:to-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                Access Complete Portfolio
+                <svg width="20" height="20" className="ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+              </Link>
+            </div>
+          )}
+        </main>
       </div>
     </div>
   )
