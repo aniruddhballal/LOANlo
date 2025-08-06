@@ -322,7 +322,7 @@ const Profile = () => {
                     <button 
                       type="button" 
                       onClick={cancelEdit}
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-black rounded-lg transition-colors duration-200"
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black rounded-lg transition-colors duration-200"
                     >
                       <X className="h-4 w-4" />
                       <span>Cancel</span>
@@ -330,7 +330,7 @@ const Profile = () => {
                     <button 
                       type="submit" 
                       disabled={loading}
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200"
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200"
                     >
                       {loading ? (
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -524,7 +524,7 @@ const Profile = () => {
                   setConfirmationPassword('')
                   setError('')
                 }}
-                className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-black rounded-lg transition-colors duration-200"
+                className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black rounded-lg transition-colors duration-200"
               >
                 Cancel
               </button>
@@ -532,7 +532,7 @@ const Profile = () => {
                 type="button"
                 onClick={handlePasswordConfirmation}
                 disabled={loading}
-                className="flex-1 px-4 py-2 bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
               >
                 {loading && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
                 <span>{loading ? 'Confirming...' : 'Confirm Changes'}</span>
@@ -614,7 +614,7 @@ const Profile = () => {
               <button 
                 type="button"
                 onClick={closeDeleteModal}
-                className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-black rounded-lg transition-colors duration-200"
+                className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-black rounded-lg transition-colors duration-200"
                 disabled={deleteLoading}
               >
                 Cancel
