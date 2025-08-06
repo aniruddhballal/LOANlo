@@ -17,7 +17,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [hasKYC, setHasKYC] = useState<boolean | null>(null)
-  const [showWelcome, setShowWelcome] = useState(true)
 
   useEffect(() => {
     fetchApplications()
@@ -130,24 +129,7 @@ const Dashboard = () => {
       </header>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
-        {/* Welcome Card */}
-        {showWelcome && (
-          <div className="mb-8 bg-white/60 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/20">
-            <div className="flex justify-between items-start">
-              <div>
-                <h2 className="text-2xl font-bold text-black mb-2">Welcome to Your Financial Hub</h2>
-                <p className="text-gray-700 text-lg">Manage your loans, track applications, and achieve your financial goals all in one place.</p>
-              </div>
-              <button 
-                onClick={() => setShowWelcome(false)}
-                className="text-gray-500 hover:text-black text-xl hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200"
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        )}
-
+  
         {/* KYC Status Card */}
         {hasKYC !== null && (
           <div className={`mb-8 rounded-2xl p-8 shadow-2xl backdrop-blur-xl border transition-all duration-200 hover:shadow-3xl ${
@@ -157,10 +139,10 @@ const Dashboard = () => {
           }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-6">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
                   hasKYC ? 'bg-white/20 text-white' : 'bg-gray-100 text-black'
                 }`}>
-                  {hasKYC ? '✓' : '!'}
+                  {hasKYC ? 'V' : 'K'}
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold mb-2">
@@ -193,31 +175,22 @@ const Dashboard = () => {
               <>
                 <Link 
                   to="/kyc" 
-                  className="group bg-black/90 backdrop-blur-xl text-white p-8 rounded-2xl shadow-2xl hover:shadow-3xl border border-black/20 transition-all duration-200 hover:bg-black"
+                  className="group bg-black/90 backdrop-blur-xl text-white p-6 rounded-xl shadow-lg hover:shadow-xl border border-black/20 transition-all duration-200"
                 >
-                  <div className="text-3xl mb-4">💰</div>
-                  <h3 className="text-xl font-bold mb-2 text-white">Apply for New Loan</h3>
-                  <p className="text-gray-300 group-hover:text-white transition-colors duration-200">
+                  <h3 className="text-lg font-semibold mb-2 text-white">Apply for New Loan</h3>
+                  <p className="text-gray-300">
                     Start a new loan application with competitive rates
                   </p>
                 </Link>
                 <Link 
                   to="/application-status" 
-                  className="group bg-white/80 backdrop-blur-xl text-black p-8 rounded-2xl shadow-2xl border border-gray-200/50 hover:shadow-3xl transition-all duration-200 hover:bg-white"
+                  className="group bg-white/80 backdrop-blur-xl text-black p-6 rounded-xl shadow-lg border border-gray-200/50 hover:shadow-xl transition-all duration-200"
                 >
-                  <div className="text-3xl mb-4">📊</div>
-                  <h3 className="text-xl font-bold mb-2 text-black">View All Applications</h3>
-                  <p className="text-gray-600 group-hover:text-black transition-colors duration-200">
+                  <h3 className="text-lg font-semibold mb-2 text-black">View All Applications</h3>
+                  <p className="text-gray-600">
                     Track the status of all your loan applications
                   </p>
                 </Link>
-                <div className="group bg-gray-100/80 backdrop-blur-xl text-black p-8 rounded-2xl shadow-2xl border border-gray-200/50 hover:shadow-3xl transition-all duration-200 cursor-pointer hover:bg-gray-100">
-                  <div className="text-3xl mb-4">🧮</div>
-                  <h3 className="text-xl font-bold mb-2 text-black">Loan Calculator</h3>
-                  <p className="text-gray-600 group-hover:text-black transition-colors duration-200">
-                    Calculate EMIs and plan your finances
-                  </p>
-                </div>
               </>
             )}
           </div>
@@ -238,21 +211,19 @@ const Dashboard = () => {
             )}
             
             {error && (
-              <div className="bg-gray-100/80 backdrop-blur-sm border border-gray-300 rounded-lg p-6 mb-6">
+              <div className="bg-gray-100/80 backdrop-blur-sm border border-gray-300 rounded-lg p-4 mb-6">
                 <div className="flex items-center">
-                  <span className="text-xl mr-3 text-black">⚠</span>
-                  <span className="text-black font-semibold text-lg">{error}</span>
+                  <span className="text-black font-semibold">{error}</span>
                 </div>
               </div>
             )}
 
             {!loading && applications.length === 0 && (
-              <div className="text-center py-16">
-                <div className="text-6xl mb-6 text-gray-400">📁</div>
-                <p className="text-gray-600 text-xl mb-6 font-medium">No loan applications found.</p>
+              <div className="text-center py-12">
+                <p className="text-gray-600 text-lg mb-4 font-medium">No loan applications found.</p>
                 <Link 
                   to="/kyc" 
-                  className="inline-block px-8 py-4 bg-black text-white rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl hover:bg-gray-800 transition-all duration-200"
+                  className="inline-block px-6 py-3 bg-black text-white rounded-lg font-semibold shadow-lg hover:shadow-xl hover:bg-gray-800 transition-all duration-200"
                 >
                   Apply for your first loan
                 </Link>
@@ -268,8 +239,8 @@ const Dashboard = () => {
                   >
                     <div className="flex flex-wrap items-center justify-between gap-4">
                       <div className="flex items-center space-x-6 min-w-0 flex-1">
-                        <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                          {app.status === 'approved' ? '✓' : app.status === 'rejected' ? '✗' : app.status === 'under_review' ? '⏳' : '📋'}
+                        <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center text-white font-bold flex-shrink-0">
+                          {app.status === 'approved' ? 'A' : app.status === 'rejected' ? 'R' : app.status === 'under_review' ? 'U' : 'P'}
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center space-x-4 mb-2">
@@ -294,13 +265,11 @@ const Dashboard = () => {
                         <div className="text-center">
                           {app.documentsUploaded ? (
                             <div className="flex items-center text-black font-semibold">
-                              <span className="text-lg mr-2">✓</span>
-                              <span>Documents Uploaded</span>
+                              <span className="mr-2">Documents Uploaded</span>
                             </div>
                           ) : (
                             <div className="flex items-center text-gray-600 font-semibold">
-                              <span className="text-lg mr-2">📄</span>
-                              <span>Documents Pending</span>
+                              <span className="mr-2">Documents Pending</span>
                             </div>
                           )}
                         </div>
