@@ -38,17 +38,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-6 relative">
-      {/* Sophisticated background pattern */}
-      <div className="absolute inset-0 overflow-hidden opacity-30">
-        <div className="absolute top-0 left-0 w-full h-full" 
-             style={{
-               backgroundImage: `radial-gradient(circle at 25% 25%, rgba(0,0,0,0.02) 0%, transparent 50%),
-                                radial-gradient(circle at 75% 75%, rgba(0,0,0,0.02) 0%, transparent 50%)`
-             }}>
-        </div>
-        <div className="absolute top-20 right-20 w-96 h-96 border border-gray-200 rounded-full opacity-20"></div>
-        <div className="absolute bottom-20 left-20 w-64 h-64 border border-gray-300 rounded-full opacity-15"></div>
-      </div>
       
       <div className="w-full max-w-lg relative z-10">
         {/* Corporate Header */}
