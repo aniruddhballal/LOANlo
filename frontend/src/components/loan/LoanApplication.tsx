@@ -1,11 +1,36 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+interface FormData {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  gender: string;
+  maritalStatus: string;
+  aadhaarNumber: string;
+  panNumber: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  employmentType: string;
+  companyName: string;
+  designation: string;
+  workExperience: string;
+  monthlyIncome: string;
+  loanType: string;
+  amount: string;
+  purpose: string;
+  tenure: string;
+}
+
 const LoanApplication = () => {
   const navigate = useNavigate()
-  const [currentStep, setCurrentStep] = useState(1)
-  const [focusedField, setFocusedField] = useState('')
-  const [formData, setFormData] = useState({
+  const [currentStep, setCurrentStep] = useState<number>(1)
+  const [focusedField, setFocusedField] = useState<string>('')
+  const [formData, setFormData] = useState<FormData>({
     // Personal Information
     firstName: '',
     lastName: '',
@@ -64,14 +89,14 @@ const LoanApplication = () => {
   }, [])
 
   // Required fields validation by step
-  const requiredFieldsByStep = {
+  const requiredFieldsByStep: { [key: number]: (keyof FormData)[] } = {
     1: ['firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus', 'aadhaarNumber', 'panNumber'],
     2: ['email', 'phone', 'address', 'city', 'state', 'pincode'],
     3: ['employmentType', 'companyName', 'designation', 'workExperience', 'monthlyIncome'],
     4: ['loanType', 'amount', 'purpose', 'tenure'],
   };
 
-  const isStepValid = (step) => {
+  const isStepValid = (step: number): boolean => {
     return requiredFieldsByStep[step].every(
       (field) => {
         const value = formData[field]?.toString().trim();
@@ -80,14 +105,14 @@ const LoanApplication = () => {
     );
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     })
   }
 
-  const handleFocus = (fieldName) => {
+  const handleFocus = (fieldName: string) => {
     setFocusedField(fieldName)
   }
 
@@ -95,7 +120,7 @@ const LoanApplication = () => {
     setFocusedField('')
   }
 
-  const nextStep = async (e) => {
+  const nextStep = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     
     if (!isStepValid(currentStep)) {
@@ -119,16 +144,16 @@ const LoanApplication = () => {
     }
   }
 
-  const saveKYC = async () => {
+  const saveKYC = async (): Promise<void> => {
     try {
       const token = localStorage.getItem('token');
-      const kycFields = [
+      const kycFields: (keyof FormData)[] = [
         'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
         'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city',
         'state', 'pincode', 'employmentType', 'companyName', 'designation',
         'workExperience', 'monthlyIncome'
       ];
-      const kycData = {};
+      const kycData: Partial<FormData> = {};
       kycFields.forEach(field => kycData[field] = formData[field]);
 
       await fetch('http://localhost:5000/api/kyc/save', {
@@ -144,7 +169,7 @@ const LoanApplication = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
     if (!isStepValid(currentStep)) {
@@ -181,12 +206,12 @@ const LoanApplication = () => {
   }
 
   const renderInputField = (
-    name, 
-    label, 
-    type = 'text', 
-    required = true, 
-    maxLength,
-    min
+    name: keyof FormData, 
+    label: string, 
+    type: string = 'text', 
+    required: boolean = true, 
+    maxLength?: number,
+    min?: string
   ) => (
     <div className="relative group">
       <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
@@ -218,10 +243,10 @@ const LoanApplication = () => {
   )
 
   const renderSelectField = (
-    name, 
-    label, 
-    options, 
-    required = true
+    name: keyof FormData, 
+    label: string, 
+    options: { value: string; label: string }[], 
+    required: boolean = true
   ) => (
     <div className="relative group">
       <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
@@ -258,9 +283,9 @@ const LoanApplication = () => {
   )
 
   const renderTextareaField = (
-    name, 
-    label, 
-    required = true
+    name: keyof FormData, 
+    label: string, 
+    required: boolean = true
   ) => (
     <div className="relative group">
       <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
@@ -273,7 +298,7 @@ const LoanApplication = () => {
           onChange={handleChange}
           onFocus={() => handleFocus(name)}
           onBlur={handleBlur}
-          rows="4"
+          rows={4}
           className={`w-full px-4 py-3 bg-white border-2 rounded-lg font-medium text-gray-800 placeholder-gray-400 resize-none transition-all duration-300 focus:outline-none hover:border-gray-400 ${
             focusedField === name 
               ? 'border-gray-800 shadow-lg transform scale-[1.01]' 
@@ -287,10 +312,10 @@ const LoanApplication = () => {
   )
 
   const renderCurrencyField = (
-    name, 
-    label, 
-    required = true,
-    min
+    name: keyof FormData, 
+    label: string, 
+    required: boolean = true,
+    min?: string
   ) => (
     <div className="relative group">
       <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
@@ -320,8 +345,8 @@ const LoanApplication = () => {
     </div>
   )
 
-  const getStepTitle = (step) => {
-    const titles = {
+  const getStepTitle = (step: number): string => {
+    const titles: { [key: number]: string } = {
       1: 'Personal Information',
       2: 'Contact Information', 
       3: 'Employment Information',
@@ -330,8 +355,8 @@ const LoanApplication = () => {
     return titles[step]
   }
 
-  const getStepDescription = (step) => {
-    const descriptions = {
+  const getStepDescription = (step: number): string => {
+    const descriptions: { [key: number]: string } = {
       1: 'Please provide your personal details as they appear on official documents',
       2: 'Provide your current contact information and residential address',
       3: 'Share your employment and income details for verification',
