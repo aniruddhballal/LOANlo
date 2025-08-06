@@ -82,47 +82,46 @@ const Dashboard = () => {
     }
   }
 
-const getStatusIcon = (status: string) => {
-  switch (status) {
-    case 'approved':
-      return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2"/>
-          <path d="M7 13l3 3 7-7" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      );
-    case 'rejected':
-      return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="#ef4444" strokeWidth="2"/>
-          <path d="M15 9l-6 6M9 9l6 6" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round"/>
-        </svg>
-      );
-    case 'under_review':
-      return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="#3b82f6" strokeWidth="2"/>
-          <circle cx="12" cy="12" r="4" stroke="#3b82f6" strokeWidth="2"/>
-          <circle cx="12" cy="12" r="1.5" fill="#3b82f6"/>
-        </svg>
-      );
-    case 'pending':
-      return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="#f59e42" strokeWidth="2"/>
-          <path d="M12 7v5l3 3" stroke="#f59e42" strokeWidth="2.5" strokeLinecap="round"/>
-        </svg>
-      );
-    default:
-      return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="#6b7280" strokeWidth="2"/>
-          <text x="12" y="16" textAnchor="middle" fontSize="12" fill="#6b7280">?</text>
-        </svg>
-      );
-  }
-};
-  
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2"/>
+            <path d="M7 13l3 3 7-7" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        );
+      case 'rejected':
+        return (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#ef4444" strokeWidth="2"/>
+            <path d="M15 9l-6 6M9 9l6 6" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round"/>
+          </svg>
+        );
+      case 'under_review':
+        return (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#3b82f6" strokeWidth="2"/>
+            <circle cx="12" cy="12" r="4" stroke="#3b82f6" strokeWidth="2"/>
+            <circle cx="12" cy="12" r="1.5" fill="#3b82f6"/>
+          </svg>
+        );
+      case 'pending':
+        return (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#f59e42" strokeWidth="2"/>
+            <path d="M12 7v5l3 3" stroke="#f59e42" strokeWidth="2.5" strokeLinecap="round"/>
+          </svg>
+        );
+      default:
+        return (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#6b7280" strokeWidth="2"/>
+            <text x="12" y="16" textAnchor="middle" fontSize="12" fill="#6b7280">?</text>
+          </svg>
+        );
+    }
+  };
 
   const formatStatus = (status: string) => {
     return status.replace('_', ' ').toUpperCase()
@@ -176,21 +175,21 @@ const getStatusIcon = (status: string) => {
           }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-<div className="w-10 h-10 rounded-full flex items-center justify-center bg-black text-white">
-  {hasKYC ? (
-    // Professional Tick SVG
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M6 12.5L10.5 17L18 9.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  ) : (
-    // Professional Exclamation SVG
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2"/>
-      <rect x="11" y="7" width="2" height="7" rx="1" fill="white"/>
-      <rect x="11" y="16" width="2" height="2" rx="1" fill="white"/>
-    </svg>
-  )}
-</div>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-black text-white">
+                  {hasKYC ? (
+                    // Professional Tick SVG
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M6 12.5L10.5 17L18 9.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  ) : (
+                    // Professional Exclamation SVG
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2"/>
+                      <rect x="11" y="7" width="2" height="7" rx="1" fill="white"/>
+                      <rect x="11" y="16" width="2" height="2" rx="1" fill="white"/>
+                    </svg>
+                  )}
+                </div>
                 <div>
                   <h3 className="text-xl font-semibold mb-1">
                     {hasKYC ? 'KYC Verified' : 'KYC Required'}
