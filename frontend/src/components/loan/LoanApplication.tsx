@@ -412,7 +412,7 @@ const LoanApplication = () => {
       <div className={styles.mainCard}>
         {/* Header */}
         <div className={styles.header}>
-          <h1 className={styles.logo}>LOANalo</h1>
+          <h1 className={styles.logo}>LOANlo</h1>
           <p className={styles.subtitle}>Loan Application Portal</p>
         </div>
 

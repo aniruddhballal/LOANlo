@@ -99,7 +99,7 @@ const Register = () => {
       <div className="w-full max-w-2xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-black mb-3 tracking-tight">LOANalo</h1>
+          <h1 className="text-5xl font-bold text-black mb-3 tracking-tight">LOANlo</h1>
           <p className="text-gray-700 text-lg font-medium">Loan Origination System</p>
         </div>
         
