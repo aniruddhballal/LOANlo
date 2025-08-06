@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [hasKYC, setHasKYC] = useState<boolean | null>(null)
+  const [showWelcome, setShowWelcome] = useState(true)
 
   useEffect(() => {
     fetchApplications()
@@ -75,33 +76,52 @@ const Dashboard = () => {
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'approved': return 'bg-white text-black border border-black'
-      case 'rejected': return 'bg-black text-white border border-black'
-      case 'under_review': return 'bg-gray-200 text-black border border-gray-400'
-      default: return 'bg-gray-100 text-gray-700 border border-gray-300'
+      case 'approved': return 'bg-black text-white'
+      case 'rejected': return 'bg-gray-800 text-white'
+      case 'under_review': return 'bg-gray-600 text-white'
+      default: return 'bg-gray-400 text-white'
     }
   }
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount)
+  }
+
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 relative">
+      {/* Subtle Background Elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-20 left-20 w-64 h-64 bg-white/30 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gray-100/40 rounded-full blur-3xl"></div>
+      </div>
 
       {/* Header Section */}
-      <header className="relative z-10 bg-white border-b border-black px-6 py-8">
+      <header className="relative z-10 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-6 py-8">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold text-black mb-2">Dashboard</h1>
-            <p className="text-lg text-gray-600">Welcome, {user?.firstName} {user?.lastName}</p>
+          <div className="flex items-center space-x-6">
+            <div className="w-14 h-14 bg-black rounded-full flex items-center justify-center text-white font-bold text-xl shadow-2xl">
+              {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-black mb-1 tracking-tight">Dashboard</h1>
+              <p className="text-lg text-gray-600">Welcome back, <span className="font-semibold text-black">{user?.firstName} {user?.lastName}</span></p>
+            </div>
           </div>
           <nav className="flex items-center space-x-4">
             <Link 
               to="/profile" 
-              className="px-4 py-2 text-black hover:bg-black hover:text-white border border-black transition-colors duration-200"
+              className="px-6 py-3 text-black hover:bg-black hover:text-white bg-white/80 backdrop-blur-sm border border-gray-300 transition-all duration-200 rounded-lg font-medium shadow-lg hover:shadow-xl"
             >
               Profile
             </Link>
             <button 
               onClick={logout} 
-              className="px-4 py-2 bg-black text-white hover:bg-white hover:text-black border border-black transition-colors duration-200"
+              className="px-6 py-3 bg-black text-white hover:bg-gray-800 border border-black transition-all duration-200 rounded-lg font-medium shadow-lg hover:shadow-xl"
             >
               Logout
             </button>
@@ -110,36 +130,94 @@ const Dashboard = () => {
       </header>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
-        {/* Quick Actions Section */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-black mb-6">Quick Actions</h2>
-          <div className="flex flex-wrap gap-4">
-            {/* Show Fill KYC only if hasKYC === false */}
-            {hasKYC === false && (
-              <div className="w-full">
-                <h3 className="text-xl font-semibold text-black mb-4">Kindly Fill KYC to apply for a loan</h3>
+        {/* Welcome Card */}
+        {showWelcome && (
+          <div className="mb-8 bg-white/60 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/20">
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-2xl font-bold text-black mb-2">Welcome to Your Financial Hub</h2>
+                <p className="text-gray-700 text-lg">Manage your loans, track applications, and achieve your financial goals all in one place.</p>
+              </div>
+              <button 
+                onClick={() => setShowWelcome(false)}
+                className="text-gray-500 hover:text-black text-xl hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* KYC Status Card */}
+        {hasKYC !== null && (
+          <div className={`mb-8 rounded-2xl p-8 shadow-2xl backdrop-blur-xl border transition-all duration-200 hover:shadow-3xl ${
+            hasKYC 
+              ? 'bg-black/90 text-white border-black/20' 
+              : 'bg-white/80 text-black border-gray-300/50'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-6">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${
+                  hasKYC ? 'bg-white/20 text-white' : 'bg-gray-100 text-black'
+                }`}>
+                  {hasKYC ? '✓' : '!'}
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold mb-2">
+                    {hasKYC ? 'KYC Verified' : 'KYC Required'}
+                  </h3>
+                  <p className={`text-lg ${hasKYC ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {hasKYC ? 'You can now apply for loans and access all features.' : 'Complete your KYC to unlock loan applications.'}
+                  </p>
+                </div>
+              </div>
+              {!hasKYC && (
                 <Link 
                   to="/kyc" 
-                  className="inline-block px-8 py-4 bg-black text-white hover:bg-white hover:text-black border-2 border-black transition-colors duration-200 font-semibold"
+                  className="px-8 py-4 bg-black text-white hover:bg-gray-800 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200"
                 >
-                  Fill User KYC
+                  Complete KYC
                 </Link>
-              </div>
-            )}
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Quick Actions Section */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-black mb-8 tracking-tight">
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {hasKYC === true && (
               <>
                 <Link 
                   to="/kyc" 
-                  className="px-8 py-4 bg-black text-white hover:bg-white hover:text-black border-2 border-black transition-colors duration-200 font-semibold"
+                  className="group bg-black/90 backdrop-blur-xl text-white p-8 rounded-2xl shadow-2xl hover:shadow-3xl border border-black/20 transition-all duration-200 hover:bg-black"
                 >
-                  Apply for New Loan
+                  <div className="text-3xl mb-4">💰</div>
+                  <h3 className="text-xl font-bold mb-2 text-white">Apply for New Loan</h3>
+                  <p className="text-gray-300 group-hover:text-white transition-colors duration-200">
+                    Start a new loan application with competitive rates
+                  </p>
                 </Link>
                 <Link 
                   to="/application-status" 
-                  className="px-8 py-4 bg-white text-black hover:bg-black hover:text-white border-2 border-black transition-colors duration-200 font-semibold"
+                  className="group bg-white/80 backdrop-blur-xl text-black p-8 rounded-2xl shadow-2xl border border-gray-200/50 hover:shadow-3xl transition-all duration-200 hover:bg-white"
                 >
-                  View All Applications
+                  <div className="text-3xl mb-4">📊</div>
+                  <h3 className="text-xl font-bold mb-2 text-black">View All Applications</h3>
+                  <p className="text-gray-600 group-hover:text-black transition-colors duration-200">
+                    Track the status of all your loan applications
+                  </p>
                 </Link>
+                <div className="group bg-gray-100/80 backdrop-blur-xl text-black p-8 rounded-2xl shadow-2xl border border-gray-200/50 hover:shadow-3xl transition-all duration-200 cursor-pointer hover:bg-gray-100">
+                  <div className="text-3xl mb-4">🧮</div>
+                  <h3 className="text-xl font-bold mb-2 text-black">Loan Calculator</h3>
+                  <p className="text-gray-600 group-hover:text-black transition-colors duration-200">
+                    Calculate EMIs and plan your finances
+                  </p>
+                </div>
               </>
             )}
           </div>
@@ -147,23 +225,34 @@ const Dashboard = () => {
 
         {/* Applications Section */}
         {hasKYC === true && (
-          <div className="bg-white border-2 border-black p-8">
-            <h2 className="text-2xl font-bold text-black mb-6">Recent Applications</h2>
+          <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/30">
+            <h2 className="text-3xl font-bold text-black mb-8 tracking-tight">
+              Recent Applications
+            </h2>
             
-            {loading && <p className="text-gray-600 text-center py-8">Loading applications...</p>}
+            {loading && (
+              <div className="flex justify-center items-center py-16">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent"></div>
+                <span className="ml-4 text-black text-lg font-medium">Loading applications...</span>
+              </div>
+            )}
             
             {error && (
-              <div className="bg-red-50 border border-red-200 p-4 mb-6">
-                <span className="text-red-800">{error}</span>
+              <div className="bg-gray-100/80 backdrop-blur-sm border border-gray-300 rounded-lg p-6 mb-6">
+                <div className="flex items-center">
+                  <span className="text-xl mr-3 text-black">⚠</span>
+                  <span className="text-black font-semibold text-lg">{error}</span>
+                </div>
               </div>
             )}
 
             {!loading && applications.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-gray-600 mb-4">No loan applications found.</p>
+              <div className="text-center py-16">
+                <div className="text-6xl mb-6 text-gray-400">📁</div>
+                <p className="text-gray-600 text-xl mb-6 font-medium">No loan applications found.</p>
                 <Link 
                   to="/kyc" 
-                  className="text-black hover:underline font-semibold"
+                  className="inline-block px-8 py-4 bg-black text-white rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl hover:bg-gray-800 transition-all duration-200"
                 >
                   Apply for your first loan
                 </Link>
@@ -171,65 +260,63 @@ const Dashboard = () => {
             )}
 
             {!loading && applications.length > 0 && (
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b-2 border-black">
-                      <th className="text-left py-4 px-4 font-bold text-black">Application ID</th>
-                      <th className="text-left py-4 px-4 font-bold text-black">Loan Type</th>
-                      <th className="text-left py-4 px-4 font-bold text-black">Amount</th>
-                      <th className="text-left py-4 px-4 font-bold text-black">Status</th>
-                      <th className="text-left py-4 px-4 font-bold text-black">Applied Date</th>
-                      <th className="text-left py-4 px-4 font-bold text-black">Documents</th>
-                      <th className="text-left py-4 px-4 font-bold text-black">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {applications.map((app, index) => (
-                      <tr 
-                        key={app._id} 
-                        className={`border-b border-gray-200 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                      >
-                        <td className="py-4 px-4">
-                          <span className="font-mono text-sm bg-gray-100 px-2 py-1 border">
-                            {app._id.slice(-6)}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4 font-semibold text-black">
-                          {app.loanType}
-                        </td>
-                        <td className="py-4 px-4 font-bold text-black">
-                          ₹{app.amount.toLocaleString()}
-                        </td>
-                        <td className="py-4 px-4">
-                          <span className={`px-3 py-1 text-sm font-semibold ${getStatusClass(app.status)}`}>
-                            {app.status.replace('_', ' ')}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4 text-gray-700">
-                          {new Date(app.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="py-4 px-4">
+              <div className="space-y-4">
+                {applications.map((app) => (
+                  <div 
+                    key={app._id} 
+                    className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 hover:shadow-xl transition-all duration-200 p-6 hover:bg-white"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <div className="flex items-center space-x-6 min-w-0 flex-1">
+                        <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                          {app.status === 'approved' ? '✓' : app.status === 'rejected' ? '✗' : app.status === 'under_review' ? '⏳' : '📋'}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center space-x-4 mb-2">
+                            <h3 className="font-bold text-black text-lg">{app.loanType}</h3>
+                            <span className={`px-4 py-2 text-sm font-bold rounded-lg ${getStatusClass(app.status)}`}>
+                              {app.status.replace('_', ' ').toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-6 text-gray-600">
+                            <span className="font-bold text-2xl text-black">{formatCurrency(app.amount)}</span>
+                            <span className="text-sm bg-gray-100 px-3 py-1 rounded font-mono text-black">
+                              ID: {app._id.slice(-8)}
+                            </span>
+                            <span className="text-sm text-gray-600">
+                              {new Date(app.createdAt).toLocaleDateString('en-IN')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-6">
+                        <div className="text-center">
                           {app.documentsUploaded ? (
-                            <span className="text-black font-semibold">✓ Uploaded</span>
+                            <div className="flex items-center text-black font-semibold">
+                              <span className="text-lg mr-2">✓</span>
+                              <span>Documents Uploaded</span>
+                            </div>
                           ) : (
-                            <span className="text-gray-500">✗ Pending</span>
+                            <div className="flex items-center text-gray-600 font-semibold">
+                              <span className="text-lg mr-2">📄</span>
+                              <span>Documents Pending</span>
+                            </div>
                           )}
-                        </td>
-                        <td className="py-4 px-4">
-                          {!app.documentsUploaded && (
-                            <Link 
-                              to={`/upload-documents/${app._id}`} 
-                              className="px-4 py-2 bg-white text-black border border-black hover:bg-black hover:text-white transition-colors duration-200 text-sm font-semibold"
-                            >
-                              Upload Documents
-                            </Link>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </div>
+                        
+                        {!app.documentsUploaded && (
+                          <Link 
+                            to={`/upload-documents/${app._id}`} 
+                            className="px-6 py-3 bg-black text-white rounded-lg font-semibold shadow-lg hover:shadow-xl hover:bg-gray-800 transition-all duration-200"
+                          >
+                            Upload Documents
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
