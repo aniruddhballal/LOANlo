@@ -7,6 +7,7 @@ import DocumentUpload from './components/loan/DocumentUpload'
 import ApplicationStatus from './components/loan/ApplicationStatus'
 import Profile from './components/profile/Profile'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import KYC from './components/loan/KYC'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -50,9 +51,14 @@ function AppContent() {
               <Dashboard />
             </ProtectedRoute>
           } />
-          <Route path="/kyc" element={
+          <Route path="/loan-application" element={
             <ProtectedRoute>
               <LoanApplication />
+            </ProtectedRoute>
+          } />
+          <Route path="/kyc" element={
+            <ProtectedRoute>
+              <KYC />
             </ProtectedRoute>
           } />
           <Route path="/upload-documents/:applicationId" element={
