@@ -238,9 +238,9 @@ const Dashboard = () => {
                 <h2 className="text-2xl font-light text-gray-900 mb-2">Available Services</h2>
                 <div className="w-16 h-0.5 bg-gradient-to-r from-gray-900 to-gray-600"></div>
               </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <Link 
-                  to="/kyc" 
+                  to="/loan-application" 
                   className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
                 >
                   <div className="flex items-start space-x-4">
@@ -281,6 +281,29 @@ const Dashboard = () => {
                       </h3>
                       <p className="text-gray-600 text-sm font-light leading-relaxed">
                         Monitor and track the comprehensive status of all your submitted loan applications in one centralized location.
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link 
+                  to="/kyc" 
+                  className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M16 7l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M21 21H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
+                        View/Update Current KYC
+                      </h3>
+                      <p className="text-gray-600 text-sm font-light leading-relaxed">
+                        Review your current KYC information and make updates to keep your verification details current and accurate.
                       </p>
                     </div>
                   </div>
