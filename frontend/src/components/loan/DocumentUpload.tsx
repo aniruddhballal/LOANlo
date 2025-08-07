@@ -332,17 +332,36 @@ const DocumentUpload = () => {
           <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-lg font-medium text-gray-900">Required Documents</h3>
+                <h3 className={`text-lg font-medium transition-colors duration-500 ${
+                  requiredProgress === 0 ? 'text-red-600' :
+                  requiredProgress < 50 ? 'text-red-500' :
+                  requiredProgress < 100 ? 'text-yellow-600' :
+                  'text-green-600'
+                }`}>
+                  Required Documents
+                </h3>
                 <p className="text-sm text-gray-600 mt-1">Essential for application processing</p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-light text-gray-900">{requiredDocsUploaded}</div>
+                <div className={`text-2xl font-light transition-colors duration-500 ${
+                  requiredProgress === 0 ? 'text-red-600' :
+                  requiredProgress < 50 ? 'text-red-500' :
+                  requiredProgress < 100 ? 'text-yellow-600' :
+                  'text-green-600'
+                }`}>
+                  {requiredDocsUploaded}
+                </div>
                 <div className="text-sm text-gray-500">of {requiredDocsCount}</div>
               </div>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
               <div 
-                className="h-2 bg-gray-800 rounded-full transition-all duration-700 ease-out"
+                className={`h-2 rounded-full transition-all duration-700 ease-out ${
+                  requiredProgress === 0 ? 'bg-red-500' :
+                  requiredProgress < 50 ? 'bg-red-400' :
+                  requiredProgress < 100 ? 'bg-yellow-500' :
+                  'bg-green-500'
+                }`}
                 style={{ width: `${requiredProgress}%` }}
               ></div>
             </div>
@@ -354,17 +373,36 @@ const DocumentUpload = () => {
           <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-lg font-medium text-gray-900">Optional Documents</h3>
+                <h3 className={`text-lg font-medium transition-colors duration-500 ${
+                  optionalProgress === 0 ? 'text-red-600' :
+                  optionalProgress < 50 ? 'text-red-500' :
+                  optionalProgress < 100 ? 'text-yellow-600' :
+                  'text-green-600'
+                }`}>
+                  Optional Documents
+                </h3>
                 <p className="text-sm text-gray-600 mt-1">Additional verification documents</p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-light text-gray-900">{optionalDocsUploaded}</div>
+                <div className={`text-2xl font-light transition-colors duration-500 ${
+                  optionalProgress === 0 ? 'text-red-600' :
+                  optionalProgress < 50 ? 'text-red-500' :
+                  optionalProgress < 100 ? 'text-yellow-600' :
+                  'text-green-600'
+                }`}>
+                  {optionalDocsUploaded}
+                </div>
                 <div className="text-sm text-gray-500">of {optionalDocsCount}</div>
               </div>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
               <div 
-                className="h-2 bg-gray-600 rounded-full transition-all duration-700 ease-out"
+                className={`h-2 rounded-full transition-all duration-700 ease-out ${
+                  optionalProgress === 0 ? 'bg-red-500' :
+                  optionalProgress < 50 ? 'bg-red-400' :
+                  optionalProgress < 100 ? 'bg-yellow-500' :
+                  'bg-green-500'
+                }`}
                 style={{ width: `${optionalProgress}%` }}
               ></div>
             </div>
@@ -373,7 +411,6 @@ const DocumentUpload = () => {
             </div>
           </div>
         </div>
-
         {/* Documents Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
           {documents.map((document, index) => (
