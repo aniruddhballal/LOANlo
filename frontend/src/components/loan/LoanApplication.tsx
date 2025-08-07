@@ -105,6 +105,13 @@ const LoanApplication = () => {
     );
   };
 
+  // Get step status for color coding
+  const getStepStatus = (step: number): 'completed' | 'current' | 'incomplete' => {
+    if (step < currentStep) return 'completed'
+    if (step === currentStep) return 'current'
+    return 'incomplete'
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
@@ -225,7 +232,7 @@ const LoanApplication = () => {
           onChange={handleChange}
           onFocus={() => handleFocus(name)}
           onBlur={handleBlur}
-          className={`w-full px-4 py-3 bg-white border-2 rounded-lg font-medium text-gray-800 placeholder-gray-400 transition-all duration-300 focus:outline-none hover:border-gray-400 ${
+          className={`w-full px-4 py-3 bg-white border-2 rounded-lg font-medium text-gray-800 placeholder-gray-400 transition-all duration-300 focus:outline-none hover:border-gray-400 ${type === 'number' ? '[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]' : ''} ${
             focusedField === name 
               ? 'border-gray-800 shadow-lg transform scale-[1.01]' 
               : 'border-gray-200 shadow-sm'
@@ -259,7 +266,7 @@ const LoanApplication = () => {
           onChange={handleChange}
           onFocus={() => handleFocus(name)}
           onBlur={handleBlur}
-          className={`w-full px-4 py-3 bg-white border-2 rounded-lg font-medium text-gray-800 transition-all duration-300 focus:outline-none hover:border-gray-400 cursor-pointer ${
+          className={`w-full px-4 py-3 pr-12 bg-white border-2 rounded-lg font-medium text-gray-800 transition-all duration-300 focus:outline-none hover:border-gray-400 cursor-pointer appearance-none ${
             focusedField === name 
               ? 'border-gray-800 shadow-lg transform scale-[1.01]' 
               : 'border-gray-200 shadow-sm'
@@ -335,7 +342,7 @@ const LoanApplication = () => {
             onChange={handleChange}
             onFocus={() => handleFocus(name)}
             onBlur={handleBlur}
-            className="flex-1 px-4 py-3 bg-transparent font-medium text-gray-800 placeholder-gray-400 focus:outline-none"
+            className="flex-1 px-4 py-3 bg-transparent font-medium text-gray-800 placeholder-gray-400 focus:outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
             required={required}
             min={min}
             placeholder="0"
@@ -483,17 +490,6 @@ const LoanApplication = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-8 px-4">
-      {/* Subtle geometric pattern overlay */}
-      <div className="absolute inset-0 opacity-[0.02] pointer-events-none">
-        <svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="black" strokeWidth="1"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-      </div>
 
       <div className="max-w-4xl mx-auto relative">
         {/* Header Section */}
@@ -525,49 +521,108 @@ const LoanApplication = () => {
               </div>
             </div>
             
-            {/* Progress Bar */}
-            <div className="relative bg-gray-200 rounded-full h-3 mb-8 shadow-inner">
+            {/* Enhanced Progress Bar with Status Colors */}
+            <div className="relative bg-gray-200 rounded-full h-4 mb-8 shadow-inner overflow-hidden">
+              {/* Completed sections - Green */}
               <div 
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-gray-800 to-gray-600 rounded-full transition-all duration-700 ease-in-out shadow-lg"
-                style={{ width: `${(currentStep / 4) * 100}%` }}
+                className="absolute top-0 left-0 h-full bg-green-50 border-2 border-green-500 rounded-full transition-all duration-700 ease-in-out"         
+                  style={{ width: `${((currentStep - 1) / 4) * 100}%` }}
               />
+              {/* Current section - Yellow */}
+              {currentStep <= 4 && (
+                <div 
+                  className="absolute top-0 h-full bg-yellow-50 border-2 border-yellow-400 rounded-full transition-all duration-700 ease-in-out"
+                  style={{ 
+                    left: `${((currentStep - 1) / 4) * 100}%`,
+                    width: `${100 / 4}%`
+                  }}
+                />
+              )}
+              {/* Status indicator line */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
             </div>
 
-            {/* Step Indicators */}
+            {/* Enhanced Step Indicators with Status Colors */}
             <div className="flex justify-between items-center">
-              {[1, 2, 3, 4].map((step) => (
-                <div key={step} className="flex flex-col items-center space-y-2">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 border-2 ${
-                    step === currentStep 
-                      ? 'bg-gray-800 text-white border-gray-800 shadow-lg transform scale-110' 
-                      : step < currentStep 
-                      ? 'bg-gray-700 text-white border-gray-700 shadow-md' 
-                      : 'bg-white text-gray-400 border-gray-300 hover:border-gray-400'
-                  }`}>
-                    {step < currentStep ? (
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    ) : (
-                      step
-                    )}
+              {[1, 2, 3, 4].map((step) => {
+                const status = getStepStatus(step)
+                return (
+                  <div key={step} className="flex flex-col items-center space-y-2">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-500 border-3 shadow-lg relative overflow-hidden ${
+                      status === 'completed'
+                        ? 'bg-green-50 text-green-700 border-2 border-green-500 transform scale-105' 
+                        : status === 'current'
+                          ? 'bg-yellow-50 text-yellow-700 border-2 border-yellow-500 transform scale-110 transition-all duration-300'
+                          : 'bg-white text-gray-600 border-2 border-gray-300 hover:border-gray-400'
+                    }`}>
+                      {status === 'completed' ? (
+                        <svg className="w-6 h-6 transition-transform duration-500 hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      ) : status === 'current' ? (
+                        <div className="flex items-center justify-center">
+                          <span className="font-bold text-lg">{step}</span>
+                        </div>
+                      ) : (
+                        <span className="font-bold">{step}</span>
+                      )}
+                    </div>
+                    <div className="text-center">
+                      <span className={`text-xs font-bold tracking-wider transition-colors duration-300 ${
+                        status === 'completed' ? 'text-green-600' 
+                        : status === 'current' ? 'text-yellow-600' 
+                        : 'text-red-400'
+                      }`}>
+                        {step === 1 ? 'PERSONAL' : step === 2 ? 'CONTACT' : step === 3 ? 'EMPLOYMENT' : 'LOAN'}
+                      </span>
+                      {/* Status indicator */}
+                      <div className={`w-2 h-2 rounded-full mx-auto mt-1 transition-colors duration-300 ${
+                        status === 'completed' ? 'bg-green-500 shadow-lg shadow-green-200' 
+                        : status === 'current' ? 'bg-yellow-400 shadow-lg shadow-yellow-200 animate-pulse' 
+                        : 'bg-red-300'
+                      }`}></div>
+                    </div>
                   </div>
-                  <span className={`text-xs font-semibold tracking-wide ${
-                    step === currentStep ? 'text-gray-800' : 'text-gray-500'
-                  }`}>
-                    {step === 1 ? 'PERSONAL' : step === 2 ? 'CONTACT' : step === 3 ? 'EMPLOYMENT' : 'LOAN'}
-                  </span>
-                </div>
-              ))}
+                )
+              })}
+            </div>
+
+            {/* Overall Progress Status */}
+            <div className="mt-6 text-center">
+              <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                currentStep === 1 ? 'bg-red-50/30 text-red-700 border-2 border-red-300' 
+                : currentStep <= 3 ? 'bg-yellow-50/30 text-yellow-700 border-2 border-yellow-300'
+                : 'bg-green-50/30 text-green-700 border-2 border-green-300'
+              }`}>
+                {currentStep === 1 && (
+                  <>
+                    <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                    Getting Started - Personal Details Required
+                  </>
+                )}
+                {currentStep > 1 && currentStep <= 3 && (
+                  <>
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
+                    In Progress - {Math.round(((currentStep - 1) / 4) * 100)}% Complete
+                  </>
+                )}
+                {currentStep === 4 && (
+                  <>
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    Almost Done - Final Step
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Error Display */}
+          {/* Error Display with Red Status */}
           {error && (
-            <div className="mb-8 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-lg shadow-sm">
-              <div className="flex items-center">
+              <div className="mb-8 p-4 bg-red-50/20 border-2 border-red-400 rounded-lg animate-shake">
+                <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                  <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                 </div>
@@ -582,7 +637,7 @@ const LoanApplication = () => {
           <form onSubmit={(e) => currentStep === 4 ? handleSubmit(e) : e.preventDefault()} className="relative z-10">
             {renderStep()}
 
-            {/* Navigation Buttons */}
+            {/* Enhanced Navigation Buttons with Status Colors */}
             <div className="flex justify-between items-center mt-12 pt-8 border-t border-gray-200">
               {currentStep > 1 ? (
                 <button 
@@ -604,27 +659,39 @@ const LoanApplication = () => {
                   type="button" 
                   onClick={nextStep}
                   disabled={!isStepValid(currentStep)}
-                  className={`inline-flex items-center px-8 py-4 rounded-xl font-semibold tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-lg ${
+                  className={`inline-flex items-center px-8 py-4 rounded-xl font-semibold tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-lg relative overflow-hidden ${
                     isStepValid(currentStep)
-                      ? 'bg-gradient-to-r from-gray-800 to-gray-600 text-white hover:from-gray-700 hover:to-gray-500 hover:scale-105 hover:shadow-xl focus:ring-gray-300'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    ? 'bg-green-50 border-2 border-green-600 text-green-700 hover:bg-green-100 hover:border-green-700 hover:scale-105 focus:ring-4 focus:ring-green-200'
+                    : 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed'
                   }`}
                 >
+                  {!isStepValid(currentStep) && (
+                    <div className="absolute inset-0 bg-red-500/20 animate-pulse"></div>
+                  )}
                   <span>CONTINUE</span>
                   <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
+                  {isStepValid(currentStep) && (
+                    <div className="absolute inset-0 bg-white/10 animate-ping rounded-xl"></div>
+                  )}
                 </button>
               ) : (
                 <button 
                   type="submit" 
                   disabled={loading || !isStepValid(currentStep)}
-                  className={`inline-flex items-center px-12 py-4 rounded-xl font-bold tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-xl ${
-                    loading || !isStepValid(currentStep)
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-gray-900 to-gray-700 text-white hover:from-gray-800 hover:to-gray-600 hover:scale-105 hover:shadow-2xl focus:ring-gray-300'
+                  className={`inline-flex items-center px-12 py-4 rounded-xl font-bold tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-xl relative overflow-hidden ${
+                  loading || !isStepValid(currentStep)
+                    ? 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed'
+                    : 'bg-green-50 border-2 border-green-700 text-green-800 hover:bg-green-100 hover:border-green-800 hover:scale-105 focus:ring-4 focus:ring-green-200'
                   }`}
                 >
+                  {loading && (
+                    <div className="absolute inset-0 bg-yellow-400/30 animate-pulse"></div>
+                  )}
+                  {!isStepValid(currentStep) && !loading && (
+                    <div className="absolute inset-0 bg-red-500/20 animate-pulse"></div>
+                  )}
                   {loading ? (
                     <>
                       <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
@@ -638,7 +705,10 @@ const LoanApplication = () => {
                       <span>SUBMIT APPLICATION</span>
                       <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>                      
+                      </svg>
+                      {isStepValid(currentStep) && (
+                        <div className="absolute inset-0 bg-white/10 animate-ping rounded-xl"></div>
+                      )}
                     </>
                   )}
                 </button>
