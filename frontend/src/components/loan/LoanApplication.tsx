@@ -154,39 +154,6 @@ const LoanApplication = () => {
     }
   }
 
-  const renderInputField = (
-    name: keyof LoanData, 
-    label: string, 
-    type: string = 'text', 
-    required: boolean = true
-  ) => (
-    <div className="relative group">
-      <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
-        {label}
-      </label>
-      <div className={`relative transition-all duration-300 ${focusedField === name ? 'transform scale-[1.02]' : ''}`}>
-        <input
-          type={type}
-          name={name}
-          value={loanData[name] || ''}
-          onChange={handleChange}
-          onFocus={() => handleFocus(name)}
-          onBlur={handleBlur}
-          className={`w-full px-4 py-3 bg-white border-2 rounded-lg font-medium text-gray-800 placeholder-gray-400 transition-all duration-300 focus:outline-none hover:border-gray-400 ${type === 'number' ? '[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]' : ''} ${
-            focusedField === name 
-              ? 'border-gray-800 shadow-lg transform scale-[1.01]' 
-              : 'border-gray-200 shadow-sm'
-          }`}
-          required={required}
-          placeholder={`Enter ${label.toLowerCase()}`}
-        />
-        <div className={`absolute inset-0 rounded-lg bg-gradient-to-r from-gray-100 to-gray-50 opacity-0 pointer-events-none transition-opacity duration-300 ${
-          focusedField === name ? 'opacity-20' : ''
-        }`}></div>
-      </div>
-    </div>
-  )
-
   const renderSelectField = (
     name: keyof LoanData, 
     label: string, 
