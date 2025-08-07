@@ -447,7 +447,7 @@ const DocumentUpload = () => {
                 <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-full text-sm font-medium ${
                   document.uploaded 
                     ? 'bg-green-100 text-green-800' 
-                    : 'bg-gray-100 text-gray-700'
+                    : 'bg-yellow-100 text-yellow-700'
                 }`}>
                   {document.uploaded ? <CheckCircleIcon /> : <ClockIcon />}
                   <span>{document.uploaded ? 'Uploaded' : 'Pending'}</span>
