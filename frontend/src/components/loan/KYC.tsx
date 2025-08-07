@@ -54,6 +54,8 @@ const KYC = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [isKYCComplete, setIsKYCComplete] = useState(false)
+  // New state to track if KYC was just completed in this session
+  const [showCongratulations, setShowCongratulations] = useState(false)
 
   // Fetch KYC details on mount and check if KYC is complete
   useEffect(() => {
@@ -81,6 +83,7 @@ const KYC = () => {
           })
           
           setIsKYCComplete(kycComplete)
+          // Don't set showCongratulations here - only show normal form
         }
       } catch (err) {
         console.error('Error fetching KYC:', err)
@@ -189,8 +192,8 @@ const KYC = () => {
 
       if (response.ok) {
         setIsKYCComplete(true)
-        // Redirect to loan application or show success message
-        navigate('/loan-application')
+        // Set this flag to show congratulations message
+        setShowCongratulations(true)
       } else {
         setError('KYC submission failed')
       }
@@ -442,8 +445,8 @@ const KYC = () => {
     }
   }
 
-  // If KYC is already complete, show completion message
-  if (isKYCComplete) {
+  // Show congratulations screen only if KYC was just completed in this session
+  if (showCongratulations && isKYCComplete) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-8 px-4">
         <div className="max-w-4xl mx-auto relative">
@@ -477,7 +480,10 @@ const KYC = () => {
                 </button>
                 
                 <button 
-                  onClick={() => setIsKYCComplete(false)}
+                  onClick={() => {
+                    setShowCongratulations(false)
+                    setCurrentStep(1)
+                  }}
                   className="inline-flex items-center px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 transform hover:scale-105 shadow-lg"
                 >
                   <span className="tracking-wide">UPDATE KYC</span>
@@ -499,7 +505,9 @@ const KYC = () => {
             <span className="text-3xl font-bold text-white tracking-wider">KYC</span>
           </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Know Your Customer</h1>
-          <p className="text-xl text-gray-600 font-medium tracking-wide">Complete your verification to proceed</p>
+          <p className="text-xl text-gray-600 font-medium tracking-wide">
+            {isKYCComplete ? 'Update your verification details' : 'Complete your verification to proceed'}
+          </p>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-blue-500 mx-auto mt-4 rounded-full"></div>
         </div>
 
@@ -513,8 +521,12 @@ const KYC = () => {
           <div className="mb-12 relative z-10">
             <div className="flex justify-between items-center mb-8">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 tracking-wide">KYC Verification Progress</h2>
-                <p className="text-gray-600 font-medium mt-1">Complete all sections for verification</p>
+                <h2 className="text-2xl font-bold text-gray-900 tracking-wide">
+                  {isKYCComplete ? 'Update KYC Details' : 'KYC Verification Progress'}
+                </h2>
+                <p className="text-gray-600 font-medium mt-1">
+                  {isKYCComplete ? 'Modify your verification information' : 'Complete all sections for verification'}
+                </p>
               </div>
               <div className="text-right">
                 <div className="text-3xl font-bold text-gray-800">{currentStep}</div>
@@ -598,19 +610,19 @@ const KYC = () => {
                 {currentStep === 1 && (
                   <>
                     <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                    Getting Started - Personal Details Required
+                    {isKYCComplete ? 'Updating Personal Details' : 'Getting Started - Personal Details Required'}
                   </>
                 )}
                 {currentStep > 1 && currentStep < 3 && (
                   <>
                     <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
-                    In Progress - {Math.round(((currentStep - 1) / 3) * 100)}% Complete
+                    {isKYCComplete ? `Updating Details - ${Math.round(((currentStep - 1) / 3) * 100)}% Complete` : `In Progress - ${Math.round(((currentStep - 1) / 3) * 100)}% Complete`}
                   </>
                 )}
                 {currentStep === 3 && (
                   <>
                     <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                    Almost Done - Final Step
+                    {isKYCComplete ? 'Finalizing Updates' : 'Almost Done - Final Step'}
                   </>
                 )}
               </div>
@@ -699,11 +711,11 @@ const KYC = () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      <span>SUBMITTING...</span>
+                      <span>{isKYCComplete ? 'UPDATING...' : 'SUBMITTING...'}</span>
                     </>
                   ) : (
                     <>
-                      <span>COMPLETE KYC</span>
+                      <span>{isKYCComplete ? 'UPDATE KYC' : 'COMPLETE KYC'}</span>
                       <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
