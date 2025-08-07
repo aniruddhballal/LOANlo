@@ -56,11 +56,14 @@ const KYC = () => {
   const [isKYCComplete, setIsKYCComplete] = useState(false)
   // New state to track if KYC was just completed in this session
   const [showCongratulations, setShowCongratulations] = useState(false)
+  // New state to track initial data loading
+  const [initialLoading, setInitialLoading] = useState(true)
 
   // Fetch KYC details on mount and check if KYC is complete
   useEffect(() => {
     const fetchKYC = async () => {
       try {
+        setInitialLoading(true)
         const token = localStorage.getItem('token')
         const response = await fetch('http://localhost:5000/api/kyc/me', {
           headers: {
@@ -87,6 +90,8 @@ const KYC = () => {
         }
       } catch (err) {
         console.error('Error fetching KYC:', err)
+      } finally {
+        setInitialLoading(false)
       }
     }
     fetchKYC()
@@ -496,6 +501,51 @@ const KYC = () => {
     )
   }
 
+  // Show loading screen while fetching initial data
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-8 px-4">
+        <div className="max-w-4xl mx-auto relative">
+          {/* Header Section */}
+          <div className="text-center mb-12 relative">
+            <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-600 to-blue-500 rounded-full mb-6 shadow-2xl">
+              <span className="text-3xl font-bold text-white tracking-wider">KYC</span>
+            </div>
+            <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Know Your Customer</h1>
+            <p className="text-xl text-gray-600 font-medium tracking-wide">Loading your verification details...</p>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-blue-500 mx-auto mt-4 rounded-full"></div>
+          </div>
+
+          {/* Loading Card */}
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-200 p-8 lg:p-12 relative overflow-hidden">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-50 rounded-full mb-6">
+                <svg className="animate-spin w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Loading KYC Information</h2>
+              <p className="text-gray-600 mb-8">Please wait while we fetch your verification details...</p>
+              
+              {/* Loading skeleton */}
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="space-y-3">
+                      <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-12 bg-gray-100 rounded-lg animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-8 px-4">
       <div className="max-w-4xl mx-auto relative">
@@ -506,7 +556,7 @@ const KYC = () => {
           </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Know Your Customer</h1>
           <p className="text-xl text-gray-600 font-medium tracking-wide">
-            {isKYCComplete ? 'Update your verification details' : 'Complete your verification to proceed'}
+            Complete your verification to proceed
           </p>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-blue-500 mx-auto mt-4 rounded-full"></div>
         </div>
@@ -522,10 +572,10 @@ const KYC = () => {
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 tracking-wide">
-                  {isKYCComplete ? 'Update KYC Details' : 'KYC Verification Progress'}
+                  KYC Verification Process
                 </h2>
                 <p className="text-gray-600 font-medium mt-1">
-                  {isKYCComplete ? 'Modify your verification information' : 'Complete all sections for verification'}
+                  Complete all sections for verification
                 </p>
               </div>
               <div className="text-right">
@@ -610,19 +660,19 @@ const KYC = () => {
                 {currentStep === 1 && (
                   <>
                     <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                    {isKYCComplete ? 'Updating Personal Details' : 'Getting Started - Personal Details Required'}
+                    Getting Started - Personal Details Required
                   </>
                 )}
                 {currentStep > 1 && currentStep < 3 && (
                   <>
                     <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
-                    {isKYCComplete ? `Updating Details - ${Math.round(((currentStep - 1) / 3) * 100)}% Complete` : `In Progress - ${Math.round(((currentStep - 1) / 3) * 100)}% Complete`}
+                    In Progress - {Math.round(((currentStep - 1) / 3) * 100)}% Complete
                   </>
                 )}
                 {currentStep === 3 && (
                   <>
                     <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                    {isKYCComplete ? 'Finalizing Updates' : 'Almost Done - Final Step'}
+                    Almost Done - Final Step
                   </>
                 )}
               </div>
