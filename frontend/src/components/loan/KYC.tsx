@@ -475,7 +475,7 @@ const KYC = () => {
               
               <div className="flex justify-center gap-4">
                 <button 
-                  onClick={() => navigate('/loan-application')}
+                  onClick={() => navigate('/loan-application', { state: { fromKYC: true } })}
                   className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl font-semibold hover:from-green-700 hover:to-green-600 focus:outline-none focus:ring-4 focus:ring-green-200 transition-all duration-200 transform hover:scale-105 shadow-lg"
                 >
                   <span className="tracking-wide">APPLY FOR LOAN</span>

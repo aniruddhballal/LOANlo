@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 interface LoanData {
   loanType: string;
@@ -31,6 +31,7 @@ interface KYCData {
 
 const LoanApplication = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [focusedField, setFocusedField] = useState<string>('')
   const [loanData, setLoanData] = useState<LoanData>({
     loanType: '',
@@ -43,6 +44,9 @@ const LoanApplication = () => {
   const [error, setError] = useState('')
   const [isKYCComplete, setIsKYCComplete] = useState(false)
   const [checkingKYC, setCheckingKYC] = useState(true)
+
+  // Check if user came from KYC page
+  const cameFromKYC = location.state?.fromKYC === true
 
   // Check KYC completion on mount
   useEffect(() => {
@@ -364,18 +368,20 @@ const LoanApplication = () => {
           <div className="w-24 h-1 bg-gradient-to-r from-green-600 to-green-500 mx-auto mt-4 rounded-full"></div>
         </div>
 
-        {/* KYC Status Card */}
-        <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 mb-8 flex items-center">
-          <div className="flex-shrink-0">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+        {/* KYC Status Card - Only show if user came from KYC page */}
+        {cameFromKYC && (
+          <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 mb-8 flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold text-green-800">KYC Verified</h3>
+              <p className="text-green-700">Your identity has been successfully verified. You can now proceed with your loan application.</p>
+            </div>
           </div>
-          <div className="ml-4">
-            <h3 className="text-lg font-semibold text-green-800">KYC Verified</h3>
-            <p className="text-green-700">Your identity has been successfully verified. You can now proceed with your loan application.</p>
-          </div>
-        </div>
+        )}
 
         {/* Main Card */}
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-200 p-8 lg:p-12 relative overflow-hidden">
