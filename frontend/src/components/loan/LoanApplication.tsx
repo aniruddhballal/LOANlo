@@ -360,7 +360,7 @@ const LoanApplication = () => {
             <span className="text-3xl font-bold text-white tracking-wider">LO</span>
           </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Loan Application</h1>
-          <p className="text-xl text-gray-600 font-medium tracking-wide">Final step to get your loan approved</p>
+          <p className="text-xl text-gray-600 font-medium tracking-wide">One step to get your loan approved</p>
           <div className="w-24 h-1 bg-gradient-to-r from-green-600 to-green-500 mx-auto mt-4 rounded-full"></div>
         </div>
 
