@@ -477,15 +477,12 @@ const LoanApplication = () => {
                 disabled={loading || !isFormValid()}
                 className={`inline-flex items-center px-12 py-4 rounded-xl font-bold tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-xl relative overflow-hidden ${
                 loading || !isFormValid()
-                  ? 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed'
+                  ? 'bg-gray-50/30 border-2 border-gray-400 text-gray-600 cursor-not-allowed'
                   : 'bg-green-50 border-2 border-green-700 text-green-800 hover:bg-green-100 hover:border-green-800 hover:scale-105 focus:ring-4 focus:ring-green-200'
                 }`}
               >
                 {loading && (
                   <div className="absolute inset-0 bg-yellow-400/30 animate-pulse"></div>
-                )}
-                {!isFormValid() && !loading && (
-                  <div className="absolute inset-0 bg-red-500/20 animate-pulse"></div>
                 )}
                 {loading ? (
                   <>
