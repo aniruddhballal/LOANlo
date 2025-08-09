@@ -12,11 +12,12 @@ export interface User {
 interface AuthContextType {
   user: User | null
   loading: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string, options?: { skipDelay?: boolean }) => Promise<void>
   register: (userData: RegisterData) => Promise<void>
   logout: () => void
   updateUser: (userData: Partial<User>) => Promise<void>
   deleteAccount: (password: string) => Promise<void>
+  completeLogin: () => void
 }
 
 interface RegisterData {
@@ -72,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [])
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, options?: { skipDelay?: boolean }) => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
@@ -88,10 +89,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(data.message || 'Login failed')
       }
 
+      // Store credentials but don't set user state immediately if delay is not skipped
       localStorage.setItem('token', data.token)
-      setUser(data.user)
+      
+      // If skipDelay is true (for direct logins), set user immediately
+      // Otherwise, let the calling component handle when to set the user
+      if (options?.skipDelay) {
+        setUser(data.user)
+      } else {
+        // Store user data temporarily for delayed setting
+        localStorage.setItem('pendingUser', JSON.stringify(data.user))
+      }
     } catch (error) {
       throw error
+    }
+  }
+
+  // Function to complete the login after animations
+  const completeLogin = () => {
+    const pendingUser = localStorage.getItem('pendingUser')
+    if (pendingUser) {
+      setUser(JSON.parse(pendingUser))
+      localStorage.removeItem('pendingUser')
     }
   }
 
@@ -120,6 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('pendingUser')
     setUser(null)
   }
 
@@ -168,6 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Clear local storage and user state
       localStorage.removeItem('token')
+      localStorage.removeItem('pendingUser')
       setUser(null)
       
       return data
@@ -183,7 +204,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     register,
     logout,
     updateUser,
-    deleteAccount
+    deleteAccount,
+    completeLogin // Expose this for manual completion
   }
 
   return (
