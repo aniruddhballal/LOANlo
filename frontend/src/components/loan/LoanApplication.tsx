@@ -368,17 +368,30 @@ const LoanApplication = () => {
           <div className="w-24 h-1 bg-gradient-to-r from-green-600 to-green-500 mx-auto mt-4 rounded-full"></div>
         </div>
 
-        {/* KYC Status Card - Only show if user came from KYC page */}
+        {/* KYC Status Card - Pure Tailwind Animation */}
         {cameFromKYC && (
-          <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 mb-8 flex items-center">
-            <div className="flex-shrink-0">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="ml-4">
-              <h3 className="text-lg font-semibold text-green-800">KYC Verified</h3>
-              <p className="text-green-700">Your identity has been successfully verified. You can now proceed with your loan application.</p>
+          <div className="mb-8 animate-[slideDown_0.6s_ease-out]">
+            <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center">
+                {/* Check icon with entrance animation */}
+                <div className="flex-shrink-0 mr-4 animate-[zoomIn_0.4s_ease-out_0.2s_both]">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-green-100">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                
+                {/* Content with staggered entrance */}
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-green-800 mb-1 animate-[slideLeft_0.5s_ease-out_0.3s_both]">
+                    KYC Verified
+                  </h3>
+                  <p className="text-green-700 animate-[slideLeft_0.5s_ease-out_0.4s_both]">
+                    Your identity has been successfully verified. You can now proceed with your loan application.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -520,6 +533,42 @@ const LoanApplication = () => {
           <p className="text-xs mt-2">Secure • Professional • Confidential</p>
         </div>
       </div>
+
+      <style>{`
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes zoomIn {
+          from {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        @keyframes slideLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
+
     </div>
   )
 }
