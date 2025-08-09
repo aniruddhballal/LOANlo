@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { CheckCircle } from 'lucide-react'
 
 interface LoanApplication {
   _id: string
@@ -17,8 +18,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [hasKYC, setHasKYC] = useState<boolean | null>(null)
-  // 1. Add these state variables at the top of your Dashboard component:
-  const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(false)
   const [justLoggedIn, setJustLoggedIn] = useState(false)
 
   useEffect(() => {
@@ -26,23 +25,17 @@ const Dashboard = () => {
     checkKYCStatus()
   }, [])
 
-  // 2. Add this useEffect to check if user just logged in:
+  // Check for login success and handle overlay timing
   useEffect(() => {
-    // Check if user just came from login
     const loginSuccess = sessionStorage.getItem('loginSuccess')
     if (loginSuccess === 'true') {
       setJustLoggedIn(true)
-      setShowWelcomeOverlay(true)
       
-      // Clear the flag and hide overlay after animation
-      setTimeout(() => {
-        setShowWelcomeOverlay(false)
-        sessionStorage.removeItem('loginSuccess')
-      }, 2000)
-      
+      {/* Hide overlay after animation completes (1.2s animation + 0.3s buffer) */}
       setTimeout(() => {
         setJustLoggedIn(false)
-      }, 2500)
+        sessionStorage.removeItem('loginSuccess')
+      }, 1500)
     }
   }, [])
 
@@ -160,45 +153,67 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Welcome Animation Overlay - Tailwind Based */}
+      {justLoggedIn && (
+        <div className="fixed inset-0 z-50 bg-gradient-to-br from-green-500/20 via-emerald-500/10 to-teal-500/20 backdrop-blur-sm
+                       animate-in fade-in duration-500
+                       after:animate-in after:fade-out after:duration-1000 after:delay-2000
+                       data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:duration-500 data-[state=closed]:delay-2500">
+          
+          {/* Success Card */}
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-8 shadow-2xl border border-green-200/50 max-w-md w-full
+                           animate-in zoom-in duration-700 delay-300
+                           animate-out zoom-out duration-500 delay-2000">
+              
+              {/* Success Icon */}
+              <div className="text-center mb-6">
+                <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full mx-auto mb-4 
+                               flex items-center justify-center relative overflow-hidden
+                               animate-in zoom-in duration-500 delay-500
+                               animate-bounce">
+                  <CheckCircle className="w-10 h-10 text-green-600 z-10" />
+                  {/* Sparkle effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-emerald-400/20 
+                                 animate-pulse duration-1000"></div>
+                </div>
+                
+                <h2 className="text-2xl font-bold text-green-900 mb-2
+                              animate-in slide-in-from-bottom-4 duration-500 delay-700">
+                  Welcome Back!
+                </h2>
+                
+                <p className="text-green-700/80 text-sm
+                              animate-in slide-in-from-bottom-4 duration-500 delay-900">
+                  Successfully authenticated to LoanLo Platform
+                </p>
+              </div>
 
-    {showWelcomeOverlay && (
-      <div className="fixed inset-0 bg-white/95 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in-slow">
-        <div className="text-center animate-scale-up-slow">
-          <div className="relative inline-flex items-center justify-center w-32 h-32 mb-8">
-            <div className="absolute inset-0 bg-green-100 rounded-full animate-ping-slow"></div>
-            <div className="absolute inset-2 bg-green-200/50 rounded-full animate-ping-slower"></div>
-            <div className="relative w-24 h-24 bg-green-500 rounded-full flex items-center justify-center animate-bounce-gentle-long">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" className="text-white animate-check-draw-slow">
-                <path d="M7 13l3 3 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-          </div>
-          <h2 className="text-4xl font-light text-gray-900 mb-3 animate-slide-up-slow">
-            Welcome Back!
-          </h2>
-          <p className="text-gray-600 text-lg animate-slide-up-slow delay-400">
-            Successfully logged into LoanLo Platform
-          </p>
-          <div className="flex items-center justify-center mt-8 space-x-3 animate-slide-up-slow delay-800">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-500">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" 
-                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span className="text-gray-500 text-base tracking-wide">Loading your dashboard</span>
-            <div className="flex space-x-2 ml-3">
-              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce-slow"></div>
-              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce-slow delay-200"></div>
-              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce-slow delay-400"></div>
+              {/* Progress Indicators */}
+              <div className="flex justify-center space-x-2 mb-6">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-100"></div>
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-200"></div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="relative h-1 bg-green-100 rounded-full overflow-hidden">
+                <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full
+                               animate-[width_1.2s_ease-in-out] w-0 
+                               [animation-fill-mode:forwards]
+                               [animation-name:progress-bar]"></div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
 
       {/* Subtle gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 opacity-60"></div>
       
-      <div className="relative z-10">
+      <div className={`relative z-10 transition-all duration-1000 ease-out ${
+        justLoggedIn ? 'scale-95 opacity-50 blur-sm' : 'scale-100 opacity-100 blur-0'
+      }`}>
         {/* Header Section */}
         <header className="bg-white border-b border-gray-200 shadow-sm">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
@@ -241,13 +256,9 @@ const Dashboard = () => {
         </header>
 
         {/* Main Content */}
-        <main className={`max-w-7xl mx-auto px-6 lg:px-8 py-8 transition-all duration-1000 ${
-          justLoggedIn ? 'animate-dashboard-slide-in' : ''
+        <main className={`max-w-7xl mx-auto px-6 lg:px-8 py-8 transition-all duration-1000 delay-300 ${
+          justLoggedIn ? 'animate-in slide-in-from-bottom-8 fade-in' : ''
         }`}>
-
-        {/* Only render content when welcome overlay is not showing */}
-          {!showWelcomeOverlay && (
-            <>
 
             {/* KYC Status Section */}
             {hasKYC !== null && (
@@ -549,149 +560,16 @@ const Dashboard = () => {
                 </Link>
               </div>
             )}
-          </>
-        )}
         </main>
       </div>
 
-      {/* 5. Add this style tag before your closing component div: */}
+      {/* Progress bar animation styles */}
       <style>{`
-        @keyframes fade-in-slow {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-      
-        @keyframes scale-up-slow {
-          from {
-            opacity: 0;
-            transform: scale(0.7);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-      
-        @keyframes slide-up-slow {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      
-        @keyframes bounce-gentle-long {
-          0%, 20%, 50%, 80%, 100% {
-            transform: translateY(0);
-          }
-          40% {
-            transform: translateY(-8px);
-          }
-          60% {
-            transform: translateY(-4px);
-          }
-        }
-      
-        @keyframes check-draw-slow {
-          from {
-            stroke-dasharray: 0 100;
-            opacity: 0;
-          }
-          to {
-            stroke-dasharray: 100 0;
-            opacity: 1;
-          }
-        }
-      
-        @keyframes bounce-slow {
-          0%, 20%, 50%, 80%, 100% {
-            transform: translateY(0);
-          }
-          40% {
-            transform: translateY(-4px);
-          }
-          60% {
-            transform: translateY(-2px);
-          }
-        }
-      
-        @keyframes ping-slow {
-          75%, 100% {
-            transform: scale(1.5);
-            opacity: 0;
-          }
-        }
-      
-        @keyframes ping-slower {
-          75%, 100% {
-            transform: scale(2);
-            opacity: 0;
-          }
-        }
-
-        @keyframes dashboard-slide-in {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      
-        .animate-fade-in-slow {
-          animation: fade-in-slow 1s ease-out;
-        }
-      
-        .animate-scale-up-slow {
-          animation: scale-up-slow 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-      
-        .animate-slide-up-slow {
-          animation: slide-up-slow 0.8s ease-out;
-        }
-      
-        .animate-bounce-gentle-long {
-          animation: bounce-gentle-long 3s infinite;
-        }
-      
-        .animate-check-draw-slow {
-          animation: check-draw-slow 1s ease-out;
-        }
-      
-        .animate-bounce-slow {
-          animation: bounce-slow 2s infinite;
-        }
-      
-        .animate-ping-slow {
-          animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-      
-        .animate-ping-slower {
-          animation: ping-slower 4s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-
-        .animate-dashboard-slide-in {
-          animation: dashboard-slide-in 1.5s ease-out;
-        }
-      
-        .delay-200 {
-          animation-delay: 0.2s;
-        }
-      
-        .delay-400 {
-          animation-delay: 0.4s;
-        }
-
-        .delay-800 {
-          animation-delay: 0.8s;
+        @keyframes progress-bar {
+          from { width: 0%; }
+          to { width: 100%; }
         }
       `}</style>
-
     </div>
   )
 }
