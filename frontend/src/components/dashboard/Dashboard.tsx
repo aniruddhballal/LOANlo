@@ -17,10 +17,33 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [hasKYC, setHasKYC] = useState<boolean | null>(null)
+  // 1. Add these state variables at the top of your Dashboard component:
+  const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(false)
+  const [justLoggedIn, setJustLoggedIn] = useState(false)
 
   useEffect(() => {
     fetchApplications()
     checkKYCStatus()
+  }, [])
+
+  // 2. Add this useEffect to check if user just logged in:
+  useEffect(() => {
+    // Check if user just came from login
+    const loginSuccess = sessionStorage.getItem('loginSuccess')
+    if (loginSuccess === 'true') {
+      setJustLoggedIn(true)
+      setShowWelcomeOverlay(true)
+      
+      // Clear the flag and hide overlay after animation
+      setTimeout(() => {
+        setShowWelcomeOverlay(false)
+        sessionStorage.removeItem('loginSuccess')
+      }, 2000)
+      
+      setTimeout(() => {
+        setJustLoggedIn(false)
+      }, 2500)
+    }
   }, [])
 
   // Check if user has KYC
@@ -137,6 +160,41 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
+
+    {showWelcomeOverlay && (
+      <div className="fixed inset-0 bg-white/95 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in-slow">
+        <div className="text-center animate-scale-up-slow">
+          <div className="relative inline-flex items-center justify-center w-32 h-32 mb-8">
+            <div className="absolute inset-0 bg-green-100 rounded-full animate-ping-slow"></div>
+            <div className="absolute inset-2 bg-green-200/50 rounded-full animate-ping-slower"></div>
+            <div className="relative w-24 h-24 bg-green-500 rounded-full flex items-center justify-center animate-bounce-gentle-long">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" className="text-white animate-check-draw-slow">
+                <path d="M7 13l3 3 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <h2 className="text-4xl font-light text-gray-900 mb-3 animate-slide-up-slow">
+            Welcome Back!
+          </h2>
+          <p className="text-gray-600 text-lg animate-slide-up-slow delay-400">
+            Successfully logged into LoanLo Platform
+          </p>
+          <div className="flex items-center justify-center mt-8 space-x-3 animate-slide-up-slow delay-800">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-500">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" 
+                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="text-gray-500 text-base tracking-wide">Loading your dashboard</span>
+            <div className="flex space-x-2 ml-3">
+              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce-slow"></div>
+              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce-slow delay-200"></div>
+              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce-slow delay-400"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
       {/* Subtle gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 opacity-60"></div>
       
@@ -183,309 +241,457 @@ const Dashboard = () => {
         </header>
 
         {/* Main Content */}
-        <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-          {/* KYC Status Section */}
-          {hasKYC !== null && (
-            <div className={`mb-8 rounded-xl p-6 shadow-sm border transition-all duration-300 ${
-              hasKYC 
-                ? 'bg-gradient-to-r from-gray-900 to-black text-white border-gray-300 shadow-md' 
-                : 'bg-white text-gray-900 border-amber-200 shadow-amber-100'
-            }`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-5">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                    hasKYC ? 'bg-white/10 backdrop-blur' : 'bg-amber-100'
-                  }`}>
-                    {hasKYC ? (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M6 12.5L10.5 17L18 9.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    ) : (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" stroke="#D97706" strokeWidth="1.5"/>
-                        <rect x="11" y="7" width="2" height="7" rx="1" fill="#D97706"/>
-                        <rect x="11" y="16" width="2" height="2" rx="1" fill="#D97706"/>
-                      </svg>
-                    )}
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold mb-1">
-                      {hasKYC ? 'Identity Verification Complete' : 'Identity Verification Required'}
-                    </h2>
-                    <p className={`text-sm font-light ${hasKYC ? 'text-gray-200' : 'text-gray-600'}`}>
-                      {hasKYC 
-                        ? 'Your account is fully verified and ready for all banking services.' 
-                        : 'Complete your identity verification to access loan application services.'}
-                    </p>
-                  </div>
-                </div>
-                {!hasKYC && (
-                  <Link 
-                    to="/kyc" 
-                    className="px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
-                  >
-                    Begin Verification
-                  </Link>
-                )}
-              </div>
-            </div>
-          )}
+        <main className={`max-w-7xl mx-auto px-6 lg:px-8 py-8 transition-all duration-1000 ${
+          justLoggedIn ? 'animate-dashboard-slide-in' : ''
+        }`}>
 
-          {/* Service Actions */}
-          {hasKYC === true && (
-            <section className="mb-10">
-              <div className="mb-6">
-                <h2 className="text-2xl font-light text-gray-900 mb-2">Available Services</h2>
-                <div className="w-16 h-0.5 bg-gradient-to-r from-gray-900 to-gray-600"></div>
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Link 
-                  to="/loan-application" 
-                  className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
-                >
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-700">
-                        <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+        {/* Only render content when welcome overlay is not showing */}
+          {!showWelcomeOverlay && (
+            <>
+
+            {/* KYC Status Section */}
+            {hasKYC !== null && (
+              <div className={`mb-8 rounded-xl p-6 shadow-sm border transition-all duration-300 ${
+                hasKYC 
+                  ? 'bg-gradient-to-r from-gray-900 to-black text-white border-gray-300 shadow-md' 
+                  : 'bg-white text-gray-900 border-amber-200 shadow-amber-100'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-5">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                      hasKYC ? 'bg-white/10 backdrop-blur' : 'bg-amber-100'
+                    }`}>
+                      {hasKYC ? (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M6 12.5L10.5 17L18 9.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      ) : (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <circle cx="12" cy="12" r="10" stroke="#D97706" strokeWidth="1.5"/>
+                          <rect x="11" y="7" width="2" height="7" rx="1" fill="#D97706"/>
+                          <rect x="11" y="16" width="2" height="2" rx="1" fill="#D97706"/>
+                        </svg>
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
-                        New Loan Application
-                      </h3>
-                      <p className="text-gray-600 text-sm font-light leading-relaxed">
-                        Submit a new loan application with competitive interest rates and flexible terms tailored to your requirements.
+                    <div>
+                      <h2 className="text-xl font-semibold mb-1">
+                        {hasKYC ? 'Identity Verification Complete' : 'Identity Verification Required'}
+                      </h2>
+                      <p className={`text-sm font-light ${hasKYC ? 'text-gray-200' : 'text-gray-600'}`}>
+                        {hasKYC 
+                          ? 'Your account is fully verified and ready for all banking services.' 
+                          : 'Complete your identity verification to access loan application services.'}
                       </p>
                     </div>
                   </div>
-                </Link>
-                
-                <Link 
-                  to="/application-status" 
-                  className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
-                >
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-700">
-                        <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M12 21c0-1-1-3-3-3s-3 2-3 3 1 3 3 3 3-2 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
-                        Application Portfolio
-                      </h3>
-                      <p className="text-gray-600 text-sm font-light leading-relaxed">
-                        Monitor and track the comprehensive status of all your submitted loan applications in one centralized location.
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-
-                <Link 
-                  to="/kyc" 
-                  className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
-                >
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-700">
-                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M16 7l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M21 21H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
-                        View/Update Current KYC
-                      </h3>
-                      <p className="text-gray-600 text-sm font-light leading-relaxed">
-                        Review your current KYC information and make updates to keep your verification details current and accurate.
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            </section>
-          )}
-
-          {/* Applications Overview */}
-          {hasKYC === true && (
-            <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-2xl font-light text-gray-900 mb-1">Recent Applications</h2>
-                    <p className="text-sm text-gray-600 font-light">Overview of your latest loan applications</p>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm">
-                      <span className="text-sm font-medium text-gray-700">
-                        {applications.length} {applications.length === 1 ? 'Application' : 'Applications'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </header>
-              
-              <div className="p-8">
-                {loading && (
-                  <div className="flex justify-center items-center py-16">
-                    <div className="relative">
-                      <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-300 border-t-gray-900"></div>
-                      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-gray-200"></div>
-                    </div>
-                    <span className="ml-4 text-gray-700 font-medium">Loading applications...</span>
-                  </div>
-                )}
-                
-                {error && (
-                  <div className="mb-6 p-5 bg-red-50 border border-red-200 rounded-xl">
-                    <div className="flex items-center space-x-3">
-                      <svg width="20" height="20" className="text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                      </svg>
-                      <span className="text-red-800 font-medium">{error}</span>
-                    </div>
-                  </div>
-                )}
-
-                {!loading && applications.length === 0 && (
-                  <div className="text-center py-16">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No Applications Found</h3>
-                    <p className="text-gray-600 mb-8 font-light">You haven't submitted any loan applications yet. Start your financial journey today.</p>
+                  {!hasKYC && (
                     <Link 
                       to="/kyc" 
-                      className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
+                      className="px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
                     >
-                      Submit First Application
+                      Begin Verification
                     </Link>
-                  </div>
-                )}
+                  )}
+                </div>
+              </div>
+            )}
 
-                {!loading && applications.length > 0 && (
-                  <div className="space-y-4">
-                    {applications.map((app) => (
-                      <div 
-                        key={app._id} 
-                        className="border border-gray-200 rounded-xl p-6 hover:bg-gray-50/50 hover:border-gray-300 transition-all duration-200 group"
+            {/* Service Actions */}
+            {hasKYC === true && (
+              <section className="mb-10">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-light text-gray-900 mb-2">Available Services</h2>
+                  <div className="w-16 h-0.5 bg-gradient-to-r from-gray-900 to-gray-600"></div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <Link 
+                    to="/loan-application" 
+                    className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                          <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
+                          New Loan Application
+                        </h3>
+                        <p className="text-gray-600 text-sm font-light leading-relaxed">
+                          Submit a new loan application with competitive interest rates and flexible terms tailored to your requirements.
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                  
+                  <Link 
+                    to="/application-status" 
+                    className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                          <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M12 21c0-1-1-3-3-3s-3 2-3 3 1 3 3 3 3-2 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
+                          Application Portfolio
+                        </h3>
+                        <p className="text-gray-600 text-sm font-light leading-relaxed">
+                          Monitor and track the comprehensive status of all your submitted loan applications in one centralized location.
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+
+                  <Link 
+                    to="/kyc" 
+                    className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                          <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M16 7l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M21 21H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
+                          View/Update Current KYC
+                        </h3>
+                        <p className="text-gray-600 text-sm font-light leading-relaxed">
+                          Review your current KYC information and make updates to keep your verification details current and accurate.
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              </section>
+            )}
+
+            {/* Applications Overview */}
+            {hasKYC === true && (
+              <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h2 className="text-2xl font-light text-gray-900 mb-1">Recent Applications</h2>
+                      <p className="text-sm text-gray-600 font-light">Overview of your latest loan applications</p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <span className="text-sm font-medium text-gray-700">
+                          {applications.length} {applications.length === 1 ? 'Application' : 'Applications'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </header>
+                
+                <div className="p-8">
+                  {loading && (
+                    <div className="flex justify-center items-center py-16">
+                      <div className="relative">
+                        <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-300 border-t-gray-900"></div>
+                        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-gray-200"></div>
+                      </div>
+                      <span className="ml-4 text-gray-700 font-medium">Loading applications...</span>
+                    </div>
+                  )}
+                  
+                  {error && (
+                    <div className="mb-6 p-5 bg-red-50 border border-red-200 rounded-xl">
+                      <div className="flex items-center space-x-3">
+                        <svg width="20" height="20" className="text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                        <span className="text-red-800 font-medium">{error}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {!loading && applications.length === 0 && (
+                    <div className="text-center py-16">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">No Applications Found</h3>
+                      <p className="text-gray-600 mb-8 font-light">You haven't submitted any loan applications yet. Start your financial journey today.</p>
+                      <Link 
+                        to="/kyc" 
+                        className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-6 flex-1 min-w-0">
-                            <div className="flex-shrink-0">
-                              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                                {getStatusIcon(app.status)}
-                              </div>
-                            </div>
-                            
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center space-x-4 mb-3">
-                                <h3 className="font-semibold text-gray-900 text-lg">{app.loanType}</h3>
-                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusClasses(app.status)}`}>
-                                  {formatStatus(app.status)}
-                                </span>
+                        Submit First Application
+                      </Link>
+                    </div>
+                  )}
+
+                  {!loading && applications.length > 0 && (
+                    <div className="space-y-4">
+                      {applications.map((app) => (
+                        <div 
+                          key={app._id} 
+                          className="border border-gray-200 rounded-xl p-6 hover:bg-gray-50/50 hover:border-gray-300 transition-all duration-200 group"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-6 flex-1 min-w-0">
+                              <div className="flex-shrink-0">
+                                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                                  {getStatusIcon(app.status)}
+                                </div>
                               </div>
                               
-                              <div className="flex items-center space-x-6 text-sm text-gray-600">
-                                <div className="flex items-center space-x-2">
-                                  <span className="font-light">Amount:</span>
-                                  <span className="font-semibold text-gray-900 text-lg">{formatCurrency(app.amount)}</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <span className="font-light">Reference:</span>
-                                  <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs font-medium">
-                                    #{app._id.slice(-8).toUpperCase()}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center space-x-4 mb-3">
+                                  <h3 className="font-semibold text-gray-900 text-lg">{app.loanType}</h3>
+                                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusClasses(app.status)}`}>
+                                    {formatStatus(app.status)}
                                   </span>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                  <span className="font-light">Submitted:</span>
-                                  <span className="font-medium">
-                                    {new Date(app.createdAt).toLocaleDateString('en-IN', {
-                                      day: 'numeric',
-                                      month: 'short',
-                                      year: 'numeric'
-                                    })}
-                                  </span>
+                                
+                                <div className="flex items-center space-x-6 text-sm text-gray-600">
+                                  <div className="flex items-center space-x-2">
+                                    <span className="font-light">Amount:</span>
+                                    <span className="font-semibold text-gray-900 text-lg">{formatCurrency(app.amount)}</span>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <span className="font-light">Reference:</span>
+                                    <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs font-medium">
+                                      #{app._id.slice(-8).toUpperCase()}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <span className="font-light">Submitted:</span>
+                                    <span className="font-medium">
+                                      {new Date(app.createdAt).toLocaleDateString('en-IN', {
+                                        day: 'numeric',
+                                        month: 'short',
+                                        year: 'numeric'
+                                      })}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                          
-                          <div className="flex items-center space-x-4 flex-shrink-0">
-                            <div className="text-sm">
-                              {app.documentsUploaded ? (
-                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                  <svg width="14" height="14" className="mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
-                                  </svg>
-                                  Documentation Complete
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                                  <svg width="14" height="14" className="mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                  </svg>
-                                  Documentation Pending
-                                </span>
+                            
+                            <div className="flex items-center space-x-4 flex-shrink-0">
+                              <div className="text-sm">
+                                {app.documentsUploaded ? (
+                                  <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <svg width="14" height="14" className="mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Documentation Complete
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                                    <svg width="14" height="14" className="mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Documentation Pending
+                                  </span>
+                                )}
+                              </div>
+                              
+                              {!app.documentsUploaded && (
+                                <Link 
+                                  to={`/upload-documents/${app._id}`} 
+                                  className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
+                                >
+                                  Upload Documents
+                                </Link>
                               )}
                             </div>
-                            
-                            {!app.documentsUploaded && (
-                              <Link 
-                                to={`/upload-documents/${app._id}`} 
-                                className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
-                              >
-                                Upload Documents
-                              </Link>
-                            )}
                           </div>
                         </div>
-                      </div>
-                    ))}
-                    
-                    {applications.length > 3 && (
-                      <div className="text-center pt-6 border-t border-gray-200 mt-8">
-                        <Link 
-                          to="/application-status" 
-                          className="inline-flex items-center text-gray-700 font-medium hover:text-gray-900 transition-colors group"
-                        >
-                          View Complete Application Portfolio
-                          <svg width="16" height="16" className="ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                          </svg>
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
+                      ))}
+                      
+                      {applications.length > 3 && (
+                        <div className="text-center pt-6 border-t border-gray-200 mt-8">
+                          <Link 
+                            to="/application-status" 
+                            className="inline-flex items-center text-gray-700 font-medium hover:text-gray-900 transition-colors group"
+                          >
+                            View Complete Application Portfolio
+                            <svg width="16" height="16" className="ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
 
-          {/* Call to Action */}
-          {hasKYC === true && (
-            <div className="mt-12 text-center">
-              <Link 
-                to="/application-status" 
-                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-gray-900 to-black text-white rounded-xl font-medium hover:from-black hover:to-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                Access Complete Portfolio
-                <svg width="20" height="20" className="ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                </svg>
-              </Link>
-            </div>
-          )}
+            {/* Call to Action */}
+            {hasKYC === true && (
+              <div className="mt-12 text-center">
+                <Link 
+                  to="/application-status" 
+                  className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-gray-900 to-black text-white rounded-xl font-medium hover:from-black hover:to-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                  Access Complete Portfolio
+                  <svg width="20" height="20" className="ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                  </svg>
+                </Link>
+              </div>
+            )}
+          </>
+        )}
         </main>
       </div>
+
+      {/* 5. Add this style tag before your closing component div: */}
+      <style>{`
+        @keyframes fade-in-slow {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      
+        @keyframes scale-up-slow {
+          from {
+            opacity: 0;
+            transform: scale(0.7);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      
+        @keyframes slide-up-slow {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      
+        @keyframes bounce-gentle-long {
+          0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-8px);
+          }
+          60% {
+            transform: translateY(-4px);
+          }
+        }
+      
+        @keyframes check-draw-slow {
+          from {
+            stroke-dasharray: 0 100;
+            opacity: 0;
+          }
+          to {
+            stroke-dasharray: 100 0;
+            opacity: 1;
+          }
+        }
+      
+        @keyframes bounce-slow {
+          0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-4px);
+          }
+          60% {
+            transform: translateY(-2px);
+          }
+        }
+      
+        @keyframes ping-slow {
+          75%, 100% {
+            transform: scale(1.5);
+            opacity: 0;
+          }
+        }
+      
+        @keyframes ping-slower {
+          75%, 100% {
+            transform: scale(2);
+            opacity: 0;
+          }
+        }
+
+        @keyframes dashboard-slide-in {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      
+        .animate-fade-in-slow {
+          animation: fade-in-slow 1s ease-out;
+        }
+      
+        .animate-scale-up-slow {
+          animation: scale-up-slow 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+      
+        .animate-slide-up-slow {
+          animation: slide-up-slow 0.8s ease-out;
+        }
+      
+        .animate-bounce-gentle-long {
+          animation: bounce-gentle-long 3s infinite;
+        }
+      
+        .animate-check-draw-slow {
+          animation: check-draw-slow 1s ease-out;
+        }
+      
+        .animate-bounce-slow {
+          animation: bounce-slow 2s infinite;
+        }
+      
+        .animate-ping-slow {
+          animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+      
+        .animate-ping-slower {
+          animation: ping-slower 4s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+
+        .animate-dashboard-slide-in {
+          animation: dashboard-slide-in 1.5s ease-out;
+        }
+      
+        .delay-200 {
+          animation-delay: 0.2s;
+        }
+      
+        .delay-400 {
+          animation-delay: 0.4s;
+        }
+
+        .delay-800 {
+          animation-delay: 0.8s;
+        }
+      `}</style>
+
     </div>
   )
 }
