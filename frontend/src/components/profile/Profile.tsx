@@ -491,117 +491,117 @@ const Profile = () => {
         </div>
       )}
 
-      {/* Elegant Delete Account Modal */}
+    {/* Elegant Delete Account Modal - Now Scrollable */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 animate-fade-in border border-gray-200">
-            <div className="text-center mb-8">
-              <div className="p-4 bg-gradient-to-br from-red-100 to-red-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                <AlertTriangle className="h-10 w-10 text-red-600" />
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 animate-fade-in border border-gray-200 max-h-[90vh] overflow-y-auto">
+              <div className="text-center mb-8">
+                <div className="p-4 bg-gradient-to-br from-red-100 to-red-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                  <AlertTriangle className="h-10 w-10 text-red-600" />
+                </div>
+                <h3 className="text-3xl font-light text-black tracking-wide">Delete Account</h3>
+                <p className="text-gray-600 mt-2 leading-relaxed">
+                  This action is permanent and cannot be undone
+                </p>
               </div>
-              <h3 className="text-3xl font-light text-black tracking-wide">Delete Account</h3>
-              <p className="text-gray-600 mt-2 leading-relaxed">
-                This action is permanent and cannot be undone
-              </p>
-            </div>
-            
-            <div className="mb-8 p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-              <p className="text-gray-800 mb-4 font-medium">
-                <strong>Warning:</strong> Deleting your account will permanently remove:
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-700">
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
-                  <span>Profile information</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
-                  <span>Posts and comments</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
-                  <span>Activity history</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
-                  <span>Uploaded files</span>
-                </div>
-                <div className="flex items-center space-x-2 md:col-span-2">
-                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
-                  <span>All associated platform data</span>
-                </div>
-              </div>
-            </div>
-            
-            {error && (
-              <div className="mb-6 bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-400 p-4 rounded-r-lg">
-                <div className="flex items-center space-x-3">
-                  <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                  <span className="text-red-800 font-medium">{error}</span>
+              
+              <div className="mb-8 p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+                <p className="text-gray-800 mb-4 font-medium">
+                  <strong>Warning:</strong> Deleting your account will permanently remove:
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-700">
+                  <div className="flex items-center space-x-2">
+                    <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                    <span>Profile information</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                    <span>Posts and comments</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                    <span>Activity history</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                    <span>Uploaded files</span>
+                  </div>
+                  <div className="flex items-center space-x-2 md:col-span-2">
+                    <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                    <span>All associated platform data</span>
+                  </div>
                 </div>
               </div>
-            )}
-            
-            <div className="space-y-6">
-              <div>
-                <label htmlFor="deleteConfirmation" className="block text-sm font-semibold text-gray-600 uppercase tracking-widest mb-3">
-                  Type "DELETE MY ACCOUNT" to confirm:
-                </label>
-                <input
-                  type="text"
-                  id="deleteConfirmation"
-                  value={deleteConfirmationText}
-                  onChange={(e) => setDeleteConfirmationText(e.target.value)}
-                  className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-red-600 transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
-                  placeholder="DELETE MY ACCOUNT"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="deletePassword" className="block text-sm font-semibold text-gray-600 uppercase tracking-widest mb-3">
-                  Current Password
-                </label>
-                <div className="relative">
+              
+              {error && (
+                <div className="mb-6 bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-400 p-4 rounded-r-lg">
+                  <div className="flex items-center space-x-3">
+                    <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                    <span className="text-red-800 font-medium">{error}</span>
+                  </div>
+                </div>
+              )}
+              
+              <div className="space-y-6">
+                <div>
+                  <label htmlFor="deleteConfirmation" className="block text-sm font-semibold text-gray-600 uppercase tracking-widest mb-3">
+                    Type "DELETE MY ACCOUNT" to confirm:
+                  </label>
                   <input
-                    type={showDeletePassword ? 'text' : 'password'}
-                    id="deletePassword"
-                    value={deletePassword}
-                    onChange={(e) => setDeletePassword(e.target.value)}
-                    className="w-full px-5 py-4 pr-14 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-red-600 transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
-                    placeholder="Enter your current password"
+                    type="text"
+                    id="deleteConfirmation"
+                    value={deleteConfirmationText}
+                    onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                    className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-red-600 transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
+                    placeholder="DELETE MY ACCOUNT"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowDeletePassword(!showDeletePassword)}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black transition-colors duration-200 p-1"
-                  >
-                    {showDeletePassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
+                </div>
+
+                <div>
+                  <label htmlFor="deletePassword" className="block text-sm font-semibold text-gray-600 uppercase tracking-widest mb-3">
+                    Current Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showDeletePassword ? 'text' : 'password'}
+                      id="deletePassword"
+                      value={deletePassword}
+                      onChange={(e) => setDeletePassword(e.target.value)}
+                      className="w-full px-5 py-4 pr-14 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-red-600 transition-all duration-300 text-black bg-white placeholder-gray-400 shadow-sm font-medium"
+                      placeholder="Enter your current password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowDeletePassword(!showDeletePassword)}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black transition-colors duration-200 p-1"
+                    >
+                      {showDeletePassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex space-x-4 mt-8">
-              <button 
-                type="button"
-                onClick={closeDeleteModal}
-                className="flex-1 px-6 py-3 bg-white hover:bg-gray-50 text-black rounded-xl border-2 border-gray-300 hover:border-gray-400 transition-all duration-300 shadow-sm font-medium tracking-wide"
-                disabled={deleteLoading}
-              >
-                Cancel
-              </button>
-              <button 
-                type="button"
-                onClick={handleDeleteAccount}
-                disabled={deleteLoading || deleteConfirmationText.toLowerCase() !== 'delete my account' || !deletePassword}
-                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
-              >
-                {deleteLoading && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
-                <span>{deleteLoading ? 'Deleting...' : 'Delete Account'}</span>
-              </button>
+              <div className="flex space-x-4 mt-8">
+                <button 
+                  type="button"
+                  onClick={closeDeleteModal}
+                  className="flex-1 px-6 py-3 bg-white hover:bg-gray-50 text-black rounded-xl border-2 border-gray-300 hover:border-gray-400 transition-all duration-300 shadow-sm font-medium tracking-wide"
+                  disabled={deleteLoading}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={deleteLoading || deleteConfirmationText.toLowerCase() !== 'delete my account' || !deletePassword}
+                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                >
+                  {deleteLoading && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
+                  <span>{deleteLoading ? 'Deleting...' : 'Delete Account'}</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
       )}
 
       <style>{`
