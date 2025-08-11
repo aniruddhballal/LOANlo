@@ -40,6 +40,25 @@ const Profile = () => {
     }
   }, [user])
 
+  // Add this useEffect for the password modal keyboard shortcuts
+  useEffect(() => {
+    if (!showPasswordModal) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && confirmationPassword && !loading) {
+        handlePasswordConfirmation();
+      }
+      if (e.key === 'Escape' && !loading) {
+        setShowPasswordModal(false);
+        setConfirmationPassword('');
+        setError('');
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showPasswordModal, confirmationPassword, loading]);
+
   // Add this at the component level, not inside JSX
   useEffect(() => {
     if (!showDeleteModal) return;
@@ -120,9 +139,15 @@ const Profile = () => {
     } catch (err) {
       let msg = 'Failed to update profile';
       if (err && typeof err === 'object' && 'message' in err) {
-        msg = (err as { message?: string }).message || msg;
+        let originalMsg = (err as { message?: string }).message || msg;
+        // Map specific backend messages to more user-friendly ones
+        if (originalMsg.toLowerCase().includes('current password is incorrect')) {
+          msg = 'Invalid password';
+        } else {
+          msg = originalMsg;
+        }
       } else if (typeof err === 'string') {
-        msg = err;
+        msg = err.toLowerCase().includes('current password is incorrect') ? 'Invalid password' : err;
       }
       setError(msg);
     } finally {
@@ -435,10 +460,10 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Sophisticated Password Confirmation Modal */}
+{/* Sophisticated Password Confirmation Modal */}
       {showPasswordModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 animate-fade-in border border-gray-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 animate-fade-in border border-gray-200 max-h-[90vh] overflow-y-auto">
             <div className="text-center mb-6">
               <div className="p-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Shield className="h-8 w-8 text-blue-600" />
@@ -448,7 +473,7 @@ const Profile = () => {
                 Please verify your identity by entering your current password to proceed with these changes.
               </p>
             </div>
-            
+           
             {error && (
               <div className="mb-6 bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-400 p-4 rounded-r-lg">
                 <div className="flex items-center space-x-3">
@@ -457,7 +482,7 @@ const Profile = () => {
                 </div>
               </div>
             )}
-            
+           
             <div className="mb-8">
               <label htmlFor="confirmationPassword" className="block text-sm font-semibold text-gray-600 uppercase tracking-widest mb-3">
                 Current Password
@@ -481,9 +506,8 @@ const Profile = () => {
                 </button>
               </div>
             </div>
-
             <div className="flex space-x-4">
-              <button 
+              <button
                 type="button"
                 onClick={() => {
                   setShowPasswordModal(false)
@@ -494,7 +518,7 @@ const Profile = () => {
               >
                 Cancel
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={handlePasswordConfirmation}
                 disabled={loading}
