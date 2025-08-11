@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { Eye, EyeOff, Trash2, AlertTriangle, User, Mail, Phone, Key, Shield, Hash, Edit3, Save, X, ArrowLeft } from 'lucide-react'
@@ -39,6 +39,23 @@ const Profile = () => {
       })
     }
   }, [user])
+
+  // Add this at the component level, not inside JSX
+  useEffect(() => {
+    if (!showDeleteModal) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && deleteConfirmationText.toLowerCase() === 'delete my account' && deletePassword && !deleteLoading) {
+        handleDeleteAccount();
+      }
+      if (e.key === 'Escape' && !deleteLoading) {
+        closeDeleteModal();
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showDeleteModal, deleteConfirmationText, deletePassword, deleteLoading]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -491,16 +508,9 @@ const Profile = () => {
         </div>
       )}
 
-    {/* Elegant Delete Account Modal - Now Scrollable */}
+      {/* Elegant Delete Account Modal - Now Scrollable */}
       {showDeleteModal && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && deleteConfirmationText.toLowerCase() === 'delete my account' && deletePassword && !deleteLoading) {
-              handleDeleteAccount();
-            }
-          }}
-        >
+        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 animate-fade-in border border-gray-200 max-h-[90vh] overflow-y-auto">
               <div className="text-center mb-8">
                 <div className="p-4 bg-gradient-to-br from-red-100 to-red-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
