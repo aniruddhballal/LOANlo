@@ -493,7 +493,14 @@ const Profile = () => {
 
     {/* Elegant Delete Account Modal - Now Scrollable */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && deleteConfirmationText.toLowerCase() === 'delete my account' && deletePassword && !deleteLoading) {
+              handleDeleteAccount();
+            }
+          }}
+        >
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 animate-fade-in border border-gray-200 max-h-[90vh] overflow-y-auto">
               <div className="text-center mb-8">
                 <div className="p-4 bg-gradient-to-br from-red-100 to-red-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
