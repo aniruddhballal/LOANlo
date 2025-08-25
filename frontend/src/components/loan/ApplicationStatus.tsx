@@ -577,8 +577,18 @@ const ApplicationStatus = () => {
 
           {/* Executive Delete Confirmation Modal */}
           {deleteConfirmation.show && deleteConfirmation.application && (
-            <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-              <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-200">
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-all duration-300 ease-out"
+              style={{
+                animation: 'fadeIn 0.3s ease-out'
+              }}
+            >
+              <div 
+                className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden border border-gray-200 transform transition-all duration-300 ease-out"
+                style={{
+                  animation: 'slideInUp 0.3s ease-out'
+                }}
+              >
                 {/* Header */}
                 <div className="px-8 py-6 border-b border-gray-200 bg-gray-50">
                   <div className="flex items-center justify-between">
@@ -605,7 +615,7 @@ const ApplicationStatus = () => {
                 </div>
                 
                 {/* Content */}
-                <div className="p-8">
+                <div className="p-8 overflow-y-auto max-h-[calc(90vh-200px)]">
                   <div className="space-y-6">
                     {/* Warning Message */}
                     <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
@@ -656,7 +666,7 @@ const ApplicationStatus = () => {
                       <input
                         type="text"
                         placeholder="Type DELETE to confirm"
-                        className="mt-4 w-full px-4 py-3 border border-gray-300 rounded-lg text-center font-mono text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all duration-200"
+                        className="mt-4 w-full px-4 py-3 border border-gray-300 rounded-lg text-center font-mono text-sm text-gray-900 bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all duration-200 placeholder-gray-400"
                         onChange={(e) => setDeleteConfirmation({...deleteConfirmation, confirmText: e.target.value})}
                       />
                     </div>
@@ -722,6 +732,27 @@ const ApplicationStatus = () => {
           </div>
         </div>
       </div>
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+      `}</style>
     </div>
   )
 }
