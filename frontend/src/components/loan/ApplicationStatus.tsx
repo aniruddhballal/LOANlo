@@ -31,6 +31,14 @@ const ApplicationStatus = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedApplication, setSelectedApplication] = useState<LoanApplication | null>(null)
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    show: boolean, 
+    application: LoanApplication | null,
+    confirmText?: string
+  }>({
+    show: false,
+    application: null
+  });
 
   useEffect(() => {
     fetchApplications()
@@ -104,7 +112,6 @@ const ApplicationStatus = () => {
   }
 
   const handleDeleteApplication = async (applicationId: string) => {
-    if (!window.confirm('Are you sure you want to delete this application? This action cannot be undone.')) return;
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:5000/api/loans/${applicationId}`, {
@@ -116,6 +123,7 @@ const ApplicationStatus = () => {
       if (response.ok) {
         setApplications(applications.filter(app => app._id !== applicationId));
         setSelectedApplication(null);
+        setDeleteConfirmation({show: false, application: null, confirmText: ''});
       } else {
         const data = await response.json();
         alert(data.message || 'Failed to delete application');
@@ -542,16 +550,16 @@ const ApplicationStatus = () => {
 
                     {/* Action Section */}
                     <div className="border-t border-gray-200 pt-6 flex justify-between items-center">
-                      <button
-                        className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                        onClick={() => handleDeleteApplication(selectedApplication._id)}
-                      >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        Delete Application
-                      </button>
-                      
+<button
+  className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+  onClick={() => setDeleteConfirmation({show: true, application: selectedApplication})}
+>
+  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+  </svg>
+  Delete Application
+</button>
+
                       <button
                         onClick={() => setSelectedApplication(null)}
                         className="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
@@ -566,6 +574,126 @@ const ApplicationStatus = () => {
                 </div>
               </div>
             )}
+
+          {/* Executive Delete Confirmation Modal */}
+          {deleteConfirmation.show && deleteConfirmation.application && (
+            <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+              <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-200">
+                {/* Header */}
+                <div className="px-8 py-6 border-b border-gray-200 bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-medium text-gray-900">Confirm Deletion</h3>
+                        <p className="text-sm text-gray-600 mt-1">This action requires your confirmation</p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => setDeleteConfirmation({show: false, application: null, confirmText: ''})}
+                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Content */}
+                <div className="p-8">
+                  <div className="space-y-6">
+                    {/* Warning Message */}
+                    <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+                      <div className="flex items-start">
+                        <svg className="w-5 h-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        <div>
+                          <h4 className="text-red-800 font-medium">Permanent Action</h4>
+                          <p className="text-red-700 text-sm mt-1">This operation cannot be undone. All associated data will be permanently removed.</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Application Details */}
+                    <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                      <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">Application to be Deleted</div>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Reference:</span>
+                          <span className="font-mono text-sm font-medium text-gray-900 bg-white px-3 py-1 rounded border">
+                            #{deleteConfirmation.application._id.slice(-8).toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Loan Type:</span>
+                          <span className="text-sm font-medium text-gray-900">{deleteConfirmation.application.loanType}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Amount:</span>
+                          <span className="text-sm font-medium text-gray-900">₹{deleteConfirmation.application.amount.toLocaleString('en-IN')}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Status:</span>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusClasses(deleteConfirmation.application.status)}`}>
+                            {getStatusIcon(deleteConfirmation.application.status)}
+                            {formatStatus(deleteConfirmation.application.status)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Confirmation Text */}
+                    <div className="text-center py-4">
+                      <p className="text-gray-700 font-medium">Are you absolutely sure you want to proceed?</p>
+                      <p className="text-sm text-gray-600 mt-1">Type <strong>DELETE</strong> below to confirm this action</p>
+                      
+                      <input
+                        type="text"
+                        placeholder="Type DELETE to confirm"
+                        className="mt-4 w-full px-4 py-3 border border-gray-300 rounded-lg text-center font-mono text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all duration-200"
+                        onChange={(e) => setDeleteConfirmation({...deleteConfirmation, confirmText: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Actions */}
+                <div className="px-8 py-6 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+                  <button
+                    onClick={() => setDeleteConfirmation({show: false, application: null, confirmText: ''})}
+                    className="inline-flex items-center px-6 py-3 border-2 border-gray-300 text-gray-700 font-medium rounded-lg hover:border-gray-400 hover:bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Cancel
+                  </button>
+                  
+                  <button
+                    onClick={() => handleDeleteApplication(deleteConfirmation.application!._id)}
+                    disabled={deleteConfirmation.confirmText !== 'DELETE'}
+                    className={`inline-flex items-center px-8 py-3 font-medium rounded-lg transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                      deleteConfirmation.confirmText === 'DELETE'
+                        ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 hover:shadow-md'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Permanently Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           </div>
         )}
 
