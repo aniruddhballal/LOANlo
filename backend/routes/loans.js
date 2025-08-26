@@ -49,6 +49,36 @@ router.post('/apply', authenticateToken, async (req, res) => {
   }
 });
 
+// Get ALL loan applications (for underwriters only)
+router.get('/all', authenticateToken, async (req, res) => {
+  try {
+    // Only underwriters can access
+    if (req.user.role !== 'underwriter') {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'Access denied. Underwriter role required.' 
+      });
+    }
+
+    const applications = await LoanApplication.find({})
+      .populate('userId', 'firstName lastName email phone role')
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      applications
+    });
+  } catch (error) {
+    console.error('Error fetching all loan applications:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error', 
+      error: error.message 
+    });
+  }
+});
+
+
 // Get user's loan applications with populated user data
 router.get('/my-applications', authenticateToken, async (req, res) => {
   try {
