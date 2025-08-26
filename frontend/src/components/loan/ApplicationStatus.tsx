@@ -44,6 +44,17 @@ const ApplicationStatus = () => {
     fetchApplications()
   }, [])
 
+  const role = localStorage.getItem("role") // or from Redux/auth context
+
+  console.log(role)
+
+  let dashboardPath = "/dashboard/applicant"; // default
+  if (role === "underwriter") {
+    dashboardPath = "/dashboard/underwriter";
+  } else if (role === "system_admin") {
+    dashboardPath = "/dashboard/system_admin";
+  }
+
   const fetchApplications = async () => {
     try {
       const token = localStorage.getItem('token')
@@ -707,31 +718,31 @@ const ApplicationStatus = () => {
           </div>
         )}
 
-        {/* Executive Navigation */}
-        <div className="mt-12 flex justify-between items-center">
-          <Link 
-            to="/dashboard" 
-            className="inline-flex items-center px-8 py-3 border-2 border-gray-300 text-gray-700 font-medium rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Return to Dashboard
-          </Link>
-          
-          <div className="flex items-center space-x-4">
-            <Link 
-              to="/kyc" 
-              className="inline-flex items-center px-8 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-            >
-              Submit New Application
-              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </div>
+{/* Executive Navigation */}
+<div className="mt-12 flex justify-between items-center">
+  <Link 
+    to={dashboardPath}
+    className="inline-flex items-center px-8 py-3 border-2 border-gray-300 text-gray-700 font-medium rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+  >
+    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+    </svg>
+    Return to Dashboard
+  </Link>
+
+  <div className="flex items-center space-x-4">
+    <Link 
+      to="/kyc" 
+      className="inline-flex items-center px-8 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+    >
+      Submit New Application
+      <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+      </svg>
+    </Link>
+  </div>
+</div>
+</div>
       <style>{`
         @keyframes fadeIn {
           from {
