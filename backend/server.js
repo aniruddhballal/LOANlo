@@ -7,7 +7,7 @@ const connectDB = require('./config/database');
 const authRoutes = require('./routes/auth');
 const loanRoutes = require('./routes/loans');
 const documentRoutes = require('./routes/documents');
-const adminRoutes = require('./routes/admin');
+const systemAdminRoutes = require('./routes/systemadmin');
 const kycRoutes = require('./routes/kyc');
 
 
@@ -29,7 +29,7 @@ if (!fs.existsSync('uploads')) {
 app.use('/api/auth', authRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/documents', documentRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/admin', systemAdminRoutes);
 
 // Connect to MongoDB and start server
 connectDB()
