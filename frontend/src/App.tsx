@@ -1,7 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './components/auth/Login'
 import Register from './components/auth/Register'
-import Dashboard from './components/dashboard/Dashboard'
+import ApplicantDashboard from './components/dashboard/ApplicantDashboard'
+import UnderwriterDashboard from './components/dashboard/UnderwriterDashboard'
+import SystemAdminDashboard from './components/dashboard/SystemAdminDashboard'
 import LoanApplication from './components/loan/LoanApplication'
 import DocumentUpload from './components/loan/DocumentUpload'
 import ApplicationStatus from './components/loan/ApplicationStatus'
@@ -21,10 +23,15 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth()
-  
+
   if (loading) return <div>Loading...</div>
-  
-  return !user ? <>{children}</> : <Navigate to="/dashboard" />
+
+  if (!user) {
+    return <>{children}</>
+  }
+
+  // user.role comes from MongoDB via backend -> AuthContext
+  return <Navigate to={`/dashboard/${user.role}`} />
 }
 
 function AppContent() {
@@ -46,11 +53,24 @@ function AppContent() {
           } />
           
           {/* Protected Routes */}
-          <Route path="/dashboard" element={
+          <Route path="/dashboard/applicant" element={
             <ProtectedRoute>
-              <Dashboard />
+              <ApplicantDashboard />
             </ProtectedRoute>
           } />
+
+          <Route path="/dashboard/underwriter" element={
+            <ProtectedRoute>
+              <UnderwriterDashboard />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/dashboard/system_admin" element={
+            <ProtectedRoute>
+              <SystemAdminDashboard />
+            </ProtectedRoute>
+          } />
+
           <Route path="/loan-application" element={
             <ProtectedRoute>
               <LoanApplication />

@@ -25,6 +25,8 @@ const Login = () => {
     if (error) setError('')
   }
 
+  const { user } = useAuth()  // get current user from context
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -37,20 +39,25 @@ const Login = () => {
       // Show success animation
       setLoginSuccess(true)
       
-      // Complete the login and redirect after animation
       setTimeout(() => {
-        // This will set the user state and trigger the redirect
         completeLogin()
         sessionStorage.setItem('loginSuccess', 'true')
-        navigate('/dashboard')
+        
+        // 🔑 Redirect based on role
+        if (user?.role) {
+          navigate(`/dashboard/${user.role}`)
+        } else {
+          navigate('/dashboard/applicant') // fallback
+        }
       }, 1000) // Match your animation duration
-      
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
       setLoading(false)
       setLoginSuccess(false)
     }
   }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-6 relative overflow-hidden">
