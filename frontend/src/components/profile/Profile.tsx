@@ -212,6 +212,8 @@ const Profile = () => {
     setError('')
   }
 
+  const role = localStorage.getItem("role"); // or from Redux
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
@@ -241,13 +243,19 @@ const Profile = () => {
                 <p className="text-gray-600 text-sm font-medium mt-1">Manage your personal information and settings</p>
               </div>
             </div>
-            <Link 
-              to="/dashboard" 
-              className="inline-flex items-center space-x-3 px-6 py-3 bg-white hover:bg-gray-50 text-black rounded-xl border-2 border-gray-300 hover:border-gray-400 transition-all duration-300 shadow-sm hover:shadow-md font-medium"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span className="tracking-wide">Return to Dashboard</span>
-            </Link>
+              <Link 
+                to={
+                  role === "underwriter" 
+                    ? "/dashboard/underwriter" 
+                    : role === "system_admin" 
+                    ? "/dashboard/system_admin" 
+                    : "/dashboard/applicant"
+                }
+                className="inline-flex items-center space-x-3 px-6 py-3 bg-white hover:bg-gray-50 text-black rounded-xl border-2 border-gray-300 hover:border-gray-400 transition-all duration-300 shadow-sm hover:shadow-md font-medium"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span className="tracking-wide">Return to Dashboard</span>
+              </Link>
           </div>
         </div>
       </div>
