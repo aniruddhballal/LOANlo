@@ -5,7 +5,7 @@ export interface User {
   email: string
   firstName: string
   lastName: string
-  role: 'borrower' | 'loan_officer' | 'admin'
+  role: 'applicant' | 'underwriter' | 'system_admin'
   phone?: string
 }
 
