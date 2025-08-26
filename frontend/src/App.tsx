@@ -35,13 +35,23 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   return <Navigate to={`/dashboard/${user.role}`} />
 }
 
+// Root Redirector — handles `/`
+const RootRedirect = () => {
+  const { user, loading } = useAuth()
+  if (loading) return <div>Loading...</div>
+  if (!user) return <Navigate to="/login" />
+  return <Navigate to={`/dashboard/${user.role}`} />
+}
+
 function AppContent() {
   return (
     <Router>
       <div className="app">
         <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Navigate to="/dashboard" />} />
+          {/* Root path */}
+          <Route path="/" element={<RootRedirect />} />
+          
+          {/* Public */}
           <Route path="/login" element={
             <PublicRoute>
               <Login />
