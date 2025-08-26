@@ -5,11 +5,11 @@ const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Sync all user data across collections (admin utility route)
+// Sync all user data across collections (system admin utility route)
 router.post('/sync-user-data', authenticateToken, async (req, res) => {
   try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Admin access required' });
+    if (req.user.role !== 'system_admin') {
+      return res.status(403).json({ message: 'System Admin access required' });
     }
 
     const users = await User.find({});
