@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 
 interface LoanApplication {
   _id: string
@@ -15,6 +17,7 @@ interface LoanApplication {
 }
 
 export default function UnderwriterDashboard() {
+  const { user, logout } = useAuth()
   const [applications, setApplications] = useState<LoanApplication[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -113,7 +116,7 @@ export default function UnderwriterDashboard() {
               <div className="flex items-center space-x-6">
                 <div className="relative">
                   <div className="w-14 h-14 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-semibold text-lg tracking-wider shadow-lg">
-                    UW
+                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white"></div>
                 </div>
@@ -124,20 +127,23 @@ export default function UnderwriterDashboard() {
                   <p className="text-base text-gray-600 font-light">
                     Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 17 ? 'Afternoon' : 'Evening'}, 
                     <span className="font-medium text-gray-900 ml-1">
-                      Review and manage loan applications
+                      {user?.firstName} {user?.lastName}
                     </span>
                   </p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm">
-                  {applications.length} {applications.length === 1 ? 'Application' : 'Applications'}
-                </div>
+                <Link 
+                  to="/profile" 
+                  className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm"
+                >
+                  Account Settings
+                </Link>
                 <button 
-                  onClick={() => window.location.reload()} 
+                  onClick={logout} 
                   className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
                 >
-                  Refresh
+                  Sign Out
                 </button>
               </div>
             </div>
