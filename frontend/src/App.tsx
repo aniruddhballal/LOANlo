@@ -10,6 +10,7 @@ import ApplicationStatus from './components/loan/ApplicationStatus'
 import Profile from './components/profile/Profile'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import KYC from './components/loan/KYC'
+import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -54,23 +55,23 @@ function AppContent() {
           
           {/* Protected Routes */}
           <Route path="/dashboard/applicant" element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={['applicant']}>
               <ApplicantDashboard />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           } />
 
           <Route path="/dashboard/underwriter" element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={['underwriter']}>
               <UnderwriterDashboard />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           } />
 
           <Route path="/dashboard/system_admin" element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={['system_admin']}>
               <SystemAdminDashboard />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           } />
-
+          
           <Route path="/loan-application" element={
             <ProtectedRoute>
               <LoanApplication />
