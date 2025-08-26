@@ -227,7 +227,7 @@ export default function UnderwriterDashboard() {
                           {applications.map((app) => (
                             <tr key={app._id} className="hover:bg-gray-50/50 transition-colors duration-150">
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs font-medium">
+                                <span className="font-mono bg-gray-900 text-white px-2 py-1 rounded text-xs font-medium">
                                   #{app._id.slice(-8).toUpperCase()}
                                 </span>
                               </td>
@@ -315,7 +315,7 @@ export default function UnderwriterDashboard() {
                               <div className="font-semibold text-gray-900">
                                 {app.userId?.firstName} {app.userId?.lastName}
                               </div>
-                              <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs font-medium">
+                              <span className="font-mono bg-gray-900 text-white px-2 py-1 rounded text-xs font-medium">
                                 #{app._id.slice(-8).toUpperCase()}
                               </span>
                             </div>
