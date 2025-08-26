@@ -206,6 +206,11 @@ export default function UnderwriterDashboard() {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
+                <div className="px-4 py-2 bg-gray-900 text-white rounded-lg shadow-sm">
+                  <span className="text-sm font-medium">
+                    {loading ? 'Loading...' : `${applications.length} ${applications.length === 1 ? 'Application' : 'Applications'}`}
+                  </span>
+                </div>
                 <Link 
                   to="/profile" 
                   className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm"
