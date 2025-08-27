@@ -213,15 +213,17 @@ export default function UnderwriterDashboard() {
                 </div>
                 <Link 
                   to="/profile" 
-                  className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm"
+                  className="relative px-5 py-2.5 text-sm font-medium text-gray-800 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-400 group"
                 >
-                  Account Settings
+                  <span className="relative z-10">Account Settings</span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
                 </Link>
                 <button 
                   onClick={logout} 
-                  className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
+                  className="relative px-5 py-2.5 text-sm font-medium text-white bg-black backdrop-blur-md border border-white/20 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-500 group"
                 >
-                  Sign Out
+                  <span className="relative z-10">Sign Out</span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
                 </button>
               </div>
             </div>
