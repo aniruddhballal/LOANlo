@@ -122,9 +122,20 @@ const DocumentUpload = () => {
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({})
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File }>({})
 
+  const { user } = useAuth()
+
   useEffect(() => {
-    fetchUploadedDocuments()
-  }, [applicationId])
+    if (user) {
+      if (user.role !== 'applicant') {
+        // 🚫 Block access for non-applicants
+        navigate(`/dashboard/${user.role}`)
+      } else {
+        // ✅ Safe to fetch docs
+        fetchUploadedDocuments()
+      }
+    }
+  }, [user, applicationId, navigate])
+
 
   const fetchUploadedDocuments = async () => {
     try {
@@ -275,8 +286,6 @@ const DocumentUpload = () => {
       setError('Failed to complete submission')
     }
   }
-
-  const { user } = useAuth()
 
   const requiredDocsCount = documents.filter(doc => doc.required).length
   const requiredDocsUploaded = documents.filter(doc => doc.required && doc.uploaded).length
