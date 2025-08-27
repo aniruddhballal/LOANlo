@@ -139,4 +139,233 @@ router.delete('/:applicationId', authenticateToken, async (req, res) => {
   }
 });
 
+// Get single loan application details (for underwriters)
+router.get('/details/:applicationId', authenticateToken, async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+    
+    // Only underwriters can access
+    if (req.user.role !== 'underwriter') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Underwriter role required.'
+      });
+    }
+
+    const application = await LoanApplication.findById(applicationId)
+      .populate('userId', 'firstName lastName email phone role')
+      .populate('kycId');
+
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: 'Application not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      application
+    });
+  } catch (error) {
+    console.error('Error fetching application details:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+});
+
+// Update loan application status (for underwriters only)
+router.put('/update-status/:applicationId', authenticateToken, async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+    const { status, comment, approvalDetails, rejectionReason } = req.body;
+    
+    // Only underwriters can access
+    if (req.user.role !== 'underwriter') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Underwriter role required.'
+      });
+    }
+
+    const application = await LoanApplication.findById(applicationId)
+      .populate('userId', 'firstName lastName email phone');
+
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: 'Application not found'
+      });
+    }
+
+    // Update the application
+    const updateData = {
+      status,
+      updatedAt: new Date()
+    };
+
+    // Add status history entry
+    const historyEntry = {
+      status,
+      timestamp: new Date(),
+      comment,
+      updatedBy: `${req.user.firstName} ${req.user.lastName}` // You might need to get this from user data
+    };
+
+    // Handle approval
+    if (status === 'approved' && approvalDetails) {
+      updateData.approvalDetails = approvalDetails;
+    }
+
+    // Handle rejection
+    if (status === 'rejected' && rejectionReason) {
+      updateData.rejectionReason = rejectionReason;
+    }
+
+    // Update the application
+    const updatedApplication = await LoanApplication.findByIdAndUpdate(
+      applicationId,
+      {
+        ...updateData,
+        $push: { statusHistory: historyEntry }
+      },
+      { new: true, runValidators: true }
+    ).populate('userId', 'firstName lastName email phone role');
+
+    res.json({
+      success: true,
+      message: `Application ${status} successfully`,
+      application: updatedApplication
+    });
+
+  } catch (error) {
+    console.error('Error updating application status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+});
+
+// Add comment to loan application (for underwriters)
+router.post('/add-comment/:applicationId', authenticateToken, async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+    const { comment } = req.body;
+    
+    // Only underwriters can access
+    if (req.user.role !== 'underwriter') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Underwriter role required.'
+      });
+    }
+
+    const application = await LoanApplication.findById(applicationId);
+
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: 'Application not found'
+      });
+    }
+
+    // Add comment to status history without changing status
+    const historyEntry = {
+      status: application.status, // Keep current status
+      timestamp: new Date(),
+      comment,
+      updatedBy: `${req.user.firstName} ${req.user.lastName}`
+    };
+
+    const updatedApplication = await LoanApplication.findByIdAndUpdate(
+      applicationId,
+      {
+        updatedAt: new Date(),
+        $push: { statusHistory: historyEntry }
+      },
+      { new: true }
+    ).populate('userId', 'firstName lastName email phone role');
+
+    res.json({
+      success: true,
+      message: 'Comment added successfully',
+      application: updatedApplication
+    });
+
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+});
+
+// Request additional documents (for underwriters)
+router.post('/request-documents/:applicationId', authenticateToken, async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+    const { documentList, message } = req.body;
+    
+    // Only underwriters can access
+    if (req.user.role !== 'underwriter') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Underwriter role required.'
+      });
+    }
+
+    const application = await LoanApplication.findById(applicationId);
+
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: 'Application not found'
+      });
+    }
+
+    // Add document request to status history
+    const historyEntry = {
+      status: 'documents_requested',
+      timestamp: new Date(),
+      comment: `Documents requested: ${documentList.join(', ')}. ${message || ''}`,
+      updatedBy: `${req.user.firstName} ${req.user.lastName}`
+    };
+
+    const updatedApplication = await LoanApplication.findByIdAndUpdate(
+      applicationId,
+      {
+        status: 'documents_requested',
+        updatedAt: new Date(),
+        documentsUploaded: false, // Reset document status
+        $push: { statusHistory: historyEntry }
+      },
+      { new: true }
+    ).populate('userId', 'firstName lastName email phone role');
+
+    // Here you might want to send an email/notification to the user
+    // about the document request
+
+    res.json({
+      success: true,
+      message: 'Document request sent successfully',
+      application: updatedApplication
+    });
+
+  } catch (error) {
+    console.error('Error requesting documents:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
