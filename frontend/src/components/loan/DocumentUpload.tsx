@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 
 // Refined, minimal icons for professional appearance
 const CheckCircleIcon = () => (
@@ -274,6 +275,8 @@ const DocumentUpload = () => {
       setError('Failed to complete submission')
     }
   }
+
+  const { user } = useAuth()
 
   const requiredDocsCount = documents.filter(doc => doc.required).length
   const requiredDocsUploaded = documents.filter(doc => doc.required && doc.uploaded).length
@@ -550,7 +553,13 @@ const DocumentUpload = () => {
         <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4 pt-8 border-t border-gray-200">
           <button 
             className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => {
+              if (user?.role) {
+                navigate(`/dashboard/${user.role}`)
+              } else {
+                navigate('/dashboard/applicant') // fallback
+              }
+            }}
           >
             <ArrowLeftIcon />
             <span>Back to Dashboard</span>
