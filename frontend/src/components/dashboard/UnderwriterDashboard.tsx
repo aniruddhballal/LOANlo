@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { CheckCircle } from 'lucide-react'
 
+import LoanReviewModal from '../modals/LoanReviewModal'
+
 interface LoanApplication {
   _id: string
   amount: number
@@ -23,6 +25,9 @@ export default function UnderwriterDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [justLoggedIn, setJustLoggedIn] = useState(false)
+
+  const [selectedApplicationId, setSelectedApplicationId] = useState<string | null>(null)
+  const [modalOpen, setModalOpen] = useState(false)
 
   useEffect(() => {
     const fetchApplications = () => {
@@ -65,6 +70,32 @@ export default function UnderwriterDashboard() {
     // cleanup function (for overlay timer)
     return cleanup
   }, [])
+
+  const handleReviewClick = (applicationId: string) => {
+    setSelectedApplicationId(applicationId)
+    setModalOpen(true)
+  }
+
+  const handleModalClose = () => {
+    setModalOpen(false)
+    setSelectedApplicationId(null)
+  }
+
+  const refreshApplications = () => {
+    const token = localStorage.getItem('token')
+    fetch('http://localhost:5000/api/loans/all', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setApplications(data.applications)
+        }
+      })
+      .catch(() => setError('Server error'))
+  }
 
   const getStatusClasses = (status: string) => {
     switch (status) {
@@ -384,7 +415,10 @@ export default function UnderwriterDashboard() {
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <button className="px-3 py-1.5 text-xs font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md">
+                                <button 
+                                  onClick={() => handleReviewClick(app._id)}
+                                  className="px-3 py-1.5 text-xs font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
+                                >
                                   Review
                                 </button>
                               </td>
@@ -452,11 +486,11 @@ export default function UnderwriterDashboard() {
                         </div>
 
                         <div className="flex items-center space-x-2 pt-4 border-t border-gray-100">
-                          <button className="flex-1 px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200">
+                          <button 
+                            onClick={() => handleReviewClick(app._id)}
+                            className="flex-1 px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200"
+                          >
                             Review
-                          </button>
-                          <button className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200">
-                            Details
                           </button>
                         </div>
                       </div>
@@ -468,6 +502,16 @@ export default function UnderwriterDashboard() {
           </section>
         </main>
       </div>
+
+      {/* Loan Review Modal */}
+      {modalOpen && selectedApplicationId && (
+        <LoanReviewModal
+          isOpen={modalOpen}
+          onClose={handleModalClose}
+          applicationId={selectedApplicationId}
+          onApplicationUpdated={refreshApplications}
+        />
+      )}
 
       {/* Progress bar animation styles */}
       <style>{`
