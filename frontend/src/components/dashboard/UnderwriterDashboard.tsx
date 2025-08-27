@@ -375,14 +375,9 @@ export default function UnderwriterDashboard() {
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center space-x-2">
-                                  <button className="px-3 py-1.5 text-xs font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md">
-                                    Review
-                                  </button>
-                                  <button className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm">
-                                    Details
-                                  </button>
-                                </div>
+                                <button className="px-3 py-1.5 text-xs font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md">
+                                  Review
+                                </button>
                               </td>
                             </tr>
                           ))}
