@@ -25,36 +25,45 @@ export default function UnderwriterDashboard() {
   const [justLoggedIn, setJustLoggedIn] = useState(false)
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    fetch('http://localhost:5000/api/loans/all', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setApplications(data.applications)
-        } else {
-          setError('Failed to fetch loan applications')
-        }
+    const fetchApplications = () => {
+      const token = localStorage.getItem('token')
+      fetch('http://localhost:5000/api/loans/all', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       })
-      .catch(() => setError('Server error'))
-      .finally(() => setLoading(false))
-  }, [])
-
-  // Check for login success and handle overlay timing
-  useEffect(() => {
-    const loginSuccess = sessionStorage.getItem('loginSuccess')
-    if (loginSuccess === 'true') {
-      setJustLoggedIn(true)
-      
-      // Hide overlay after animation completes (1.2s animation + 0.3s buffer)
-      setTimeout(() => {
-        setJustLoggedIn(false)
-        sessionStorage.removeItem('loginSuccess')
-      }, 1500)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setApplications(data.applications)
+          } else {
+            setError('Failed to fetch loan applications')
+          }
+        })
+        .catch(() => setError('Server error'))
+        .finally(() => setLoading(false))
     }
+
+    const handleLoginOverlay = () => {
+      const loginSuccess = sessionStorage.getItem('loginSuccess')
+      if (loginSuccess === 'true') {
+        setJustLoggedIn(true)
+
+        const timer = setTimeout(() => {
+          setJustLoggedIn(false)
+          sessionStorage.removeItem('loginSuccess')
+        }, 1500)
+
+        return () => clearTimeout(timer) // cleanup
+      }
+    }
+
+    // run both
+    fetchApplications()
+    const cleanup = handleLoginOverlay()
+
+    // cleanup function (for overlay timer)
+    return cleanup
   }, [])
 
   const getStatusClasses = (status: string) => {
