@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 // Refined, minimal icons for professional appearance
@@ -55,9 +55,12 @@ interface Document {
 }
 
 const DocumentUpload = () => {
-  const { applicationId } = useParams<{ applicationId: string }>()
+
+  const location = useLocation()
   const navigate = useNavigate()
-  
+
+  const applicationId = location.state?.applicationId
+
   const [documents, setDocuments] = useState<Document[]>([
     { 
       name: 'Aadhaar Card', 
@@ -125,12 +128,16 @@ const DocumentUpload = () => {
   const { user } = useAuth()
 
   useEffect(() => {
+    if (!applicationId) {
+      // 🚫 No app ID, redirect back
+      navigate("/dashboard/applicant")
+      return
+    }
+
     if (user) {
-      if (user.role !== 'applicant') {
-        // 🚫 Block access for non-applicants
+      if (user.role !== "applicant") {
         navigate(`/dashboard/${user.role}`)
       } else {
-        // ✅ Safe to fetch docs
         fetchUploadedDocuments()
       }
     }

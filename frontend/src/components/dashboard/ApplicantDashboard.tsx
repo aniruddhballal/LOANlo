@@ -520,14 +520,14 @@ const Dashboard = () => {
                                 )}
                               </div>
                               
-                              {!app.documentsUploaded && (
-                                <Link 
-                                  to={`/upload-documents/${app._id}`} 
-                                  className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
-                                >
-                                  Upload Documents
-                                </Link>
-                              )}
+                              <Link 
+                                to="/upload-documents" 
+                                state={{ applicationId: app._id }}   // pass ID through state
+                                className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
+                              >
+                                Upload Documents
+                              </Link>
+                              
                             </div>
                           </div>
                         </div>

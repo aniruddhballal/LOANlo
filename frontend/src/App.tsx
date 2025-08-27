@@ -92,7 +92,7 @@ function AppContent() {
               <KYC />
             </ProtectedRoute>
           } />
-          <Route path="/upload-documents/:applicationId" element={
+          <Route path="/upload-documents" element={
             <ProtectedRoute>
               <DocumentUpload />
             </ProtectedRoute>

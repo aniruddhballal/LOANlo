@@ -147,9 +147,9 @@ const LoanApplication = () => {
       const data = await response.json()
 
       if (response.ok) {
-        navigate(`/upload-documents/${data.applicationId}`)
+        navigate("/upload-documents", { state: { applicationId: data.applicationId } })
       } else {
-        setError(data.message || 'Application submission failed')
+        setError(data.message || "Application submission failed")
       }
     } catch (err) {
       setError('Application submission failed')
