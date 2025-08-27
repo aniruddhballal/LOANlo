@@ -206,11 +206,6 @@ export default function UnderwriterDashboard() {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="px-4 py-2 bg-gray-900 text-white rounded-lg shadow-sm">
-                  <span className="text-sm font-medium">
-                    {loading ? 'Loading...' : `${applications.length} ${applications.length === 1 ? 'Application' : 'Applications'}`}
-                  </span>
-                </div>
                 <Link 
                   to="/profile" 
                   className="relative px-5 py-2.5 text-sm font-medium text-gray-800 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-400 group"
@@ -239,10 +234,19 @@ export default function UnderwriterDashboard() {
             <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-2xl font-light text-gray-900 mb-1">Loan Applications</h2>
-                  <p className="text-sm text-gray-600 font-light">Review and process submitted loan applications</p>
+                  <h2 className="text-2xl font-light text-gray-900 mb-1">
+                    Loan Applications
+                  </h2>
+                  <p className="text-sm text-gray-600 font-light">
+                    Review and process submitted loan applications
+                  </p>
                 </div>
-                <div className="w-16 h-0.5 bg-gradient-to-r from-gray-900 to-gray-600"></div>
+                {/* Application Count */}
+                <div className="text-sm font-medium text-gray-700">
+                  {loading 
+                    ? "Loading..." 
+                    : `${applications.length} ${applications.length === 1 ? "Application" : "Applications"}`}
+                </div>
               </div>
             </header>
             
