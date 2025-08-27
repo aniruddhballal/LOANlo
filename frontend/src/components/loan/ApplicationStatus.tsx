@@ -734,7 +734,7 @@ const ApplicationStatus = () => {
 
           <div className="flex items-center space-x-4">
             <Link 
-              to="/kyc" 
+              to="/loan-application" 
               className="inline-flex items-center px-8 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               Submit New Application
