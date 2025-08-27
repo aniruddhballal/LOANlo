@@ -18,7 +18,7 @@ const loanApplicationSchema = new mongoose.Schema({
   // Application Status
   status: {
     type: String,
-    enum: ['pending', 'under_review', 'approved', 'rejected'],
+    enum: ['pending', 'under_review', 'approved', 'rejected', 'documents_requested'],
     default: 'pending'
   },
   documentsUploaded: { type: Boolean, default: false },
