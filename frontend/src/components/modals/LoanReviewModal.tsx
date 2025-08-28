@@ -165,10 +165,10 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'approved': return 'text-emerald-600 bg-emerald-50 border-emerald-200'
-      case 'rejected': return 'text-red-600 bg-red-50 border-red-200'
-      case 'under_review': return 'text-blue-600 bg-blue-50 border-blue-200'
-      default: return 'text-amber-600 bg-amber-50 border-amber-200'
+      case 'approved': return 'text-green-800 bg-green-100 border-green-400'
+      case 'rejected': return 'text-red-800 bg-red-100 border-red-400'
+      case 'under_review': return 'text-blue-800 bg-blue-100 border-blue-400'
+      default: return 'text-amber-800 bg-amber-100 border-amber-400'
     }
   }
 
@@ -188,13 +188,13 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       
       {/* Modal */}
       <div className="relative flex items-center justify-center min-h-screen p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+        <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-gray-200">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gray-50/50">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gray-50">
             <div>
               <h2 className="text-2xl font-semibold text-gray-900">
                 Loan Application Review
@@ -220,14 +220,14 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
               </div>
             ) : error ? (
               <div className="flex-1 flex items-center justify-center">
-                <div className="text-red-600 bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="text-red-700 bg-red-50 border border-red-200 rounded-lg p-4">
                   {error}
                 </div>
               </div>
             ) : application ? (
               <>
                 {/* Tabs */}
-                <div className="flex border-b border-gray-200 bg-gray-50/30">
+                <div className="flex border-b border-gray-200 bg-white">
                   {[
                     { id: 'details', label: 'Application Details', icon: FileText },
                     { id: 'history', label: 'Status History', icon: Clock },
@@ -238,10 +238,10 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center space-x-2 px-6 py-3 font-medium text-sm transition-colors duration-200 ${
+                        className={`flex items-center space-x-2 px-6 py-4 font-medium text-sm transition-colors duration-200 ${
                           activeTab === tab.id
-                            ? 'text-gray-900 border-b-2 border-gray-900 bg-white'
-                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                            ? 'text-gray-900 border-b-2 border-gray-900 bg-gray-50'
+                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                         }`}
                       >
                         <Icon className="w-4 h-4" />
@@ -256,9 +256,9 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                   {activeTab === 'details' && (
                     <div className="space-y-6">
                       {/* Applicant Info */}
-                      <div className="bg-gray-50 rounded-xl p-6">
+                      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                         <div className="flex items-center space-x-4 mb-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-semibold">
+                          <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-black rounded-full flex items-center justify-center text-white font-semibold">
                             {application.userId?.firstName?.charAt(0)}{application.userId?.lastName?.charAt(0)}
                           </div>
                           <div>
@@ -271,12 +271,12 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="text-sm font-medium text-gray-600">Phone</label>
-                            <p className="text-gray-900">{application.userId?.phone}</p>
+                            <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Phone</label>
+                            <p className="text-gray-900 font-medium mt-1">{application.userId?.phone}</p>
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-gray-600">Role</label>
-                            <p className="text-gray-900 capitalize">{application.userId?.role}</p>
+                            <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Role</label>
+                            <p className="text-gray-900 font-medium mt-1 capitalize">{application.userId?.role}</p>
                           </div>
                         </div>
                       </div>
@@ -284,34 +284,34 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                       {/* Loan Details */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-4">
-                          <h3 className="font-semibold text-gray-900 text-lg">Loan Information</h3>
+                          <h3 className="font-semibold text-gray-900 text-lg border-b border-gray-200 pb-2">Loan Information</h3>
                           
                           <div>
-                            <label className="text-sm font-medium text-gray-600">Loan Type</label>
-                            <p className="text-gray-900 font-medium">{getLoanTypeLabel(application.loanType)}</p>
+                            <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Loan Type</label>
+                            <p className="text-gray-900 font-medium mt-1">{getLoanTypeLabel(application.loanType)}</p>
                           </div>
                           
                           <div>
-                            <label className="text-sm font-medium text-gray-600">Amount Requested</label>
-                            <p className="text-gray-900 font-semibold text-xl">{formatCurrency(application.amount)}</p>
+                            <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Amount Requested</label>
+                            <p className="text-gray-900 font-bold text-xl mt-1">{formatCurrency(application.amount)}</p>
                           </div>
                           
                           <div>
-                            <label className="text-sm font-medium text-gray-600">Tenure</label>
-                            <p className="text-gray-900">{application.tenure} months</p>
+                            <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Tenure</label>
+                            <p className="text-gray-900 font-medium mt-1">{application.tenure} months</p>
                           </div>
                           
                           <div>
-                            <label className="text-sm font-medium text-gray-600">Purpose</label>
-                            <p className="text-gray-900">{application.purpose}</p>
+                            <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Purpose</label>
+                            <p className="text-gray-900 font-medium mt-1">{application.purpose}</p>
                           </div>
                         </div>
 
                         <div className="space-y-4">
-                          <h3 className="font-semibold text-gray-900 text-lg">Application Status</h3>
+                          <h3 className="font-semibold text-gray-900 text-lg border-b border-gray-200 pb-2">Application Status</h3>
                           
                           <div>
-                            <label className="text-sm font-medium text-gray-600">Current Status</label>
+                            <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Current Status</label>
                             <div className="mt-1">
                               <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(application.status)}`}>
                                 {application.status.replace('_', ' ').toUpperCase()}
@@ -320,60 +320,66 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                           </div>
                           
                           <div>
-                            <label className="text-sm font-medium text-gray-600">Documents Uploaded</label>
+                            <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Documents Uploaded</label>
                             <div className="flex items-center space-x-2 mt-1">
                               {application.documentsUploaded ? (
-                                <CheckCircle className="w-4 h-4 text-emerald-600" />
+                                <CheckCircle className="w-4 h-4 text-green-600" />
                               ) : (
                                 <XCircle className="w-4 h-4 text-red-600" />
                               )}
-                              <span className={application.documentsUploaded ? 'text-emerald-600' : 'text-red-600'}>
+                              <span className={`font-medium ${application.documentsUploaded ? 'text-green-700' : 'text-red-700'}`}>
                                 {application.documentsUploaded ? 'Complete' : 'Pending'}
                               </span>
                             </div>
                           </div>
                           
                           <div>
-                            <label className="text-sm font-medium text-gray-600">Applied On</label>
-                            <p className="text-gray-900">{formatDate(application.createdAt)}</p>
+                            <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Applied On</label>
+                            <p className="text-gray-900 font-medium mt-1">{formatDate(application.createdAt)}</p>
                           </div>
                           
                           <div>
-                            <label className="text-sm font-medium text-gray-600">Last Updated</label>
-                            <p className="text-gray-900">{formatDate(application.updatedAt)}</p>
+                            <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Last Updated</label>
+                            <p className="text-gray-900 font-medium mt-1">{formatDate(application.updatedAt)}</p>
                           </div>
                         </div>
                       </div>
 
                       {/* Approval/Rejection Details */}
                       {application.status === 'approved' && application.approvalDetails && (
-                        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6">
-                          <h3 className="font-semibold text-emerald-900 text-lg mb-4">Approval Details</h3>
+                        <div className="bg-white border-2 border-green-400 rounded-lg p-6">
+                          <h3 className="font-semibold text-gray-900 text-lg mb-4 flex items-center">
+                            <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
+                            Approval Details
+                          </h3>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
-                              <label className="text-sm font-medium text-emerald-700">Approved Amount</label>
-                              <p className="text-emerald-900 font-semibold">{formatCurrency(application.approvalDetails.approvedAmount)}</p>
+                              <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Approved Amount</label>
+                              <p className="text-black font-bold text-lg mt-1">{formatCurrency(application.approvalDetails.approvedAmount)}</p>
                             </div>
                             <div>
-                              <label className="text-sm font-medium text-emerald-700">Interest Rate</label>
-                              <p className="text-emerald-900 font-semibold">{application.approvalDetails.interestRate}%</p>
+                              <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Interest Rate</label>
+                              <p className="text-black font-bold text-lg mt-1">{application.approvalDetails.interestRate}%</p>
                             </div>
                             <div>
-                              <label className="text-sm font-medium text-emerald-700">Tenure</label>
-                              <p className="text-emerald-900 font-semibold">{application.approvalDetails.tenure} months</p>
+                              <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Tenure</label>
+                              <p className="text-black font-bold text-lg mt-1">{application.approvalDetails.tenure} months</p>
                             </div>
                             <div>
-                              <label className="text-sm font-medium text-emerald-700">EMI</label>
-                              <p className="text-emerald-900 font-semibold">{formatCurrency(application.approvalDetails.emi)}</p>
+                              <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">EMI</label>
+                              <p className="text-black font-bold text-lg mt-1">{formatCurrency(application.approvalDetails.emi)}</p>
                             </div>
                           </div>
                         </div>
                       )}
 
                       {application.status === 'rejected' && application.rejectionReason && (
-                        <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-                          <h3 className="font-semibold text-red-900 text-lg mb-2">Rejection Reason</h3>
-                          <p className="text-red-800">{application.rejectionReason}</p>
+                        <div className="bg-white border-2 border-red-400 rounded-lg p-6">
+                          <h3 className="font-semibold text-gray-900 text-lg mb-2 flex items-center">
+                            <XCircle className="w-5 h-5 text-red-600 mr-2" />
+                            Rejection Reason
+                          </h3>
+                          <p className="text-gray-700 font-medium">{application.rejectionReason}</p>
                         </div>
                       )}
                     </div>
@@ -381,20 +387,20 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
 
                   {activeTab === 'history' && (
                     <div className="space-y-4">
-                      <h3 className="font-semibold text-gray-900 text-lg">Status Timeline</h3>
+                      <h3 className="font-semibold text-gray-900 text-lg border-b border-gray-200 pb-2">Status Timeline</h3>
                       <div className="space-y-4">
                         {application.statusHistory.map((entry, index) => (
-                          <div key={index} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
-                            <div className={`w-2 h-2 rounded-full mt-2 ${getStatusColor(entry.status).includes('emerald') ? 'bg-emerald-500' : getStatusColor(entry.status).includes('red') ? 'bg-red-500' : getStatusColor(entry.status).includes('blue') ? 'bg-blue-500' : 'bg-amber-500'}`} />
+                          <div key={index} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className={`w-3 h-3 rounded-full mt-2 ${entry.status === 'approved' ? 'bg-green-500' : entry.status === 'rejected' ? 'bg-red-500' : entry.status === 'under_review' ? 'bg-blue-500' : 'bg-amber-500'}`} />
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
                                 <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(entry.status)}`}>
                                   {entry.status.replace('_', ' ').toUpperCase()}
                                 </span>
-                                <span className="text-sm text-gray-500">{formatDate(entry.timestamp)}</span>
+                                <span className="text-sm text-gray-500 font-medium">{formatDate(entry.timestamp)}</span>
                               </div>
                               {entry.comment && (
-                                <p className="text-gray-700 mt-2">{entry.comment}</p>
+                                <p className="text-gray-700 mt-2 font-medium">{entry.comment}</p>
                               )}
                               {entry.updatedBy && (
                                 <p className="text-sm text-gray-500 mt-1">Updated by: {entry.updatedBy}</p>
@@ -408,11 +414,11 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
 
                   {activeTab === 'actions' && (
                     <div className="space-y-6">
-                      <h3 className="font-semibold text-gray-900 text-lg">Review Actions</h3>
+                      <h3 className="font-semibold text-gray-900 text-lg border-b border-gray-200 pb-2">Review Actions</h3>
                       
                       {/* Comment Section */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2 uppercase tracking-wide">
                           Add Comment/Notes
                         </label>
                         <textarea
@@ -420,28 +426,28 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                           onChange={(e) => setComment(e.target.value)}
                           placeholder="Add your review comments, notes, or feedback..."
                           rows={4}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-gray-800 resize-none"
                         />
                       </div>
 
                       {/* Approval Details */}
                       {application.status !== 'approved' && (
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <h4 className="font-medium text-gray-900 mb-3">Approval Details</h4>
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                          <h4 className="font-medium text-gray-900 mb-3 uppercase tracking-wide">Approval Details</h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 mb-1 uppercase tracking-wide">
                                 Approved Amount (₹)
                               </label>
                               <input
                                 type="number"
                                 value={approvalData.approvedAmount}
                                 onChange={(e) => setApprovalData(prev => ({ ...prev, approvedAmount: parseInt(e.target.value) || 0 }))}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-gray-800 text-black font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 mb-1 uppercase tracking-wide">
                                 Interest Rate (%)
                               </label>
                               <input
@@ -449,29 +455,29 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                                 step="0.1"
                                 value={approvalData.interestRate}
                                 onChange={(e) => setApprovalData(prev => ({ ...prev, interestRate: parseFloat(e.target.value) || 0 }))}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-gray-800 text-black font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 mb-1 uppercase tracking-wide">
                                 Tenure (months)
                               </label>
                               <input
                                 type="number"
                                 value={approvalData.tenure}
                                 onChange={(e) => setApprovalData(prev => ({ ...prev, tenure: parseInt(e.target.value) || 0 }))}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-gray-800 text-black font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 mb-1 uppercase tracking-wide">
                                 Calculated EMI (₹)
                               </label>
                               <input
                                 type="number"
                                 value={approvalData.emi}
                                 readOnly
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed text-black font-medium focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               />
                             </div>
                           </div>
@@ -484,10 +490,10 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                           <button
                             onClick={() => handleStatusUpdate('under_review')}
                             disabled={actionLoading !== ''}
-                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                            className="flex items-center space-x-2 px-6 py-3 bg-blue-50 text-blue-800 border-2 border-blue-400 rounded-lg hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium"
                           >
                             {actionLoading === 'under_review' ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-800 border-t-transparent" />
                             ) : (
                               <AlertCircle className="w-4 h-4" />
                             )}
@@ -499,10 +505,10 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                           <button
                             onClick={() => handleStatusUpdate('approved')}
                             disabled={actionLoading !== '' || !comment.trim()}
-                            className="flex items-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                            className="flex items-center space-x-2 px-6 py-3 bg-green-50 text-green-800 border-2 border-green-400 rounded-lg hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium"
                           >
                             {actionLoading === 'approved' ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-green-800 border-t-transparent" />
                             ) : (
                               <CheckCircle className="w-4 h-4" />
                             )}
@@ -514,10 +520,10 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                           <button
                             onClick={() => handleStatusUpdate('rejected')}
                             disabled={actionLoading !== '' || !comment.trim()}
-                            className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                            className="flex items-center space-x-2 px-6 py-3 bg-red-50 text-red-800 border-2 border-red-400 rounded-lg hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium"
                           >
                             {actionLoading === 'rejected' ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-800 border-t-transparent" />
                             ) : (
                               <XCircle className="w-4 h-4" />
                             )}
@@ -527,7 +533,7 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
 
                         <button
                           onClick={() => {/* Handle document request */}}
-                          className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
+                          className="flex items-center space-x-2 px-6 py-3 bg-gray-50 text-gray-800 border-2 border-gray-400 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-medium"
                         >
                           <Upload className="w-4 h-4" />
                           <span>Request Documents</span>
@@ -535,8 +541,8 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                       </div>
 
                       {error && (
-                        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                          <p className="text-red-800">{error}</p>
+                        <div className="p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+                          <p className="text-red-700 font-medium">{error}</p>
                         </div>
                       )}
                     </div>
