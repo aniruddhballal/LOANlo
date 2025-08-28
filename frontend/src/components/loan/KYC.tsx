@@ -483,16 +483,6 @@ const KYC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
-                
-                <button 
-                  onClick={() => {
-                    setShowCongratulations(false)
-                    setCurrentStep(1)
-                  }}
-                  className="inline-flex items-center px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 transform hover:scale-105 shadow-lg"
-                >
-                  <span className="tracking-wide">UPDATE KYC</span>
-                </button>
               </div>
             </div>
           </div>
