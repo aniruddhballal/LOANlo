@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X, FileText, Clock, CheckCircle, XCircle, AlertCircle, MessageSquare, Upload } from 'lucide-react'
+import api from '../../api'
 
 interface LoanApplication {
   _id: string
@@ -66,30 +67,24 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
     setLoading(true)
     setError(null)
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`http://localhost:5000/api/loans/details/${applicationId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-      const data = await response.json()
+      const { data } = await api.get(`/loans/details/${applicationId}`)
       if (data.success) {
         setApplication(data.application)
-        // Pre-fill approval data with requested amounts
         setApprovalData({
           approvedAmount: data.application.amount,
-          interestRate: 12, // Default rate
+          interestRate: 12,
           tenure: data.application.tenure,
           emi: 0
         })
       } else {
         setError(data.message)
       }
-    } catch (err) {
+    } catch (err: any) {
       setError('Failed to fetch application details')
     } finally {
       setLoading(false)
     }
+
   }
 
   const calculateEMI = () => {
@@ -109,40 +104,30 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
   const handleStatusUpdate = async (status: 'approved' | 'rejected' | 'under_review') => {
     setActionLoading(status)
     try {
-      const token = localStorage.getItem('token')
       const payload = {
         status,
         comment,
         ...(status === 'approved' && { approvalDetails: approvalData }),
         ...(status === 'rejected' && { rejectionReason: comment })
       }
-      
-      const response = await fetch(`http://localhost:5000/api/loans/update-status/${applicationId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload)
-      })
-      
-      const data = await response.json()
+
+      const { data } = await api.put(`/loans/update-status/${applicationId}`, payload)
       if (data.success) {
-        await fetchApplicationDetails() // Refresh data
+        await fetchApplicationDetails()
         setComment('')
-        onApplicationUpdated() // Notify parent to refresh
-        // Show success message or close modal
+        onApplicationUpdated()
         if (status !== 'under_review') {
           setTimeout(() => onClose(), 1500)
         }
       } else {
         setError(data.message)
       }
-    } catch (err) {
+    } catch (err: any) {
       setError('Failed to update application status')
     } finally {
       setActionLoading('')
     }
+
   }
 
   const formatCurrency = (amount: number) => {

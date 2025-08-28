@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import api from '../../api'
 
 interface LoanApplication {
   _id: string
@@ -57,22 +58,10 @@ const ApplicationStatus = () => {
 
   const fetchApplications = async () => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch('http://localhost:5000/api/loans/my-applications', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setApplications(data.applications)
-      } else {
-        setError(data.message || 'Failed to fetch applications')
-      }
-    } catch (err) {
-      setError('Failed to fetch applications')
+      const { data } = await api.get('/loans/my-applications')
+      setApplications(data.applications)
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to fetch applications')
     } finally {
       setLoading(false)
     }
@@ -124,23 +113,12 @@ const ApplicationStatus = () => {
 
   const handleDeleteApplication = async (applicationId: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/loans/${applicationId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        setApplications(applications.filter(app => app._id !== applicationId));
-        setSelectedApplication(null);
-        setDeleteConfirmation({show: false, application: null, confirmText: ''});
-      } else {
-        const data = await response.json();
-        alert(data.message || 'Failed to delete application');
-      }
-    } catch (err) {
-      alert('Failed to delete application');
+      await api.delete(`/loans/${applicationId}`)
+      setApplications(applications.filter(app => app._id !== applicationId))
+      setSelectedApplication(null)
+      setDeleteConfirmation({ show: false, application: null, confirmText: '' })
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to delete application')
     }
   };
 

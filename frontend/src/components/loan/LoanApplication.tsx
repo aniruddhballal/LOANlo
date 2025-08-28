@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import api from '../../api';
 
 interface LoanData {
   loanType: string;
@@ -52,28 +53,21 @@ const LoanApplication = () => {
   useEffect(() => {
     const checkKYCCompletion = async () => {
       try {
-        const token = localStorage.getItem('token')
-        const response = await fetch('http://localhost:5000/api/kyc/me', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        const data = await response.json()
-        
+        const { data } = await api.get('/kyc/me')
+
         if (data.kyc) {
-          // Check if all KYC fields are completed
           const requiredKYCFields = [
             'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
             'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city',
             'state', 'pincode', 'employmentType', 'companyName', 'designation',
             'workExperience', 'monthlyIncome'
           ]
-          
+
           const kycComplete = requiredKYCFields.every(field => {
             const value = data.kyc[field]
             return value !== null && value !== undefined && value.toString().trim() !== ''
           })
-          
+
           if (kycComplete) {
             setKycData(data.kyc)
             setIsKYCComplete(true)
@@ -83,8 +77,8 @@ const LoanApplication = () => {
         } else {
           setIsKYCComplete(false)
         }
-      } catch (err) {
-        console.error('Error checking KYC:', err)
+      } catch (err: any) {
+        console.error('Error checking KYC:', err.response?.data?.message || err)
         setIsKYCComplete(false)
       } finally {
         setCheckingKYC(false)
@@ -127,32 +121,11 @@ const LoanApplication = () => {
     setLoading(true)
 
     try {
-      const token = localStorage.getItem('token')
-      
-      // Combine KYC data with loan data for submission
-      const applicationData = {
-        ...kycData,
-        ...loanData
-      }
-      
-      const response = await fetch('http://localhost:5000/api/loans/apply', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(applicationData)
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        navigate("/upload-documents", { state: { applicationId: data.applicationId } })
-      } else {
-        setError(data.message || "Application submission failed")
-      }
-    } catch (err) {
-      setError('Application submission failed')
+      const applicationData = { ...kycData, ...loanData }
+      const { data } = await api.post('/loans/apply', applicationData)
+      navigate("/upload-documents", { state: { applicationId: data.applicationId } })
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Application submission failed")
     } finally {
       setLoading(false)
     }

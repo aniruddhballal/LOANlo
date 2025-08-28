@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import api from '../../api'
 
 // Refined, minimal icons for professional appearance
 const CheckCircleIcon = () => (
@@ -146,23 +147,14 @@ const DocumentUpload = () => {
 
   const fetchUploadedDocuments = async () => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`http://localhost:5000/api/documents/${applicationId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setDocuments(prevDocs => 
-          prevDocs.map(doc => ({
-            ...doc,
-            uploaded: data.uploadedDocuments.includes(doc.type)
-          }))
-        )
-      }
-    } catch (err) {
+      const { data } = await api.get(`/documents/${applicationId}`)
+      setDocuments(prevDocs =>
+        prevDocs.map(doc => ({
+          ...doc,
+          uploaded: data.uploadedDocuments.includes(doc.type)
+        }))
+      )
+    } catch (err: any) {
       console.error('Failed to fetch uploaded documents:', err)
     }
   }
@@ -213,44 +205,33 @@ const DocumentUpload = () => {
       formData.append('documentType', documentType)
       formData.append('applicationId', applicationId!)
 
-      const token = localStorage.getItem('token')
-      const response = await fetch('http://localhost:5000/api/documents/upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
+      await api.post('/documents/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       })
 
-      if (response.ok) {
-        clearInterval(progressInterval)
-        setUploadProgress(prev => ({ ...prev, [documentType]: 100 }))
-        
-        setTimeout(() => {
-          setDocuments(prevDocs =>
-            prevDocs.map(doc =>
-              doc.type === documentType ? { ...doc, uploaded: true, file: undefined } : doc
-            )
-          )
-          setSelectedFiles(prev => {
-            const newFiles = { ...prev }
-            delete newFiles[documentType]
-            return newFiles
-          })
-          setUploadProgress(prev => {
-            const newProgress = { ...prev }
-            delete newProgress[documentType]
-            return newProgress
-          })
-        }, 1000)
-      } else {
-        clearInterval(progressInterval)
-        const data = await response.json()
-        setError(data.message || 'Upload failed')
-      }
-    } catch (err) {
       clearInterval(progressInterval)
-      setError('Upload failed')
+      setUploadProgress(prev => ({ ...prev, [documentType]: 100 }))
+
+      setTimeout(() => {
+        setDocuments(prevDocs =>
+          prevDocs.map(doc =>
+            doc.type === documentType ? { ...doc, uploaded: true, file: undefined } : doc
+          )
+        )
+        setSelectedFiles(prev => {
+          const newFiles = { ...prev }
+          delete newFiles[documentType]
+          return newFiles
+        })
+        setUploadProgress(prev => {
+          const newProgress = { ...prev }
+          delete newProgress[documentType]
+          return newProgress
+        })
+      }, 1000)
+    } catch (err: any) {
+      clearInterval(progressInterval)
+      setError(err.response?.data?.message || 'Upload failed')
     } finally {
       setLoading(false)
     }
@@ -275,22 +256,10 @@ const DocumentUpload = () => {
     }
 
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`http://localhost:5000/api/documents/complete/${applicationId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (response.ok) {
-        navigate('/application-status')
-      } else {
-        const data = await response.json()
-        setError(data.message || 'Failed to complete submission')
-      }
-    } catch (err) {
-      setError('Failed to complete submission')
+      await api.post(`/documents/complete/${applicationId}`)
+      navigate('/application-status')
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to complete submission')
     }
   }
 

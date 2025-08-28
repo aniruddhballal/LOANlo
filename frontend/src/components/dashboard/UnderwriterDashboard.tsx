@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { CheckCircle } from 'lucide-react'
 
 import LoanReviewModal from '../modals/LoanReviewModal'
+import api from '../../api'
 
 interface LoanApplication {
   _id: string
@@ -30,23 +31,19 @@ export default function UnderwriterDashboard() {
   const [modalOpen, setModalOpen] = useState(false)
 
   useEffect(() => {
-    const fetchApplications = () => {
-      const token = localStorage.getItem('token')
-      fetch('http://localhost:5000/api/loans/all', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            setApplications(data.applications)
-          } else {
-            setError('Failed to fetch loan applications')
-          }
-        })
-        .catch(() => setError('Server error'))
-        .finally(() => setLoading(false))
+    const fetchApplications = async () => {
+      try {
+        const { data } = await api.get('/loans/all')
+        if (data.success) {
+          setApplications(data.applications)
+        } else {
+          setError('Failed to fetch loan applications')
+        }
+      } catch {
+        setError('Server error')
+      } finally {
+        setLoading(false)
+      }
     }
 
     const handleLoginOverlay = () => {
@@ -81,20 +78,15 @@ export default function UnderwriterDashboard() {
     setSelectedApplicationId(null)
   }
 
-  const refreshApplications = () => {
-    const token = localStorage.getItem('token')
-    fetch('http://localhost:5000/api/loans/all', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setApplications(data.applications)
-        }
-      })
-      .catch(() => setError('Server error'))
+  const refreshApplications = async () => {
+    try {
+      const { data } = await api.get('/loans/all')
+      if (data.success) {
+        setApplications(data.applications)
+      }
+    } catch {
+      setError('Server error')
+    }
   }
 
   const getStatusClasses = (status: string) => {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import api from '../../api';
 
 interface KYCData {
   firstName: string;
@@ -64,32 +65,24 @@ const KYC = () => {
     const fetchKYC = async () => {
       try {
         setInitialLoading(true)
-        const token = localStorage.getItem('token')
-        const response = await fetch('http://localhost:5000/api/kyc/me', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        const data = await response.json()
+        const { data } = await api.get('/kyc/me')
         if (data.kyc) {
-          setFormData((prev) => ({
+          setFormData(prev => ({
             ...prev,
             ...data.kyc
           }))
-          
-          // Check if KYC is complete (all fields filled)
+
           const kycComplete = Object.entries(data.kyc).every(([key, value]) => {
             if (key in formData) {
               return value !== null && value !== undefined && value.toString().trim() !== ''
             }
             return true
           })
-          
+
           setIsKYCComplete(kycComplete)
-          // Don't set showCongratulations here - only show normal form
         }
-      } catch (err) {
-        console.error('Error fetching KYC:', err)
+      } catch (err: any) {
+        console.error('Error fetching KYC:', err.response?.data?.message || err)
       } finally {
         setInitialLoading(false)
       }
@@ -159,18 +152,11 @@ const KYC = () => {
 
   const saveKYC = async (): Promise<void> => {
     try {
-      const token = localStorage.getItem('token');
-      await fetch('http://localhost:5000/api/kyc/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-      });
-    } catch (err) {
-      console.error('Error saving KYC:', err)
+      await api.post('/kyc/save', formData)
+    } catch (err: any) {
+      console.error('Error saving KYC:', err.response?.data?.message || err)
     }
+
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -185,25 +171,11 @@ const KYC = () => {
     setLoading(true)
 
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch('http://localhost:5000/api/kyc/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-      })
-
-      if (response.ok) {
-        setIsKYCComplete(true)
-        // Set this flag to show congratulations message
-        setShowCongratulations(true)
-      } else {
-        setError('KYC submission failed')
-      }
-    } catch (err) {
-      setError('KYC submission failed')
+      await api.post('/kyc/save', formData)
+      setIsKYCComplete(true)
+      setShowCongratulations(true)
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'KYC submission failed')
     } finally {
       setLoading(false)
     }
