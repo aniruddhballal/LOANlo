@@ -1,13 +1,13 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api", // central base URL
+  baseURL: "http://localhost:5000/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Add auth token automatically if available
+// Automatically attach token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -15,5 +15,19 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Handle token expiration globally
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("pendingUser");
+      // Optionally, redirect to login page
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;

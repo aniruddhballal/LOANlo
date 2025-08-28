@@ -51,12 +51,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .then(({ data }) => {
           if (data.success) {
             setUser(data.user)
-          } else {
-            localStorage.removeItem('token')
           }
         })
         .catch(() => {
-          localStorage.removeItem('token')
+          // api.ts' interceptor handles 401
         })
         .finally(() => {
           setLoading(false)
