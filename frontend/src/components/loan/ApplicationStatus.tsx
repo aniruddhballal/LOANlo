@@ -296,9 +296,11 @@ const ApplicationStatus = () => {
                               <div className="text-lg font-light text-gray-900">₹{app.amount.toLocaleString('en-IN')}</div>
                             </td>
                             <td className="px-6 py-6 whitespace-nowrap">
-                              <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border ${getStatusClasses(app.status)}`}>
+                              <div
+                                className={`inline-flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium border ${getStatusClasses(app.status)}`}
+                              >
                                 {getStatusIcon(app.status)}
-                                {formatStatus(app.status)}
+                                <span>{formatStatus(app.status)}</span>
                               </div>
                             </td>
                             <td className="px-6 py-6 whitespace-nowrap">
