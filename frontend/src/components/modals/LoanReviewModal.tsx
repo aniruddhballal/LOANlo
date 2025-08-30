@@ -489,7 +489,7 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                         {application.status !== 'approved' && (
                           <button
                             onClick={() => handleStatusUpdate('approved')}
-                            disabled={actionLoading !== '' || !comment.trim()}
+                            disabled={actionLoading !== '' || !comment.trim() || !application.documentsUploaded}
                             className="flex items-center space-x-2 px-6 py-3 bg-green-50 text-green-800 border-2 border-green-400 rounded-lg hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium"
                           >
                             {actionLoading === 'approved' ? (
@@ -521,7 +521,7 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
                           className="flex items-center space-x-2 px-6 py-3 bg-gray-50 text-gray-800 border-2 border-gray-400 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-medium"
                         >
                           <Upload className="w-4 h-4" />
-                          <span>Request Documents</span>
+                          <span>Request Additional Documents</span>
                         </button>
                       </div>
 
