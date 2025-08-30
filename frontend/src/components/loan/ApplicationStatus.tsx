@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { X, FileText, Clock, CheckCircle, XCircle } from 'lucide-react'
 import api from '../../api'
 
 interface LoanApplication {
@@ -32,6 +33,7 @@ const ApplicationStatus = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedApplication, setSelectedApplication] = useState<LoanApplication | null>(null)
+  const [activeTab, setActiveTab] = useState('details')
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     show: boolean, 
     application: LoanApplication | null,
@@ -76,6 +78,15 @@ const ApplicationStatus = () => {
     }
   }
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'approved': return 'text-green-800 bg-green-100 border-green-400'
+      case 'rejected': return 'text-red-800 bg-red-100 border-red-400'
+      case 'under_review': return 'text-blue-800 bg-blue-100 border-blue-400'
+      default: return 'text-amber-800 bg-amber-100 border-amber-400'
+    }
+  }
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved': return (
@@ -109,6 +120,35 @@ const ApplicationStatus = () => {
 
   const formatStatus = (status: string) => {
     return status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+  }
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount)
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  const getLoanTypeLabel = (type: string) => {
+    const types = {
+      personal: 'Personal Loan',
+      home: 'Home Loan',
+      vehicle: 'Vehicle Loan',
+      business: 'Business Loan',
+      education: 'Education Loan'
+    }
+    return types[type as keyof typeof types] || type
   }
 
   const handleDeleteApplication = async (applicationId: string) => {
@@ -310,7 +350,10 @@ const ApplicationStatus = () => {
                             <td className="px-6 py-6 whitespace-nowrap">
                               <div className="flex items-center space-x-3">
                                 <button 
-                                  onClick={() => setSelectedApplication(app)}
+                                  onClick={() => {
+                                    setSelectedApplication(app)
+                                    setActiveTab('details')
+                                  }}
                                   className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                 >
                                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,225 +386,204 @@ const ApplicationStatus = () => {
               </div>
             </div>
 
-            {/* Professional Details Modal */}
+            {/* Updated Review Modal matching underwriter style */}
             {selectedApplication && (
-              <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-                <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden">
-                  <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6">
-                    <div className="flex justify-between items-center">
+              <div className="fixed inset-0 z-50 overflow-hidden">
+                {/* Backdrop */}
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedApplication(null)} />
+                
+                {/* Modal */}
+                <div className="relative flex items-center justify-center min-h-screen p-4">
+                  <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-gray-200">
+                    {/* Header */}
+                    <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gray-50">
                       <div>
-                        <h3 className="text-2xl font-light text-gray-900">Application Details</h3>
-                        <p className="text-sm text-gray-600 mt-1">Comprehensive review of application #{selectedApplication._id.slice(-8).toUpperCase()}</p>
+                        <h2 className="text-2xl font-semibold text-gray-900">
+                          Application Details
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Application #{selectedApplication._id.slice(-8).toUpperCase()}
+                        </p>
                       </div>
-                      <button 
+                      <button
                         onClick={() => setSelectedApplication(null)}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200"
+                        className="p-2 hover:bg-gray-200 rounded-lg transition-colors duration-200"
                       >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <X className="w-5 h-5 text-gray-500" />
                       </button>
                     </div>
-                  </div>
-                  
-                  <div className="p-8 overflow-y-auto max-h-[calc(90vh-120px)]">
-                    {/* Application Summary Card */}
-                    <div className="bg-gray-50 rounded-xl p-6 mb-8">
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="space-y-4">
-                          <div>
-                            <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Reference Number</div>
-                            <div className="font-mono text-sm font-medium text-gray-900 bg-white px-3 py-2 rounded-lg border">
-                              #{selectedApplication._id.slice(-8).toUpperCase()}
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Applicant Name</div>
-                            <div className="text-gray-900 font-medium">{selectedApplication.applicantName}</div>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-4">
-                          <div>
-                            <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Product Type</div>
-                            <div className="text-gray-900 font-medium">{selectedApplication.loanType}</div>
-                          </div>
-                          <div>
-                            <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Loan Purpose</div>
-                            <div className="text-gray-900 font-medium">{selectedApplication.purpose}</div>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-4">
-                          <div>
-                            <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Principal Amount</div>
-                            <div className="text-2xl font-light text-gray-900">₹{selectedApplication.amount.toLocaleString('en-IN')}</div>
-                          </div>
-                          <div>
-                            <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Tenure</div>
-                            <div className="text-gray-900 font-medium">{selectedApplication.tenure} months</div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
-                        <div>
-                          <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Current Status</div>
-                          <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border ${getStatusClasses(selectedApplication.status)}`}>
-                            <span className="mr-2">{getStatusIcon(selectedApplication.status)}</span>
-                            {formatStatus(selectedApplication.status)}
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Submission Date</div>
-                          <div className="text-gray-900 font-medium">
-                            {new Date(selectedApplication.createdAt).toLocaleDateString('en-IN', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* Approval Details */}
-                    {selectedApplication.status === 'approved' && selectedApplication.approvalDetails && (
-                      <div className="mb-8 border border-green-200 bg-green-50 rounded-xl overflow-hidden">
-                        <div className="px-6 py-4 bg-green-100 border-b border-green-200">
-                          <h4 className="text-lg font-medium text-green-900 flex items-center">
-                            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                            Application Approved
-                          </h4>
-                        </div>
-                        <div className="p-6">
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <div className="text-center">
-                              <div className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-2">Approved Amount</div>
-                              <div className="text-2xl font-light text-green-900">₹{selectedApplication.approvalDetails.approvedAmount.toLocaleString('en-IN')}</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-2">Interest Rate</div>
-                              <div className="text-2xl font-light text-green-900">{selectedApplication.approvalDetails.interestRate}%</div>
-                              <div className="text-xs text-green-700 mt-1">per annum</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-2">Loan Tenure</div>
-                              <div className="text-2xl font-light text-green-900">{selectedApplication.approvalDetails.tenure}</div>
-                              <div className="text-xs text-green-700 mt-1">months</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-2">Monthly EMI</div>
-                              <div className="text-2xl font-light text-green-900">₹{selectedApplication.approvalDetails.emi.toLocaleString('en-IN')}</div>
-                            </div>
-                          </div>
-                        </div>
+                    {/* Content */}
+                    <div className="flex flex-col h-[calc(90vh-200px)]">
+                      {/* Tabs */}
+                      <div className="flex border-b border-gray-200 bg-white">
+                        {[
+                          { id: 'details', label: 'Application Details', icon: FileText },
+                          { id: 'history', label: 'Status History', icon: Clock }
+                        ].map((tab) => {
+                          const Icon = tab.icon
+                          return (
+                            <button
+                              key={tab.id}
+                              onClick={() => setActiveTab(tab.id)}
+                              className={`flex items-center space-x-2 px-6 py-4 font-medium text-sm transition-colors duration-200 ${
+                                activeTab === tab.id
+                                  ? 'text-gray-900 border-b-2 border-gray-900 bg-gray-50'
+                                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                              }`}
+                            >
+                              <Icon className="w-4 h-4" />
+                              <span>{tab.label}</span>
+                            </button>
+                          )
+                        })}
                       </div>
-                    )}
 
-                    {/* Rejection Details */}
-                    {selectedApplication.status === 'rejected' && selectedApplication.rejectionReason && (
-                      <div className="mb-8 border border-red-200 bg-red-50 rounded-xl overflow-hidden">
-                        <div className="px-6 py-4 bg-red-100 border-b border-red-200">
-                          <h4 className="text-lg font-medium text-red-900 flex items-center">
-                            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
-                            Application Declined
-                          </h4>
-                        </div>
-                        <div className="p-6">
-                          <div className="text-sm text-red-700 leading-relaxed">
-                            <strong className="font-medium">Reason for Decline:</strong>
-                            <p className="mt-2 text-red-800">{selectedApplication.rejectionReason}</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Status Timeline */}
-                    <div className="mb-8">
-                      <h4 className="text-lg font-medium text-gray-900 mb-6 flex items-center">
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Processing Timeline
-                      </h4>
-                      
-                      <div className="space-y-4">
-                        {selectedApplication.statusHistory && selectedApplication.statusHistory.length > 0 ? (
-                          selectedApplication.statusHistory.map((history, index) => (
-                            <div key={index} className="relative">
-                              {index !== selectedApplication.statusHistory.length - 1 && (
-                                <div className="absolute left-6 top-12 w-0.5 h-16 bg-gray-200"></div>
-                              )}
-                              <div className="flex items-start space-x-4">
-                                <div className={`flex-shrink-0 w-12 h-12 rounded-full border-2 flex items-center justify-center ${getStatusClasses(history.status)}`}>
-                                  {getStatusIcon(history.status)}
+                      {/* Tab Content */}
+                      <div className="flex-1 overflow-y-auto p-6">
+                        {activeTab === 'details' && (
+                          <div className="space-y-6">
+                            {/* Applicant Info */}
+                            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                              <div className="flex items-center space-x-4 mb-4">
+                                <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-black rounded-full flex items-center justify-center text-white font-semibold">
+                                  {selectedApplication.applicantName?.charAt(0)}
                                 </div>
-                                <div className="flex-grow bg-gray-50 rounded-lg p-4 border border-gray-200">
-                                  <div className="flex justify-between items-start mb-2">
-                                    <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusClasses(history.status)}`}>
-                                      {formatStatus(history.status)}
-                                    </div>
-                                    <div className="text-sm text-gray-600 font-medium">
-                                      {new Date(history.timestamp).toLocaleString('en-IN', {
-                                        year: 'numeric',
-                                        month: 'short',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                      })}
-                                    </div>
-                                  </div>
-                                  {history.comment && (
-                                    <div className="text-sm text-gray-700 italic mb-2 pl-4 border-l-2 border-gray-300">
-                                      "{history.comment}"
-                                    </div>
-                                  )}
-                                  {history.updatedBy && (
-                                    <div className="text-xs text-gray-500 font-medium">
-                                      Processed by: {history.updatedBy}
-                                    </div>
-                                  )}
+                                <div>
+                                  <h3 className="font-semibold text-gray-900 text-lg">
+                                    {selectedApplication.applicantName}
+                                  </h3>
+                                  <p className="text-gray-600">Loan Applicant</p>
                                 </div>
                               </div>
                             </div>
-                          ))
-                        ) : (
-                          <div className="text-center py-8 text-gray-500">
-                            <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <p className="text-sm font-medium">No timeline information available</p>
+
+                            {/* Loan Details */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="space-y-4">
+                                <h3 className="font-semibold text-gray-900 text-lg border-b border-gray-200 pb-2">Loan Information</h3>
+                                
+                                <div>
+                                  <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Loan Type</label>
+                                  <p className="text-gray-900 font-medium mt-1">{getLoanTypeLabel(selectedApplication.loanType)}</p>
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Amount Requested</label>
+                                  <p className="text-gray-900 font-bold text-xl mt-1">{formatCurrency(selectedApplication.amount)}</p>
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Tenure</label>
+                                  <p className="text-gray-900 font-medium mt-1">{selectedApplication.tenure} months</p>
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Purpose</label>
+                                  <p className="text-gray-900 font-medium mt-1">{selectedApplication.purpose}</p>
+                                </div>
+                              </div>
+
+                              <div className="space-y-4">
+                                <h3 className="font-semibold text-gray-900 text-lg border-b border-gray-200 pb-2">Application Status</h3>
+                                
+                                <div>
+                                  <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Current Status</label>
+                                  <div className="mt-1">
+                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(selectedApplication.status)}`}>
+                                      {selectedApplication.status.replace('_', ' ').toUpperCase()}
+                                    </span>
+                                  </div>
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Documents Uploaded</label>
+                                  <div className="flex items-center space-x-2 mt-1">
+                                    {selectedApplication.documentsUploaded ? (
+                                      <CheckCircle className="w-4 h-4 text-green-600" />
+                                    ) : (
+                                      <XCircle className="w-4 h-4 text-red-600" />
+                                    )}
+                                    <span className={`font-medium ${selectedApplication.documentsUploaded ? 'text-green-700' : 'text-red-700'}`}>
+                                      {selectedApplication.documentsUploaded ? 'Complete' : 'Pending'}
+                                    </span>
+                                  </div>
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Applied On</label>
+                                  <p className="text-gray-900 font-medium mt-1">{formatDate(selectedApplication.createdAt)}</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Approval/Rejection Details */}
+                            {selectedApplication.status === 'approved' && selectedApplication.approvalDetails && (
+                              <div className="bg-white border-2 border-green-400 rounded-lg p-6">
+                                <h3 className="font-semibold text-gray-900 text-lg mb-4 flex items-center">
+                                  <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
+                                  Approval Details
+                                </h3>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                  <div>
+                                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Approved Amount</label>
+                                    <p className="text-black font-bold text-lg mt-1">{formatCurrency(selectedApplication.approvalDetails.approvedAmount)}</p>
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Interest Rate</label>
+                                    <p className="text-black font-bold text-lg mt-1">{selectedApplication.approvalDetails.interestRate}%</p>
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">Tenure</label>
+                                    <p className="text-black font-bold text-lg mt-1">{selectedApplication.approvalDetails.tenure} months</p>
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">EMI</label>
+                                    <p className="text-black font-bold text-lg mt-1">{formatCurrency(selectedApplication.approvalDetails.emi)}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {selectedApplication.status === 'rejected' && selectedApplication.rejectionReason && (
+                              <div className="bg-white border-2 border-red-400 rounded-lg p-6">
+                                <h3 className="font-semibold text-gray-900 text-lg mb-2 flex items-center">
+                                  <XCircle className="w-5 h-5 text-red-600 mr-2" />
+                                  Rejection Reason
+                                </h3>
+                                <p className="text-gray-700 font-medium">{selectedApplication.rejectionReason}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {activeTab === 'history' && (
+                          <div className="space-y-4">
+                            <h3 className="font-semibold text-gray-900 text-lg border-b border-gray-200 pb-2">Status Timeline</h3>
+                            <div className="space-y-4">
+                              {selectedApplication.statusHistory.map((entry, index) => (
+                                <div key={index} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                  <div className={`w-3 h-3 rounded-full mt-2 ${entry.status === 'approved' ? 'bg-green-500' : entry.status === 'rejected' ? 'bg-red-500' : entry.status === 'under_review' ? 'bg-blue-500' : 'bg-amber-500'}`} />
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between">
+                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(entry.status)}`}>
+                                        {entry.status.replace('_', ' ').toUpperCase()}
+                                      </span>
+                                      <span className="text-sm text-gray-500 font-medium">{formatDate(entry.timestamp)}</span>
+                                    </div>
+                                    {entry.comment && (
+                                      <p className="text-gray-700 mt-2 font-medium">{entry.comment}</p>
+                                    )}
+                                    {entry.updatedBy && (
+                                      <p className="text-sm text-gray-500 mt-1">Updated by: {entry.updatedBy}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         )}
                       </div>
-                    </div>
-
-                    {/* Action Section */}
-                    <div className="border-t border-gray-200 pt-6 flex justify-between items-center">
-                      <button
-                        className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                        onClick={() => setDeleteConfirmation({show: true, application: selectedApplication})}
-                      >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        Delete Application
-                      </button>
-
-                      <button
-                        onClick={() => setSelectedApplication(null)}
-                        className="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                      >
-                        Close Details
-                        <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
                     </div>
                   </div>
                 </div>
