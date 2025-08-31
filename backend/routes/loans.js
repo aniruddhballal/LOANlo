@@ -139,19 +139,11 @@ router.delete('/:applicationId', authenticateToken, async (req, res) => {
   }
 });
 
-// Get single loan application details (for underwriters)
+// Get single loan application details (for underwriters and applicants)
 router.get('/details/:applicationId', authenticateToken, async (req, res) => {
   try {
     const { applicationId } = req.params;
-    
-    // Only underwriters can access
-    if (req.user.role !== 'underwriter') {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. Underwriter role required.'
-      });
-    }
-
+   
     const application = await LoanApplication.findById(applicationId)
       .populate('userId', 'firstName lastName email phone role')
       .populate('kycId');
@@ -160,6 +152,24 @@ router.get('/details/:applicationId', authenticateToken, async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Application not found'
+      });
+    }
+
+    // Allow underwriters to see any application, applicants can only see their own
+    if (req.user.role === 'underwriter') {
+      // Underwriters can access any application
+    } else if (req.user.role === 'applicant') {
+      // Applicants can only access their own applications
+      if (application.userId._id.toString() !== req.user.userId.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. You can only view your own applications.'
+        });
+      }
+    } else {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Unauthorized role.'
       });
     }
 
