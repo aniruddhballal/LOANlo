@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CheckCircle, XCircle, AlertCircle, Eye, Download, Loader } from 'lucide-react'
+import { CheckCircle, XCircle, AlertCircle, Eye, Download, Loader, Trash2 } from 'lucide-react'
 import type { LoanApplication } from '../types'
 import { formatDate, getDocumentProgress, getProgressBarColor } from '../utils'
 import api from '../../../../api'
@@ -11,6 +11,8 @@ interface DocumentsTabProps {
 export default function DocumentsTab({ application }: DocumentsTabProps) {
   const [loadingDocument, setLoadingDocument] = useState<string | null>(null)
   const [documentError, setDocumentError] = useState<string | null>(null)
+  const [deletingDocument, setDeletingDocument] = useState<string | null>(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
 
   const documentProgress = getDocumentProgress(application.documents)
   const allRequiredDocsUploaded = documentProgress.percentage === 100
@@ -59,6 +61,50 @@ export default function DocumentsTab({ application }: DocumentsTabProps) {
     } finally {
       setLoadingDocument(null)
     }
+  }
+
+  const handleDocumentDelete = async (doc: any) => {
+    if (!doc.uploaded) return
+
+    setDeletingDocument(doc.type)
+    setDocumentError(null)
+
+    try {
+      const response = await api.delete(`/documents/delete/${application._id}/${doc.type}`)
+
+      if (response.data.success) {
+        // Force a page refresh or update the application data
+        // You might want to call a parent function to refresh the data
+        // For now, we'll show a success message
+        window.location.reload() // Simple refresh - you might want to implement a better state update
+      }
+
+    } catch (error: any) {
+      console.error('Error deleting document:', error)
+      
+      let errorMessage = `Failed to delete ${doc.name}.`
+      if (error.response?.status === 404) {
+        errorMessage += ' Document not found.'
+      } else if (error.response?.status === 403) {
+        errorMessage += ' Access denied.'
+      } else if (error.response?.status >= 500) {
+        errorMessage += ' Server error.'
+      }
+      errorMessage += ' Please try again.'
+      
+      setDocumentError(errorMessage)
+    } finally {
+      setDeletingDocument(null)
+      setShowDeleteConfirm(null)
+    }
+  }
+
+  const handleDeleteConfirm = (doc: any) => {
+    setShowDeleteConfirm(doc.type)
+  }
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirm(null)
   }
 
   const handleDocumentDownload = async (doc: any) => {
@@ -260,6 +306,21 @@ export default function DocumentsTab({ application }: DocumentsTabProps) {
                       )}
                       <span>Download</span>
                     </button>
+
+                    {/* Delete Document Button */}
+                    <button
+                      onClick={() => handleDeleteConfirm(doc)}
+                      disabled={deletingDocument === doc.type}
+                      className="flex items-center space-x-1 px-3 py-1 text-sm bg-red-50 text-red-700 border border-red-200 rounded-md hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                      title={`Delete ${doc.name}`}
+                    >
+                      {deletingDocument === doc.type ? (
+                        <Loader className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                      <span>Delete</span>
+                    </button>
                   </div>
                 )}
               </div>
@@ -267,6 +328,60 @@ export default function DocumentsTab({ application }: DocumentsTabProps) {
           </div>
         ))}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="flex-shrink-0">
+                <XCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Delete Document</h3>
+                <p className="text-sm text-gray-500">
+                  {(() => {
+                    const doc = application.documents?.find(d => d.type === showDeleteConfirm)
+                    return doc?.name
+                  })()}
+                </p>
+              </div>
+            </div>
+            
+            <div className="mb-4">
+              <p className="text-sm text-gray-700">
+                Are you sure you want to delete this document? This action cannot be undone and the file will be permanently removed from the system.
+              </p>
+            </div>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={handleDeleteCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  const doc = application.documents?.find(d => d.type === showDeleteConfirm)
+                  if (doc) handleDocumentDelete(doc)
+                }}
+                disabled={deletingDocument !== null}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deletingDocument ? (
+                  <div className="flex items-center space-x-2">
+                    <Loader className="w-4 h-4 animate-spin" />
+                    <span>Deleting...</span>
+                  </div>
+                ) : (
+                  'Delete Document'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Error Display */}
       {documentError && (
