@@ -55,6 +55,8 @@ interface Document {
   description?: string
 }
 
+
+
 const DocumentUpload = () => {
   const location = useLocation()
   const navigate = useNavigate()
@@ -302,16 +304,70 @@ const DocumentUpload = () => {
             </p>
           </div>
 
-          {/* Loading State */}
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="relative">
-              <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-600 rounded-full animate-spin"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <DocumentIcon />
+          {/* Progress Overview - Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex-1">
+                  <div className="h-6 bg-gray-200 rounded w-32 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-48"></div>
+                </div>
+                <div className="text-right">
+                  <div className="h-8 bg-gray-200 rounded w-8 mb-1"></div>
+                  <div className="h-4 bg-gray-200 rounded w-12"></div>
+                </div>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2"></div>
+              <div className="flex justify-end mt-2">
+                <div className="h-3 bg-gray-200 rounded w-16"></div>
               </div>
             </div>
-            <p className="text-gray-600 mt-6 text-lg font-light">Loading your documents...</p>
-            <p className="text-gray-500 mt-2 text-sm">Fetching upload status from secure vault</p>
+
+            <div className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex-1">
+                  <div className="h-6 bg-gray-200 rounded w-32 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-48"></div>
+                </div>
+                <div className="text-right">
+                  <div className="h-8 bg-gray-200 rounded w-8 mb-1"></div>
+                  <div className="h-4 bg-gray-200 rounded w-12"></div>
+                </div>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2"></div>
+              <div className="flex justify-end mt-2">
+                <div className="h-3 bg-gray-200 rounded w-16"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Documents Grid - Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+            {[...Array(8)].map((_, index) => (
+              <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <div className="h-6 bg-gray-200 rounded w-40 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-5 bg-gray-200 rounded w-16 mt-2"></div>
+                  </div>
+                  <div className="h-8 bg-gray-200 rounded-full w-20"></div>
+                </div>
+                <div className="border-t border-gray-100 pt-4">
+                  <div className="h-20 bg-gray-200 rounded-lg"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Action Buttons - Skeleton */}
+          <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4 pt-8 border-t border-gray-200">
+            <div className="w-full sm:w-auto h-12 bg-gray-200 rounded-lg animate-pulse" style={{ width: '180px' }}></div>
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+              <div className="w-full sm:w-auto h-12 bg-gray-200 rounded-lg animate-pulse" style={{ width: '160px' }}></div>
+              <div className="w-full sm:w-auto h-12 bg-gray-200 rounded-lg animate-pulse" style={{ width: '170px' }}></div>
+            </div>
           </div>
         </main>
       </div>
