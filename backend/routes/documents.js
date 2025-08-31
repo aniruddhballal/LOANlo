@@ -184,6 +184,102 @@ router.get('/download/:applicationId/:documentType', authenticateToken, async (r
   }
 });
 
+// Delete document
+router.delete('/delete/:applicationId/:documentType', authenticateToken, async (req, res) => {
+  try {
+    const { applicationId, documentType } = req.params;
+
+    // Find the document record
+    const document = await Document.findOne({ 
+      applicationId, 
+      documentType 
+    });
+    
+    if (!document) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Document not found' 
+      });
+    }
+
+    // Verify user ownership (only the applicant can delete their own documents)
+    // Admin users shouldn't delete applicant documents without specific permissions
+    const application = await LoanApplication.findOne({
+      _id: applicationId,
+      userId: req.user.userId
+    });
+    
+    if (!application) {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'Access denied - you can only delete your own documents' 
+      });
+    }
+
+    // Check if application is still in a state where documents can be modified
+    if (application.status === 'approved' || application.status === 'disbursed') {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Cannot delete documents from approved or disbursed applications' 
+      });
+    }
+
+    try {
+      // Delete file from disk if it exists
+      if (fs.existsSync(document.filePath)) {
+        fs.unlinkSync(document.filePath);
+        console.log(`Deleted file: ${document.filePath}`);
+      } else {
+        console.log(`File not found on disk: ${document.filePath}`);
+      }
+    } catch (fileError) {
+      console.error('Error deleting file from disk:', fileError);
+      // Continue with database deletion even if file deletion fails
+    }
+
+    // Delete document record from database
+    await Document.deleteOne({ _id: document._id });
+
+    // Update application's document status if needed
+    const remainingDocs = await Document.find({ applicationId });
+    const requiredDocs = ['aadhaar', 'pan', 'salary_slips', 'bank_statements', 'employment_certificate', 'photo'];
+    const uploadedRequiredDocs = remainingDocs.filter(doc => 
+      requiredDocs.includes(doc.documentType)
+    ).length;
+
+    // If not all required documents are present anymore, update application status
+    if (uploadedRequiredDocs < requiredDocs.length && application.documentsUploaded) {
+      application.documentsUploaded = false;
+      if (application.status === 'under_review') {
+        application.status = 'documents_pending';
+        application.statusHistory.push({
+          status: 'documents_pending',
+          timestamp: new Date(),
+          comment: `Document ${documentType} was deleted, additional documents required`
+        });
+      }
+      await application.save();
+    }
+
+    res.json({
+      success: true,
+      message: 'Document deleted successfully',
+      deletedDocument: {
+        documentType: document.documentType,
+        fileName: document.fileName
+      }
+    });
+
+  } catch (error) {
+    console.error('Error deleting document:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error', 
+      error: error.message 
+    });
+  }
+});
+
 // Upload document
 router.post('/upload', authenticateToken, upload.single('document'), async (req, res) => {
   try {
