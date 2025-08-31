@@ -11,6 +11,7 @@ import Profile from './components/profile/Profile'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import KYC from './components/loan/KYC'
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
+import AccessDenied from './components/auth/AccessDenied'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -80,6 +81,10 @@ function AppContent() {
             <RoleProtectedRoute allowedRoles={['system_admin']}>
               <SystemAdminDashboard />
             </RoleProtectedRoute>
+          } />
+
+          <Route path="/access-denied" element={
+            <AccessDenied />
           } />
           
           <Route path="/loan-application" element={

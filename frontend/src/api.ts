@@ -7,7 +7,6 @@ const api = axios.create({
   },
 });
 
-// Automatically attach token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -20,12 +19,15 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    if (status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("pendingUser");
-      // Optionally, redirect to login page
       window.location.href = "/login";
     }
+     if (status === 403) {
+        window.location.href = "/access-denied";
+      }
     return Promise.reject(error);
   }
 );
