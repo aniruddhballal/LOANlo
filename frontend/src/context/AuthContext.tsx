@@ -64,6 +64,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [])
 
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'token') {
+        if (e.newValue) {
+          // Token changed (login in another tab) → re-verify
+          api.get('/auth/verify')
+            .then(({ data }) => {
+              if (data.success) {
+                setUser(data.user)
+              } else {
+                setUser(null)
+              }
+            })
+            .catch(() => setUser(null))
+        } else {
+          // Token removed (logout in another tab)
+          setUser(null)
+        }
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [])
+
+
   const login = async (email: string, password: string, options?: { skipDelay?: boolean }) => {
     try {
       const { data } = await api.post('/auth/login', { email, password })
