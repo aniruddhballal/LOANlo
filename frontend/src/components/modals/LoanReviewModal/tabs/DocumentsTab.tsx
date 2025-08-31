@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { CheckCircle, XCircle, AlertCircle, Eye, Download, Loader, Trash2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import type { LoanApplication } from '../types'
 import { formatDate, getDocumentProgress, getProgressBarColor } from '../utils'
 import api from '../../../../api'
@@ -188,6 +189,23 @@ export default function DocumentsTab({ application }: DocumentsTabProps) {
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-gray-900 text-lg">Document Requirements</h3>
         <div className="flex items-center space-x-3">
+          {!allRequiredDocsUploaded && (
+            <Link
+              to="/upload-documents"
+              state={{ applicationId: application._id }}
+              className="inline-flex items-center px-5 py-3 rounded-xl text-sm font-semibold bg-white text-amber-700 border-2 border-amber-200 hover:border-amber-300 hover:bg-amber-50 transition-all duration-200 shadow-sm hover:shadow-lg group"
+            >
+              <div className="w-5 h-5 mr-3 bg-amber-100 rounded-full flex items-center justify-center group-hover:bg-amber-200">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+              </div>
+              Upload Required Documents
+              <svg width="14" height="14" className="ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+              </svg>
+            </Link>
+          )}
           <span className="text-sm font-medium text-gray-600">
             {documentProgress.uploaded} of {documentProgress.total} completed
           </span>
