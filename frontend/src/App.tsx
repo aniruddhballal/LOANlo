@@ -88,24 +88,24 @@ function AppContent() {
           } />
           
           <Route path="/loan-application" element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={['applicant']}>
               <LoanApplication />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           } />
           <Route path="/kyc" element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={['applicant']}>
               <KYC />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           } />
           <Route path="/upload-documents" element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={['applicant']}>
               <DocumentUpload />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           } />
           <Route path="/application-status" element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={['applicant']}>
               <ApplicationStatus />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           } />
           <Route path="/profile" element={
             <ProtectedRoute>
