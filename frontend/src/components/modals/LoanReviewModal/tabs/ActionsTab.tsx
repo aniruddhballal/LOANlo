@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { CheckCircle, XCircle, AlertCircle, Upload } from 'lucide-react'
-import type { LoanApplication, ApprovalData } from './types'
-import { getDocumentProgress, getProgressBarColor } from './utils'
+import type { LoanApplication, ApprovalData } from '../types'
+import { getDocumentProgress, getProgressBarColor } from '../utils'
 
 interface ActionsTabProps {
   application: LoanApplication

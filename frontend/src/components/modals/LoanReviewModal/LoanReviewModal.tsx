@@ -3,10 +3,10 @@ import { X, FileText, Clock, MessageSquare, File } from 'lucide-react'
 import api from '../../../api'
 import type { LoanApplication, ApprovalData } from './types'
 import { getRequiredDocuments } from './utils'
-import ApplicationDetailsTab from './ApplicationDetailsTab'
-import DocumentsTab from './DocumentsTab'
-import StatusHistoryTab from './StatusHistoryTab'
-import ActionsTab from './ActionsTab'
+import ApplicationDetailsTab from './tabs/ApplicationDetailsTab'
+import DocumentsTab from './tabs/DocumentsTab'
+import StatusHistoryTab from './tabs/StatusHistoryTab'
+import ActionsTab from './tabs/ActionsTab'
 
 interface LoanReviewModalProps {
   isOpen: boolean

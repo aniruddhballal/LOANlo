@@ -1,6 +1,6 @@
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react'
-import type { LoanApplication } from './types'
-import { formatDate, getDocumentProgress, getProgressBarColor } from './utils'
+import type { LoanApplication } from '../types'
+import { formatDate, getDocumentProgress, getProgressBarColor } from '../utils'
 
 interface DocumentsTabProps {
   application: LoanApplication
