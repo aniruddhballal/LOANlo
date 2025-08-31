@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import api from '../../api'
-import ApplicationReviewModal from '../modals/ApplicationReviewModal'
+import LoanReviewModal from '../modals/LoanReviewModal'
 
 interface LoanApplication {
   _id: string
@@ -48,8 +48,6 @@ const ApplicationStatus = () => {
   }, [])
 
   const role = localStorage.getItem("role") // or from Redux/auth context
-
-  console.log(role)
 
   let dashboardPath = "/dashboard/applicant"; // default
   if (role === "underwriter") {
@@ -347,11 +345,16 @@ const ApplicationStatus = () => {
               </div>
             </div>
 
-          <ApplicationReviewModal
-            application={selectedApplication}
+            <LoanReviewModal
             isOpen={!!selectedApplication}
             onClose={() => setSelectedApplication(null)}
-          />
+            applicationId={selectedApplication?._id || ''}
+            onApplicationUpdated={() => {
+              // Add your refresh logic here, like refetching applications
+              setSelectedApplication(null)
+            }}
+            showActions={false}
+            />
 
           {/* Executive Delete Confirmation Modal */}
           {deleteConfirmation.show && deleteConfirmation.application && (
