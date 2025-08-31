@@ -68,8 +68,12 @@ export default function DocumentsTab({ application }: DocumentsTabProps) {
     setDocumentError(null)
 
     try {
-      const response = await api.get(`/loans/documents/${application._id}/${doc.type}`, {
-        responseType: 'blob'
+      // Use the same endpoint as view for consistency
+      const response = await api.get(`/documents/file/${application._id}/${doc.type}`, {
+        responseType: 'blob',
+        headers: {
+          'Accept': '*/*'
+        }
       })
 
       // Create download link
@@ -78,19 +82,56 @@ export default function DocumentsTab({ application }: DocumentsTabProps) {
       const link = document.createElement('a')
       link.href = url
       
-      // Generate filename with application ID for uniqueness
-      const fileExtension = response.headers['content-type']?.includes('pdf') ? 'pdf' : 
-                           response.headers['content-type']?.includes('image') ? 'jpg' : 'pdf'
-      link.download = `${doc.name.replace(/\s+/g, '_')}_${application._id.slice(-8)}.${fileExtension}`
+      // Determine file extension from content-type or default to pdf
+      let fileExtension = 'pdf'
+      const contentType = response.headers['content-type'] || response.headers['Content-Type'] || ''
       
+      if (contentType.includes('pdf')) {
+        fileExtension = 'pdf'
+      } else if (contentType.includes('image/jpeg') || contentType.includes('image/jpg')) {
+        fileExtension = 'jpg'
+      } else if (contentType.includes('image/png')) {
+        fileExtension = 'png'
+      } else if (contentType.includes('image/')) {
+        fileExtension = 'jpg' // Default for other images
+      } else if (contentType.includes('word') || contentType.includes('msword')) {
+        fileExtension = 'doc'
+      } else if (contentType.includes('spreadsheet') || contentType.includes('excel')) {
+        fileExtension = 'xlsx'
+      }
+      
+      // Generate clean filename
+      const cleanDocName = doc.name.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_')
+      link.download = `${cleanDocName}_${application._id.slice(-8)}.${fileExtension}`
+      
+      // Force download
+      link.style.display = 'none'
       document.body.appendChild(link)
       link.click()
-      document.body.removeChild(link)
-      window.URL.revokeObjectURL(url)
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+      }, 100)
+
+      console.log('Download initiated for:', link.download)
 
     } catch (error: any) {
       console.error('Error downloading document:', error)
-      setDocumentError(`Failed to download ${doc.name}. Please try again.`)
+      
+      // More detailed error messaging
+      let errorMessage = `Failed to download ${doc.name}.`
+      if (error.response?.status === 404) {
+        errorMessage += ' Document not found.'
+      } else if (error.response?.status === 403) {
+        errorMessage += ' Access denied.'
+      } else if (error.response?.status >= 500) {
+        errorMessage += ' Server error.'
+      }
+      errorMessage += ' Please try again.'
+      
+      setDocumentError(errorMessage)
     } finally {
       setLoadingDocument(null)
     }
