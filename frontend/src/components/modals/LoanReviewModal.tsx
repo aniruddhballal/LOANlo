@@ -41,9 +41,10 @@ interface LoanReviewModalProps {
   onClose: () => void
   applicationId: string
   onApplicationUpdated: () => void
+  showActions?: boolean // Add this optional prop
 }
 
-export default function LoanReviewModal({ isOpen, onClose, applicationId, onApplicationUpdated }: LoanReviewModalProps) {
+export default function LoanReviewModal({ isOpen, onClose, applicationId, onApplicationUpdated, showActions = true }: LoanReviewModalProps) {
   const [application, setApplication] = useState<LoanApplication | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -211,30 +212,30 @@ export default function LoanReviewModal({ isOpen, onClose, applicationId, onAppl
               </div>
             ) : application ? (
               <>
-                {/* Tabs */}
-                <div className="flex border-b border-gray-200 bg-white">
-                  {[
-                    { id: 'details', label: 'Application Details', icon: FileText },
-                    { id: 'history', label: 'Status History', icon: Clock },
-                    { id: 'actions', label: 'Actions', icon: MessageSquare }
-                  ].map((tab) => {
-                    const Icon = tab.icon
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center space-x-2 px-6 py-4 font-medium text-sm transition-colors duration-200 ${
-                          activeTab === tab.id
-                            ? 'text-gray-900 border-b-2 border-gray-900 bg-gray-50'
-                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        <span>{tab.label}</span>
-                      </button>
-                    )
-                  })}
-                </div>
+            {/* Tabs */}
+            <div className="flex border-b border-gray-200 bg-white">
+              {[
+                { id: 'details', label: 'Application Details', icon: FileText },
+                { id: 'history', label: 'Status History', icon: Clock },
+                ...(showActions ? [{ id: 'actions', label: 'Actions', icon: MessageSquare }] : [])
+              ].map((tab) => {
+                const Icon = tab.icon
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center space-x-2 px-6 py-4 font-medium text-sm transition-colors duration-200 ${
+                      activeTab === tab.id
+                        ? 'text-gray-900 border-b-2 border-gray-900 bg-gray-50'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{tab.label}</span>
+                  </button>
+                )
+              })}
+            </div>
 
                 {/* Tab Content */}
                 <div className="flex-1 overflow-y-auto p-6">
