@@ -206,7 +206,7 @@ const ApplicationStatus = () => {
                 You haven't submitted any loan applications yet. Start your financial journey by applying for a loan that meets your needs.
               </p>
               <Link 
-                to="/kyc" 
+                to="/loan-application" 
                 className="inline-flex items-center px-8 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 Begin Application Process
