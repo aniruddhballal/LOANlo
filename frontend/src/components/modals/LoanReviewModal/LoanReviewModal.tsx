@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X, FileText, Clock, MessageSquare, File } from 'lucide-react'
-import api from '../../api'
+import api from '../../../api'
 import type { LoanApplication, ApprovalData } from './types'
 import { getRequiredDocuments } from './utils'
 import ApplicationDetailsTab from './ApplicationDetailsTab'

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { CheckCircle } from 'lucide-react'
 
-import LoanReviewModal from '../modals/LoanReviewModal'
+import LoanReviewModal from '../modals/LoanReviewModal/LoanReviewModal'
 import api from '../../api'
 
 interface LoanApplication {
