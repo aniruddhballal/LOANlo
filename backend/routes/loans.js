@@ -3,6 +3,72 @@ const LoanApplication = require('../models/LoanApplication');
 const { authenticateToken } = require('../middleware/auth');
 const UserKYC = require('../models/UserKYC');
 const router = express.Router();
+const Document = require('../models/Document');
+
+// Helper function to build document requirements with status
+const buildDocumentRequirements = (uploadedDocs) => {
+  const uploadedDocMap = {};
+  uploadedDocs.forEach(doc => {
+    uploadedDocMap[doc.documentType] = doc;
+  });
+
+  const requirements = [
+    {
+      name: 'Aadhaar Card',
+      type: 'aadhaar',
+      required: true,
+      description: 'Government issued identity proof with 12-digit unique number'
+    },
+    {
+      name: 'PAN Card',
+      type: 'pan',
+      required: true,
+      description: 'Permanent Account Number card for tax identification'
+    },
+    {
+      name: 'Salary Slips (Last 3 months)',
+      type: 'salary_slips',
+      required: true,
+      description: 'Recent salary certificates showing current income'
+    },
+    {
+      name: 'Bank Statements (Last 6 months)',
+      type: 'bank_statements',
+      required: true,
+      description: 'Bank account statements for financial verification'
+    },
+    {
+      name: 'Employment Certificate',
+      type: 'employment_certificate',
+      required: true,
+      description: 'Letter from employer confirming current employment status'
+    },
+    {
+      name: 'Photo',
+      type: 'photo',
+      required: true,
+      description: 'Recent passport-size photograph for identification'
+    },
+    {
+      name: 'Address Proof',
+      type: 'address_proof',
+      required: false,
+      description: 'Utility bill or rent agreement showing current address'
+    },
+    {
+      name: 'Income Tax Returns',
+      type: 'itr',
+      required: false,
+      description: 'IT returns for additional income verification'
+    }
+  ];
+
+  return requirements.map(req => ({
+    ...req,
+    uploaded: !!uploadedDocMap[req.type],
+    uploadedAt: uploadedDocMap[req.type]?.uploadedAt
+  }));
+};
 
 // Submit loan application
 router.post('/apply', authenticateToken, async (req, res) => {
@@ -173,9 +239,24 @@ router.get('/details/:applicationId', authenticateToken, async (req, res) => {
       });
     }
 
+    // Get uploaded documents for this application
+    const uploadedDocs = await Document.find({ applicationId });
+    
+    // Build document requirements with upload status
+    const documentRequirements = buildDocumentRequirements(uploadedDocs);
+    
+    // Add documents array to application data
+    const applicationData = application.toObject();
+    applicationData.documents = documentRequirements;
+
+    // Update documentsUploaded flag based on required documents
+    const requiredDocs = documentRequirements.filter(doc => doc.required);
+    const uploadedRequiredDocs = requiredDocs.filter(doc => doc.uploaded);
+    applicationData.documentsUploaded = uploadedRequiredDocs.length === requiredDocs.length;
+
     res.json({
       success: true,
-      application
+      application: applicationData
     });
   } catch (error) {
     console.error('Error fetching application details:', error);
