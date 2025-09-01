@@ -429,7 +429,7 @@ const Dashboard = () => {
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">No Applications Found</h3>
                       <p className="text-gray-600 mb-8 font-light">You haven't submitted any loan applications yet. Start your financial journey today.</p>
                       <Link 
-                        to="/kyc" 
+                        to="/loan-application" 
                         className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
                       >
                         Submit First Application
