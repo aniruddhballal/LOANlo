@@ -679,7 +679,7 @@ const DocumentUpload = () => {
             disabled={requiredDocsUploaded !== requiredDocsCount}
           >
             <DocumentIcon />
-            <span>Complete Application</span>
+            <span>Submit for Review</span>
           </button>
         </div>
 
