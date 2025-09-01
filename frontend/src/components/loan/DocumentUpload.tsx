@@ -392,7 +392,6 @@ const DocumentUpload = () => {
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
                 <h1 className="text-2xl font-light text-gray-900 tracking-wide">Document Vault</h1>
-                <div className="w-2 h-2 bg-gray-500 rounded-full ml-2"></div>
               </div>
               <div className="h-6 w-px bg-gray-300"></div>
               <p className="text-sm text-gray-600 uppercase tracking-widest font-medium">Secure Document Management</p>
