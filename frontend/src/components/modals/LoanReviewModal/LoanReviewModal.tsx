@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, FileText, Clock, MessageSquare, File, AlertCircle } from 'lucide-react'
+import { X, FileText, Clock, MessageSquare, File, AlertCircle, CheckCircle } from 'lucide-react'
 import api from '../../../api'
 import type { LoanApplication, ApprovalData } from './types'
 import { getRequiredDocuments } from './utils'
@@ -37,6 +37,8 @@ export default function LoanReviewModal({
     emi: 0
   })
   const [actionLoading, setActionLoading] = useState('')
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
 
   useEffect(() => {
     if (isOpen && applicationId) {
@@ -115,8 +117,17 @@ export default function LoanReviewModal({
         await fetchApplicationDetails()
         setComment('')
         setActiveTab('details') // Switch to application details tab
+        
+        // Show success message
+        setSuccessMessage('Additional documents have been requested successfully. The applicant has been notified.')
+        setShowSuccessMessage(true)
+        
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+          setShowSuccessMessage(false)
+        }, 5000)
+        
         onApplicationUpdated()
-        // Don't auto-close modal for pending status so underwriter can see the change
       } else {
         setError(data.message)
       }
@@ -184,6 +195,27 @@ export default function LoanReviewModal({
                           The applicant needs to submit the application before it can be reviewed.
                         </p>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {showSuccessMessage && (
+                  <div className="bg-green-50 border-l-4 border-green-400 p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex">
+                        <CheckCircle className="h-5 w-5 text-green-400" />
+                        <div className="ml-3">
+                          <p className="text-sm text-green-700">
+                            <strong>Success!</strong> {successMessage}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setShowSuccessMessage(false)}
+                        className="text-green-400 hover:text-green-600 transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
                 )}
