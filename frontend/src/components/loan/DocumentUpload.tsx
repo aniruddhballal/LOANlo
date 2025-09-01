@@ -407,6 +407,23 @@ const DocumentUpload = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-12">
+        {/* Back Button */}
+        <div>
+          <button
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-all duration-200 text-sm font-medium"
+            onClick={() => {
+              if (user?.role) {
+                navigate(`/dashboard/${user.role}`)
+              } else {
+                navigate('/dashboard/applicant') // fallback
+              }
+            }}
+          >
+            <ArrowLeftIcon />
+            <span>Back to Dashboard</span>
+          </button>
+        </div>
+
         {/* Title Section */}
         <div className="text-center mb-12 pb-8 border-b border-gray-200">
           <h2 className="text-3xl font-light text-gray-900 mb-3 tracking-wide">Document Submission</h2>
@@ -647,40 +664,24 @@ const DocumentUpload = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4 pt-8 border-t border-gray-200">
+        <div className="flex flex-col sm:flex-row items-center justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-8 border-t border-gray-200">
           <button 
-            className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium"
-            onClick={() => {
-              if (user?.role) {
-                navigate(`/dashboard/${user.role}`)
-              } else {
-                navigate('/dashboard/applicant') // fallback
-              }
-            }}
+            className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={uploadAllDocuments}
+            disabled={loading || !documents.some(doc => doc.file && !doc.uploaded)}
           >
-            <ArrowLeftIcon />
-            <span>Back to Dashboard</span>
+            <CloudUploadIcon />
+            <span>Upload All Selected</span>
           </button>
-
-          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
-            <button 
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={uploadAllDocuments}
-              disabled={loading || !documents.some(doc => doc.file && !doc.uploaded)}
-            >
-              <CloudUploadIcon />
-              <span>Upload All Selected</span>
-            </button>
-            
-            <button 
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={completeDocumentSubmission}
-              disabled={requiredDocsUploaded !== requiredDocsCount}
-            >
-              <DocumentIcon />
-              <span>Complete Application</span>
-            </button>
-          </div>
+          
+          <button 
+            className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={completeDocumentSubmission}
+            disabled={requiredDocsUploaded !== requiredDocsCount}
+          >
+            <DocumentIcon />
+            <span>Complete Application</span>
+          </button>
         </div>
 
         {/* Footer Note */}
