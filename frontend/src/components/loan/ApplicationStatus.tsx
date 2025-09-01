@@ -354,6 +354,7 @@ const ApplicationStatus = () => {
               setSelectedApplication(null)
             }}
             showActions={false}
+            isUnderwriter={false}
             />
 
           {/* Executive Delete Confirmation Modal */}

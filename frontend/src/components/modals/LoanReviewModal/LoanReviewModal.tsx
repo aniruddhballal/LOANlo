@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, FileText, Clock, MessageSquare, File } from 'lucide-react'
+import { X, FileText, Clock, MessageSquare, File, AlertCircle } from 'lucide-react'
 import api from '../../../api'
 import type { LoanApplication, ApprovalData } from './types'
 import { getRequiredDocuments } from './utils'
@@ -14,6 +14,7 @@ interface LoanReviewModalProps {
   applicationId: string
   onApplicationUpdated: () => void
   showActions?: boolean
+  isUnderwriter?: boolean
 }
 
 export default function LoanReviewModal({ 
@@ -21,7 +22,8 @@ export default function LoanReviewModal({
   onClose, 
   applicationId, 
   onApplicationUpdated, 
-  showActions = true 
+  showActions = true,
+  isUnderwriter = false
 }: LoanReviewModalProps) {
   const [application, setApplication] = useState<LoanApplication | null>(null)
   const [loading, setLoading] = useState(false)
@@ -98,6 +100,9 @@ export default function LoanReviewModal({
     }
   }
 
+  // Check if application is ready for underwriter actions
+  const canPerformActions = application?.status === 'under_review'
+
   if (!isOpen) return null
 
   return (
@@ -141,13 +146,28 @@ export default function LoanReviewModal({
               </div>
             ) : application ? (
               <>
+                {/* Status Warning for Pending Applications - Only for Underwriters */}
+                {application.status === 'pending' && isUnderwriter && (
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <div className="flex">
+                      <AlertCircle className="h-5 w-5 text-yellow-400" />
+                      <div className="ml-3">
+                        <p className="text-sm text-yellow-700">
+                          <strong>Application Not Submitted:</strong> This application is still pending document upload. 
+                          The applicant needs to submit the application before it can be reviewed.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Tabs */}
                 <div className="flex border-b border-gray-200 bg-white">
                   {[
                     { id: 'details', label: 'Application Details', icon: FileText },
                     { id: 'documents', label: 'Document Status', icon: File },
                     { id: 'history', label: 'Status History', icon: Clock },
-                    ...(showActions ? [{ id: 'actions', label: 'Actions', icon: MessageSquare }] : [])
+                    ...(showActions && canPerformActions ? [{ id: 'actions', label: 'Actions', icon: MessageSquare }] : [])
                   ].map((tab) => {
                     const Icon = tab.icon
                     return (
@@ -181,13 +201,27 @@ export default function LoanReviewModal({
                     <StatusHistoryTab application={application} />
                   )}
 
-                  {activeTab === 'actions' && (
+                  {activeTab === 'actions' && canPerformActions && (
                     <ActionsTab 
                       application={application}
                       onStatusUpdate={handleStatusUpdate}
                       error={error}
                       actionLoading={actionLoading}
                     />
+                  )}
+
+                  {/* Show message when actions tab is selected but not available */}
+                  {activeTab === 'actions' && !canPerformActions && (
+                    <div className="text-center py-8">
+                      <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        Actions Not Available
+                      </h3>
+                      <p className="text-gray-600 max-w-md mx-auto">
+                        Underwriter actions are only available when the application status is "Under Review". 
+                        The applicant must submit their application first.
+                      </p>
+                    </div>
                   )}
                 </div>
               </>

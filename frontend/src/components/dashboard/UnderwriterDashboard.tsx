@@ -502,6 +502,8 @@ export default function UnderwriterDashboard() {
           onClose={handleModalClose}
           applicationId={selectedApplicationId}
           onApplicationUpdated={refreshApplications}
+          showActions={true}
+          isUnderwriter={true}
         />
       )}
 
