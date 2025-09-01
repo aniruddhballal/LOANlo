@@ -190,8 +190,7 @@ export default function LoanReviewModal({
                         <AlertCircle className="h-5 w-5 text-yellow-400" />
                         <div className="ml-3">
                           <p className="text-sm text-yellow-700">
-                            <strong>Application Not Submitted:</strong> This application is still pending document upload. 
-                            The applicant needs to submit the application before it can be reviewed.
+                            <strong>Application Not Submitted:</strong> The applicant needs to submit the application before it can be reviewed.
                           </p>
                         </div>
                       </div>
