@@ -82,10 +82,13 @@ export default function DocumentsTab({ application }: DocumentsTabProps) {
 
     } catch (error: any) {
       console.error('Error deleting document:', error)
+      console.log('Backend response:', error.response?.data) // ADD THIS LINE
       
       let errorMessage = `Failed to delete ${doc.name}.`
       if (error.response?.status === 404) {
         errorMessage += ' Document not found.'
+      } else if (error.response?.status === 400) {// ADD THIS BLOCK
+        errorMessage = error.response?.data?.message || errorMessage
       } else if (error.response?.status === 403) {
         errorMessage += ' Access denied.'
       } else if (error.response?.status >= 500) {
