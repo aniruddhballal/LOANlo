@@ -43,6 +43,7 @@ export default function LoanReviewModal({
   useEffect(() => {
     if (isOpen && applicationId) {
       setActiveTab('details') // Reset to first tab when modal opens
+      setShowSuccessMessage(false) // Add this line
       fetchApplicationDetails()
     }
   }, [isOpen, applicationId])
