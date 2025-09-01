@@ -122,6 +122,20 @@ const ApplicationStatus = () => {
     }
   };
 
+  const handleSubmitForReview = async (applicationId: string) => {
+    try {
+      await api.patch(`/loans/${applicationId}/submit-for-review`) // or whatever your API endpoint is
+      // Update the local state to reflect the status change
+      setApplications(applications.map(app => 
+        app._id === applicationId 
+          ? { ...app, status: 'under_review' as const }
+          : app
+      ))
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to submit for review')
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
@@ -321,7 +335,7 @@ const ApplicationStatus = () => {
                                   </svg>
                                   Review
                                 </button>
-                                {!app.documentsUploaded && (
+                                {!app.documentsUploaded ? (
                                   <Link 
                                     to="/upload-documents" 
                                     state={{ applicationId: app._id }}
@@ -333,7 +347,17 @@ const ApplicationStatus = () => {
                                     </svg>
                                     Upload
                                   </Link>
-                                )}
+                                ) : app.documentsUploaded && app.status === 'pending' ? (
+                                  <button
+                                    onClick={() => handleSubmitForReview(app._id)}
+                                    className="inline-flex items-center px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                  >
+                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Submit for Review
+                                  </button>
+                                ) : null}
                               </div>
                             </td>
                           </tr>
