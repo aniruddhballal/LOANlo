@@ -39,11 +39,13 @@ export default function LoanReviewModal({
   const [actionLoading, setActionLoading] = useState('')
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
+  const [showWarningMessage, setShowWarningMessage] = useState(true)
 
   useEffect(() => {
     if (isOpen && applicationId) {
       setActiveTab('details') // Reset to first tab when modal opens
-      setShowSuccessMessage(false) // Add this line
+      setShowSuccessMessage(false)
+      setShowWarningMessage(true)
       fetchApplicationDetails()
     }
   }, [isOpen, applicationId])
@@ -181,16 +183,24 @@ export default function LoanReviewModal({
             ) : application ? (
               <>
                 {/* Status Warning for Pending Applications - Only for Underwriters */}
-                {application.status === 'pending' && isUnderwriter &&  !showSuccessMessage && (
+                {application.status === 'pending' && isUnderwriter && !showSuccessMessage && showWarningMessage && (
                   <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                    <div className="flex">
-                      <AlertCircle className="h-5 w-5 text-yellow-400" />
-                      <div className="ml-3">
-                        <p className="text-sm text-yellow-700">
-                          <strong>Application Not Submitted:</strong> This application is still pending document upload. 
-                          The applicant needs to submit the application before it can be reviewed.
-                        </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex">
+                        <AlertCircle className="h-5 w-5 text-yellow-400" />
+                        <div className="ml-3">
+                          <p className="text-sm text-yellow-700">
+                            <strong>Application Not Submitted:</strong> This application is still pending document upload. 
+                            The applicant needs to submit the application before it can be reviewed.
+                          </p>
+                        </div>
                       </div>
+                      <button
+                        onClick={() => setShowWarningMessage(false)}
+                        className="text-yellow-400 hover:text-yellow-600 transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
                 )}
