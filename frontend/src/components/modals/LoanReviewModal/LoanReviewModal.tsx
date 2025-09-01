@@ -122,11 +122,6 @@ export default function LoanReviewModal({
         setSuccessMessage('Additional documents have been requested successfully. The applicant has been notified.')
         setShowSuccessMessage(true)
         
-        // Hide success message after 5 seconds
-        setTimeout(() => {
-          setShowSuccessMessage(false)
-        }, 5000)
-        
         onApplicationUpdated()
       } else {
         setError(data.message)
@@ -185,7 +180,7 @@ export default function LoanReviewModal({
             ) : application ? (
               <>
                 {/* Status Warning for Pending Applications - Only for Underwriters */}
-                {application.status === 'pending' && isUnderwriter && (
+                {application.status === 'pending' && isUnderwriter &&  !showSuccessMessage && (
                   <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                     <div className="flex">
                       <AlertCircle className="h-5 w-5 text-yellow-400" />
