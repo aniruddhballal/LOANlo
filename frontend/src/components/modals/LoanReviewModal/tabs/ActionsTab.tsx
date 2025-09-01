@@ -6,11 +6,12 @@ import { getDocumentProgress, getProgressBarColor } from '../utils'
 interface ActionsTabProps {
   application: LoanApplication
   onStatusUpdate: (status: 'approved' | 'rejected' | 'under_review') => Promise<void>
+  onRequestAdditionalDocuments: () => void;
   error?: string | null
   actionLoading: string
 }
 
-export default function ActionsTab({ application, onStatusUpdate, error, actionLoading }: ActionsTabProps) {
+export default function ActionsTab({ application, onStatusUpdate, onRequestAdditionalDocuments, error, actionLoading }: ActionsTabProps) {
   const [comment, setComment] = useState('')
   const [approvalData, setApprovalData] = useState<ApprovalData>({
     approvedAmount: 0,
@@ -224,8 +225,9 @@ export default function ActionsTab({ application, onStatusUpdate, error, actionL
         )}
 
         <button
-          onClick={() => {/* Handle document request */}}
-          className="flex items-center space-x-2 px-6 py-3 bg-gray-50 text-gray-800 border-2 border-gray-400 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-medium"
+            onClick={onRequestAdditionalDocuments}
+            disabled={actionLoading === 'pending'}
+            className="flex items-center space-x-2 px-6 py-3 bg-gray-50 text-gray-800 border-2 border-gray-400 rounded-lg hover:bg-gray-100 transition-colors duration-200 font-medium"
         >
           <Upload className="w-4 h-4" />
           <span>Request Additional Documents</span>

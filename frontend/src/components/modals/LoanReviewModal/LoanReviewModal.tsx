@@ -101,6 +101,32 @@ export default function LoanReviewModal({
     }
   }
 
+  const handleRequestAdditionalDocuments = async () => {
+    setActionLoading('pending')
+    try {
+      const payload = {
+        status: 'pending',
+        comment: comment || 'Additional documents requested',
+        requestedDocuments: true
+      }
+
+      const { data } = await api.put(`/loans/update-status/${applicationId}`, payload)
+      if (data.success) {
+        await fetchApplicationDetails()
+        setComment('')
+        setActiveTab('details') // Switch to application details tab
+        onApplicationUpdated()
+        // Don't auto-close modal for pending status so underwriter can see the change
+      } else {
+        setError(data.message)
+      }
+    } catch (err: any) {
+      setError('Failed to request additional documents')
+    } finally {
+      setActionLoading('')
+    }
+  }
+
   // Check if application is ready for underwriter actions
   const canPerformActions = application?.status === 'under_review'
 
@@ -206,6 +232,7 @@ export default function LoanReviewModal({
                     <ActionsTab 
                       application={application}
                       onStatusUpdate={handleStatusUpdate}
+                      onRequestAdditionalDocuments={handleRequestAdditionalDocuments}
                       error={error}
                       actionLoading={actionLoading}
                     />
