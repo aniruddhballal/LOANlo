@@ -272,7 +272,7 @@ router.get('/details/:applicationId', authenticateToken, async (req, res) => {
 router.put('/update-status/:applicationId', authenticateToken, async (req, res) => {
   try {
     const { applicationId } = req.params;
-    const { status, comment, approvalDetails, rejectionReason } = req.body;
+    const { status, comment, approvalDetails, rejectionReason, additionalDocumentsRequested } = req.body;
     
     // Only underwriters can access
     if (req.user.role !== 'underwriter') {
@@ -297,6 +297,11 @@ router.put('/update-status/:applicationId', authenticateToken, async (req, res) 
       status,
       updatedAt: new Date()
     };
+
+    // Handle additional documents requested field
+    if (additionalDocumentsRequested !== undefined) {
+      updateData.additionalDocumentsRequested = additionalDocumentsRequested;
+    }
 
     // Add status history entry
     const historyEntry = {
