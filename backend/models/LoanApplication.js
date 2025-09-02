@@ -22,6 +22,12 @@ const loanApplicationSchema = new mongoose.Schema({
     default: 'pending'
   },
   documentsUploaded: { type: Boolean, default: false },
+
+  // Additional Documents Requested
+  additionalDocumentsRequested: {
+    type: Boolean,
+    default: false
+  },
  
   // Status History
   statusHistory: [{
