@@ -112,7 +112,8 @@ export default function LoanReviewModal({
       const payload = {
         status: 'pending',
         comment: comment || 'Additional documents requested',
-        requestedDocuments: true
+        additionalDocumentsRequested: true,  // Set the new field to true
+        documentsUploaded: false  // Add this line to set documentsUploaded to false
       }
 
       const { data } = await api.put(`/loans/update-status/${applicationId}`, payload)
