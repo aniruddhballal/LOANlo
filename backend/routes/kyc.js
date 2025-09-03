@@ -1,31 +1,55 @@
 const express = require('express');
 const router = express.Router();
-const UserKYC = require('../models/UserKYC');
+const User = require('../models/User'); // Changed from UserKYC to User
 const { authenticateToken } = require('../middleware/auth');
 
 // Save or update KYC details
 router.post('/save', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const kycData = { ...req.body, userId };
-
-    // Upsert: update if exists, else create
-    const kyc = await UserKYC.findOneAndUpdate(
-      { userId },
-      kycData,
-      { upsert: true, new: true }
+    
+    // Extract KYC fields from request body (excluding sensitive fields)
+    const {
+      firstName, lastName, dateOfBirth, gender, maritalStatus,
+      aadhaarNumber, panNumber, phone, address, city, state, pincode,
+      employmentType, companyName, designation, workExperience, monthlyIncome
+    } = req.body;
+    
+    const kycUpdateData = {
+      firstName, lastName, dateOfBirth, gender, maritalStatus,
+      aadhaarNumber, panNumber, phone, address, city, state, pincode,
+      employmentType, companyName, designation, workExperience, monthlyIncome
+    };
+    
+    // Remove undefined fields
+    Object.keys(kycUpdateData).forEach(key => 
+      kycUpdateData[key] === undefined && delete kycUpdateData[key]
     );
-
-    res.json({ 
-      success: true, 
-      kyc,
+    
+    // Update the user document with KYC data
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      kycUpdateData,
+      { new: true, runValidators: true }
+    ).select('-password'); // Exclude password from response
+    
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      user: updatedUser,
       message: 'KYC details saved successfully'
     });
   } catch (err) {
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to save KYC', 
-      error: err.message 
+    res.status(500).json({
+      success: false,
+      message: 'Failed to save KYC',
+      error: err.message
     });
   }
 });
@@ -33,42 +57,70 @@ router.post('/save', authenticateToken, async (req, res) => {
 // Get user's KYC details
 router.get('/me', authenticateToken, async (req, res) => {
   try {
-    const kyc = await UserKYC.findOne({ userId: req.user.userId });
+    const user = await User.findById(req.user.userId).select('-password');
     
-    res.json({ 
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    res.json({
       success: true,
-      kyc 
+      user
     });
   } catch (err) {
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Failed to fetch KYC', 
-      error: err.message 
+      message: 'Failed to fetch KYC',
+      error: err.message
     });
   }
 });
 
-// Optional: Delete KYC details
+// Clear KYC details (set KYC fields to null/undefined)
 router.delete('/me', authenticateToken, async (req, res) => {
   try {
-    const deleted = await UserKYC.findOneAndDelete({ userId: req.user.userId });
+    const kycFields = {
+      dateOfBirth: null,
+      gender: null,
+      maritalStatus: null,
+      aadhaarNumber: null,
+      panNumber: null,
+      address: null,
+      city: null,
+      state: null,
+      pincode: null,
+      employmentType: null,
+      companyName: null,
+      designation: null,
+      workExperience: null,
+      monthlyIncome: null
+    };
     
-    if (!deleted) {
-      return res.status(404).json({ 
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.userId,
+      kycFields,
+      { new: true }
+    ).select('-password');
+    
+    if (!updatedUser) {
+      return res.status(404).json({
         success: false,
-        message: 'KYC details not found' 
+        message: 'User not found'
       });
     }
-
-    res.json({ 
+    
+    res.json({
       success: true,
-      message: 'KYC details deleted successfully' 
+      message: 'KYC details cleared successfully'
     });
   } catch (err) {
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Failed to delete KYC', 
-      error: err.message 
+      message: 'Failed to clear KYC',
+      error: err.message
     });
   }
 });

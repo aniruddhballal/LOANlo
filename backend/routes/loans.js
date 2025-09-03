@@ -1,7 +1,7 @@
 const express = require('express');
 const LoanApplication = require('../models/LoanApplication');
 const { authenticateToken } = require('../middleware/auth');
-const UserKYC = require('../models/UserKYC');
+const User = require('../models/User'); // Changed from UserKYC to User
 const router = express.Router();
 const Document = require('../models/Document');
 
@@ -75,13 +75,22 @@ router.post('/apply', authenticateToken, async (req, res) => {
   try {
     const { loanType, amount, purpose, tenure } = req.body;
     
-    // Get user's KYC details to populate applicant name
-    const userKYC = await UserKYC.findOne({ userId: req.user.userId });
+    // Get user details to populate applicant name and check profile completion
+    const user = await User.findById(req.user.userId);
     
-    if (!userKYC) {
+    if (!user) {
       return res.status(400).json({ 
         success: false,
-        message: 'KYC details not found. Please complete KYC first.' 
+        message: 'User not found.' 
+      });
+    }
+
+    // Check if profile is complete
+    if (!user.isProfileComplete) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Please complete your profile/KYC before applying for a loan.',
+        profileCompletion: user.calculateProfileCompletion()
       });
     }
 
@@ -91,7 +100,7 @@ router.post('/apply', authenticateToken, async (req, res) => {
       purpose,
       tenure,
       userId: req.user.userId,
-      applicantName: `${userKYC.firstName} ${userKYC.lastName}`,
+      applicantName: `${user.firstName} ${user.lastName}`,
       statusHistory: [{
         status: 'pending',
         timestamp: new Date(),
@@ -143,7 +152,6 @@ router.get('/all', authenticateToken, async (req, res) => {
     });
   }
 });
-
 
 // Get user's loan applications with populated user data
 router.get('/my-applications', authenticateToken, async (req, res) => {
@@ -211,8 +219,7 @@ router.get('/details/:applicationId', authenticateToken, async (req, res) => {
     const { applicationId } = req.params;
    
     const application = await LoanApplication.findById(applicationId)
-      .populate('userId', 'firstName lastName email phone role')
-      .populate('kycId');
+      .populate('userId', 'firstName lastName email phone role dateOfBirth gender aadhaarNumber panNumber address city state pincode employmentType companyName monthlyIncome');
 
     if (!application) {
       return res.status(404).json({

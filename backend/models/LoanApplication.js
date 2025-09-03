@@ -5,9 +5,6 @@ const loanApplicationSchema = new mongoose.Schema({
  
   // Add this field to store the applicant name
   applicantName: { type: String, required: true },
-  
-  // Reference to KYC data (optional - for easy population)
-  kycId: { type: mongoose.Schema.Types.ObjectId, ref: 'UserKYC' },
  
   // Loan Information (only loan-specific fields)
   loanType: { type: String, enum: ['personal', 'home', 'vehicle', 'business', 'education'], required: true },
@@ -22,7 +19,7 @@ const loanApplicationSchema = new mongoose.Schema({
     default: 'pending'
   },
   documentsUploaded: { type: Boolean, default: false },
-
+  
   // Additional Documents Requested
   additionalDocumentsRequested: {
     type: Boolean,

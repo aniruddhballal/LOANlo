@@ -66,13 +66,13 @@ const KYC = () => {
       try {
         setInitialLoading(true)
         const { data } = await api.get('/kyc/me')
-        if (data.kyc) {
+        if (data.user) {
           setFormData(prev => ({
             ...prev,
-            ...data.kyc
+            ...data.user
           }))
 
-          const kycComplete = Object.entries(data.kyc).every(([key, value]) => {
+          const kycComplete = Object.entries(data.user).every(([key, value]) => {
             if (key in formData) {
               return value !== null && value !== undefined && value.toString().trim() !== ''
             }
