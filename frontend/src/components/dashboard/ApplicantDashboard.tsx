@@ -21,28 +21,28 @@ const ApplicantDashboard = () => {
   const [applications, setApplications] = useState<LoanApplication[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [hasKYC, setHasKYC] = useState<boolean | null>(null)
+  const [hasPersonalDetails, setHasPersonalDetails] = useState<boolean | null>(null)
 
   useEffect(() => {
     fetchApplications()
-    checkKYCStatus()
+    checkPersonalDetailsStatus()
   }, [])
 
-  const checkKYCStatus = async () => {
+  const checkPersonalDetailsStatus = async () => {
     try {
-      const { data } = await api.get('/kyc/me')
+      const { data } = await api.get('/user/me')
       const requiredFields = [
         'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
         'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city',
         'state', 'pincode', 'employmentType', 'companyName', 'designation',
         'workExperience', 'monthlyIncome'
       ]
-      const kyc = data.kyc
-      const allFieldsFilled = kyc && requiredFields.every(field => kyc[field] && kyc[field].toString().trim() !== '')
-      setHasKYC(!!kyc && allFieldsFilled)
+      const user = data.user
+      const allFieldsFilled = user && requiredFields.every(field => user[field] && user[field].toString().trim() !== '')
+      setHasPersonalDetails(!!user && allFieldsFilled)
     } catch (err) {
-      console.error('Failed to check KYC status:', err)
-      setHasKYC(false)
+      console.error('Failed to check User Details status:', err)
+      setHasPersonalDetails(false)
     }
   }
 
@@ -104,19 +104,19 @@ const ApplicantDashboard = () => {
       welcomeTitle="Welcome Back!"
       welcomeSubtitle="Successfully authenticated to LoanLo Platform"
     >
-      {/* KYC Status Section */}
-      {hasKYC !== null && (
+      {/* Personal Details Section */}
+      {hasPersonalDetails !== null && (
         <div className={`mb-8 rounded-xl p-6 shadow-sm border transition-all duration-300 ${
-          hasKYC 
+          hasPersonalDetails 
             ? 'bg-gradient-to-r from-gray-900 to-black text-white border-gray-300 shadow-md' 
             : 'bg-white text-gray-900 border-amber-200 shadow-amber-100'
         }`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-5">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                hasKYC ? 'bg-white/10 backdrop-blur' : 'bg-amber-100'
+                hasPersonalDetails ? 'bg-white/10 backdrop-blur' : 'bg-amber-100'
               }`}>
-                {hasKYC ? (
+                {hasPersonalDetails ? (
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path d="M6 12.5L10.5 17L18 9.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
@@ -130,21 +130,21 @@ const ApplicantDashboard = () => {
               </div>
               <div>
                 <h2 className="text-xl font-semibold mb-1">
-                  {hasKYC ? 'Identity Verification Complete' : 'Identity Verification Required'}
+                  {hasPersonalDetails ? 'Personal Details Complete' : 'Personal Details Required'}
                 </h2>
-                <p className={`text-sm font-light ${hasKYC ? 'text-gray-200' : 'text-gray-600'}`}>
-                  {hasKYC 
-                    ? 'Your account is fully verified and ready for all banking services.' 
-                    : 'Complete your identity verification to access loan application services.'}
+                <p className={`text-sm font-light ${hasPersonalDetails ? 'text-gray-200' : 'text-gray-600'}`}>
+                  {hasPersonalDetails 
+                     ? 'Your personal details are complete and your profile is ready for loan applications.'
+                     : 'Please complete your personal details to continue with loan applications.'}
                 </p>
               </div>
             </div>
-            {!hasKYC && (
+            {!hasPersonalDetails && (
               <Link 
-                to="/kyc" 
+                to="/personal-details" 
                 className="px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
               >
-                Begin Verification
+                Complete Profile
               </Link>
             )}
           </div>
@@ -152,7 +152,7 @@ const ApplicantDashboard = () => {
       )}
 
       {/* Service Actions */}
-      {hasKYC === true && (
+      {hasPersonalDetails === true && (
         <section className="mb-10">
           <div className="mb-6">
             <h2 className="text-2xl font-light text-gray-900 mb-2">Available Services</h2>
@@ -207,7 +207,7 @@ const ApplicantDashboard = () => {
             </Link>
 
             <Link 
-              to="/kyc" 
+              to="/personal-details" 
               className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
             >
               <div className="flex items-start space-x-4">
@@ -220,10 +220,10 @@ const ApplicantDashboard = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
-                    View/Update Current KYC
+                    View/Update Personal Details
                   </h3>
                   <p className="text-gray-600 text-sm font-light leading-relaxed">
-                    Review your current KYC information and make updates to keep your verification details current and accurate.
+                    Review your saved personal details and update them anytime to keep your profile accurate.
                   </p>
                 </div>
               </div>
@@ -233,7 +233,7 @@ const ApplicantDashboard = () => {
       )}
 
       {/* Applications Overview */}
-      {hasKYC === true && (
+      {hasPersonalDetails === true && (
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
             <div className="flex justify-between items-center">
@@ -363,7 +363,7 @@ const ApplicantDashboard = () => {
       )}
 
       {/* Call to Action */}
-      {hasKYC === true && (
+      {hasPersonalDetails === true && (
         <div className="mt-12 text-center">
           <Link 
             to="/application-status" 

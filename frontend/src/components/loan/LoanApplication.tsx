@@ -9,7 +9,7 @@ interface LoanData {
   tenure: string;
 }
 
-interface KYCData {
+interface PersonalDetailsData {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
@@ -40,52 +40,52 @@ const LoanApplication = () => {
     purpose: '',
     tenure: ''
   })
-  const [kycData, setKycData] = useState<KYCData | null>(null)
+  const [personalDetails, setPersonalDetails] = useState<PersonalDetailsData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [isKYCComplete, setIsKYCComplete] = useState(false)
-  const [checkingKYC, setCheckingKYC] = useState(true)
+  const [isPersonalDetailsComplete, setIsPersonalDetailsComplete] = useState(false)
+  const [checkingPersonalDetails, setCheckingPersonalDetails] = useState(true)
 
-  // Check if user came from KYC page
-  const cameFromKYC = location.state?.fromKYC === true
+  // Check if user came from Personal Details page
+  const cameFromPersonalDetails = location.state?.fromPersonalDetails === true
 
-  // Check KYC completion on mount
+  // Check Personal Details completion on mount
   useEffect(() => {
-    const checkKYCCompletion = async () => {
+    const checkPersonalDetailsCompletion  = async () => {
       try {
-        const { data } = await api.get('/kyc/me')
+        const { data } = await api.get('/personal-details/me')
 
-        if (data.kyc) {
-          const requiredKYCFields = [
+        if (data.personalDetails) {
+          const requiredFields = [
             'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
             'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city',
             'state', 'pincode', 'employmentType', 'companyName', 'designation',
             'workExperience', 'monthlyIncome'
           ]
 
-          const kycComplete = requiredKYCFields.every(field => {
-            const value = data.kyc[field]
+          const complete = requiredFields.every(field => {
+            const value = data.personalDetails[field]
             return value !== null && value !== undefined && value.toString().trim() !== ''
           })
 
-          if (kycComplete) {
-            setKycData(data.kyc)
-            setIsKYCComplete(true)
+          if (complete) {
+            setPersonalDetails(data.personalDetails)
+            setIsPersonalDetailsComplete(true)
           } else {
-            setIsKYCComplete(false)
+            setIsPersonalDetailsComplete(false)
           }
         } else {
-          setIsKYCComplete(false)
+          setIsPersonalDetailsComplete(false)
         }
       } catch (err: any) {
-        console.error('Error checking KYC:', err.response?.data?.message || err)
-        setIsKYCComplete(false)
+        console.error('Error checking Personal Details:', err.response?.data?.message || err)
+        setIsPersonalDetailsComplete(false)
       } finally {
-        setCheckingKYC(false)
+        setCheckingPersonalDetails(false)
       }
     }
     
-    checkKYCCompletion()
+    checkPersonalDetailsCompletion()
   }, [])
 
   const isFormValid = (): boolean => {
@@ -121,7 +121,7 @@ const LoanApplication = () => {
     setLoading(true)
 
     try {
-      const applicationData = { ...kycData, ...loanData }
+      const applicationData = { ...personalDetails, ...loanData }
       const { data } = await api.post('/loans/apply', applicationData)
       navigate("/upload-documents", { state: { applicationId: data.applicationId } })
     } catch (err: any) {
@@ -234,8 +234,8 @@ const LoanApplication = () => {
     </div>
   )
 
-  // Loading state while checking KYC
-  if (checkingKYC) {
+  // Loading state while checking Personal Details Completion
+  if (checkingPersonalDetails) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -251,8 +251,8 @@ const LoanApplication = () => {
     )
   }
 
-  // If KYC is not complete, show message to complete KYC first
-  if (!isKYCComplete) {
+  // If Personal Details is not complete, show message to complete Personal Details first
+  if (!isPersonalDetailsComplete) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-8 px-4">
         <div className="max-w-4xl mx-auto relative">
@@ -263,8 +263,8 @@ const LoanApplication = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">KYC Required</h1>
-            <p className="text-xl text-gray-600 font-medium tracking-wide">Complete your verification first</p>
+            <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Personal Details Required</h1>
+            <p className="text-xl text-gray-600 font-medium tracking-wide">Please complete your personal details first</p>
             <div className="w-24 h-1 bg-gradient-to-r from-red-600 to-red-500 mx-auto mt-4 rounded-full"></div>
           </div>
 
@@ -279,10 +279,10 @@ const LoanApplication = () => {
                 </svg>
               </div>
               
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Complete Your KYC First</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Complete Your Personal Details First</h2>
               <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-                To apply for a loan, you need to complete your Know Your Customer (KYC) verification process. 
-                This helps us verify your identity and ensure compliance with financial regulations.
+                To apply for a loan, you need to first provide your personal details. 
+                This helps us verify your identity and prepare your account for further checks.
               </p>
               
               <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8 text-left max-w-2xl mx-auto">
@@ -305,10 +305,10 @@ const LoanApplication = () => {
               
               <div className="flex justify-center gap-4">
                 <button 
-                  onClick={() => navigate('/kyc')}
+                  onClick={() => navigate('/personal-details')}
                   className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-xl font-semibold hover:from-red-700 hover:to-red-600 focus:outline-none focus:ring-4 focus:ring-red-200 transition-all duration-200 transform hover:scale-105 shadow-lg"
                 >
-                  <span className="tracking-wide">COMPLETE KYC</span>
+                  <span className="tracking-wide">COMPLETE PERSONAL DETAILS</span>
                   <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
@@ -341,8 +341,8 @@ const LoanApplication = () => {
           <div className="w-24 h-1 bg-gradient-to-r from-green-600 to-green-500 mx-auto mt-4 rounded-full"></div>
         </div>
 
-        {/* KYC Status Card - Pure Tailwind Animation */}
-        {cameFromKYC && (
+        {/* Personal Details Status Card - Pure Tailwind Animation */}
+        {cameFromPersonalDetails  && (
           <div className="mb-8 animate-[slideDown_0.6s_ease-out]">
             <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center">
@@ -358,10 +358,10 @@ const LoanApplication = () => {
                 {/* Content with staggered entrance */}
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-green-800 mb-1 animate-[slideLeft_0.5s_ease-out_0.3s_both]">
-                    KYC Verified
+                    Personal Details Complete
                   </h3>
                   <p className="text-green-700 animate-[slideLeft_0.5s_ease-out_0.4s_both]">
-                    Your identity has been successfully verified. You can now proceed with your loan application.
+                    Your identity information has been successfully saved. You can now proceed with your loan application.
                   </p>
                 </div>
               </div>
@@ -433,19 +433,19 @@ const LoanApplication = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="font-semibold text-gray-700">Applicant:</span>
-                  <span className="ml-2 text-gray-600">{kycData?.firstName} {kycData?.lastName}</span>
+                  <span className="ml-2 text-gray-600">{personalDetails?.firstName} {personalDetails?.lastName}</span>
                 </div>
                 <div>
                   <span className="font-semibold text-gray-700">Email:</span>
-                  <span className="ml-2 text-gray-600">{kycData?.email}</span>
+                  <span className="ml-2 text-gray-600">{personalDetails?.email}</span>
                 </div>
                 <div>
                   <span className="font-semibold text-gray-700">Monthly Income:</span>
-                  <span className="ml-2 text-gray-600">₹{kycData?.monthlyIncome}</span>
+                  <span className="ml-2 text-gray-600">₹{personalDetails?.monthlyIncome}</span>
                 </div>
                 <div>
                   <span className="font-semibold text-gray-700">Employment:</span>
-                  <span className="ml-2 text-gray-600">{kycData?.employmentType}</span>
+                  <span className="ml-2 text-gray-600">{personalDetails?.employmentType}</span>
                 </div>
                 {loanData.loanType && (
                   <div>
