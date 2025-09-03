@@ -8,7 +8,7 @@ import LoanApplication from './components/loan/LoanApplication'
 import DocumentUpload from './components/loan/DocumentUpload'
 import ApplicationStatus from './components/loan/ApplicationStatus'
 import { AuthProvider, useAuth } from './context/AuthContext'
-import KYC from './components/loan/KYC'
+import KYC from './components/KYC/KYC'
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 import AccessDenied from './components/auth/AccessDenied'
 
