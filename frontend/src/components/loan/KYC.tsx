@@ -744,7 +744,7 @@ const KYC = () => {
 
         {/* Footer */}
         <div className="text-center mt-8 text-gray-500">
-          <p className="text-sm font-medium tracking-wide">© 2024 LOANlo Financial Services. All rights reserved.</p>
+          <p className="text-sm font-medium tracking-wide">© 2025 LOANlo Financial Services. All rights reserved.</p>
           <p className="text-xs mt-2">Secure • Professional • Confidential</p>
         </div>
       </div>

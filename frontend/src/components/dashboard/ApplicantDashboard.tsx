@@ -211,7 +211,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <h1 className="text-3xl font-light text-gray-900 mb-1 tracking-tight">
-                    Client Dashboard
+                    Applicant Dashboard
                   </h1>
                   <p className="text-base text-gray-600 font-light">
                     Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 17 ? 'Afternoon' : 'Evening'}, 
