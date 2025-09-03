@@ -30,7 +30,7 @@ const ApplicantDashboard = () => {
 
   const checkPersonalDetailsStatus = async () => {
     try {
-      const { data } = await api.get('/user/me')
+      const { data } = await api.get('/profile/me')
       const requiredFields = [
         'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
         'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city',
