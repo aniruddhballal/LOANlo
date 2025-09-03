@@ -222,15 +222,6 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <Link 
-                  to="/profile" 
-                  className="relative px-5 py-2.5 text-sm font-medium text-gray-800 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-400 group"
-                >
-                  <span className="relative z-10">
-                    Account Settings
-                  </span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-                </Link>
                 <button 
                   onClick={logout} 
                   className="relative px-5 py-2.5 text-sm font-medium text-white bg-black backdrop-blur-md border border-white/20 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-500 group"

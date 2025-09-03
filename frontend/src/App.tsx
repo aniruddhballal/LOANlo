@@ -7,20 +7,10 @@ import SystemAdminDashboard from './components/dashboard/SystemAdminDashboard'
 import LoanApplication from './components/loan/LoanApplication'
 import DocumentUpload from './components/loan/DocumentUpload'
 import ApplicationStatus from './components/loan/ApplicationStatus'
-import Profile from './components/profile/Profile'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import KYC from './components/loan/KYC'
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 import AccessDenied from './components/auth/AccessDenied'
-
-// Protected Route Component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth()
-  
-  if (loading) return <div>Loading...</div>
-  
-  return user ? <>{children}</> : <Navigate to="/login" />
-}
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -106,11 +96,6 @@ function AppContent() {
             <RoleProtectedRoute allowedRoles={['applicant']}>
               <ApplicationStatus />
             </RoleProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
           } />
         </Routes>
       </div>

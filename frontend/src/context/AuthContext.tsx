@@ -16,8 +16,6 @@ interface AuthContextType {
   login: (email: string, password: string, options?: { skipDelay?: boolean }) => Promise<void>
   register: (userData: RegisterData) => Promise<void>
   logout: () => void
-  updateUser: (userData: Partial<User>) => Promise<void>
-  deleteAccount: (password: string) => Promise<void>
   completeLogin: () => void
 }
 
@@ -132,36 +130,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null)
   }
 
-  const updateUser = async (userData: Partial<User>) => {
-    try {
-      const { data } = await api.put('/auth/profile', userData)
-      setUser(data.user)
-      return data
-    } catch (error) {
-      throw error
-    }
-  }
-
-  const deleteAccount = async (password: string) => {
-    try {
-      const { data } = await api.delete('/auth/delete-account', { data: { password } })
-      localStorage.removeItem('token')
-      localStorage.removeItem('pendingUser')
-      setUser(null)
-      return data
-    } catch (error) {
-      throw error
-    }
-  }
-
   const value = {
     user,
     loading,
     login,
     register,
     logout,
-    updateUser,
-    deleteAccount,
     completeLogin // Expose this for manual completion
   }
 
