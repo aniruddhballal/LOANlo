@@ -1,71 +1,71 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User'); // Changed from UserKYC to User
+const User = require('../models/User');
 const { authenticateToken } = require('../middleware/auth');
 
-// Save or update KYC details
+// Save or update profile details
 router.post('/save', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
-    
-    // Extract KYC fields from request body (excluding sensitive fields)
+
+    // Extract profile fields from request body
     const {
       firstName, lastName, dateOfBirth, gender, maritalStatus,
       aadhaarNumber, panNumber, phone, address, city, state, pincode,
       employmentType, companyName, designation, workExperience, monthlyIncome
     } = req.body;
-    
-    const kycUpdateData = {
+
+    const profileUpdateData = {
       firstName, lastName, dateOfBirth, gender, maritalStatus,
       aadhaarNumber, panNumber, phone, address, city, state, pincode,
       employmentType, companyName, designation, workExperience, monthlyIncome
     };
-    
+
     // Remove undefined fields
-    Object.keys(kycUpdateData).forEach(key => 
-      kycUpdateData[key] === undefined && delete kycUpdateData[key]
+    Object.keys(profileUpdateData).forEach(
+      key => profileUpdateData[key] === undefined && delete profileUpdateData[key]
     );
-    
-    // Update the user document with KYC data
+
+    // Update the user document with profile data
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      kycUpdateData,
+      profileUpdateData,
       { new: true, runValidators: true }
-    ).select('-password'); // Exclude password from response
-    
+    ).select('-password');
+
     if (!updatedUser) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
-    
+
     res.json({
       success: true,
       user: updatedUser,
-      message: 'KYC details saved successfully'
+      message: 'Profile details saved successfully'
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: 'Failed to save KYC',
+      message: 'Failed to save profile details',
       error: err.message
     });
   }
 });
 
-// Get user's KYC details
+// Get user's profile details
 router.get('/me', authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select('-password');
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
-    
+
     res.json({
       success: true,
       user
@@ -73,16 +73,16 @@ router.get('/me', authenticateToken, async (req, res) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch KYC',
+      message: 'Failed to fetch profile details',
       error: err.message
     });
   }
 });
 
-// Clear KYC details (set KYC fields to null/undefined)
+// Clear profile details (set profile fields to null/undefined)
 router.delete('/me', authenticateToken, async (req, res) => {
   try {
-    const kycFields = {
+    const profileFields = {
       dateOfBirth: null,
       gender: null,
       maritalStatus: null,
@@ -98,28 +98,28 @@ router.delete('/me', authenticateToken, async (req, res) => {
       workExperience: null,
       monthlyIncome: null
     };
-    
+
     const updatedUser = await User.findByIdAndUpdate(
       req.user.userId,
-      kycFields,
+      profileFields,
       { new: true }
     ).select('-password');
-    
+
     if (!updatedUser) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
-    
+
     res.json({
       success: true,
-      message: 'KYC details cleared successfully'
+      message: 'Profile details cleared successfully'
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: 'Failed to clear KYC',
+      message: 'Failed to clear profile details',
       error: err.message
     });
   }

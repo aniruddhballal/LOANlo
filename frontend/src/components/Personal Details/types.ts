@@ -1,4 +1,4 @@
-export interface KYCData {
+export interface PersonalDetailsData {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
@@ -19,10 +19,12 @@ export interface KYCData {
   monthlyIncome: string;
 }
 
-export interface KYCFormProps {
-  formData: KYCData;
+export interface PersonalDetailsFormProps {
+  formData: PersonalDetailsData;
   focusedField: string;
-  onFieldChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  onFieldChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => void;
   onFocus: (fieldName: string) => void;
   onBlur: () => void;
 }

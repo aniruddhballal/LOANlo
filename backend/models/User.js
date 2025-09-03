@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
   phone: { type: String },
   role: { type: String, enum: ['applicant', 'underwriter', 'system_admin'], default: 'applicant' },
   
-  // KYC fields (all optional since they're filled later)
+  // PII fields (all optional since they're filled later)
   dateOfBirth: String,
   gender: String,
   maritalStatus: String,

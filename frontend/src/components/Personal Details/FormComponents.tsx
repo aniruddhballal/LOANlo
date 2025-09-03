@@ -1,12 +1,12 @@
 import React from 'react';
-import type { KYCData } from './types';
+import type { PersonalDetailsData } from './types';
 
 interface BaseFieldProps {
-  name: keyof KYCData;
+  name: keyof PersonalDetailsData;
   label: string;
   required?: boolean;
   focusedField: string;
-  formData: KYCData;
+  formData: PersonalDetailsData;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
   onFocus: (fieldName: string) => void;
   onBlur: () => void;

@@ -17,10 +17,10 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ currentStep }) => {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 tracking-wide">
-            KYC Verification Process
+            Personal Details Form
           </h2>
           <p className="text-gray-600 font-medium mt-1">
-            Complete all sections for verification
+            Please complete all sections to proceed with your application
           </p>
         </div>
         <div className="text-right">

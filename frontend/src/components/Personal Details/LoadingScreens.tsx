@@ -6,10 +6,10 @@ export const LoadingScreen: React.FC = () => (
       {/* Header Section */}
       <div className="text-center mb-12 relative">
         <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-600 to-blue-500 rounded-full mb-6 shadow-2xl">
-          <span className="text-3xl font-bold text-white tracking-wider">KYC</span>
+          <span className="text-3xl font-bold text-white tracking-wider">PD</span>
         </div>
-        <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Know Your Customer</h1>
-        <p className="text-xl text-gray-600 font-medium tracking-wide">Loading your verification details...</p>
+        <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Personal Details</h1>
+        <p className="text-xl text-gray-600 font-medium tracking-wide">Loading your application form...</p>
         <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-blue-500 mx-auto mt-4 rounded-full"></div>
       </div>
 
@@ -22,8 +22,8 @@ export const LoadingScreen: React.FC = () => (
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Loading KYC Information</h2>
-          <p className="text-gray-600 mb-8">Please wait while we fetch your verification details...</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Loading Personal Details</h2>
+          <p className="text-gray-600 mb-8">Please wait while we fetch your application data...</p>
           
           {/* Loading skeleton */}
           <div className="space-y-6">
@@ -56,16 +56,16 @@ export const CongratulationsScreen: React.FC<CongratulationsScreenProps> = ({ on
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">KYC Complete!</h1>
-        <p className="text-xl text-gray-600 font-medium tracking-wide">Your verification is successful</p>
+        <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Personal Details Saved!</h1>
+        <p className="text-xl text-gray-600 font-medium tracking-wide">Your information has been submitted successfully</p>
         <div className="w-24 h-1 bg-gradient-to-r from-green-600 to-green-500 mx-auto mt-4 rounded-full"></div>
       </div>
 
       {/* Completion Card */}
       <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-200 p-8 lg:p-12 relative overflow-hidden">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Verification Complete</h2>
-          <p className="text-lg text-gray-600 mb-8">Your KYC details have been successfully verified. You can now proceed to apply for loans.</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Form Completed</h2>
+          <p className="text-lg text-gray-600 mb-8">Your personal details have been recorded. You can now proceed to apply for loans.</p>
           
           <div className="flex justify-center gap-4">
             <button 

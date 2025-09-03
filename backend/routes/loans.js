@@ -1,7 +1,7 @@
 const express = require('express');
 const LoanApplication = require('../models/LoanApplication');
 const { authenticateToken } = require('../middleware/auth');
-const User = require('../models/User'); // Changed from UserKYC to User
+const User = require('../models/User');
 const router = express.Router();
 const Document = require('../models/Document');
 
@@ -89,7 +89,7 @@ router.post('/apply', authenticateToken, async (req, res) => {
     if (!user.isProfileComplete) {
       return res.status(400).json({ 
         success: false,
-        message: 'Please complete your profile/KYC before applying for a loan.',
+        message: 'Please complete your profile before applying for a loan.',
         profileCompletion: user.calculateProfileCompletion()
       });
     }

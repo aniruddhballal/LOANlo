@@ -1,15 +1,15 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const fs = require('fs');
 const config = require('./config');
 const connectDB = require('./config/database');
+
+// Routes
 const authRoutes = require('./routes/auth');
 const loanRoutes = require('./routes/loans');
 const documentRoutes = require('./routes/documents');
 const systemAdminRoutes = require('./routes/systemadmin');
-const kycRoutes = require('./routes/kyc');
-
+const profileRoutes = require('./routes/profile');
 
 const app = express();
 const PORT = config.PORT;
@@ -18,7 +18,7 @@ const PORT = config.PORT;
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
-app.use('/api/kyc', kycRoutes);
+app.use('/api/profile', profileRoutes); // mount under /api/profile
 
 // Create uploads directory if it doesn't exist
 if (!fs.existsSync('uploads')) {

@@ -1,9 +1,9 @@
 import React from 'react';
 import { InputField, SelectField, TextareaField, CurrencyField } from './FormComponents';
-import type { KYCFormProps } from './types';
+import type { PersonalDetailsFormProps  } from './types';
 import { SELECT_OPTIONS, STEP_INFO } from './constants';
 
-export const PersonalInfoStep: React.FC<KYCFormProps> = ({
+export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
   formData,
   focusedField,
   onFieldChange,
@@ -92,7 +92,7 @@ export const PersonalInfoStep: React.FC<KYCFormProps> = ({
   </div>
 );
 
-export const ContactInfoStep: React.FC<KYCFormProps> = ({
+export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
   formData,
   focusedField,
   onFieldChange,
@@ -168,7 +168,7 @@ export const ContactInfoStep: React.FC<KYCFormProps> = ({
   </div>
 );
 
-export const EmploymentInfoStep: React.FC<KYCFormProps> = ({
+export const EmploymentInfoStep: React.FC<PersonalDetailsFormProps> = ({
   formData,
   focusedField,
   onFieldChange,

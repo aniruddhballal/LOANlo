@@ -3,50 +3,49 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 
 // Import types and constants
-import type { KYCData } from './types';
-import { REQUIRED_FIELDS_BY_STEP, INITIAL_KYC_DATA } from './constants';
+import type { PersonalDetailsData } from './types';
+import { REQUIRED_FIELDS_BY_STEP, INITIAL_PERSONAL_DETAILS_DATA } from './constants';
 
 // Import components
 import ProgressBar from './ProgressBar';
-import { PersonalInfoStep, ContactInfoStep, EmploymentInfoStep } from './KYCSteps';
+import { PersonalInfoStep, ContactInfoStep, EmploymentInfoStep } from './PersonalDetailsSteps';
 import { LoadingScreen, CongratulationsScreen } from './LoadingScreens';
 
-const KYC = () => {
+const PersonalDetails = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [focusedField, setFocusedField] = useState<string>('');
-  const [formData, setFormData] = useState<KYCData>(INITIAL_KYC_DATA);
+  const [formData, setFormData] = useState<PersonalDetailsData>(INITIAL_PERSONAL_DETAILS_DATA);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isKYCComplete, setIsKYCComplete] = useState(false);
+  const [isPersonalDetailsComplete, setIsPersonalDetailsComplete] = useState(false);
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
 
-  // Fetch KYC details on mount and check if KYC is complete
   useEffect(() => {
-    const fetchKYC = async () => {
+    const fetchPersonalDetails = async () => {
       try {
         setInitialLoading(true);
-        const { data } = await api.get('/kyc/me');
+        const { data } = await api.get('/profile/me');
         if (data.user) {
           setFormData(prev => ({ ...prev, ...data.user }));
 
-          const kycComplete = Object.entries(data.user).every(([key, value]) => {
+          const detailsComplete = Object.entries(data.user).every(([key, value]) => {
             if (key in formData) {
               return value !== null && value !== undefined && value.toString().trim() !== '';
             }
             return true;
           });
 
-          setIsKYCComplete(kycComplete);
+          setIsPersonalDetailsComplete(detailsComplete);
         }
       } catch (err: any) {
-        console.error('Error fetching KYC:', err.response?.data?.message || err);
+        console.error('Error fetching Personal Details:', err.response?.data?.message || err);
       } finally {
         setInitialLoading(false);
       }
     };
-    fetchKYC();
+    fetchPersonalDetails();
   }, []);
 
   const isStepValid = (step: number): boolean => {
@@ -77,7 +76,7 @@ const KYC = () => {
     }
     
     setError('');
-    await saveKYC();
+    await savePersonalDetails();
     
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
@@ -90,11 +89,11 @@ const KYC = () => {
     }
   };
 
-  const saveKYC = async (): Promise<void> => {
+  const savePersonalDetails = async (): Promise<void> => {
     try {
-      await api.post('/kyc/save', formData);
+      await api.post('/profile/save', formData);
     } catch (err: any) {
-      console.error('Error saving KYC:', err.response?.data?.message || err);
+      console.error('Error saving Personal Details:', err.response?.data?.message || err);
     }
   };
 
@@ -110,18 +109,18 @@ const KYC = () => {
     setLoading(true);
 
     try {
-      await api.post('/kyc/save', formData);
-      setIsKYCComplete(true);
+      await api.post('/profile/save', formData);
+      setIsPersonalDetailsComplete(true);
       setShowCongratulations(true);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'KYC submission failed');
+      setError(err.response?.data?.message || 'PII submission failed');
     } finally {
       setLoading(false);
     }
   };
 
   const handleNavigateToLoan = () => {
-    navigate('/loan-application', { state: { fromKYC: true } });
+    navigate('/loan-application', { state: { fromProfileSetup: true } });
   };
 
   const renderCurrentStep = () => {
@@ -145,8 +144,8 @@ const KYC = () => {
     }
   };
 
-  // Show congratulations screen only if KYC was just completed in this session
-  if (showCongratulations && isKYCComplete) {
+  // Show congratulations screen only if Personal Details was just completed in this session
+  if (showCongratulations && isPersonalDetailsComplete) {
     return <CongratulationsScreen onNavigateToLoan={handleNavigateToLoan} />;
   }
 
@@ -161,11 +160,11 @@ const KYC = () => {
         {/* Header Section */}
         <div className="text-center mb-12 relative">
           <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-600 to-blue-500 rounded-full mb-6 shadow-2xl">
-            <span className="text-3xl font-bold text-white tracking-wider">KYC</span>
+            <span className="text-3xl font-bold text-white tracking-wider">PII</span>
           </div>
-          <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Know Your Customer</h1>
+          <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Personally Identifiable Information</h1>
           <p className="text-xl text-gray-600 font-medium tracking-wide">
-            Complete your verification to proceed
+            Fill in your details to proceed
           </p>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-blue-500 mx-auto mt-4 rounded-full"></div>
         </div>
@@ -261,11 +260,11 @@ const KYC = () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      <span>{isKYCComplete ? 'UPDATING...' : 'SUBMITTING...'}</span>
+                      <span>{isPersonalDetailsComplete ? 'UPDATING...' : 'SUBMITTING...'}</span>
                     </>
                   ) : (
                     <>
-                      <span>{isKYCComplete ? 'UPDATE KYC' : 'COMPLETE KYC'}</span>
+                      <span>{isPersonalDetailsComplete ? 'UPDATE DETAILS' : 'SUBMIT DETAILS'}</span>
                       <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
@@ -290,4 +289,4 @@ const KYC = () => {
   );
 };
 
-export default KYC;
+export default PersonalDetails;

@@ -17,7 +17,6 @@ export interface LoanApplication {
     role: string
   }
   applicantName: string
-  kycId?: string
   loanType: 'personal' | 'home' | 'vehicle' | 'business' | 'education'
   amount: number
   purpose: string
