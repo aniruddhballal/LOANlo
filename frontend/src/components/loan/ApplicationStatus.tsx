@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import api from '../../api'
-import LoanReviewModal from '../modals/LoanReviewModal/LoanReviewModal'
+import LoanReviewModal from './LoanReviewModal'
 
 interface LoanApplication {
   _id: string

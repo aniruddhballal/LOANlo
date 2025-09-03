@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { CheckCircle } from 'lucide-react'
 
-import LoanReviewModal from '../modals/LoanReviewModal/LoanReviewModal'
+import LoanReviewModal from '../loan/LoanReviewModal'
 import api from '../../api'
 
 interface LoanApplication {
