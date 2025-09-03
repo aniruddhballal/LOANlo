@@ -147,7 +147,7 @@ const Login = () => {
                                'border-green-300 bg-green-50 text-green-900 placeholder-green-600' :
                                'border-gray-200 focus:border-gray-400 hover:border-gray-300 bg-white text-gray-900 placeholder-gray-400'
                              }`}
-                    placeholder="Enter your corporate email address"
+                    placeholder="Enter your email address"
                     required
                   />
                 </div>
@@ -185,7 +185,7 @@ const Login = () => {
                                'border-green-300 bg-green-50 text-green-900 placeholder-green-600' :
                                'border-gray-200 focus:border-gray-400 hover:border-gray-300 bg-white text-gray-900 placeholder-gray-400'
                              }`}
-                    placeholder="Enter your secure password"
+                    placeholder="Enter your password"
                     required
                   />
                   <div
@@ -260,7 +260,7 @@ const Login = () => {
                            focus:outline-none group hover:text-gray-700"
                   style={{ color: 'black', textDecoration: 'none' }}
                 >
-                  Request Account Access
+                  Create Your Account
                   <span className="absolute left-0 bottom-[-2px] w-0 h-px bg-gray-900
                                  transition-all duration-300 group-hover:w-full"></span>
                 </a>
