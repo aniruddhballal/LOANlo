@@ -50,43 +50,43 @@ const LoanApplication = () => {
   const cameFromPersonalDetails = location.state?.fromPersonalDetails === true
 
   // Check Personal Details completion on mount
-  useEffect(() => {
-    const checkPersonalDetailsCompletion  = async () => {
-      try {
-        const { data } = await api.get('/personal-details/me')
+useEffect(() => {
+  const checkPersonalDetailsCompletion = async () => {
+    try {
+      const { data } = await api.get('/profile/me')
 
-        if (data.personalDetails) {
-          const requiredFields = [
-            'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
-            'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city',
-            'state', 'pincode', 'employmentType', 'companyName', 'designation',
-            'workExperience', 'monthlyIncome'
-          ]
+      if (data.user) {
+        const requiredFields = [
+          'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
+          'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city',
+          'state', 'pincode', 'employmentType', 'companyName', 'designation',
+          'workExperience', 'monthlyIncome'
+        ]
 
-          const complete = requiredFields.every(field => {
-            const value = data.personalDetails[field]
-            return value !== null && value !== undefined && value.toString().trim() !== ''
-          })
+        const complete = requiredFields.every(field => {
+          const value = data.user[field]
+          return value !== null && value !== undefined && value.toString().trim() !== ''
+        })
 
-          if (complete) {
-            setPersonalDetails(data.personalDetails)
-            setIsPersonalDetailsComplete(true)
-          } else {
-            setIsPersonalDetailsComplete(false)
-          }
+        if (complete) {
+          setPersonalDetails(data.user)
+          setIsPersonalDetailsComplete(true)
         } else {
           setIsPersonalDetailsComplete(false)
         }
-      } catch (err: any) {
-        console.error('Error checking Personal Details:', err.response?.data?.message || err)
+      } else {
         setIsPersonalDetailsComplete(false)
-      } finally {
-        setCheckingPersonalDetails(false)
       }
+    } catch (err: any) {
+      console.error('Error checking Personal Details:', err.response?.data?.message || err)
+      setIsPersonalDetailsComplete(false)
+    } finally {
+      setCheckingPersonalDetails(false)
     }
-    
-    checkPersonalDetailsCompletion()
-  }, [])
+  }
+
+  checkPersonalDetailsCompletion()
+}, [])
 
   const isFormValid = (): boolean => {
     return Object.values(loanData).every(value => 
