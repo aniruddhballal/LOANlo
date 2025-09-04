@@ -27,48 +27,94 @@ interface SelectFieldProps extends BaseFieldProps {
 export const InputField: React.FC<InputFieldProps> = ({
   name,
   label,
-  type = 'text',
+  type = "text",
   required = true,
   maxLength,
   min,
-  inputMode,
-  pattern,
   focusedField,
   formData,
   onChange,
   onFocus,
-  onBlur
-}) => (
-  <div className="relative group">
-    <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
-      {label}
-    </label>
-    <div className={`relative transition-all duration-300 ${focusedField === name ? 'transform scale-[1.02]' : ''}`}>
-      <input
-        type={type}
-        name={name}
-        value={formData[name] || ''}
-        onChange={onChange}
-        onFocus={() => onFocus(name)}
-        onBlur={onBlur}
-        className={`w-full px-4 py-3 bg-white border-2 rounded-lg font-medium text-gray-800 placeholder-gray-400 transition-all duration-300 focus:outline-none hover:border-gray-400 ${type === 'number' ? '[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]' : ''} ${
-          focusedField === name 
-            ? 'border-gray-800 shadow-lg transform scale-[1.01]' 
-            : 'border-gray-200 shadow-sm'
+  onBlur,
+}) => {
+  // Add Aadhaar & PAN restrictions automatically
+  const getFieldProps = () => {
+    if (name === "aadhaarNumber") {
+      return {
+        inputMode: "numeric" as const,
+        pattern: "[0-9]{12}",
+      };
+    }
+    if (name === "panNumber") {
+      return {
+        inputMode: "text" as const,
+        pattern: "[A-Z]{5}[0-9]{4}[A-Z]{1}",
+        style: { textTransform: "uppercase" as const },
+      };
+    }
+    return {};
+  };
+
+  return (
+    <div className="relative group">
+      <label
+        className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${
+          required
+            ? "after:content-['*'] after:ml-1 after:text-red-500"
+            : ""
         }`}
-        required={required}
-        maxLength={maxLength}
-        min={min}
-        inputMode={inputMode}
-        pattern={pattern}
-        placeholder={`Enter ${label.toLowerCase()}`}
-      />
-      <div className={`absolute inset-0 rounded-lg bg-gradient-to-r from-gray-100 to-gray-50 opacity-0 pointer-events-none transition-opacity duration-300 ${
-        focusedField === name ? 'opacity-20' : ''
-      }`}></div>
+      >
+        {label}
+      </label>
+      <div
+        className={`relative transition-all duration-300 ${
+          focusedField === name ? "transform scale-[1.02]" : ""
+        }`}
+      >
+        <input
+          type={type}
+          name={name}
+          value={formData[name] || ""}
+          onChange={(e) => {
+            // Force uppercase for PAN
+            const value =
+              name === "panNumber"
+                ? e.target.value.toUpperCase()
+                : e.target.value;
+
+            const newEvent = {
+              ...e,
+              target: { ...e.target, name: e.target.name, value },
+            } as React.ChangeEvent<HTMLInputElement>;
+
+            onChange(newEvent);
+          }}
+          onFocus={() => onFocus(name)}
+          onBlur={onBlur}
+          className={`w-full px-4 py-3 bg-white border-2 rounded-lg font-medium text-gray-800 placeholder-gray-400 transition-all duration-300 focus:outline-none hover:border-gray-400 ${
+            type === "number"
+              ? "[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+              : ""
+          } ${
+            focusedField === name
+              ? "border-gray-800 shadow-lg transform scale-[1.01]"
+              : "border-gray-200 shadow-sm"
+          }`}
+          required={required}
+          maxLength={maxLength}
+          min={min}
+          placeholder={`Enter ${label.toLowerCase()}`}
+          {...getFieldProps()}
+        />
+        <div
+          className={`absolute inset-0 rounded-lg bg-gradient-to-r from-gray-100 to-gray-50 opacity-0 pointer-events-none transition-opacity duration-300 ${
+            focusedField === name ? "opacity-20" : ""
+          }`}
+        ></div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const SelectField: React.FC<SelectFieldProps> = ({
   name,
