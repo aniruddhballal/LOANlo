@@ -91,6 +91,8 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
           onChange={onFieldChange}
           onFocus={onFocus}
           onBlur={onBlur}
+          inputMode="text"
+          pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
         />
       </div>
     </div>
