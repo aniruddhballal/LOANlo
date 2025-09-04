@@ -249,7 +249,7 @@ const PersonalDetails = () => {
                     disabled={!isStepValid(currentStep)}
                     className={`inline-flex items-center px-8 py-4 rounded-xl font-light tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-lg relative overflow-hidden ${
                       isStepValid(currentStep)
-                      ? 'bg-gray-900 text-white hover:bg-black hover:scale-105 focus:ring-gray-400'
+                      ? 'bg-green-50 border-2 border-green-600 text-green-700 hover:bg-green-100 hover:border-green-700 hover:scale-105 focus:ring-4 focus:ring-green-200'
                       : 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed'
                     }`}
                   >
