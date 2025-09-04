@@ -50,7 +50,7 @@ const PersonalDetails = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentStep]);
+  }, [currentStep, error]);
 
   const isStepValid = (step: number): boolean => {
     return REQUIRED_FIELDS_BY_STEP[step].every((field) => {
@@ -169,9 +169,6 @@ const PersonalDetails = () => {
       <div className="max-w-4xl mx-auto relative">
         {/* Header Section */}
         <div className="text-center mb-12 relative">
-          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-600 to-blue-500 rounded-full mb-6 shadow-2xl">
-            <span className="text-3xl font-bold text-white tracking-wider">PII</span>
-          </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Personally Identifiable Information</h1>
           <p className="text-xl text-gray-600 font-medium tracking-wide">
             Fill in your details to proceed
