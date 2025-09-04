@@ -69,9 +69,14 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
           name="aadhaarNumber"
           label="Aadhaar Number"
           maxLength={12}
+          inputMode="numeric"
+          pattern="[0-9]*"
           focusedField={focusedField}
           formData={formData}
-          onChange={onFieldChange}
+          onChange={(e) => {
+            e.target.value = e.target.value.replace(/\D/g, ""); // strip non-digits
+            onFieldChange(e);
+          }}
           onFocus={onFocus}
           onBlur={onBlur}
         />

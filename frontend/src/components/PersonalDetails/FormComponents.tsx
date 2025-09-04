@@ -16,6 +16,8 @@ interface InputFieldProps extends BaseFieldProps {
   type?: string;
   maxLength?: number;
   min?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  pattern?: string;
 }
 
 interface SelectFieldProps extends BaseFieldProps {
@@ -29,6 +31,8 @@ export const InputField: React.FC<InputFieldProps> = ({
   required = true,
   maxLength,
   min,
+  inputMode,
+  pattern,
   focusedField,
   formData,
   onChange,
@@ -55,6 +59,8 @@ export const InputField: React.FC<InputFieldProps> = ({
         required={required}
         maxLength={maxLength}
         min={min}
+        inputMode={inputMode}
+        pattern={pattern}
         placeholder={`Enter ${label.toLowerCase()}`}
       />
       <div className={`absolute inset-0 rounded-lg bg-gradient-to-r from-gray-100 to-gray-50 opacity-0 pointer-events-none transition-opacity duration-300 ${
