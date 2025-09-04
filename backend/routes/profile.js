@@ -15,6 +15,20 @@ router.post('/save', authenticateToken, async (req, res) => {
       employmentType, companyName, designation, workExperience, monthlyIncome
     } = req.body;
 
+    if (aadhaarNumber && !/^\d{12}$/.test(aadhaarNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid Aadhaar number format. It must be 12 digits.'
+      });
+    }
+
+    if (panNumber && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(panNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid PAN number format. Example: AAAPA1234A'
+      });
+    }
+
     const profileUpdateData = {
       firstName, lastName, dateOfBirth, gender, maritalStatus,
       aadhaarNumber, panNumber, phone, address, city, state, pincode,
@@ -52,7 +66,7 @@ router.post('/save', authenticateToken, async (req, res) => {
       error: err.message
     });
   }
-});
+});  
 
 // Get user's profile details
 router.get('/me', authenticateToken, async (req, res) => {
