@@ -69,16 +69,16 @@ const PersonalDetails = () => {
 
   const nextStep = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    
+
     if (!isStepValid(currentStep)) {
       setError('Please fill in all required fields before proceeding.');
       return;
     }
-    
-    setError('');
-    await savePersonalDetails();
-    
-    if (currentStep < 3) {
+
+    setError("");
+    const success = await savePersonalDetails();
+
+    if (success && currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -89,11 +89,17 @@ const PersonalDetails = () => {
     }
   };
 
-  const savePersonalDetails = async (): Promise<void> => {
+  const savePersonalDetails = async (): Promise<boolean> => {
     try {
-      await api.post('/profile/save', formData);
+      await api.post("/profile/save", formData);
+      return true;
     } catch (err: any) {
-      console.error('Error saving Personal Details:', err.response?.data?.message || err);
+      console.error(
+        "Error saving Personal Details:",
+        err.response?.data?.message || err
+      );
+      setError(err.response?.data?.message || "Failed to save details");
+      return false;
     }
   };
 
@@ -183,7 +189,8 @@ const PersonalDetails = () => {
             <div className="mb-8 p-4 bg-red-50/20 border-2 border-red-400 rounded-lg animate-shake">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                  {/* remove this dot */}
+                  <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div> 
                   <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
