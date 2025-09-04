@@ -169,126 +169,174 @@ const PersonalDetails = () => {
       <div className="max-w-4xl mx-auto relative">
         {/* Header Section */}
         <div className="text-center mb-12 relative">
-          <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Personally Identifiable Information</h1>
-          <p className="text-xl text-gray-600 font-medium tracking-wide">
-            Fill in your details to proceed
+          <h1 className="text-4xl font-light text-gray-900 mb-3 tracking-wide">Personal Information</h1>
+          <p className="text-lg text-gray-600 font-light tracking-wide">
+            Complete your details to proceed with loan applications
           </p>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-blue-500 mx-auto mt-4 rounded-full"></div>
+          <div className="w-24 h-0.5 bg-gradient-to-r from-gray-900 to-gray-600 mx-auto mt-6"></div>
         </div>
 
         {/* Main Card */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-200 p-8 lg:p-12 relative overflow-hidden">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 relative overflow-hidden">
           {/* Subtle corner accents */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-transparent rounded-bl-3xl opacity-50"></div>
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-100 to-transparent rounded-tr-3xl opacity-50"></div>
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gray-100 to-transparent rounded-bl-2xl opacity-40"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-gray-100 to-transparent rounded-tr-2xl opacity-40"></div>
 
-          {/* Progress Section */}
-          <ProgressBar currentStep={currentStep} />
-
-          {/* Error Display */}
-          {error && (
-            <div className="mb-8 p-4 bg-red-50/20 border-2 border-red-400 rounded-lg animate-shake">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-semibold text-red-800">{error}</p>
+          {/* Header section matching dashboard style */}
+          <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50 relative z-10">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-light text-gray-900 mb-1">Personal Details Form</h2>
+                <p className="text-sm text-gray-600 font-light">Step {currentStep} of 3 - Please provide accurate information</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm">
+                  <span className="text-sm font-light text-gray-700">
+                    Step {currentStep}/3
+                  </span>
                 </div>
               </div>
             </div>
-          )}
+          </header>
 
-          {/* Form Content */}
-          <form onSubmit={(e) => currentStep === 3 ? handleSubmit(e) : e.preventDefault()} className="relative z-10">
-            {renderCurrentStep()}
+          <div className="p-8 lg:p-12 relative z-10">
+            {/* Progress Section */}
+            <ProgressBar currentStep={currentStep} />
+
+          {/* Error Display */}
+            {error && (
+              <div className="mb-8 p-6 bg-red-50/30 border-2 border-red-400 rounded-xl animate-pulse">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-light text-red-800">{error}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Form Content */}
+            <form onSubmit={(e) => currentStep === 3 ? handleSubmit(e) : e.preventDefault()} className="relative z-10">
+              {renderCurrentStep()}
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between items-center mt-12 pt-8 border-t border-gray-200">
-              {currentStep > 1 ? (
-                <button 
-                  type="button" 
-                  onClick={prevStep}
-                  className="inline-flex items-center px-8 py-4 bg-white border-2 border-gray-300 rounded-xl text-gray-700 font-semibold hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                >
-                  <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  <span className="tracking-wide">PREVIOUS</span>
-                </button>
-              ) : (
-                <div></div>
-              )}
-              
-              {currentStep < 3 ? (
-                <button 
-                  type="button" 
-                  onClick={nextStep}
-                  disabled={!isStepValid(currentStep)}
-                  className={`inline-flex items-center px-8 py-4 rounded-xl font-semibold tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-lg relative overflow-hidden ${
-                    isStepValid(currentStep)
-                    ? 'bg-green-50 border-2 border-green-600 text-green-700 hover:bg-green-100 hover:border-green-700 hover:scale-105 focus:ring-4 focus:ring-green-200'
-                    : 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed'
-                  }`}
-                >
-                  {!isStepValid(currentStep) && (
-                    <div className="absolute inset-0 bg-red-500/20 animate-pulse"></div>
-                  )}
-                  <span>CONTINUE</span>
-                  <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  {isStepValid(currentStep) && (
-                    <div className="absolute inset-0 bg-white/10 animate-ping rounded-xl"></div>
-                  )}
-                </button>
-              ) : (
-                <button 
-                  type="submit" 
-                  disabled={loading || !isStepValid(currentStep)}
-                  className={`inline-flex items-center px-12 py-4 rounded-xl font-bold tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-xl relative overflow-hidden ${
-                  loading || !isStepValid(currentStep)
-                    ? 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed'
-                    : 'bg-green-50 border-2 border-green-700 text-green-800 hover:bg-green-100 hover:border-green-800 hover:scale-105 focus:ring-4 focus:ring-green-200'
-                  }`}
-                >
-                  {loading && (
-                    <div className="absolute inset-0 bg-yellow-400/30 animate-pulse"></div>
-                  )}
-                  {!isStepValid(currentStep) && !loading && (
-                    <div className="absolute inset-0 bg-red-500/20 animate-pulse"></div>
-                  )}
-                  {loading ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      <span>{isPersonalDetailsComplete ? 'UPDATING...' : 'SUBMITTING...'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>{isPersonalDetailsComplete ? 'UPDATE DETAILS' : 'SUBMIT DETAILS'}</span>
-                      <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {isStepValid(currentStep) && (
-                        <div className="absolute inset-0 bg-white/10 animate-ping rounded-xl"></div>
-                      )}
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-          </form>
+              <div className="flex justify-between items-center mt-12 pt-8 border-t border-gray-200">
+                {currentStep > 1 ? (
+                  <button 
+                    type="button" 
+                    onClick={prevStep}
+                    className="inline-flex items-center px-8 py-4 bg-white border-2 border-gray-300 rounded-xl text-gray-700 font-light hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  >
+                    <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span className="tracking-wide">PREVIOUS</span>
+                  </button>
+                ) : (
+                  <div></div>
+                )}
+                
+                {currentStep < 3 ? (
+                  <button 
+                    type="button" 
+                    onClick={nextStep}
+                    disabled={!isStepValid(currentStep)}
+                    className={`inline-flex items-center px-8 py-4 rounded-xl font-light tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-lg relative overflow-hidden ${
+                      isStepValid(currentStep)
+                      ? 'bg-gray-900 text-white hover:bg-black hover:scale-105 focus:ring-gray-400'
+                      : 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed'
+                    }`}
+                  >
+                    {!isStepValid(currentStep) && (
+                      <div className="absolute inset-0 bg-red-500/20 animate-pulse"></div>
+                    )}
+                    <span>CONTINUE</span>
+                    <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    {isStepValid(currentStep) && (
+                      <div className="absolute inset-0 bg-white/10 animate-ping rounded-xl"></div>
+                    )}
+                  </button>
+                ) : (
+                  <button 
+                    type="submit" 
+                    disabled={loading || !isStepValid(currentStep)}
+                    className={`inline-flex items-center px-12 py-4 rounded-xl font-light tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-xl relative overflow-hidden ${
+                    loading || !isStepValid(currentStep)
+                      ? 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed'
+                      : 'bg-green-50 border-2 border-green-700 text-green-800 hover:bg-green-100 hover:border-green-800 hover:scale-105 focus:ring-4 focus:ring-green-200'
+                    }`}
+                  >
+                    {loading && (
+                      <div className="absolute inset-0 bg-yellow-400/30 animate-pulse"></div>
+                    )}
+                    {!isStepValid(currentStep) && !loading && (
+                      <div className="absolute inset-0 bg-red-500/20 animate-pulse"></div>
+                    )}
+                    {loading ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>{isPersonalDetailsComplete ? 'UPDATING...' : 'SUBMITTING...'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{isPersonalDetailsComplete ? 'UPDATE DETAILS' : 'SUBMIT DETAILS'}</span>
+                        <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        {isStepValid(currentStep) && (
+                          <div className="absolute inset-0 bg-white/10 animate-ping rounded-xl"></div>
+                        )}
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
         </div>
+
+        {/* Call to Action - Dashboard style with original flair */}
+        {isPersonalDetailsComplete && (
+          <div className="mt-12 text-center">
+            <button 
+              onClick={() => navigate('/dashboard/applicant')}
+              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-gray-900 to-black text-white rounded-xl font-light hover:from-black hover:to-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 group"
+            >
+              <svg 
+                width="20" 
+                height="20" 
+                className="mr-3 transition-transform duration-300 group-hover:-translate-x-1" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth="2" 
+                  d="M7 16l-4-4m0 0l4-4m-4 4h18" 
+                />
+              </svg>
+              Return to Dashboard
+            </button>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="text-center mt-8 text-gray-500">
-          <p className="text-sm font-medium tracking-wide">© 2025 LOANlo Financial Services. All rights reserved.</p>
-          <p className="text-xs mt-2">Secure • Professional • Confidential</p>
+          <p className="text-sm font-light tracking-wide">© 2025 LOANlo Financial Services. All rights reserved.</p>
+          <p className="text-xs font-light mt-2">Secure • Professional • Confidential</p>
         </div>
       </div>
     </div>
