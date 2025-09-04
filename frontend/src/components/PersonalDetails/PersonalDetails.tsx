@@ -48,6 +48,10 @@ const PersonalDetails = () => {
     fetchPersonalDetails();
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentStep]);
+
   const isStepValid = (step: number): boolean => {
     return REQUIRED_FIELDS_BY_STEP[step].every((field) => {
       const value = formData[field]?.toString().trim();
