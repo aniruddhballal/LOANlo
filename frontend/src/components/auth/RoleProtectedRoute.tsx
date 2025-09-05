@@ -17,7 +17,6 @@ const RoleProtectedRoute = ({ children, allowedRoles }: RoleProtectedRouteProps)
   // logged in but wrong role
   if (!allowedRoles.includes(user.role)) {
     return <Navigate to={`/dashboard/${user.role}`} /> 
-    // 👆 kick them back to *their own* dashboard
   }
 
   // allowed
