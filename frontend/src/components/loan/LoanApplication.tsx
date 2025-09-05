@@ -163,89 +163,96 @@ const LoanApplication = () => {
       <div className="max-w-4xl mx-auto relative">
         {/* Header Section */}
         <div className="text-center mb-12 relative">
-          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-green-600 to-green-500 rounded-full mb-6 shadow-2xl">
-            <span className="text-3xl font-bold text-white tracking-wider">LO</span>
-          </div>
-          <h1 className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">Loan Application</h1>
-          <p className="text-xl text-gray-600 font-medium tracking-wide">One step to get your loan approved</p>
-          <div className="w-24 h-1 bg-gradient-to-r from-green-600 to-green-500 mx-auto mt-4 rounded-full"></div>
+          <h1 className="text-4xl font-light text-gray-900 mb-3 tracking-wide">Loan Application</h1>
+          <p className="text-lg text-gray-600 font-light tracking-wide">
+            One step to get your loan approved
+          </p>
+          <div className="w-24 h-0.5 bg-gradient-to-r from-gray-900 to-gray-600 mx-auto mt-6"></div>
         </div>
 
         {/* Personal Details Status Card */}
         {cameFromPersonalDetails && <SuccessMessage />}
 
         {/* Main Card */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-200 p-8 lg:p-12 relative overflow-hidden">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 relative overflow-hidden">
           {/* Subtle corner accents */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-100 to-transparent rounded-bl-3xl opacity-50"></div>
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-green-100 to-transparent rounded-tr-3xl opacity-50"></div>
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gray-100 to-transparent rounded-bl-2xl opacity-40"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-gray-100 to-transparent rounded-tr-2xl opacity-40"></div>
 
+          {/* Header section matching dashboard style */}
+          <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50 relative z-10">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-light text-gray-900 mb-1">Loan Application Form</h2>
+                <p className="text-sm text-gray-600 font-light">Please provide accurate loan details</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm">
+                  <span className="text-sm font-light text-gray-700">
+                    Application
+                  </span>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div className="p-8 lg:p-12 relative z-10">
           {/* Error Display */}
           {error && <ErrorMessage message={error} />}
 
-          {/* Form Content */}
-          <LoanForm
-            loanData={loanData}
-            focusedField={focusedField}
-            loading={loading}
-            isFormValid={isFormValid()}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onChange={handleChange}
-            onSubmit={handleSubmit}
-          />
-
-          {/* Summary Section */}
-          {personalDetails && (
-            <ApplicationSummary
-              personalDetails={personalDetails}
+            {/* Form Content */}
+            <LoanForm
               loanData={loanData}
+              focusedField={focusedField}
+              loading={loading}
+              isFormValid={isFormValid()}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
             />
-          )}
+
+            {/* Summary Section */}
+            {personalDetails && (
+              <ApplicationSummary
+                personalDetails={personalDetails}
+                loanData={loanData}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Call to Action - Dashboard style with original flair */}
+        <div className="mt-12 text-center">
+          <button 
+            onClick={() => navigate('/dashboard/applicant')}
+            className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-gray-900 to-black text-white rounded-xl font-light hover:from-black hover:to-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 group"
+          >
+            <svg 
+              width="20" 
+              height="20" 
+              className="mr-3 transition-transform duration-300 group-hover:-translate-x-1" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth="2" 
+                d="M7 16l-4-4m0 0l4-4m-4 4h18" 
+              />
+            </svg>
+            Return to Dashboard
+          </button>
         </div>
 
         {/* Footer */}
         <div className="text-center mt-8 text-gray-500">
-          <p className="text-sm font-medium tracking-wide">© 2025 LOANlo Financial Services. All rights reserved.</p>
-          <p className="text-xs mt-2">Secure • Professional • Confidential</p>
+          <p className="text-sm font-light tracking-wide">© 2025 LOANlo Financial Services. All rights reserved.</p>
+          <p className="text-xs font-light mt-2">Secure • Professional • Confidential</p>
         </div>
       </div>
-
-      <style>{`
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes zoomIn {
-          from {
-            opacity: 0;
-            transform: scale(0.8);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        
-        @keyframes slideLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-      `}</style>
-
     </div>
   )
 }
