@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import api from '../../api'
-import { LoadingState, ErrorMessage, SuccessMessage } from '../ui/StatusMessages'
-import { PersonalDetailsRequired } from '../loan/PersonalDetailsRequired'
-import { LoanForm } from '../loan/LoanForm'
-import { ApplicationSummary } from '../loan/ApplicationSummary'
+import api from '../../../api'
+import { LoadingState, ErrorMessage, SuccessMessage } from './ui/StatusMessages'
+import { PersonalDetailsRequired } from './PersonalDetailsRequired'
+import { LoanForm } from './LoanForm'
+import { ApplicationSummary } from './ApplicationSummary'
 
 interface LoanData {
   loanType: string

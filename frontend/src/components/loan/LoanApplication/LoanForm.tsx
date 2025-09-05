@@ -1,5 +1,5 @@
 import React from 'react'
-import { SelectField, TextareaField, CurrencyField } from '../forms/FormFields'
+import { SelectField, TextareaField, CurrencyField } from './forms/FormFields'
 
 interface LoanData {
   loanType: string

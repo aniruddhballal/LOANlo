@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { DashboardLayout } from '../shared/DashboardLayout'
-import { LoadingSpinner } from '../shared/LoadingSpinner'
-import { ErrorAlert } from '../shared/ErrorAlert'
-import { EmptyState } from '../shared/EmptyState'
-import { StatusBadge } from '../shared/StatusBadge'
-import { formatCurrency, formatDate, formatApplicationId } from '../../utils/formatters'
+import { DashboardLayout } from './shared/DashboardLayout'
+import { LoadingSpinner } from './shared/LoadingSpinner'
+import { ErrorAlert } from './shared/ErrorAlert'
+import { EmptyState } from './shared/EmptyState'
+import { StatusBadge } from './shared/StatusBadge'
+import { formatCurrency, formatDate, formatApplicationId } from './utils/formatters'
 import api from '../../api'
 
 interface LoanApplication {

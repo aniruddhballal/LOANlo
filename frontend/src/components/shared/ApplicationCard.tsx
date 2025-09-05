@@ -1,6 +1,6 @@
 // components/shared/ApplicationCard.tsx
-import { StatusBadge } from './StatusBadge'
-import { formatCurrency, formatDate, formatApplicationId } from '../../utils/formatters'
+import { StatusBadge } from '../dashboards/shared/StatusBadge'
+import { formatCurrency, formatDate, formatApplicationId } from '../dashboards/utils/formatters'
 
 interface BaseApplication {
   _id: string

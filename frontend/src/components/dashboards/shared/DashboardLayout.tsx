@@ -2,7 +2,7 @@
 import type { ReactNode } from 'react'
 import { WelcomeOverlay } from './WelcomeOverlay'
 import { DashboardHeader } from './DashboardHeader'
-import { useLoginOverlay } from '../../hooks/useLoginOverlay'
+import { useLoginOverlay } from './hooks/useLoginOverlay'
 
 interface DashboardLayoutProps {
   title: string

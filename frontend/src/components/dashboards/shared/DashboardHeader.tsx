@@ -1,5 +1,5 @@
 // components/shared/DashboardHeader.tsx
-import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '../../../context/AuthContext'
 
 interface DashboardHeaderProps {
   title: string
