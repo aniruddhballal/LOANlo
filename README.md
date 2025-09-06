@@ -1,13 +1,22 @@
-## Tasks/Features
+## Tasks/Features - Stacked
 
-- [X] Start project + initial commit
-- [x] Stylise the Login, Register, Dashboardpages, ApplicationStatus, Profile, LoanApplication and DocumentUpload pages (module.css)
-- [x] Shift from MongoDB Compass to MongoDB Atlas
-- [x] Modularise the backend server code
-- [x] User Password edit feature
-- [x] Ask User for password in case they want to edit their profile
-~~- [x] Unify all the module.css files, so the pages look alike in style~~ No more vanilla module.css files
-- [x] Improve styles of all pages by shifting from the dark and irregularly styled theme into white based formal, corporate, sleek and modern design
-- [x] ~~Concept of KYC - create new collection to store UserKYC, set up routing. Check for KYC completion status before giving User access to features of the app.~~ There is a new definition of KYC now
-- [x] ~~Allow deletion of Loan Application~~
+- [x] ~~User convenience in the edit/delete profile~~ Neither feature exists currently
+- [x] Add Conditional Welcome/Congratulations/Error displays - landing animations
+- [x] Show colours for progress/completion of document uploads
+- [x] Fix all ts compile errors
+- [x] ~~User account deletion~~ Temporarily removed, waiting for better PII-KYC logic separation
+- [x] Enter key form submit (Rogin/Register pages)
+- [x] Convert Login/Register div tags into form tags
+- [x] Explore better styling formats and icons from Tailwind
+- [x] Switch from vanilla module.css to Tailwind
+- [x] ~~Allow deletion of Loan Application~~ Temporarily removed
 - [x] Support multiple loan applications for a single individual
+- [x] ~~Concept of KYC - create new collection to store UserKYC, set up routing. Check for KYC completion status before giving User access to features of the app.~~ There is a new definition of KYC now
+- [x] Improve styles of all pages by shifting from the dark and irregularly styled theme into white based formal, corporate, sleek and modern design
+- [x] ~~Unify all the module.css files, so the pages look alike in style~~ No more vanilla module.css files
+- [x] ~~Ask User for password in case they want to edit their profile~~ User profile and "kyc" has been merged
+- [x] ~~User Password edit feature~~ Currently removed
+- [x] Modularise the backend server code
+- [x] Shift from MongoDB Compass to MongoDB Atlas
+- [x] Stylise the Login, Register, Dashboardpages, ApplicationStatus, Profile, LoanApplication and DocumentUpload pages (module.css)
+- [X] Start project + initial commit
