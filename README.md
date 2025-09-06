@@ -1,6 +1,32 @@
 ## Tasks/Features - Stacked
 
-- [x] ~~User convenience in the edit/delete profile~~ Neither feature exists currently
+- [x] Modularise LoanApplication page
+- [x] Autoscroll, autoclose, auto-highlight to make errors/succes states more visible to the User
+- [x] Continue button in KYC/PII form has fire-forget model 
+- [x] Input validation for Aadhaar and PAN details
+- [x] Modularise the Dashboard page, and make it user-dynamic (reusing same components, pass states and parameters)
+- [x] Merge UserKYC and PII/User details collections - reflect it onto the frontend features
+- [x] Modularise the KYC Component
+- [x] Remove edit/delete account feature
+- [x] Display success/error messages for all modals, forms, submits - consider switching to toast messages
+- [x] Flow between pending<->under_review->accepted/rejected/request_documents->pending<->
+- [x] Loading spinner states or skeletons for all the pages
+- [x] Review/Download/Delete functionality for all the uploaded documents
+- [x] Revamp the whole project directory structure
+- [x] Modularise the LoanReviewModal
+- [x] Cross tab auth sync
+- [x] Add a global 403 Access Denied Page
+- [x] Conditions to be met for underwriter to take any actions on the loan applications (statuses of the documents uploaded)
+- [x] Global token expiration handling interceptor
+- [x] Switch to central axios
+- [x] Create modals that can be shared across the website, for all users (dynamic-user-customisable)
+- [x] State driven routing instead of parameter driven - usecase in DocumentsUpload page
+- [x] UI/UX check
+- [x] Underwriter dashboard - special functions, and API calls
+- [x] Keep a check on the naming conventions
+- [x] Role protected routing - dynamic redirection
+- [x] Create and Assign newer User roles - use them (session/login auth details) to navigate through pages of the website
+- [x] ~~UI/UX for the edit/delete profile~~ Neither feature exists currently
 - [x] Add Conditional Welcome/Congratulations/Error displays - landing animations
 - [x] Show colours for progress/completion of document uploads
 - [x] Fix all ts compile errors
