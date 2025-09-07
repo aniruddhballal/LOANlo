@@ -1,5 +1,6 @@
 ## Tasks/Features - Stacked
 
+- [x] Shift from JavaScript backend to TypeScript backend
 - [x] Modularise LoanApplication page
 - [x] Autoscroll, autoclose, auto-highlight to make errors/succes states more visible to the User
 - [x] Continue button in KYC/PII form has fire-forget model 
