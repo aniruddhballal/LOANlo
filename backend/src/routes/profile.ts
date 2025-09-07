@@ -52,22 +52,24 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       key => profileUpdateData[key] === undefined && delete profileUpdateData[key]
     );
 
-    const updatedUser = await User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
       userId,
       profileUpdateData,
       { new: true, runValidators: true }
-    ).select('-password');
+    );
 
-    if (!updatedUser) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    // --- New part: mark profile complete if 100% ---
+    if (user.calculateProfileCompletion() === 100 && !user.isProfileComplete) {
+      user.isProfileComplete = true;
+      await user.save();
     }
 
     res.json({
       success: true,
-      user: updatedUser,
+      user,
+      isProfileComplete: user.isProfileComplete, // send to frontend
       message: 'Profile details saved successfully'
     });
   } catch (err: any) {

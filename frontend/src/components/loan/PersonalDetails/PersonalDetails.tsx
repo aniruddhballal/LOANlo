@@ -114,14 +114,20 @@ const PersonalDetails = () => {
       setError('Please fill in all required fields before submitting.');
       return;
     }
-    
+
     setError('');
     setLoading(true);
 
     try {
-      await api.post('/profile/save', formData);
-      setIsPersonalDetailsComplete(true);
-      setShowCongratulations(true);
+      const res = await api.post('/profile/save', formData);
+
+      // If backend returns the updated profile completion status
+      if (res.data.success) {
+        setIsPersonalDetailsComplete(res.data.isProfileComplete); // sync local state
+        setShowCongratulations(true);
+      } else {
+        setError(res.data.message);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'PII submission failed');
     } finally {
