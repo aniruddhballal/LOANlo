@@ -1,18 +1,17 @@
-const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
-const config = require('./config');
-const connectDB = require('./config/database');
+import express, { Application } from 'express';
+import cors from 'cors';
+import fs from 'fs';
+import config from './config';
+import connectDB from './config/database';
 
 // Routes
-const authRoutes = require('./routes/auth');
-const loanRoutes = require('./routes/loans');
-const documentRoutes = require('./routes/documents');
-const systemAdminRoutes = require('./routes/systemadmin');
-const profileRoutes = require('./routes/profile');
+import authRoutes from './routes/auth';
+import loanRoutes from './routes/loans';
+import documentRoutes from './routes/documents';
+import profileRoutes from './routes/profile';
 
-const app = express();
-const PORT = config.PORT;
+const app: Application = express();
+const PORT: number = Number(config.PORT) || 5000;
 
 // Middleware
 app.use(cors());
@@ -29,7 +28,6 @@ if (!fs.existsSync('uploads')) {
 app.use('/api/auth', authRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/documents', documentRoutes);
-app.use('/api/admin', systemAdminRoutes);
 
 // Connect to MongoDB and start server
 connectDB()
@@ -39,6 +37,10 @@ connectDB()
       console.log(`🚀 Server running on port ${PORT}`);
     });
   })
-  .catch((err) => {
-    console.error('❌ MongoDB connection error:', err.message);
+  .catch((err: unknown) => {
+    if (err instanceof Error) {
+      console.error('❌ MongoDB connection error:', err.message);
+    } else {
+      console.error('❌ MongoDB connection error:', err);
+    }
   });

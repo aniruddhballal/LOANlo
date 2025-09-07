@@ -1,14 +1,26 @@
-const express = require('express');
-const router = express.Router();
-const User = require('../models/User');
-const { authenticateToken } = require('../middleware/auth');
+import { Router, Request, Response } from 'express';
+import User from '../models/User';
+import { authenticateToken } from '../middleware/auth';
+
+const router = Router();
+
+interface AuthRequest extends Request {
+  user?: {
+    userId: string;
+    email: string;
+    role: string;
+  };
+}
 
 // Save or update profile details
-router.post('/save', authenticateToken, async (req, res) => {
+router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user?.userId;
 
-    // Extract profile fields from request body
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
     const {
       firstName, lastName, dateOfBirth, gender, maritalStatus,
       aadhaarNumber, panNumber, phone, address, city, state, pincode,
@@ -29,7 +41,7 @@ router.post('/save', authenticateToken, async (req, res) => {
       });
     }
 
-    const profileUpdateData = {
+    const profileUpdateData: Record<string, unknown> = {
       firstName, lastName, dateOfBirth, gender, maritalStatus,
       aadhaarNumber, panNumber, phone, address, city, state, pincode,
       employmentType, companyName, designation, workExperience, monthlyIncome
@@ -40,7 +52,6 @@ router.post('/save', authenticateToken, async (req, res) => {
       key => profileUpdateData[key] === undefined && delete profileUpdateData[key]
     );
 
-    // Update the user document with profile data
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       profileUpdateData,
@@ -59,19 +70,19 @@ router.post('/save', authenticateToken, async (req, res) => {
       user: updatedUser,
       message: 'Profile details saved successfully'
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       success: false,
       message: 'Failed to save profile details',
       error: err.message
     });
   }
-});  
+});
 
 // Get user's profile details
-router.get('/me', authenticateToken, async (req, res) => {
+router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const user = await User.findById(req.user.userId).select('-password');
+    const user = await User.findById(req.user?.userId).select('-password');
 
     if (!user) {
       return res.status(404).json({
@@ -80,11 +91,8 @@ router.get('/me', authenticateToken, async (req, res) => {
       });
     }
 
-    res.json({
-      success: true,
-      user
-    });
-  } catch (err) {
+    res.json({ success: true, user });
+  } catch (err: any) {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch profile details',
@@ -93,8 +101,8 @@ router.get('/me', authenticateToken, async (req, res) => {
   }
 });
 
-// Clear profile details (set profile fields to null/undefined)
-router.delete('/me', authenticateToken, async (req, res) => {
+// Clear profile details
+router.delete('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const profileFields = {
       dateOfBirth: null,
@@ -114,7 +122,7 @@ router.delete('/me', authenticateToken, async (req, res) => {
     };
 
     const updatedUser = await User.findByIdAndUpdate(
-      req.user.userId,
+      req.user?.userId,
       profileFields,
       { new: true }
     ).select('-password');
@@ -126,11 +134,8 @@ router.delete('/me', authenticateToken, async (req, res) => {
       });
     }
 
-    res.json({
-      success: true,
-      message: 'Profile details cleared successfully'
-    });
-  } catch (err) {
+    res.json({ success: true, message: 'Profile details cleared successfully' });
+  } catch (err: any) {
     res.status(500).json({
       success: false,
       message: 'Failed to clear profile details',
@@ -139,4 +144,4 @@ router.delete('/me', authenticateToken, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
