@@ -114,7 +114,6 @@ router.get(
       fileStream.pipe(res);
 
       fileStream.on('error', (error) => {
-        console.error('Error streaming file:', error);
         if (!res.headersSent) {
           res.status(500).json({
             success: false,
@@ -123,7 +122,6 @@ router.get(
         }
       });
     } catch (error: any) {
-      console.error('Error serving document:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',
@@ -183,7 +181,6 @@ router.get(
       // Force download with attachment disposition
       res.download(document.filePath, document.fileName, (error) => {
         if (error) {
-          console.error('Error downloading file:', error);
           if (!res.headersSent) {
             res.status(500).json({
               success: false,
@@ -193,7 +190,6 @@ router.get(
         }
       });
     } catch (error: any) {
-      console.error('Error downloading document:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',
@@ -252,12 +248,8 @@ router.delete(
         // Delete file from disk if it exists
         if (fs.existsSync(document.filePath)) {
           fs.unlinkSync(document.filePath);
-          console.log(`Deleted file: ${document.filePath}`);
-        } else {
-          console.log(`File not found on disk: ${document.filePath}`);
         }
       } catch (fileError) {
-        console.error('Error deleting file from disk:', fileError);
         // Continue with database deletion even if file deletion fails
       }
 
@@ -302,7 +294,6 @@ router.delete(
         },
       });
     } catch (error: any) {
-      console.error('Error deleting document:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',
@@ -375,7 +366,6 @@ router.post(
         },
       });
     } catch (error: any) {
-      console.error('Upload error:', error);
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   }
@@ -421,7 +411,6 @@ router.get(
         })),
       });
     } catch (error: any) {
-      console.error('Get documents error:', error);
       res
         .status(500)
         .json({ message: 'Server error', error: error.message });
@@ -490,7 +479,6 @@ router.post(
         message: 'Document submission completed successfully',
       });
     } catch (error: any) {
-      console.error('Complete submission error:', error);
       res
         .status(500)
         .json({ message: 'Server error', error: error.message });

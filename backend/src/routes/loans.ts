@@ -122,7 +122,6 @@ router.post(
 
       res.status(201).json({ success: true, message: 'Loan application submitted successfully', applicationId: loanApplication._id });
     } catch (error: any) {
-      console.error('Loan submission error:', error);
       res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
   }
@@ -151,7 +150,6 @@ router.get(
         applications
       });
     } catch (error: any) {
-      console.error('Error fetching all loan applications:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',
@@ -295,7 +293,6 @@ router.get(
         application: applicationData
       });
     } catch (error: any) {
-      console.error('Error fetching application details:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',
@@ -383,7 +380,6 @@ router.put(
         application: updatedApplication
       });
     } catch (error: any) {
-      console.error('Error updating application status:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',
@@ -443,7 +439,6 @@ router.post(
       });
 
     } catch (error: any) {
-      console.error('Error adding comment:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',
@@ -507,7 +502,6 @@ router.post(
       });
 
     } catch (error: any) {
-      console.error('Error requesting documents:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',
@@ -585,7 +579,6 @@ router.patch(
       });
 
     } catch (error: any) {
-      console.error('Error submitting application for review:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',

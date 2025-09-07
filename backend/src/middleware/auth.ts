@@ -30,7 +30,6 @@ export const authenticateToken = (
 
   jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
     if (err) {
-      console.error('JWT verification error:', err);
       res.status(403).json({ message: 'Invalid or expired token' });
       return;
     }
