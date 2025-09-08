@@ -212,52 +212,6 @@ export const UnderwriterTableSkeleton = ({ rows = 5 }) => (
   </SkeletonBase>
 );
 
-// Applications Overview Skeleton (for ApplicantDashboard) - delete this guy too
-interface ApplicationsOverviewSkeletonProps {
-  showCards?: number;
-}
-
-export const ApplicationsOverviewSkeleton: React.FC<ApplicationsOverviewSkeletonProps> = ({ showCards = 3 }) => (
-  <SkeletonBase>
-    <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-        <div className="flex justify-between items-center">
-          <div>
-            <SkeletonText className="w-48 h-8 mb-1" />
-            <SkeletonText className="w-64 h-4" />
-          </div>
-          <SkeletonBox className="w-32 h-10 rounded-lg" />
-        </div>
-      </header>
-      
-      <div className="p-8">
-        <div className="space-y-4">
-          {Array.from({ length: showCards }).map((_, i) => (
-            <ApplicationCardSkeleton key={i} />
-          ))}
-        </div>
-      </div>
-    </section>
-  </SkeletonBase>
-);
-
-// Section Header Skeleton - delete this guy later
-export const SectionHeaderSkeleton = () => (
-  <SkeletonBase>
-    <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-        <div className="flex justify-between items-center">
-          <div>
-            <SkeletonText className="w-48 h-8 mb-1" />
-            <SkeletonText className="w-64 h-4" />
-          </div>
-          <SkeletonText className="w-32 h-6" />
-        </div>
-      </header>
-    </section>
-  </SkeletonBase>
-);
-
 // Enhanced Loading Spinner (replacement for LoadingSpinner)
 const sizeClasses = {
   small: "w-4 h-4 border",
