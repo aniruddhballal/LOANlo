@@ -59,6 +59,10 @@ const ApplicationStatus = () => {
     }
   }
 
+  const handleApplicationUpdated = () => {
+    fetchApplications() // This should refetch the list
+  }
+
   const getStatusClasses = (status: string) => {
     switch (status) {
       case 'approved': return 'bg-green-50 text-green-900 border-green-200 shadow-sm'
@@ -354,10 +358,7 @@ const ApplicationStatus = () => {
             isOpen={!!selectedApplication}
             onClose={() => setSelectedApplication(null)}
             applicationId={selectedApplication?._id || ''}
-            onApplicationUpdated={() => {
-              // Add your refresh logic here, like refetching applications
-              setSelectedApplication(null)
-            }}
+            onApplicationUpdated={handleApplicationUpdated}
             showActions={false}
             isUnderwriter={false}
             />
