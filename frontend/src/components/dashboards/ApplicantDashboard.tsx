@@ -1,12 +1,102 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { DashboardLayout } from './shared/DashboardLayout'
-import { LoadingSpinner } from './shared/LoadingSpinner'
 import { ErrorAlert } from './shared/ErrorAlert'
 import { EmptyState } from './shared/EmptyState'
 import { StatusBadge } from './shared/StatusBadge'
 import { formatCurrency, formatDate, formatApplicationId } from './utils/formatters'
 import api from '../../api'
+import React from 'react'
+
+interface SkeletonBaseProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+const SkeletonBase: React.FC<SkeletonBaseProps> = ({ className = "", children }) => (
+  <div className={`animate-pulse ${className}`}>
+    {children}
+  </div>
+);
+
+const SkeletonBox = ({ className = "" }) => (
+  <div className={`bg-gray-200 rounded-lg ${className}`} />
+);
+
+const SkeletonText = ({ className = "" }) => (
+  <div className={`bg-gray-200 rounded-md h-4 ${className}`} />
+);
+
+const SkeletonCircle = ({ className = "" }) => (
+  <div className={`bg-gray-200 rounded-full ${className}`} />
+);
+
+const PersonalDetailsSkeleton = () => (
+  <SkeletonBase>
+    <div className="mb-8 rounded-xl p-6 shadow-sm border bg-white border-gray-200">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-5">
+          <SkeletonCircle className="w-12 h-12" />
+          <div>
+            <SkeletonText className="w-48 mb-2" />
+            <SkeletonText className="w-64 h-3" />
+          </div>
+        </div>
+        <SkeletonBox className="w-32 h-12 rounded-lg" />
+      </div>
+    </div>
+  </SkeletonBase>
+);
+
+const ServiceActionsSkeleton = () => (
+  <SkeletonBase>
+    <section className="mb-10">
+      <div className="mb-6">
+        <SkeletonText className="w-48 h-8 mb-2" />
+        <SkeletonBox className="w-16 h-0.5" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+            <div className="flex items-start space-x-4">
+              <SkeletonBox className="w-12 h-12 rounded-lg" />
+              <div className="flex-1">
+                <SkeletonText className="w-40 h-5 mb-2" />
+                <SkeletonText className="w-full h-3 mb-1" />
+                <SkeletonText className="w-3/4 h-3" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  </SkeletonBase>
+);
+
+const ApplicationCardSkeleton = () => (
+  <div className="border border-gray-200 rounded-xl p-6">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-6 flex-1 min-w-0">
+        <SkeletonCircle className="w-10 h-10" />
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center space-x-4 mb-3">
+            <SkeletonText className="w-32 h-5" />
+            <SkeletonBox className="w-20 h-6 rounded-full" />
+          </div>
+          
+          <div className="flex items-center space-x-6">
+            <SkeletonText className="w-24 h-4" />
+            <SkeletonText className="w-28 h-4" />
+            <SkeletonText className="w-32 h-4" />
+          </div>
+        </div>
+      </div>
+      
+      <SkeletonBox className="w-48 h-12 rounded-xl" />
+    </div>
+  </div>
+);
 
 interface LoanApplication {
   _id: string
@@ -105,7 +195,9 @@ const ApplicantDashboard = () => {
       welcomeSubtitle="Successfully authenticated to LoanLo Platform"
     >
       {/* Personal Details Section */}
-      {hasPersonalDetails !== null && (
+      {hasPersonalDetails === null ? (
+        <PersonalDetailsSkeleton />
+      ) : (
         <div className={`mb-8 rounded-xl p-6 shadow-sm border transition-all duration-300 ${
           hasPersonalDetails 
             ? 'bg-gradient-to-r from-gray-900 to-black text-white border-gray-300 shadow-md' 
@@ -152,7 +244,9 @@ const ApplicantDashboard = () => {
       )}
 
       {/* Service Actions */}
-      {hasPersonalDetails === true && (
+      {loading && hasPersonalDetails === null ? (
+        <ServiceActionsSkeleton />
+      ) : hasPersonalDetails === true && (
         <section className="mb-10">
           <div className="mb-6">
             <h2 className="text-2xl font-light text-gray-900 mb-2">Available Services</h2>
@@ -252,7 +346,14 @@ const ApplicantDashboard = () => {
           </header>
           
           <div className="p-8">
-            {loading && <LoadingSpinner text="Loading applications..." />}
+            {loading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <ApplicationCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : (
+              <>
             
             {error && <ErrorAlert message={error} />}
 
@@ -358,6 +459,8 @@ const ApplicantDashboard = () => {
                 )}
               </div>
             )}
+            </>
+          )}
           </div>
         </section>
       )}
