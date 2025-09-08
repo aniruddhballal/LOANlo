@@ -137,6 +137,20 @@ export default function LoanReviewModal({
     }
   }
 
+  const handleDeleteApplication = async (applicationId: string) => {
+    try {
+      const { data } = await api.delete(`/loans/${applicationId}`)
+      if (data.success) {
+        onApplicationUpdated() // Refresh the parent list
+        onClose() // Close the modal
+      } else {
+        setError(data.message)
+      }
+    } catch (err: any) {
+      setError('Failed to delete application')
+    }
+  }
+
   // Check if application is ready for underwriter actions
   const canPerformActions = application?.status === 'under_review'
 
@@ -255,7 +269,10 @@ export default function LoanReviewModal({
                 {/* Tab Content */}
                 <div className="flex-1 overflow-y-auto p-6">
                   {activeTab === 'details' && (
-                    <ApplicationDetailsTab application={application} />
+                    <ApplicationDetailsTab 
+                      application={application} 
+                      onDelete={handleDeleteApplication} 
+                    />
                   )}
 
                   {activeTab === 'documents' && (

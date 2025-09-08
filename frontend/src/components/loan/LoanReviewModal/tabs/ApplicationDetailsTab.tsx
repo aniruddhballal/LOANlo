@@ -1,17 +1,93 @@
-import { CheckCircle, XCircle } from 'lucide-react'
+import { CheckCircle, XCircle, Trash2, AlertTriangle } from 'lucide-react'
+import { useState } from 'react'
 import type { LoanApplication } from '../types'
 import { formatCurrency, formatDate, getStatusColor, getLoanTypeLabel, getDocumentProgress } from '../utils'
 
 interface ApplicationDetailsTabProps {
   application: LoanApplication
+  onDelete?: (applicationId: string) => Promise<void> | void
 }
 
-export default function ApplicationDetailsTab({ application }: ApplicationDetailsTabProps) {
+export default function ApplicationDetailsTab({ application, onDelete }: ApplicationDetailsTabProps) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  
   const documentProgress = getDocumentProgress(application.documents)
   const allRequiredDocsUploaded = documentProgress.percentage === 100
 
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!onDelete) return
+    
+    setIsDeleting(true)
+    try {
+      await onDelete(application._id.toString())
+      setShowDeleteConfirm(false)
+    } catch (error) {
+      console.error('Failed to delete application:', error)
+      // You might want to show an error message here
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirm(false)
+  }
+
   return (
     <div className="space-y-6">
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4 border border-gray-200">
+            <div className="flex items-center space-x-3 mb-4">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
+              <h3 className="font-semibold text-gray-900 text-lg">Delete Application</h3>
+            </div>
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete this loan application for <strong>{application.applicantName}</strong>? 
+              This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={handleDeleteCancel}
+                disabled={isDeleting}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
+              >
+                {isDeleting && (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                )}
+                <span>{isDeleting ? 'Deleting...' : 'Delete'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Button */}
+      {onDelete && (
+        <div className="flex justify-end">
+          <button
+            onClick={handleDeleteClick}
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-colors"
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete Application
+          </button>
+        </div>
+      )}
+
       {/* Applicant Info */}
       <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
         <div className="flex items-center space-x-4 mb-4">

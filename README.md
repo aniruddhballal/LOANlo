@@ -1,5 +1,6 @@
 ## Tasks/Features - Stacked
 
+- [ ] Add the Loan Application Delete functionality back - this time, make sure only applicants can delete it? Should under-writers have all that power? Check auto-refresh/re-render the loan applications once one has been deleted?
 - [x] Shift from JavaScript backend to TypeScript backend
 - [x] Modularise LoanApplication page
 - [x] Autoscroll, autoclose, auto-highlight to make errors/succes states more visible to the User
