@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { DashboardLayout } from './shared/DashboardLayout'
-import { LoadingSpinner } from './shared/LoadingSpinner'
+import { UnderwriterTableSkeleton } from './shared/SkeletonComponents'
 import { ErrorAlert } from './shared/ErrorAlert'
 import { EmptyState } from './shared/EmptyState'
 import { StatusBadge } from './shared/StatusBadge'
@@ -88,14 +88,17 @@ export default function UnderwriterDashboard() {
             </div>
             <div className="text-sm font-medium text-gray-700">
               {loading 
-                ? "Loading..." 
+                ? <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
                 : `${applications.length} ${applications.length === 1 ? "Application" : "Applications"}`}
             </div>
           </div>
         </header>
         
         <div className="p-8">
-          {loading && <LoadingSpinner text="Loading applications..." />}
+        {loading ? (
+          <UnderwriterTableSkeleton rows={5} />
+        ) : (
+          <>
           
           {error && <ErrorAlert message={error} />}
 
@@ -250,6 +253,8 @@ export default function UnderwriterDashboard() {
                 ))}
               </div>
             </div>
+            )}
+          </>
           )}
         </div>
       </section>
