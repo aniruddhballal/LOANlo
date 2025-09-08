@@ -182,36 +182,6 @@ router.get(
   }
 );
 
-// Get single loan application with populated user data - THIS CAN BE DELETED RIGHT?
-// router.get(
-//   '/application/:applicationId',
-//   authenticateToken,
-//   async (req: AuthenticatedRequest, res: Response) => {
-//     try {
-//       const { applicationId } = req.params as { applicationId: string };
-
-//       const application = await LoanApplication.findOne({
-//         _id: applicationId,
-//         userId: req.user?.userId
-//       }).populate('userId', 'firstName lastName email phone');
-
-//       if (!application) {
-//         return res.status(404).json({ message: 'Application not found' });
-//       }
-
-//       res.json({
-//         success: true,
-//         application
-//       });
-//     } catch (error: any) {
-//       res.status(500).json({
-//         message: 'Server error',
-//         error: error.message
-//       });
-//     }
-//   }
-// );
-
 // Delete a loan application
 router.delete(
   '/:applicationId',
