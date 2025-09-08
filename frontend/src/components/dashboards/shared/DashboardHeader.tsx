@@ -1,4 +1,3 @@
-// components/shared/DashboardHeader.tsx
 import { useAuth } from '../../../context/AuthContext'
 
 interface DashboardHeaderProps {

@@ -1,4 +1,3 @@
-// components/shared/ErrorAlert.tsx
 interface ErrorAlertProps {
   message: string
 }

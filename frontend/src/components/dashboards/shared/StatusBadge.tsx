@@ -1,4 +1,3 @@
-// components/shared/StatusBadge.tsx
 interface StatusBadgeProps {
   status: string
   showIcon?: boolean

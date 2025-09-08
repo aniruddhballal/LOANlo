@@ -1,4 +1,3 @@
-// components/shared/DashboardLayout.tsx
 import type { ReactNode } from 'react'
 import { WelcomeOverlay } from './WelcomeOverlay'
 import { DashboardHeader } from './DashboardHeader'

@@ -1,4 +1,3 @@
-// components/shared/WelcomeOverlay.tsx
 import { CheckCircle } from 'lucide-react'
 
 interface WelcomeOverlayProps {

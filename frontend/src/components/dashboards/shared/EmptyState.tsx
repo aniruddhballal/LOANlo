@@ -1,4 +1,3 @@
-// components/shared/EmptyState.tsx
 import type { ReactNode } from 'react'
 
 interface EmptyStateProps {
