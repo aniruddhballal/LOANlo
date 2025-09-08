@@ -1,5 +1,6 @@
 ## Tasks/Features - Stacked
 
+- [ ] Loading/Skeleton screen for the Applicant and Underwriter Dashboard page, and the RoleProtectedRoute component
 - [ ] Add the Loan Application Delete functionality back - this time, make sure only applicants can delete it? Should under-writers have all that power? Check auto-refresh/re-render the loan applications once one has been deleted?
 - [x] Shift from JavaScript backend to TypeScript backend
 - [x] Modularise LoanApplication page
