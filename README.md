@@ -1,5 +1,11 @@
 ## Tasks/Features - Stacked
 
+- [ ] Begin Application Process-> button onclick, has informal/unmatched styles
+- [ ] Deleting documents is causing entire ApplicationStatus page to reload
+- [ ] Individual document submission/uploading is causing glitches in all the individual document submitting boxes?
+- [ ] LoanReviewModal features are not User Role specific
+- [ ] Implement Auth0/O-Auth
+- [ ] Clear up backend unused routes - loans.ts, profile.ts, documents.ts, auth,ts
 - [x] Blocked view at the bottom of the screen for Underwriter's LoanReviewModal
 - [x] Loading/Skeleton screen for the Applicant and Underwriter Dashboard page, and the RoleProtectedRoute component
 - [ ] Add the Loan Application Delete functionality back - this time, make sure only applicants can delete it? Should under-writers have all that power? Check auto-refresh/re-render the loan applications once one has been deleted?

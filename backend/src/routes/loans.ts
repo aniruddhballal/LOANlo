@@ -359,7 +359,7 @@ router.put(
   }
 );
 
-// Request additional documents (for underwriters)
+// Request additional documents (for underwriters) - unused right now
 router.post(
   '/request-documents/:applicationId',
   authenticateToken,
