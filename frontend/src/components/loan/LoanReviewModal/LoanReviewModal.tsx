@@ -106,6 +106,13 @@ export default function LoanReviewModal({
     }
   }
 
+  const handleDocumentUpdate = async () => {
+    // Refresh the application data after document changes
+    await fetchApplicationDetails()
+    // Also refresh the parent list
+    onApplicationUpdated()
+  }
+
   const handleRequestAdditionalDocuments = async () => {
     setActionLoading('pending')
     try {
@@ -276,7 +283,10 @@ export default function LoanReviewModal({
                   )}
 
                   {activeTab === 'documents' && (
-                    <DocumentsTab application={application} />
+                    <DocumentsTab 
+                      application={application} 
+                      onDocumentUpdate={handleDocumentUpdate}
+                    />
                   )}
 
                   {activeTab === 'history' && (

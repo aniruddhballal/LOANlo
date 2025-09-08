@@ -7,9 +7,10 @@ import api from '../../../../api'
 
 interface DocumentsTabProps {
   application: LoanApplication
+  onDocumentUpdate: () => Promise<void>
 }
 
-export default function DocumentsTab({ application }: DocumentsTabProps) {
+export default function DocumentsTab({ application, onDocumentUpdate }: DocumentsTabProps) {
   const [loadingDocument, setLoadingDocument] = useState<string | null>(null)
   const [documentError, setDocumentError] = useState<string | null>(null)
   const [deletingDocument, setDeletingDocument] = useState<string | null>(null)
@@ -74,10 +75,7 @@ export default function DocumentsTab({ application }: DocumentsTabProps) {
       const response = await api.delete(`/documents/delete/${application._id}/${doc.type}`)
 
       if (response.data.success) {
-        // Force a page refresh or update the application data
-        // You might want to call a parent function to refresh the data
-        // For now, we'll show a success message
-        window.location.reload() // Simple refresh - you might want to implement a better state update
+        await onDocumentUpdate()
       }
 
     } catch (error: any) {

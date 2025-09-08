@@ -1,7 +1,7 @@
 ## Tasks/Features - Stacked
 
 - [ ] Begin Application Process-> button onclick, has informal/unmatched styles
-- [ ] Deleting documents is causing entire ApplicationStatus page to reload
+- [x] Deleting documents is causing entire ApplicationStatus page to reload
 - [ ] Individual document submission/uploading is causing glitches in all the individual document submitting boxes?
 - [ ] LoanReviewModal features are not User Role specific
 - [ ] Implement Auth0/O-Auth
