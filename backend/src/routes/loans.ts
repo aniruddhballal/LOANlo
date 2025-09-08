@@ -182,35 +182,35 @@ router.get(
   }
 );
 
-// Get single loan application with populated user data
-router.get(
-  '/application/:applicationId',
-  authenticateToken,
-  async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { applicationId } = req.params as { applicationId: string };
+// Get single loan application with populated user data - THIS CAN BE DELETED RIGHT?
+// router.get(
+//   '/application/:applicationId',
+//   authenticateToken,
+//   async (req: AuthenticatedRequest, res: Response) => {
+//     try {
+//       const { applicationId } = req.params as { applicationId: string };
 
-      const application = await LoanApplication.findOne({
-        _id: applicationId,
-        userId: req.user?.userId
-      }).populate('userId', 'firstName lastName email phone');
+//       const application = await LoanApplication.findOne({
+//         _id: applicationId,
+//         userId: req.user?.userId
+//       }).populate('userId', 'firstName lastName email phone');
 
-      if (!application) {
-        return res.status(404).json({ message: 'Application not found' });
-      }
+//       if (!application) {
+//         return res.status(404).json({ message: 'Application not found' });
+//       }
 
-      res.json({
-        success: true,
-        application
-      });
-    } catch (error: any) {
-      res.status(500).json({
-        message: 'Server error',
-        error: error.message
-      });
-    }
-  }
-);
+//       res.json({
+//         success: true,
+//         application
+//       });
+//     } catch (error: any) {
+//       res.status(500).json({
+//         message: 'Server error',
+//         error: error.message
+//       });
+//     }
+//   }
+// );
 
 // Delete a loan application
 router.delete(
@@ -379,65 +379,6 @@ router.put(
         message: `Application ${status} successfully`,
         application: updatedApplication
       });
-    } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: 'Server error',
-        error: error.message
-      });
-    }
-  }
-);
-
-// Add comment to loan application (for underwriters)
-router.post(
-  '/add-comment/:applicationId',
-  authenticateToken,
-  async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { applicationId } = req.params as { applicationId: string };
-      const { comment } = req.body as { comment: string };
-
-      // Only underwriters can access
-      if (req.user?.role !== 'underwriter') {
-        return res.status(403).json({
-          success: false,
-          message: 'Access denied. Underwriter role required.'
-        });
-      }
-
-      const application = await LoanApplication.findById(applicationId);
-
-      if (!application) {
-        return res.status(404).json({
-          success: false,
-          message: 'Application not found'
-        });
-      }
-
-      // Add comment to status history without changing status
-      const historyEntry: any = {
-        status: application.status, // Keep current status
-        timestamp: new Date(),
-        comment,
-        updatedBy: `${req.user?.firstName ?? 'Unknown'} ${req.user?.lastName ?? ''}`
-      };
-
-      const updatedApplication = await LoanApplication.findByIdAndUpdate(
-        applicationId,
-        {
-          updatedAt: new Date(),
-          $push: { statusHistory: historyEntry }
-        },
-        { new: true }
-      ).populate('userId', 'firstName lastName email phone role');
-
-      res.json({
-        success: true,
-        message: 'Comment added successfully',
-        application: updatedApplication
-      });
-
     } catch (error: any) {
       res.status(500).json({
         success: false,
