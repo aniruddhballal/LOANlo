@@ -2,6 +2,7 @@ import { CheckCircle, XCircle, Trash2, AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
 import type { LoanApplication } from '../types'
 import { formatCurrency, formatDate, getStatusColor, getLoanTypeLabel, getDocumentProgress } from '../utils'
+import { useAuth } from '../../../../context/AuthContext'
 
 interface ApplicationDetailsTabProps {
   application: LoanApplication
@@ -14,6 +15,8 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
   
   const documentProgress = getDocumentProgress(application.documents)
   const allRequiredDocsUploaded = documentProgress.percentage === 100
+
+  const { user } = useAuth()
 
   const handleDeleteClick = () => {
     setShowDeleteConfirm(true)
@@ -75,18 +78,21 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
         </div>
       )}
 
-      {/* Delete Button */}
-      {onDelete && (
-        <div className="flex justify-end">
-          <button
-            onClick={handleDeleteClick}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-colors"
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Delete Application
-          </button>
-        </div>
-      )}
+      {/* Delete Button - Only visible for the applicant who owns this application */}
+      {onDelete &&
+        user &&
+        user.role === 'applicant' &&
+        (
+          <div className="flex justify-end">
+            <button
+              onClick={handleDeleteClick}
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-colors"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete Application
+            </button>
+          </div>
+        )}
 
       {/* Applicant Info */}
       <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
