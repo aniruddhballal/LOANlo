@@ -9,8 +9,7 @@ import { REQUIRED_FIELDS_BY_STEP, INITIAL_PERSONAL_DETAILS_DATA } from './consta
 // Import components
 import ProgressBar from './ProgressBar';
 import { PersonalInfoStep, ContactInfoStep, EmploymentInfoStep } from './PersonalDetailsSteps';
-import { CongratulationsScreen } from './LoadingScreens';
-import { LoadingState } from '../LoanApplication/ui/StatusMessages';
+import { LoadingState, ApplicationSuccess } from '../LoanApplication/ui/StatusMessages';
 
 const PersonalDetails = () => {
   const navigate = useNavigate();
@@ -163,7 +162,7 @@ const PersonalDetails = () => {
 
   // Show congratulations screen only if Personal Details was just completed in this session
   if (showCongratulations && isPersonalDetailsComplete) {
-    return <CongratulationsScreen onNavigateToLoan={handleNavigateToLoan} />;
+    return <ApplicationSuccess onNavigateToLoan={handleNavigateToLoan} />;
   }
 
   // Show loading screen while fetching initial data

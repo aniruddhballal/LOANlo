@@ -81,3 +81,58 @@ export const SuccessMessage: React.FC = () => (
     </div>
   </div>
 )
+
+interface ApplicationSuccessProps {
+  onNavigateToLoan: () => void
+}
+
+export const ApplicationSuccess: React.FC<ApplicationSuccessProps> = ({ onNavigateToLoan }) => (
+  <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 py-12 px-4">
+    <div className="max-w-4xl mx-auto relative">
+      {/* Header Section */}
+      <div className="text-center mb-12 relative">
+        <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-green-600 to-green-500 rounded-full mb-6 shadow-2xl">
+          <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h1 className="text-4xl font-light text-slate-900 mb-4 tracking-tight">
+          Application Successfully Submitted
+        </h1>
+        <p className="text-slate-500 font-normal text-lg leading-relaxed">
+          Your personal details have been saved successfully
+        </p>
+        <div className="w-16 h-0.5 bg-gradient-to-r from-emerald-400 to-emerald-300 mx-auto mt-6 rounded-full"></div>
+      </div>
+
+      {/* Completion Card */}
+      <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-200/50 p-12 relative overflow-hidden">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 opacity-[0.02]">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-transparent to-emerald-900"></div>
+        </div>
+        
+        <div className="relative text-center">
+          <h2 className="text-3xl font-light text-slate-900 mb-4 tracking-tight">
+            Form Completed
+          </h2>
+          <p className="text-slate-500 text-lg mb-12 font-normal max-w-md mx-auto leading-relaxed">
+            Your personal details have been recorded. You can now proceed to apply for loans.
+          </p>
+          
+          <div className="flex justify-center">
+            <button 
+              onClick={onNavigateToLoan}
+              className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-slate-800 to-slate-700 text-white rounded-xl font-medium hover:from-slate-900 hover:to-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-200 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              <span className="tracking-wide">APPLY FOR LOAN</span>
+              <svg className="w-4 h-4 ml-3 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)
