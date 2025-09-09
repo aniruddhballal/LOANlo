@@ -1,7 +1,9 @@
 ## Tasks/Features - Stacked
 
+- [ ] Stylise the delete application ka pura flow
+- [ ] Clean up the interfaces and props - might have fields that I am not using in that page
 - [ ] Should applicants be allowed to apply for multiple loans? What's the category of people who can do that? Is there a category?
-- [ ] Add a check if the current logged in user is the one who is even viewing/clicking on the delete application/documents button. dont need these checks for the Underwriter because they won't have these features either ways - only Applicants can delete the documents, or the entire loan application. Underwriter should not be able to delete application.
+- [x] Add a check if the current logged in user is the one who is even viewing/clicking on the delete application/documents button. dont need these checks for the Underwriter because they won't have these features either ways - only Applicants can delete the documents, or the entire loan application. Underwriter should not be able to delete application.
 - [ ] Allow User profile deletion
 - [ ] Begin Application Process-> button onclick, has informal/unmatched styles
 - [x] Deleting documents is causing entire ApplicationStatus page to reload
