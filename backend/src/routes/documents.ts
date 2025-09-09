@@ -7,8 +7,7 @@ import LoanApplication from '../models/LoanApplication';
 import Document, { DocumentType } from '../models/Document'; // import type if needed
 
 const router = Router();
-
-
+// this route is used for both viewing and downloading the file - logic is slightly complex, but same api endpoint is used for both the functionalities - can switch to native/default downloading later if this seems too complex
 router.get(
   '/file/:applicationId/:documentType',
   authenticateToken,
@@ -119,74 +118,6 @@ router.get(
             success: false,
             message: 'Error reading file',
           });
-        }
-      });
-    } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: 'Server error',
-        error: error.message,
-      });
-    }
-  }
-);
-
-// Alternative route for forced download (optional)
-router.get(
-  '/download/:applicationId/:documentType',
-  authenticateToken,
-  async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { applicationId, documentType } = req.params as {
-        applicationId: string;
-        documentType: string;
-      };
-
-      const document = await Document.findOne({
-        applicationId,
-        documentType,
-      });
-
-      if (!document) {
-        return res.status(404).json({
-          success: false,
-          message: 'Document not found',
-        });
-      }
-
-      if (
-        req.user &&
-        !['underwriter', 'system_admin', 'admin', 'reviewer'].includes(req.user.role)
-      ) {
-        const application = await LoanApplication.findOne({
-          _id: applicationId,
-          userId: req.user.userId,
-        });
-
-        if (!application) {
-          return res.status(403).json({
-            success: false,
-            message: 'Access denied',
-          });
-        }
-      }
-
-      if (!fs.existsSync(document.filePath)) {
-        return res.status(404).json({
-          success: false,
-          message: 'File not found on server',
-        });
-      }
-
-      // Force download with attachment disposition
-      res.download(document.filePath, document.fileName, (error) => {
-        if (error) {
-          if (!res.headersSent) {
-            res.status(500).json({
-              success: false,
-              message: 'Error downloading file',
-            });
-          }
         }
       });
     } catch (error: any) {
