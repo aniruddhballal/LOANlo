@@ -13,7 +13,6 @@ interface LoanReviewModalProps {
   onClose: () => void
   applicationId: string
   onApplicationUpdated: () => void
-  showActions?: boolean
   isUnderwriter?: boolean
 }
 
@@ -22,7 +21,6 @@ export default function LoanReviewModal({
   onClose, 
   applicationId, 
   onApplicationUpdated, 
-  showActions = true,
   isUnderwriter = false
 }: LoanReviewModalProps) {
   const [application, setApplication] = useState<LoanApplication | null>(null)
@@ -160,6 +158,8 @@ export default function LoanReviewModal({
 
   // Check if application is ready for underwriter actions
   const canPerformActions = application?.status === 'under_review'
+  // Only underwriters can see actions
+  const canShowActionsTab = isUnderwriter && application?.status === 'under_review'
 
   if (!isOpen) return null
 
@@ -253,7 +253,7 @@ export default function LoanReviewModal({
                     { id: 'details', label: 'Application Details', icon: FileText },
                     { id: 'documents', label: 'Document Status', icon: File },
                     { id: 'history', label: 'Status History', icon: Clock },
-                    ...(showActions && canPerformActions ? [{ id: 'actions', label: 'Actions', icon: MessageSquare }] : [])
+                    ...(canShowActionsTab ? [{ id: 'actions', label: 'Actions', icon: MessageSquare }] : [])
                   ].map((tab) => {
                     const Icon = tab.icon
                     return (
@@ -294,7 +294,7 @@ export default function LoanReviewModal({
                     <StatusHistoryTab application={application} />
                   )}
 
-                  {activeTab === 'actions' && canPerformActions && (
+                  {activeTab === 'actions' && canShowActionsTab && (
                     <ActionsTab 
                       application={application}
                       onStatusUpdate={handleStatusUpdate}
