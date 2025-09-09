@@ -10,6 +10,7 @@ export interface DocumentRequirement {
 export interface LoanApplication {
   _id: string
   userId: {
+    _id: string
     firstName: string
     lastName: string
     email: string
