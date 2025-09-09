@@ -15,7 +15,6 @@ interface LoanApplication {
   documentsUploaded: boolean
 }
 
-
 const ApplicationStatus = () => {
   const [applications, setApplications] = useState<LoanApplication[]>([])
   const [loading, setLoading] = useState(true)
@@ -346,7 +345,6 @@ const ApplicationStatus = () => {
             onClose={() => setSelectedApplication(null)}
             applicationId={selectedApplication?._id || ''}
             onApplicationUpdated={handleApplicationUpdated}
-            showActions={false}
             isUnderwriter={user?.role === 'underwriter'}
             />
           </div>
