@@ -50,23 +50,30 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
 
   return (
     <div className="space-y-6">
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4 border border-gray-200">
-            <div className="flex items-center space-x-3 mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-600" />
-              <h3 className="font-semibold text-gray-900 text-lg">Delete Application</h3>
+          <div className="bg-white rounded-lg max-w-md mx-4 border border-gray-200 shadow-xl">
+            <div className="p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-lg">Delete Application</h3>
+                  <p className="text-sm text-gray-500">This action cannot be undone</p>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-6">
+                Are you sure you want to delete this loan application for{' '}
+                <span className="font-medium text-gray-900">{application.applicantName}</span>?
+              </p>
             </div>
-            <p className="text-gray-700 mb-6">
-              Are you sure you want to delete this loan application for <strong>{application.applicantName}</strong>? 
-              This action cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-3">
+            <div className="border-t border-gray-200 px-6 py-4 bg-gray-50 rounded-b-lg flex justify-end space-x-3">
               <button
                 onClick={handleDeleteCancel}
                 disabled={isDeleting}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -78,42 +85,38 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
                 {isDeleting && (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 )}
-                <span>{isDeleting ? 'Deleting...' : 'Delete'}</span>
+                <span>{isDeleting ? 'Deleting...' : 'Delete Application'}</span>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Delete Button - Only visible for the applicant who owns this application */}
-      {onDelete &&
-        user &&
-        user.role === 'applicant' &&
-        isOwner &&
-        (
-          <div className="flex justify-end">
+      {/* Header with Applicant Info and Actions */}
+      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-black rounded-full flex items-center justify-center text-white font-semibold">
+              {application.userId?.firstName?.charAt(0)}{application.userId?.lastName?.charAt(0)}
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900 text-lg">
+                {application.applicantName}
+              </h3>
+              <p className="text-gray-600">{application.userId?.email}</p>
+            </div>
+          </div>
+          
+          {/* Delete Button - Only visible for the applicant who owns this application */}
+          {onDelete && user && user.role === 'applicant' && isOwner && (
             <button
               onClick={handleDeleteClick}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-colors"
+              className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200"
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Delete Application
+              Delete
             </button>
-          </div>
-        )}
-
-      {/* Applicant Info */}
-      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-        <div className="flex items-center space-x-4 mb-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-black rounded-full flex items-center justify-center text-white font-semibold">
-            {application.userId?.firstName?.charAt(0)}{application.userId?.lastName?.charAt(0)}
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 text-lg">
-              {application.applicantName}
-            </h3>
-            <p className="text-gray-600">{application.userId?.email}</p>
-          </div>
+          )}
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
