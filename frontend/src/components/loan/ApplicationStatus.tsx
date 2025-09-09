@@ -345,7 +345,6 @@ const ApplicationStatus = () => {
             onClose={() => setSelectedApplication(null)}
             applicationId={selectedApplication?._id || ''}
             onApplicationUpdated={handleApplicationUpdated}
-            isUnderwriter={user?.role === 'underwriter'}
             />
           </div>
         )}

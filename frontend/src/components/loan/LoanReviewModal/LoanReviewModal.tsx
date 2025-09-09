@@ -8,12 +8,13 @@ import DocumentsTab from './tabs/DocumentsTab'
 import StatusHistoryTab from './tabs/StatusHistoryTab'
 import ActionsTab from './tabs/ActionsTab'
 
+import { useAuth } from '../../../context/AuthContext'
+
 interface LoanReviewModalProps {
   isOpen: boolean
   onClose: () => void
   applicationId: string
   onApplicationUpdated: () => void
-  isUnderwriter?: boolean
 }
 
 export default function LoanReviewModal({ 
@@ -21,8 +22,11 @@ export default function LoanReviewModal({
   onClose, 
   applicationId, 
   onApplicationUpdated, 
-  isUnderwriter = false
 }: LoanReviewModalProps) {
+
+  const { user } = useAuth()
+  const isUnderwriter = user?.role === 'underwriter'
+
   const [application, setApplication] = useState<LoanApplication | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
