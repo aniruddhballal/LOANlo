@@ -8,9 +8,10 @@ import api from '../../../../api'
 interface DocumentsTabProps {
   application: LoanApplication
   onDocumentUpdate: () => Promise<void>
+  isApplicant?: boolean
 }
 
-export default function DocumentsTab({ application, onDocumentUpdate }: DocumentsTabProps) {
+export default function DocumentsTab({ application, onDocumentUpdate, isApplicant = false }: DocumentsTabProps) {
   const [loadingDocument, setLoadingDocument] = useState<string | null>(null)
   const [documentError, setDocumentError] = useState<string | null>(null)
   const [deletingDocument, setDeletingDocument] = useState<string | null>(null)
@@ -80,12 +81,12 @@ export default function DocumentsTab({ application, onDocumentUpdate }: Document
 
     } catch (error: any) {
       console.error('Error deleting document:', error)
-      console.log('Backend response:', error.response?.data) // ADD THIS LINE
+      console.log('Backend response:', error.response?.data)
       
       let errorMessage = `Failed to delete ${doc.name}.`
       if (error.response?.status === 404) {
         errorMessage += ' Document not found.'
-      } else if (error.response?.status === 400) {// ADD THIS BLOCK
+      } else if (error.response?.status === 400) {
         errorMessage = error.response?.data?.message || errorMessage
       } else if (error.response?.status === 403) {
         errorMessage += ' Access denied.'
@@ -190,7 +191,8 @@ export default function DocumentsTab({ application, onDocumentUpdate }: Document
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-gray-900 text-lg">Document Requirements</h3>
         <div className="flex items-center space-x-3">
-          {!allRequiredDocsUploaded && (
+          {/* Only show upload button for applicants */}
+          {isApplicant && !allRequiredDocsUploaded && (
             <Link
               to="/upload-documents"
               state={{ applicationId: application._id }}
@@ -296,7 +298,7 @@ export default function DocumentsTab({ application, onDocumentUpdate }: Document
                 
                 {doc.uploaded && (
                   <div className="flex items-center space-x-2">
-                    {/* View Document Button */}
+                    {/* View Document Button - Always visible */}
                     <button
                       onClick={() => handleDocumentView(doc)}
                       disabled={loadingDocument === doc.type}
@@ -311,7 +313,7 @@ export default function DocumentsTab({ application, onDocumentUpdate }: Document
                       <span>View</span>
                     </button>
 
-                    {/* Download Document Button */}
+                    {/* Download Document Button - Always visible */}
                     <button
                       onClick={() => handleDocumentDownload(doc)}
                       disabled={loadingDocument === `${doc.type}_download`}
@@ -326,20 +328,22 @@ export default function DocumentsTab({ application, onDocumentUpdate }: Document
                       <span>Download</span>
                     </button>
 
-                    {/* Delete Document Button */}
-                    <button
-                      onClick={() => handleDeleteConfirm(doc)}
-                      disabled={deletingDocument === doc.type}
-                      className="flex items-center space-x-1 px-3 py-1 text-sm bg-red-50 text-red-700 border border-red-200 rounded-md hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                      title={`Delete ${doc.name}`}
-                    >
-                      {deletingDocument === doc.type ? (
-                        <Loader className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="w-4 h-4" />
-                      )}
-                      <span>Delete</span>
-                    </button>
+                    {/* Delete Document Button - Only visible for applicants */}
+                    {isApplicant && (
+                      <button
+                        onClick={() => handleDeleteConfirm(doc)}
+                        disabled={deletingDocument === doc.type}
+                        className="flex items-center space-x-1 px-3 py-1 text-sm bg-red-50 text-red-700 border border-red-200 rounded-md hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                        title={`Delete ${doc.name}`}
+                      >
+                        {deletingDocument === doc.type ? (
+                          <Loader className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                        <span>Delete</span>
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -348,8 +352,8 @@ export default function DocumentsTab({ application, onDocumentUpdate }: Document
         ))}
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
+      {/* Delete Confirmation Modal - Only show for applicants */}
+      {isApplicant && showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <div className="flex items-center space-x-3 mb-4">
@@ -421,15 +425,16 @@ export default function DocumentsTab({ application, onDocumentUpdate }: Document
         </div>
       )}
 
-      {!allRequiredDocsUploaded && (
+      {/* Only show pending documents warning for applicants */}
+      {isApplicant && !allRequiredDocsUploaded && (
         <div className="bg-amber-50 border-2 border-amber-200 rounded-lg p-4">
           <div className="flex items-start space-x-3">
             <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
             <div>
               <h4 className="font-medium text-amber-800">Documents Pending</h4>
               <p className="text-sm text-amber-700 mt-1">
-                The applicant needs to upload {documentProgress.total - documentProgress.uploaded} more required document(s) 
-                before the application can be reviewed and processed.
+                You need to upload {documentProgress.total - documentProgress.uploaded} more required document(s) 
+                before your application can be reviewed and processed.
               </p>
             </div>
           </div>

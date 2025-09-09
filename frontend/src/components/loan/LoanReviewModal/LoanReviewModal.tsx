@@ -286,6 +286,7 @@ export default function LoanReviewModal({
                     <DocumentsTab 
                       application={application} 
                       onDocumentUpdate={handleDocumentUpdate}
+                      isApplicant={!isUnderwriter}
                     />
                   )}
 

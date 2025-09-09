@@ -4,7 +4,7 @@
 - [ ] Begin Application Process-> button onclick, has informal/unmatched styles
 - [x] Deleting documents is causing entire ApplicationStatus page to reload
 - [ ] Individual document submission/uploading is causing glitches in all the individual document submitting boxes?
-- [ ] LoanReviewModal features are not User Role specific
+- [x] LoanReviewModal features are not User Role specific - anyone can view/interact with the upload/delete documents buttons
 - [ ] Implement Auth0/O-Auth
 - [x] Clear up backend unused routes - loans.ts, profile.ts, documents.ts, auth,ts
 - [x] Blocked view at the bottom of the screen for Underwriter's LoanReviewModal
