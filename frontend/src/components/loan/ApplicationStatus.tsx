@@ -7,28 +7,14 @@ import { useAuth } from '../../context/AuthContext'
 
 interface LoanApplication {
   _id: string
-  applicantName: string
   loanType: string
   amount: number
-  purpose: string
   tenure: number
   status: 'pending' | 'under_review' | 'approved' | 'rejected'
   createdAt: string
   documentsUploaded: boolean
-  statusHistory: Array<{
-    status: string
-    timestamp: string
-    comment?: string
-    updatedBy?: string
-  }>
-  rejectionReason?: string
-  approvalDetails?: {
-    approvedAmount: number
-    interestRate: number
-    tenure: number
-    emi: number
-  }
 }
+
 
 const ApplicationStatus = () => {
   const [applications, setApplications] = useState<LoanApplication[]>([])
