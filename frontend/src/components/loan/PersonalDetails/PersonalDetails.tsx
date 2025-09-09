@@ -9,7 +9,8 @@ import { REQUIRED_FIELDS_BY_STEP, INITIAL_PERSONAL_DETAILS_DATA } from './consta
 // Import components
 import ProgressBar from './ProgressBar';
 import { PersonalInfoStep, ContactInfoStep, EmploymentInfoStep } from './PersonalDetailsSteps';
-import { LoadingScreen, CongratulationsScreen } from './LoadingScreens';
+import { CongratulationsScreen } from './LoadingScreens';
+import { LoadingState } from '../LoanApplication/ui/StatusMessages';
 
 const PersonalDetails = () => {
   const navigate = useNavigate();
@@ -167,7 +168,12 @@ const PersonalDetails = () => {
 
   // Show loading screen while fetching initial data
   if (initialLoading) {
-    return <LoadingScreen />;
+    return (
+      <LoadingState
+        title="Loading Personal Details"
+        message="Please wait while we fetch your information..."
+      />
+    )
   }
 
   return (

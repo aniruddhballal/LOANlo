@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { LoadingState } from '../loan/LoanApplication/ui/StatusMessages'
 
 interface RoleProtectedRouteProps {
   children: React.ReactNode
@@ -11,12 +12,10 @@ const RoleProtectedRoute = ({ children, allowedRoles }: RoleProtectedRouteProps)
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
-          <span className="text-gray-600 font-light text-lg">Authenticating...</span>
-        </div>
-      </div>
+      <LoadingState 
+        title="Authenticating" 
+        message="Please wait while we log you in..." 
+      />
     )
   }
 

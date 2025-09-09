@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import api from '../../api'
 import LoanReviewModal from './LoanReviewModal'
 import { useAuth } from '../../context/AuthContext'
+import { LoadingState } from './LoanApplication/ui/StatusMessages'
 
 interface LoanApplication {
   _id: string
@@ -108,34 +109,10 @@ const ApplicationStatus = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-        {/* Elegant animated background patterns */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-24 -left-24 w-96 h-96 border border-gray-100 rounded-full opacity-20 animate-pulse"></div>
-          <div className="absolute top-1/3 -right-32 w-64 h-64 border border-gray-200 rounded-full opacity-30 animate-pulse" style={{animationDelay: '1s'}}></div>
-          <div className="absolute bottom-24 left-1/4 w-48 h-48 border border-gray-150 rounded-full opacity-25 animate-pulse" style={{animationDelay: '2s'}}></div>
-          <div className="absolute top-2/3 right-1/4 w-32 h-32 border border-gray-100 rounded-full opacity-20 animate-pulse" style={{animationDelay: '0.5s'}}></div>
-        </div>
-        
-        <div className="relative z-10 flex items-center justify-center min-h-screen">
-          <div className="text-center p-8">
-            <div className="relative mb-8">
-              <div className="w-20 h-20 mx-auto border-4 border-gray-200 rounded-full animate-spin border-t-gray-900"></div>
-              <div className="absolute inset-0 w-20 h-20 mx-auto border-2 border-gray-100 rounded-full animate-ping opacity-75"></div>
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-light text-gray-900 tracking-wide">Loading Applications</h2>
-              <div className="flex justify-center space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    return <LoadingState 
+      title="Loading Your Applications"
+      message="Hang tight, we're reviewing your details..."
+    />
   }
 
   return (
