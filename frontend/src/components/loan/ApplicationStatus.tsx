@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import api from '../../api'
 import LoanReviewModal from './LoanReviewModal'
 import { useAuth } from '../../context/AuthContext'
-import { LoadingState } from './LoanApplication/ui/StatusMessages'
+import { LoadingState } from '../ui/StatusMessages'
 
 interface LoanApplication {
   _id: string

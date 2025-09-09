@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import api from '../../../api'
-import { LoadingState, ErrorMessage, SuccessMessage } from './ui/StatusMessages'
+import { LoadingState, ErrorMessage, SuccessMessage } from '../../ui/StatusMessages'
 import { PersonalDetailsRequired } from './PersonalDetailsRequired'
 import { LoanForm } from './LoanForm'
 import { ApplicationSummary } from './ApplicationSummary'

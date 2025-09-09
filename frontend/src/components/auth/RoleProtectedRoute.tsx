@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LoadingState } from '../loan/LoanApplication/ui/StatusMessages'
+import { LoadingState } from '../ui/StatusMessages'
 
 interface RoleProtectedRouteProps {
   children: React.ReactNode
