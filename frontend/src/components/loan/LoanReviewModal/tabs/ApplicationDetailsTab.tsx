@@ -18,6 +18,13 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
 
   const { user } = useAuth()
 
+  const isOwner =
+    user !== null &&
+    application.userId !== undefined &&
+    (typeof application.userId === 'string'
+      ? user.id === application.userId
+      : user.id === application.userId._id.toString());
+
   const handleDeleteClick = () => {
     setShowDeleteConfirm(true)
   }
@@ -82,6 +89,7 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
       {onDelete &&
         user &&
         user.role === 'applicant' &&
+        isOwner &&
         (
           <div className="flex justify-end">
             <button
