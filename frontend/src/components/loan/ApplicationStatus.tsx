@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 
 import api from '../../api'
 import LoanReviewModal from './LoanReviewModal'
+import { useAuth } from '../../context/AuthContext'
 
 interface LoanApplication {
   _id: string
@@ -39,13 +40,13 @@ const ApplicationStatus = () => {
     fetchApplications()
   }, [])
 
-  const role = localStorage.getItem("role") // or from Redux/auth context
+  const { user } = useAuth()
 
-  let dashboardPath = "/dashboard/applicant"; // default
-  if (role === "underwriter") {
-    dashboardPath = "/dashboard/underwriter";
-  } else if (role === "system_admin") {
-    dashboardPath = "/dashboard/system_admin";
+  let dashboardPath = "/dashboard/applicant" // default
+  if (user?.role === "underwriter") {
+    dashboardPath = "/dashboard/underwriter"
+  } else if (user?.role === "system_admin") {
+    dashboardPath = "/dashboard/system_admin"
   }
 
   const fetchApplications = async () => {
@@ -360,7 +361,7 @@ const ApplicationStatus = () => {
             applicationId={selectedApplication?._id || ''}
             onApplicationUpdated={handleApplicationUpdated}
             showActions={false}
-            isUnderwriter={false}
+            isUnderwriter={user?.role === 'underwriter'}
             />
           </div>
         )}
