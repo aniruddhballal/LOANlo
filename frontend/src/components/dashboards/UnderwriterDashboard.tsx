@@ -8,6 +8,8 @@ import { formatCurrency, formatDate, formatTime, formatApplicationId } from './u
 import LoanReviewModal from '../loan/LoanReviewModal'
 import api from '../../api'
 
+import { useAuth } from '../../context/AuthContext'
+
 interface LoanApplication {
   _id: string
   amount: number
@@ -32,6 +34,8 @@ export default function UnderwriterDashboard() {
   useEffect(() => {
     fetchApplications()
   }, [])
+
+  const { user } = useAuth()
 
   const fetchApplications = async () => {
     try {
@@ -267,8 +271,7 @@ export default function UnderwriterDashboard() {
           onClose={handleModalClose}
           applicationId={selectedApplicationId}
           onApplicationUpdated={refreshApplications}
-          showActions={true}
-          isUnderwriter={true}
+          isUnderwriter={user?.role === 'underwriter'}
         />
       )}
     </>
