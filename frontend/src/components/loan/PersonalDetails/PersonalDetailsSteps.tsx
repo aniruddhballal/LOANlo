@@ -56,9 +56,11 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
   const handleAadhaarChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
   > = (e) => {
-    const target = e.target as HTMLInputElement; // safe, since this is Aadhaar input
-    const value = target.value.replace(/\D/g, "");
-    target.value = value;
+    let value = '';
+    if (e.target instanceof HTMLInputElement) {
+      value = e.target.value.replace(/\D/g, "");
+      e.target.value = value;
+    }
     onFieldChange(e);
 
     if (value && !isValidAadhaar(value)) {
@@ -74,9 +76,11 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
   const handlePANChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
   > = (e) => {
-    const target = e.target as HTMLInputElement; // safe, this is an <input>
-    const value = target.value.toUpperCase();
-    target.value = value;
+    let value = '';
+    if (e.target instanceof HTMLInputElement) {
+      value = e.target.value.toUpperCase();
+      e.target.value = value;
+    }
     onFieldChange(e);
 
     if (value && !isValidPAN(value)) {
@@ -198,9 +202,13 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
 }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleEmailChange: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> = (e) => {
-    const target = e.target as HTMLInputElement;
-    const { value } = target;
+  const handleEmailChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    let value = '';
+    if (e.target instanceof HTMLInputElement) {
+      value = e.target.value;
+    }
     onFieldChange(e);
 
     if (value && !isValidEmail(value)) {
@@ -213,9 +221,13 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
     }
   };
 
-  const handlePhoneChange: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> = (e) => {
-    const target = e.target as HTMLInputElement;
-    const { value } = target;
+  const handlePhoneChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    let value = '';
+    if (e.target instanceof HTMLInputElement) {
+      value = e.target.value;
+    }
     onFieldChange(e);
 
     if (value && !isValidPhone(value)) {
@@ -228,9 +240,13 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
     }
   };
 
-  const handlePincodeChange: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> = (e) => {
-    const target = e.target as HTMLInputElement;
-    const { value } = target;
+  const handlePincodeChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    let value = '';
+    if (e.target instanceof HTMLInputElement) {
+      value = e.target.value;
+    }
     onFieldChange(e);
 
     if (value && !isValidPincode(value)) {
