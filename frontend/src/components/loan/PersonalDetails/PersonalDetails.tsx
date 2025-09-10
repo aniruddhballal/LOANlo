@@ -8,7 +8,7 @@ import { REQUIRED_FIELDS_BY_STEP, INITIAL_PERSONAL_DETAILS_DATA } from './consta
 
 // Import components
 import ProgressBar from './ProgressBar';
-import { PersonalInfoStep, ContactInfoStep, EmploymentInfoStep } from './PersonalDetailsSteps';
+import { PersonalInfoStep, ContactInfoStep, EmploymentInfoStep, validateStep } from './PersonalDetailsSteps';
 import { LoadingState, ApplicationSuccess } from '../../ui/StatusMessages';
 
 const PersonalDetails = () => {
@@ -52,11 +52,9 @@ const PersonalDetails = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentStep, error]);
 
+  // Enhanced validation function using the new validateStep function
   const isStepValid = (step: number): boolean => {
-    return REQUIRED_FIELDS_BY_STEP[step].every((field) => {
-      const value = formData[field]?.toString().trim();
-      return value !== '' && value !== undefined && value !== null;
-    });
+    return validateStep(step, formData);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -75,7 +73,7 @@ const PersonalDetails = () => {
     e.preventDefault();
 
     if (!isStepValid(currentStep)) {
-      setError('Please fill in all required fields before proceeding.');
+      setError('Please fill in all required fields with valid information before proceeding.');
       return;
     }
 
@@ -111,7 +109,7 @@ const PersonalDetails = () => {
     e.preventDefault();
     
     if (!isStepValid(currentStep)) {
-      setError('Please fill in all required fields before submitting.');
+      setError('Please fill in all required fields with valid information before submitting.');
       return;
     }
 
@@ -261,7 +259,7 @@ const PersonalDetails = () => {
                     className={`inline-flex items-center px-8 py-4 rounded-xl font-light tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-lg relative overflow-hidden ${
                       isStepValid(currentStep)
                       ? 'bg-green-50 border-2 border-green-600 text-green-700 hover:bg-green-100 hover:border-green-700 hover:scale-105 focus:ring-4 focus:ring-green-200'
-                      : 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed'
+                      : 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed opacity-60'
                     }`}
                   >
                     {!isStepValid(currentStep) && (
@@ -281,7 +279,7 @@ const PersonalDetails = () => {
                     disabled={loading || !isStepValid(currentStep)}
                     className={`inline-flex items-center px-12 py-4 rounded-xl font-light tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-xl relative overflow-hidden ${
                     loading || !isStepValid(currentStep)
-                      ? 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed'
+                      ? 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed opacity-60'
                       : 'bg-green-50 border-2 border-green-700 text-green-800 hover:bg-green-100 hover:border-green-800 hover:scale-105 focus:ring-4 focus:ring-green-200'
                     }`}
                   >
