@@ -30,12 +30,19 @@ const PersonalDetails = () => {
         if (data.user) {
           setFormData(prev => ({ ...prev, ...data.user }));
 
-          const detailsComplete = Object.entries(data.user).every(([key, value]) => {
-            if (key in formData) {
-              return value !== null && value !== undefined && value.toString().trim() !== '';
-            }
-            return true;
-          });
+          const requiredFields = [
+            'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
+            'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city', 
+            'state', 'pincode', 'employmentType', 'companyName', 'designation', 
+            'workExperience', 'monthlyIncome'
+          ];
+
+          const detailsComplete = requiredFields.every(field => {
+            const value = data.user[field];
+            return value !== null && value !== undefined && value.toString().trim() !== '';
+          }) && validateStep(1, data.user, REQUIRED_FIELDS_BY_STEP) && 
+              validateStep(2, data.user, REQUIRED_FIELDS_BY_STEP) && 
+              validateStep(3, data.user, REQUIRED_FIELDS_BY_STEP);
 
           setIsPersonalDetailsComplete(detailsComplete);
         }
