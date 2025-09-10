@@ -154,47 +154,4 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
   }
 });
 
-// Clear profile details - unused right now
-// router.delete('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
-//   try {
-//     const profileFields = {
-//       dateOfBirth: null,
-//       gender: null,
-//       maritalStatus: null,
-//       aadhaarNumber: null,
-//       panNumber: null,
-//       address: null,
-//       city: null,
-//       state: null,
-//       pincode: null,
-//       employmentType: null,
-//       companyName: null,
-//       designation: null,
-//       workExperience: null,
-//       monthlyIncome: null
-//     };
-
-//     const updatedUser = await User.findByIdAndUpdate(
-//       req.user?.userId,
-//       profileFields,
-//       { new: true }
-//     ).select('-password');
-
-//     if (!updatedUser) {
-//       return res.status(404).json({
-//         success: false,
-//         message: 'User not found'
-//       });
-//     }
-
-//     res.json({ success: true, message: 'Profile details cleared successfully' });
-//   } catch (err: any) {
-//     res.status(500).json({
-//       success: false,
-//       message: 'Failed to clear profile details',
-//       error: err.message
-//     });
-//   }
-// });
-
 export default router;
