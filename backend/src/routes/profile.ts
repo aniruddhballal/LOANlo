@@ -81,8 +81,38 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
 
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-    // --- New part: mark profile complete if 100% ---
-    if (user.calculateProfileCompletion() === 100 && !user.isProfileComplete) {
+    // Enhanced profile completion check that matches frontend validation
+    const isProfileComplete = (userData: any): boolean => {
+      // Check all required fields are present and not empty
+      const requiredFields = [
+        'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
+        'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city', 
+        'state', 'pincode', 'employmentType', 'companyName', 'designation', 
+        'workExperience', 'monthlyIncome'
+      ];
+
+      const allFieldsPresent = requiredFields.every(field => {
+        const value = userData[field]?.toString().trim();
+        return value !== '' && value !== undefined && value !== null;
+      });
+
+      if (!allFieldsPresent) return false;
+
+      // Apply same format validations as frontend
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.email || '');
+      const phoneValid = /^[6-9]\d{9}$/.test(userData.phone || '');
+      const pincodeValid = /^\d{6}$/.test(userData.pincode || '');
+      const aadhaarValid = /^\d{12}$/.test(userData.aadhaarNumber || '');
+      const panValid = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(userData.panNumber || '');
+      const workExperienceValid = Number(userData.workExperience) >= 0;
+      const monthlyIncomeValid = Number(userData.monthlyIncome) > 0;
+
+      return emailValid && phoneValid && pincodeValid && aadhaarValid && 
+            panValid && workExperienceValid && monthlyIncomeValid;
+    };
+
+    // Use the new validation function
+    if (isProfileComplete(user) && !user.isProfileComplete) {
       user.isProfileComplete = true;
       await user.save();
     }
