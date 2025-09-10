@@ -23,7 +23,7 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
 
     const {
       firstName, lastName, dateOfBirth, gender, maritalStatus,
-      aadhaarNumber, panNumber, phone, address, city, state, pincode,
+      aadhaarNumber, panNumber, email, phone, address, city, state, pincode,
       employmentType, companyName, designation, workExperience, monthlyIncome
     } = req.body;
 
@@ -43,7 +43,7 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
 
     const profileUpdateData: Record<string, unknown> = {
       firstName, lastName, dateOfBirth, gender, maritalStatus,
-      aadhaarNumber, panNumber, phone, address, city, state, pincode,
+      aadhaarNumber, panNumber, email, phone, address, city, state, pincode,
       employmentType, companyName, designation, workExperience, monthlyIncome
     };
 
