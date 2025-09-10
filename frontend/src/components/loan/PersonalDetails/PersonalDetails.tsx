@@ -54,7 +54,7 @@ const PersonalDetails = () => {
 
   // Enhanced validation function using the new validateStep function
   const isStepValid = (step: number): boolean => {
-    return validateStep(step, formData);
+    return validateStep(step, formData, REQUIRED_FIELDS_BY_STEP);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {

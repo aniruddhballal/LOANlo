@@ -399,7 +399,16 @@ export const EmploymentInfoStep: React.FC<PersonalDetailsFormProps> = ({
 );
 
 // Export validation functions for use in parent component
-export const validateStep = (step: number, formData: any): boolean => {
+export const validateStep = (step: number, formData: any, requiredFieldsByStep: { [key: number]: (keyof any)[] }): boolean => {
+  // First check if all required fields are filled
+  const requiredFieldsValid = requiredFieldsByStep[step]?.every((field) => {
+    const value = formData[field]?.toString().trim();
+    return value !== '' && value !== undefined && value !== null;
+  }) || false;
+
+  if (!requiredFieldsValid) return false;
+
+  // Then apply additional format/business rule validations
   switch (step) {
     case 1:
       return (
