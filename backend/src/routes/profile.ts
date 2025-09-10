@@ -37,7 +37,28 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
     if (panNumber && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(panNumber)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid PAN number format. Example: AAAPA1234A'
+        message: 'Invalid PAN number format. Example: ABCDE1234F'
+      });
+    }
+
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email format'
+      });
+    }
+
+    if (phone && !/^[6-9]\d{9}$/.test(phone)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid phone number format'
+      });
+    }
+
+    if (pincode && !/^\d{6}$/.test(pincode)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid pincode format'
       });
     }
 
