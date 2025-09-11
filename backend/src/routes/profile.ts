@@ -151,9 +151,11 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
         'workExperience', 'monthlyIncome'
       ];
 
+      // ✅ Required fields check
       const allFieldsPresent = requiredFields.every(field => {
-        const value = userData[field]?.toString().trim();
-        return value !== '' && value !== undefined && value !== null;
+        const value = userData[field];
+        if (value === null || value === undefined) return false;
+        return value.toString().trim() !== '';
       });
 
       if (!allFieldsPresent) return false;
@@ -164,8 +166,13 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       const pincodeValid = /^\d{6}$/.test(userData.pincode || '');
       const aadhaarValid = /^\d{12}$/.test(userData.aadhaarNumber || '');
       const panValid = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(userData.panNumber || '');
-      const workExperienceValid = Number(userData.workExperience) >= 0;
-      const monthlyIncomeValid = Number(userData.monthlyIncome) > 0;
+
+      // Numbers must be numeric and positive (matching the coercion rules)
+      const workExperienceValid = 
+        userData.workExperience !== null && !isNaN(Number(userData.workExperience)) && Number(userData.workExperience) >= 0;
+
+      const monthlyIncomeValid = 
+        userData.monthlyIncome !== null && !isNaN(Number(userData.monthlyIncome)) && Number(userData.monthlyIncome) > 0;
 
       return emailValid && phoneValid && pincodeValid && aadhaarValid && 
             panValid && workExperienceValid && monthlyIncomeValid;
