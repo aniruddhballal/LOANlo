@@ -415,52 +415,69 @@ export const EmploymentInfoStep: React.FC<PersonalDetailsFormProps> = ({
 );
 
 // Export validation functions for use in parent component
-export const validateStep = (step: number, formData: any, requiredFieldsByStep: { [key: number]: (keyof any)[] }): boolean => {
-  // First check if all required fields are filled
+export const validateStep = (
+  step: number,
+  formData: any,
+  requiredFieldsByStep: { [key: number]: (keyof any)[] }
+): boolean => {
+  // 1. Required fields check
   const requiredFieldsValid = requiredFieldsByStep[step]?.every((field) => {
-    const value = formData[field]?.toString().trim();
-    return value !== '' && value !== undefined && value !== null;
+    const value = formData[field];
+    return value !== null && value !== undefined && value.toString().trim() !== '';
   }) || false;
 
   if (!requiredFieldsValid) return false;
 
-  // Then apply additional format/business rule validations
+  // 2. Step-specific validations
   switch (step) {
     case 1:
+      // Personal info + ID validations
       return (
         formData.firstName?.trim() &&
         formData.lastName?.trim() &&
         formData.dateOfBirth?.trim() &&
         formData.gender?.trim() &&
         formData.maritalStatus?.trim() &&
-        isValidAadhaar(formData.aadhaarNumber || '') &&
-        isValidPAN(formData.panNumber || '')
+        // Age check: 18+
+        (() => {
+          const dob = new Date(formData.dateOfBirth);
+          if (isNaN(dob.getTime())) return false;
+          const today = new Date();
+          let age = today.getFullYear() - dob.getFullYear();
+          const monthDiff = today.getMonth() - dob.getMonth();
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
+          return age >= 18;
+        })() &&
+        // Aadhaar & PAN
+        /^\d{12}$/.test(formData.aadhaarNumber || '') &&
+        /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.panNumber || '')
       );
+
     case 2:
+      // Contact + address validations
       return (
-        isValidEmail(formData.email || '') &&
-        isValidPhone(formData.phone || '') &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email || '') &&
+        /^[6-9]\d{9}$/.test(formData.phone || '') &&
         formData.address?.trim() &&
         formData.city?.trim() &&
         formData.state?.trim() &&
-        isValidPincode(formData.pincode || '')
+        /^\d{6}$/.test(formData.pincode || '')
       );
+
     case 3:
+      // Employment + numeric validations
+      const workExp = Number(formData.workExperience);
+      const monthlyIncome = Number(formData.monthlyIncome);
       return (
         formData.employmentType?.trim() &&
         formData.companyName?.trim() &&
         formData.designation?.trim() &&
-        formData.workExperience !== null &&
-        formData.workExperience !== undefined &&
-        formData.workExperience !== '' &&
-        formData.workExperience.toString().trim() !== '' &&
-        Number(formData.workExperience) >= 0 &&
-        formData.monthlyIncome !== null &&
-        formData.monthlyIncome !== undefined &&
-        formData.monthlyIncome !== '' &&
-        formData.monthlyIncome.toString().trim() !== '' &&
-        Number(formData.monthlyIncome) > 0
+        !isNaN(workExp) &&
+        workExp >= 0 &&
+        !isNaN(monthlyIncome) &&
+        monthlyIncome >= 1000 && monthlyIncome <= 10000000
       );
+
     default:
       return false;
   }
