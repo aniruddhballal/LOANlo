@@ -47,8 +47,108 @@ const profileFetchLimiter = rateLimit({
   }
 });
 
+// Input validation middleware to detect malicious patterns
+const validateProfileInput = (req: Request, res: Response, next: Function) => {
+  const {
+    firstName, lastName, dateOfBirth, gender, maritalStatus,
+    aadhaarNumber, panNumber, email, phone, address, city, state, pincode,
+    employmentType, companyName, designation, workExperience, monthlyIncome
+  } = req.body;
+
+  // Suspicious patterns that could indicate attacks
+  const suspiciousPatterns = [
+    /<script[^>]*>.*?<\/script>/gi, // Script tags
+    /<iframe[^>]*>.*?<\/iframe>/gi, // Iframe tags
+    /javascript:/gi, // JavaScript protocol
+    /on\w+\s*=/gi, // Event handlers (onclick, onload, etc.)
+    /union\s+select/gi, // SQL injection
+    /drop\s+table/gi, // SQL injection
+    /insert\s+into/gi, // SQL injection
+    /delete\s+from/gi, // SQL injection
+    /update\s+set/gi, // SQL injection
+    /\$\{.*\}/g, // Template literal injection
+    /\{\{.*\}\}/g, // Template injection
+    /%3Cscript/gi, // URL encoded script tags
+    /&lt;script/gi, // HTML encoded script tags
+  ];
+
+  // Text fields to validate
+  const textFields = [
+    firstName, lastName, gender, maritalStatus, address, 
+    city, state, employmentType, companyName, designation
+  ];
+
+  for (const field of textFields) {
+    if (typeof field === 'string') {
+      // Check for suspicious patterns
+      for (const pattern of suspiciousPatterns) {
+        if (pattern.test(field)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid input detected. Please remove special characters and try again.'
+          });
+        }
+      }
+
+      // Check for excessively long inputs (potential DoS)
+      if (field.length > 500) {
+        return res.status(400).json({
+          success: false,
+          message: 'Input too long. Please limit text fields to 500 characters.'
+        });
+      }
+
+      // Check for null bytes (can cause issues in some systems)
+      if (field.includes('\0')) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid characters detected.'
+        });
+      }
+    }
+  }
+
+  // Validate numeric inputs
+  if (workExperience !== undefined && workExperience !== null) {
+    const workExp = Number(workExperience);
+    if (isNaN(workExp) || workExp < 0 || workExp > 100) {
+      return res.status(400).json({
+        success: false,
+        message: 'Work experience must be between 0 and 100 years.'
+      });
+    }
+  }
+
+  if (monthlyIncome !== undefined && monthlyIncome !== null) {
+    const income = Number(monthlyIncome);
+    if (isNaN(income) || income < 0 || income > 100000000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Monthly income must be a valid positive number.'
+      });
+    }
+  }
+
+  // Additional validation for structured fields
+  if (email && email.length > 254) {
+    return res.status(400).json({
+      success: false,
+      message: 'Email address too long.'
+    });
+  }
+
+  if (phone && phone.length > 15) {
+    return res.status(400).json({
+      success: false,
+      message: 'Phone number too long.'
+    });
+  }
+
+  next();
+};
+
 // Save or update profile details
-router.post('/save', profileUpdateLimiter, authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/save', profileUpdateLimiter, validateProfileInput, authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
 
