@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import User from '../models/User';
 import { authenticateToken } from '../middleware/auth';
 import validator from 'validator';
+import { isProfileComplete, UserProfile } from '../../../shared/validation';
 
 const router = Router();
 
@@ -29,7 +30,7 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
     } = req.body;
 
     // Input sanitization + numeric coercion
-    const sanitizedData = {
+    const sanitizedData: UserProfile = {
       firstName: validator.escape(firstName?.trim() || ''),
       lastName: validator.escape(lastName?.trim() || ''),
       dateOfBirth: dateOfBirth?.trim() || '',
@@ -47,8 +48,8 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       companyName: validator.escape(companyName?.trim() || ''),
       designation: validator.escape(designation?.trim() || ''),
       // to ensure that the numeric fields are actually numbers
-      workExperience: isNaN(Number(workExperience)) ? null : Number(workExperience),
-      monthlyIncome: isNaN(Number(monthlyIncome)) ? null : Number(monthlyIncome)
+      workExperience: isNaN(Number(workExperience)) ? undefined : Number(workExperience),
+      monthlyIncome: isNaN(Number(monthlyIncome)) ? undefined : Number(monthlyIncome),
     };
 
     // Aadhaar validation
@@ -115,10 +116,10 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
     }
 
     // Income validation (reasonable bounds)
+    const monthlyIncomeNum = Number(sanitizedData.monthlyIncome);
     if (
-      sanitizedData.monthlyIncome !== null &&
-      (sanitizedData.monthlyIncome < 1000 ||
-      sanitizedData.monthlyIncome > 10000000)
+      sanitizedData.monthlyIncome != null &&
+      (isNaN(monthlyIncomeNum) || monthlyIncomeNum < 1000 || monthlyIncomeNum > 10000000)
     ) {
       return res.status(400).json({
         success: false,
@@ -126,59 +127,24 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       });
     }
 
-    const profileUpdateData: Record<string, unknown> = sanitizedData;
+    // Work experience validation
+    const workExpNum = Number(sanitizedData.workExperience);
+    if (
+      sanitizedData.workExperience != null &&
+      (isNaN(workExpNum) || workExpNum < 0)
+    ) {
+      return res.status(400).json({ success: false, message: 'Invalid work experience' });
+    }
 
-    // Remove undefined fields
-    Object.keys(profileUpdateData).forEach(
-      key => profileUpdateData[key] === undefined && delete profileUpdateData[key]
-    );
-
+    // Update user in DB
     const user = await User.findByIdAndUpdate(
       userId,
-      profileUpdateData,
+      sanitizedData,
       { new: true, runValidators: true }
     );
-
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-    // Enhanced profile completion check that matches frontend validation
-    const isProfileComplete = (userData: any): boolean => {
-      // Check all required fields are present and not empty
-      const requiredFields = [
-        'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
-        'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city', 
-        'state', 'pincode', 'employmentType', 'companyName', 'designation', 
-        'workExperience', 'monthlyIncome'
-      ];
-
-      // ✅ Required fields check
-      const allFieldsPresent = requiredFields.every(field => {
-        const value = userData[field];
-        if (value === null || value === undefined) return false;
-        return value.toString().trim() !== '';
-      });
-
-      if (!allFieldsPresent) return false;
-
-      // Apply same format validations as frontend
-      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.email || '');
-      const phoneValid = /^[6-9]\d{9}$/.test(userData.phone || '');
-      const pincodeValid = /^\d{6}$/.test(userData.pincode || '');
-      const aadhaarValid = /^\d{12}$/.test(userData.aadhaarNumber || '');
-      const panValid = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(userData.panNumber || '');
-
-      // Numbers must be numeric and positive (matching the coercion rules)
-      const workExperienceValid = 
-        userData.workExperience !== null && !isNaN(Number(userData.workExperience)) && Number(userData.workExperience) >= 0;
-
-      const monthlyIncomeValid = 
-        userData.monthlyIncome !== null && !isNaN(Number(userData.monthlyIncome)) && Number(userData.monthlyIncome) > 0;
-
-      return emailValid && phoneValid && pincodeValid && aadhaarValid && 
-            panValid && workExperienceValid && monthlyIncomeValid;
-    };
-
-    // Use the new validation function
+    // Mark profile complete using shared validation
     if (isProfileComplete(user) && !user.isProfileComplete) {
       user.isProfileComplete = true;
       await user.save();

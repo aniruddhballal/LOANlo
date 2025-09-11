@@ -11,6 +11,8 @@ import ProgressBar from './ProgressBar';
 import { PersonalInfoStep, ContactInfoStep, EmploymentInfoStep, validateStep } from './PersonalDetailsSteps';
 import { LoadingState, ApplicationSuccess } from '../../ui/StatusMessages';
 
+import { isProfileComplete } from '../../../../../shared/validation';
+
 const PersonalDetails = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -30,33 +32,7 @@ const PersonalDetails = () => {
         if (data.user) {
           setFormData(prev => ({ ...prev, ...data.user }));
 
-          const requiredFields = [
-            'firstName', 'lastName', 'dateOfBirth', 'gender', 'maritalStatus',
-            'aadhaarNumber', 'panNumber', 'email', 'phone', 'address', 'city', 
-            'state', 'pincode', 'employmentType', 'companyName', 'designation', 
-            'workExperience', 'monthlyIncome'
-          ];
-
-          const detailsComplete = requiredFields.every(field => {
-            const value = data.user[field];
-              if (value === null || value === undefined) return false;
-              return value.toString().trim() !== '';
-            }) &&
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.user.email || '') &&   // email
-            /^[6-9]\d{9}$/.test(data.user.phone || '') &&                // phone
-            /^\d{6}$/.test(data.user.pincode || '') &&                   // pincode
-            /^\d{12}$/.test(data.user.aadhaarNumber || '') &&            // aadhaar
-            /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(data.user.panNumber || '') && // pan
-            data.user.workExperience !== null &&
-            !isNaN(Number(data.user.workExperience)) &&
-            Number(data.user.workExperience) >= 0 &&                     // workExperience
-            data.user.monthlyIncome !== null &&
-            !isNaN(Number(data.user.monthlyIncome)) &&
-            Number(data.user.monthlyIncome) > 0 &&                       // monthlyIncome
-            validateStep(1, data.user, REQUIRED_FIELDS_BY_STEP) &&
-            validateStep(2, data.user, REQUIRED_FIELDS_BY_STEP) &&
-            validateStep(3, data.user, REQUIRED_FIELDS_BY_STEP);
-
+          const detailsComplete = isProfileComplete(data.user);
           setIsPersonalDetailsComplete(detailsComplete);
         }
       } catch (err: any) {
