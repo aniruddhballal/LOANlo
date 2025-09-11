@@ -1,6 +1,9 @@
 ## Tasks/Features - Stacked
 
-- [ ] Stylise the delete application/document - all the features that have been added on the go - unify them
+- [ ] User can make the details incomplete and then navigate back and then can be stuck there - because the filed they need to fill, to complete the profile - is on the next page and the continue/next button is not taking them there because the details are incomplete
+- [ ] Take inputs from dropdown of locations, pincode autofilling based on address, and allow for gmaps pinpoint drop of location
+- [ ] Error displays in PII page is animated poorly
+- [x] Stylise the delete application/document - all the features that have been added on the go - unify them
 - [ ] Clean up the interfaces and props - might have fields that I am not using in that page
 - [ ] Should applicants be allowed to apply for multiple loans? What's the category of people who can do that? Is there a category?
 - [x] Add a check if the current logged in user is the one who is even viewing/clicking on the delete application/documents button. dont need these checks for the Underwriter because they won't have these features either ways - only Applicants can delete the documents, or the entire loan application. Underwriter should not be able to delete application.
