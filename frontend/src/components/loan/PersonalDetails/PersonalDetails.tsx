@@ -39,10 +39,23 @@ const PersonalDetails = () => {
 
           const detailsComplete = requiredFields.every(field => {
             const value = data.user[field];
-            return value !== null && value !== undefined && value.toString().trim() !== '';
-          }) && validateStep(1, data.user, REQUIRED_FIELDS_BY_STEP) && 
-              validateStep(2, data.user, REQUIRED_FIELDS_BY_STEP) && 
-              validateStep(3, data.user, REQUIRED_FIELDS_BY_STEP);
+              if (value === null || value === undefined) return false;
+              return value.toString().trim() !== '';
+            }) &&
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.user.email || '') &&   // email
+            /^[6-9]\d{9}$/.test(data.user.phone || '') &&                // phone
+            /^\d{6}$/.test(data.user.pincode || '') &&                   // pincode
+            /^\d{12}$/.test(data.user.aadhaarNumber || '') &&            // aadhaar
+            /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(data.user.panNumber || '') && // pan
+            data.user.workExperience !== null &&
+            !isNaN(Number(data.user.workExperience)) &&
+            Number(data.user.workExperience) >= 0 &&                     // workExperience
+            data.user.monthlyIncome !== null &&
+            !isNaN(Number(data.user.monthlyIncome)) &&
+            Number(data.user.monthlyIncome) > 0 &&                       // monthlyIncome
+            validateStep(1, data.user, REQUIRED_FIELDS_BY_STEP) &&
+            validateStep(2, data.user, REQUIRED_FIELDS_BY_STEP) &&
+            validateStep(3, data.user, REQUIRED_FIELDS_BY_STEP);
 
           setIsPersonalDetailsComplete(detailsComplete);
         }
