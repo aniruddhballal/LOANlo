@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import User from '../models/User';
 import { authenticateToken } from '../middleware/auth';
+import validator from 'validator';
 
 const router = Router();
 
@@ -26,6 +27,28 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       aadhaarNumber, panNumber, email, phone, address, city, state, pincode,
       employmentType, companyName, designation, workExperience, monthlyIncome
     } = req.body;
+
+    // added Input sanitization for inputs to prevent XSS
+    const sanitizedData = {
+      firstName: validator.escape(firstName?.trim() || ''),
+      lastName: validator.escape(lastName?.trim() || ''),
+      dateOfBirth: dateOfBirth?.trim() || '',
+      gender: validator.escape(gender?.trim() || ''),
+      maritalStatus: validator.escape(maritalStatus?.trim() || ''),
+      aadhaarNumber: aadhaarNumber?.trim() || '',
+      panNumber: panNumber?.trim() || '',
+      email: validator.normalizeEmail(email?.trim() || '') || '',
+      phone: phone?.trim() || '',
+      address: validator.escape(address?.trim() || ''),
+      city: validator.escape(city?.trim() || ''),
+      state: validator.escape(state?.trim() || ''),
+      pincode: pincode?.trim() || '',
+      employmentType: validator.escape(employmentType?.trim() || ''),
+      companyName: validator.escape(companyName?.trim() || ''),
+      designation: validator.escape(designation?.trim() || ''),
+      workExperience: workExperience,
+      monthlyIncome: monthlyIncome
+    };
 
     if (aadhaarNumber && !/^\d{12}$/.test(aadhaarNumber)) {
       return res.status(400).json({
@@ -62,11 +85,7 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       });
     }
 
-    const profileUpdateData: Record<string, unknown> = {
-      firstName, lastName, dateOfBirth, gender, maritalStatus,
-      aadhaarNumber, panNumber, email, phone, address, city, state, pincode,
-      employmentType, companyName, designation, workExperience, monthlyIncome
-    };
+    const profileUpdateData: Record<string, unknown> = sanitizedData;
 
     // Remove undefined fields
     Object.keys(profileUpdateData).forEach(
