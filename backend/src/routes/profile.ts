@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import User from '../models/User';
 import { authenticateToken } from '../middleware/auth';
 import validator from 'validator';
@@ -14,8 +15,40 @@ interface AuthRequest extends Request {
   };
 }
 
+// Rate limiting middleware for profile updates
+const profileUpdateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each user to 5 profile updates per 15 minutes
+  message: {
+    success: false,
+    message: 'Too many profile update attempts. Please try again in 15 minutes.',
+    retryAfter: 15 * 60 // seconds
+  },
+  standardHeaders: true, // Return rate limit info in headers
+  legacyHeaders: false,
+  keyGenerator: (req: AuthRequest) : string => {
+    // Rate limit per user ID instead of IP to prevent circumvention
+    return req.user?.userId ?? req.ip ?? "unknown";
+  },
+  skipSuccessfulRequests: false, // Count all attempts, not just failed ones
+  skipFailedRequests: false
+});
+
+// Rate limiting for profile fetch (more lenient)
+const profileFetchLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 60, // 60 requests per minute for profile fetching
+  message: {
+    success: false,
+    message: 'Too many requests. Please try again later.'
+  },
+  keyGenerator: (req: AuthRequest): string => {
+    return req.user?.userId ?? req.ip ?? "unknown";
+  }
+});
+
 // Save or update profile details
-router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/save', profileUpdateLimiter, authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
 
@@ -166,7 +199,7 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
 });
 
 // Get user's profile details
-router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/me', profileFetchLimiter, authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const user = await User.findById(req.user?.userId).select('-password');
 
