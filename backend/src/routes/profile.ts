@@ -86,6 +86,38 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       });
     }
 
+    // Age validation (18+ for loans)
+    if (sanitizedData.dateOfBirth) {
+      const birthDate = new Date(sanitizedData.dateOfBirth);
+      const age =
+        new Date().getFullYear() -
+        birthDate.getFullYear() -
+        (new Date().getMonth() < birthDate.getMonth() ||
+        (new Date().getMonth() === birthDate.getMonth() &&
+        new Date().getDate() < birthDate.getDate())
+          ? 1
+          : 0); // ensures accurate age calculation
+
+      if (age < 18) {
+        return res.status(400).json({
+          success: false,
+          message: 'Must be 18 or older'
+        });
+      }
+    }
+
+    // Income validation (reasonable bounds)
+    if (
+      sanitizedData.monthlyIncome &&
+      (sanitizedData.monthlyIncome < 1000 ||
+      sanitizedData.monthlyIncome > 10000000)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid income range'
+      });
+    }
+
     const profileUpdateData: Record<string, unknown> = sanitizedData;
 
     // Remove undefined fields
