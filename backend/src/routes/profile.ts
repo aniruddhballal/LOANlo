@@ -46,8 +46,9 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       employmentType: validator.escape(employmentType?.trim() || ''),
       companyName: validator.escape(companyName?.trim() || ''),
       designation: validator.escape(designation?.trim() || ''),
-      workExperience: workExperience,
-      monthlyIncome: monthlyIncome
+      // to ensure that the numeric fields are actually numbers
+      workExperience: isNaN(Number(workExperience)) ? null : Number(workExperience),
+      monthlyIncome: isNaN(Number(monthlyIncome)) ? null : Number(monthlyIncome)
     };
 
     if (aadhaarNumber && !/^\d{12}$/.test(aadhaarNumber)) {
