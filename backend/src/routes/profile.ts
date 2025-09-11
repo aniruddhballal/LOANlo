@@ -28,7 +28,7 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       employmentType, companyName, designation, workExperience, monthlyIncome
     } = req.body;
 
-    // added Input sanitization for inputs to prevent XSS
+    // Input sanitization + numeric coercion
     const sanitizedData = {
       firstName: validator.escape(firstName?.trim() || ''),
       lastName: validator.escape(lastName?.trim() || ''),
@@ -51,6 +51,7 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       monthlyIncome: isNaN(Number(monthlyIncome)) ? null : Number(monthlyIncome)
     };
 
+    // Aadhaar validation
     if (aadhaarNumber && !/^\d{12}$/.test(aadhaarNumber)) {
       return res.status(400).json({
         success: false,
@@ -58,6 +59,7 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       });
     }
 
+    // PAN validation
     if (panNumber && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(panNumber)) {
       return res.status(400).json({
         success: false,
@@ -65,6 +67,7 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       });
     }
 
+    // Email validation
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({
         success: false,
@@ -72,6 +75,7 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       });
     }
 
+    // Phone validation
     if (phone && !/^[6-9]\d{9}$/.test(phone)) {
       return res.status(400).json({
         success: false,
@@ -79,6 +83,7 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
       });
     }
 
+    // Pincode validation
     if (pincode && !/^\d{6}$/.test(pincode)) {
       return res.status(400).json({
         success: false,
@@ -89,14 +94,17 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
     // Age validation (18+ for loans)
     if (sanitizedData.dateOfBirth) {
       const birthDate = new Date(sanitizedData.dateOfBirth);
-      const age =
-        new Date().getFullYear() -
-        birthDate.getFullYear() -
-        (new Date().getMonth() < birthDate.getMonth() ||
-        (new Date().getMonth() === birthDate.getMonth() &&
-        new Date().getDate() < birthDate.getDate())
-          ? 1
-          : 0); // ensures accurate age calculation
+
+      if (isNaN(birthDate.getTime())) {
+        return res.status(400).json({ success: false, message: 'Invalid date of birth format' });
+      }
+
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
 
       if (age < 18) {
         return res.status(400).json({
@@ -108,7 +116,7 @@ router.post('/save', authenticateToken, async (req: AuthRequest, res: Response) 
 
     // Income validation (reasonable bounds)
     if (
-      sanitizedData.monthlyIncome &&
+      sanitizedData.monthlyIncome !== null &&
       (sanitizedData.monthlyIncome < 1000 ||
       sanitizedData.monthlyIncome > 10000000)
     ) {
