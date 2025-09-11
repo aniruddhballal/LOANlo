@@ -235,8 +235,15 @@ const PersonalDetails = () => {
                 {currentStep > 1 ? (
                   <button 
                     type="button" 
-                    onClick={prevStep}
-                    className="inline-flex items-center px-8 py-4 bg-white border-2 border-gray-300 rounded-xl text-gray-700 font-light hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                    onClick={() => {
+                      if (isStepValid(currentStep)) prevStep();
+                    }}
+                    disabled={!isStepValid(currentStep)}
+                    className={`inline-flex items-center px-8 py-4 rounded-xl font-light tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-lg relative overflow-hidden ${
+                      isStepValid(currentStep)
+                        ? 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 hover:scale-105'
+                        : 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed opacity-60'
+                    }`}
                   >
                     <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
