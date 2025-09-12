@@ -1,6 +1,7 @@
 import express, { Request, Response, RequestHandler } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 import config from '../config';
 import User from '../models/User';
 import { authenticateToken } from '../middleware/auth';
@@ -16,10 +17,46 @@ interface AuthenticatedRequest extends Request {
 
 const router = express.Router();
 
-// Register
-router.post('/register', async (req: Request, res: Response) => {
+// Rate limiting configurations
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 requests per windowMs for login attempts
+  message: {
+    error: 'Too many authentication attempts, please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3, // Limit each IP to 3 registration attempts per hour
+  message: {
+    error: 'Too many registration attempts, please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const verifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // More lenient for token verification
+  message: {
+    error: 'Too many verification requests, please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Register with rate limiting
+router.post('/register', registerLimiter, async (req: Request, res: Response) => {
   try {
     const { firstName, lastName, email, password, phone } = req.body;
+
+    // Input validation
+    if (!firstName || !lastName || !email || !password) {
+      return res.status(400).json({ message: 'All required fields must be provided' });
+    }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -27,7 +64,6 @@ router.post('/register', async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = new User({
       firstName,
       lastName,
@@ -65,10 +101,15 @@ router.post('/register', async (req: Request, res: Response) => {
   }
 });
 
-// Login
-router.post('/login', async (req: Request, res: Response) => {
+// Login with rate limiting
+router.post('/login', authLimiter, async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
+
+    // Input validation
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -111,16 +152,16 @@ router.post('/login', async (req: Request, res: Response) => {
   }
 });
 
-// Verify token
+// Verify token with rate limiting
 router.get(
   '/verify',
+  verifyLimiter,
   authenticateToken,
   (async (req, res) => {
     const user = await User.findById((req as AuthenticatedRequest).user?.userId).select('-password');
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
-
     res.json({
       success: true,
       user: {
