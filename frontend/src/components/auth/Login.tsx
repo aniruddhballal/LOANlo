@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle, Shield, CheckCircle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import CaptchaModal from './CaptchaModal' // Import the CAPTCHA component
+import axios from "axios"
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -66,9 +67,18 @@ const Login = () => {
           navigate('/dashboard/applicant') // fallback
         }
       }, 1000) // Match your animation duration
+    } catch (err: unknown) {
+      let errorMsg = "Login failed"
 
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
+      if (axios.isAxiosError(err)) {
+        // Axios error type guard
+        errorMsg = err.response?.data?.message || err.message
+      } else if (err instanceof Error) {
+        // Regular JS error
+        errorMsg = err.message
+      }
+
+      setError(errorMsg)
       setLoading(false)
       setLoginSuccess(false)
     }
