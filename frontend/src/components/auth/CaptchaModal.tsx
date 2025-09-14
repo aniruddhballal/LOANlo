@@ -228,7 +228,8 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
                          text-center text-lg font-mono tracking-wider
                          transition-all duration-200
                          disabled:opacity-50 disabled:cursor-not-allowed
-                         placeholder:text-gray-400"
+                         placeholder:text-gray-400
+                               text-gray-900"
                 placeholder="Enter your answer"
                 autoComplete="off"
                 required
