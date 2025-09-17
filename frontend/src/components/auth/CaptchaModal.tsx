@@ -315,7 +315,7 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
                 <div className="w-12 h-12 bg-red-100 rounded-full mx-auto mb-3 flex items-center justify-center">
                   <Clock className="w-6 h-6 text-red-600" />
                 </div>
-                <p className="text-red-800 font-medium text-sm mb-2">Rate Limited</p>
+                <p className="text-red-800 font-medium text-sm mb-2">Failed Captcha Verification</p>
                 <p className="text-red-600 text-xs">
                   Try again in: {formatTimeRemaining(timeRemaining)}
                 </p>
@@ -354,7 +354,7 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
             <div className="mb-4 p-3 rounded-xl border border-yellow-200 bg-yellow-50 flex items-start space-x-2">
               <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" />
               <div className="text-yellow-700 text-xs font-medium">
-                Warning: Only {rateLimitStatus.remainingAttempts} attempts remaining.
+                Warning: Only {rateLimitStatus.remainingAttempts} attempt(s) remaining.
               </div>
             </div>
           )}
