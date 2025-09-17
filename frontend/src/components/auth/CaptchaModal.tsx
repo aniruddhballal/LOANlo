@@ -236,7 +236,6 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
   // Add this helper function to handle incorrect answers
   const handleIncorrectAnswer = (data: any) => {
     const newAttempts = attempts + 1;
-    setAttempts(newAttempts);
     setIsNewSession(false); // no longer new session after first attempt
 
     // Update rate limit status with the latest data
@@ -251,12 +250,16 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
     );
 
     if (newAttempts >= maxAttempts) {
+      // Don't update attempts state if we've reached the max (to prevent "4 out of 3")
       setError("Maximum attempts reached for this session.");
       setTimeout(() => {
         onFail();
         onClose();
       }, 2000);
     } else {
+      // Only update attempts if we haven't exceeded the max
+      setAttempts(newAttempts);
+      
       const remainingInSession = maxAttempts - newAttempts;
       const totalRemaining = data.remainingAttempts || 0;
       setError(
