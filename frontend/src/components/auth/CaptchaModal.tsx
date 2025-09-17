@@ -44,12 +44,12 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
   const maxAttempts = 3
 
   // Generate new captcha challenge
-  const generateCaptcha = () => {
+  const generateCaptcha = (clearError: boolean = true) => {
     const operators = ['+', '-', '*']
     const selectedOperator = operators[Math.floor(Math.random() * operators.length)]
-    
+  
     let n1, n2
-    
+  
     switch (selectedOperator) {
       case '+':
         n1 = Math.floor(Math.random() * 50) + 1
@@ -67,12 +67,16 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
         n1 = Math.floor(Math.random() * 20) + 1
         n2 = Math.floor(Math.random() * 20) + 1
     }
-    
+  
     setNum1(n1)
     setNum2(n2)
     setOperator(selectedOperator)
     setUserAnswer('')
-    setError('')
+    
+    // Only clear error if explicitly requested
+    if (clearError) {
+      setError('')
+    }
   }
 
   // Fetch rate limit status
@@ -250,7 +254,8 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
 
     if (newAttempts >= maxAttempts) {
       // Don't update attempts state if we've reached the max (to prevent "4 out of 3")
-      setError("Maximum attempts reached for this session.");
+      setError("CAPTCHA verification failed. Please try again.");
+      
       setTimeout(() => {
         onFail();
         onClose();
@@ -258,14 +263,11 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
     } else {
       // Only update attempts if we haven't exceeded the max
       setAttempts(newAttempts);
-      
-      // Show completed attempts for both counters (consistent counting)
-      const completedInSession = newAttempts; // attempts completed in this session
-      
+            
       setError(
-        `Incorrect answer. ${completedInSession} out of ${maxAttempts} attempts remaining in this session.`
+        `Incorrect answer`
       );
-      generateCaptcha(); // New challenge
+      generateCaptcha(false); // New challenge but keep the error message
     }
   };
 
@@ -376,7 +378,7 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
                   <span>Math Challenge</span>
                   <button
                     type="button"
-                    onClick={generateCaptcha}
+                    onClick={() => generateCaptcha()} // Keep default (true) - clear errors when user manually refreshes
                     disabled={isVerifying || isRateLimited}
                     className="p-1 hover:bg-gray-200 rounded transition-colors duration-200 disabled:opacity-50"
                     title="Generate new challenge"
