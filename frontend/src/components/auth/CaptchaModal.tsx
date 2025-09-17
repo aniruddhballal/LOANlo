@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { X, RefreshCw, Shield, AlertCircle, CheckCircle } from 'lucide-react'
+import { X, RefreshCw, Shield, AlertCircle, CheckCircle, Clock } from 'lucide-react'
+import api from '../../api'
 
 interface CaptchaModalProps {
   isOpen: boolean
@@ -8,6 +9,15 @@ interface CaptchaModalProps {
   onFail: () => void
   title?: string
   description?: string
+  apiBaseUrl?: string
+}
+
+interface RateLimitStatus {
+  totalAttempts: number
+  remainingAttempts: number
+  sessionCount: number
+  rateLimited: boolean
+  timeRemaining: number
 }
 
 const CaptchaModal: React.FC<CaptchaModalProps> = ({
@@ -16,7 +26,7 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
   onSuccess,
   onFail,
   title = "Security Verification",
-  description = "Please solve this simple math problem to continue"
+  description = "Please solve this simple math problem to continue",
 }) => {
   const [num1, setNum1] = useState(0)
   const [num2, setNum2] = useState(0)
@@ -26,8 +36,13 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
   const [attempts, setAttempts] = useState(0)
   const [isVerifying, setIsVerifying] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [rateLimitStatus, setRateLimitStatus] = useState<RateLimitStatus | null>(null)
+  const [isRateLimited, setIsRateLimited] = useState(false)
+  const [timeRemaining, setTimeRemaining] = useState(0)
+  const [isNewSession, setIsNewSession] = useState(true)
 
   const maxAttempts = 3
+  const maxTotalAttempts = 9
 
   // Generate new captcha challenge
   const generateCaptcha = () => {
@@ -61,19 +76,56 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
     setError('')
   }
 
-  // Calculate correct answer
-  const getCorrectAnswer = () => {
-    switch (operator) {
-      case '+':
-        return num1 + num2
-      case '-':
-        return num1 - num2
-      case '*':
-        return num1 * num2
-      default:
-        return num1 + num2
-    }
+  // Fetch rate limit status
+  const fetchRateLimitStatus = async () => {
+    try {
+  const response = await api.get<RateLimitStatus>("/auth/captcha/status");
+  const status = response.data;
+
+  setRateLimitStatus(status);
+  setIsRateLimited(status.rateLimited);
+  setTimeRemaining(status.timeRemaining);
+
+  if (status.rateLimited) {
+    setError(
+      `Rate limit exceeded. Please try again in ${Math.ceil(
+        status.timeRemaining / 60
+      )} minutes.`
+    );
   }
+} catch (err) {
+  console.error("Failed to fetch rate limit status:", err);
+
+  // Set default values on error
+  setRateLimitStatus({
+    totalAttempts: 0,
+    remainingAttempts: 9,
+    sessionCount: 0,
+    rateLimited: false,
+    timeRemaining: 0,
+  });
+}
+
+  }
+
+  // Timer for rate limit countdown
+  useEffect(() => {
+    if (isRateLimited && timeRemaining > 0) {
+      const timer = setInterval(() => {
+        setTimeRemaining(prev => {
+          if (prev <= 1) {
+            setIsRateLimited(false)
+            setError('')
+            fetchRateLimitStatus()
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+
+      return () => clearInterval(timer)
+    }
+  }, [isRateLimited, timeRemaining])
 
   // Initialize captcha when modal opens
   useEffect(() => {
@@ -81,13 +133,19 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
       generateCaptcha()
       setAttempts(0)
       setIsSuccess(false)
+      setIsNewSession(true)
+      fetchRateLimitStatus()
     }
   }, [isOpen])
 
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
+    e?.preventDefault()
     
+    if (isRateLimited) {
+      return
+    }
+
     if (!userAnswer.trim()) {
       setError('Please enter an answer')
       return
@@ -96,31 +154,72 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
     setIsVerifying(true)
     setError('')
 
-    // Simulate verification delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 800))
+    try {
+      const response = await api.post("/auth/captcha/verify", {
+        answer: parseInt(userAnswer.trim()),
+        num1,
+        num2,
+        operator,
+        isNewSession,
+      });
 
-    const correctAnswer = getCorrectAnswer()
-    const userNum = parseInt(userAnswer.trim())
+      const data = response.data;
 
-    if (userNum === correctAnswer) {
-      setIsSuccess(true)
-      setTimeout(() => {
-        onSuccess()
-        onClose()
-      }, 1000)
-    } else {
-      const newAttempts = attempts + 1
-      setAttempts(newAttempts)
-      
-      if (newAttempts >= maxAttempts) {
-        setError(`Maximum attempts reached. Please try again later.`)
+      // Update rate limit status
+      setRateLimitStatus((prev) =>
+        prev
+          ? {
+              ...prev,
+              remainingAttempts: data.remainingAttempts || 0,
+            }
+          : null
+      );
+
+      if (data.success) {
+        // ✅ Correct answer
+        setIsSuccess(true);
         setTimeout(() => {
-          onFail()
-          onClose()
-        }, 2000)
+          onSuccess();
+          onClose();
+        }, 1000);
       } else {
-        setError(`Incorrect answer. ${maxAttempts - newAttempts} attempts remaining.`)
-        generateCaptcha() // Generate new challenge
+        // ❌ Wrong answer
+        const newAttempts = attempts + 1;
+        setAttempts(newAttempts);
+        setIsNewSession(false); // no longer new session after first attempt
+
+        if (newAttempts >= maxAttempts) {
+          setError("Maximum attempts reached for this session.");
+          setTimeout(() => {
+            onFail();
+            onClose();
+          }, 2000);
+        } else {
+          const remainingInSession = maxAttempts - newAttempts;
+          const totalRemaining = data.remainingAttempts || 0;
+          setError(
+            `Incorrect answer. ${remainingInSession} attempts remaining in this session. ${totalRemaining} total attempts remaining.`
+          );
+          generateCaptcha(); // New challenge
+        }
+      }
+    } catch (err: any) {
+      // Axios puts status under err.response
+      if (err.response?.status === 429) {
+        const data = err.response.data || {};
+        setIsRateLimited(true);
+        setTimeRemaining(data.retryAfter || 300);
+        setError(data.message || "Rate limit exceeded");
+
+        setTimeout(() => {
+          onFail();
+          onClose();
+        }, 2000);
+      } else {
+        console.error("Captcha verification error:", err);
+        setError(
+          "Unable to connect to server. Please check your connection and try again."
+        );
       }
     }
     
@@ -135,6 +234,13 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
       setUserAnswer(value)
       if (error) setError('')
     }
+  }
+
+  // Format time remaining
+  const formatTimeRemaining = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${minutes}:${secs.toString().padStart(2, '0')}`
   }
 
   if (!isOpen) return null
@@ -156,6 +262,23 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
           </div>
         )}
 
+        {/* Rate Limited Overlay */}
+        {isRateLimited && (
+          <div className="absolute inset-0 bg-red-500/10 backdrop-blur-sm rounded-3xl flex items-center justify-center z-10">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-red-200 animate-in zoom-in duration-300">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-red-100 rounded-full mx-auto mb-3 flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-red-600" />
+                </div>
+                <p className="text-red-800 font-medium text-sm mb-2">Rate Limited</p>
+                <p className="text-red-600 text-xs">
+                  Try again in: {formatTimeRemaining(timeRemaining)}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div className="flex items-center space-x-3">
@@ -164,7 +287,15 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Attempt {attempts + 1} of {maxAttempts}</p>
+              <div className="flex items-center space-x-2 text-xs text-gray-500 mt-0.5">
+                <span>Session: {attempts + 1} of {maxAttempts}</span>
+                {rateLimitStatus && (
+                  <>
+                    <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                    <span>Total: {rateLimitStatus.totalAttempts}/{maxTotalAttempts}</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <button
@@ -182,6 +313,16 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
             {description}
           </p>
 
+          {/* Rate limit warning */}
+          {rateLimitStatus && rateLimitStatus.remainingAttempts <= 3 && !isRateLimited && (
+            <div className="mb-4 p-3 rounded-xl border border-yellow-200 bg-yellow-50 flex items-start space-x-2">
+              <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" />
+              <div className="text-yellow-700 text-xs font-medium">
+                Warning: Only {rateLimitStatus.remainingAttempts} attempts remaining before rate limit.
+              </div>
+            </div>
+          )}
+
           {/* Error Message */}
           {error && (
             <div className="mb-4 p-3 rounded-xl border border-red-200 bg-red-50 flex items-start space-x-2">
@@ -190,7 +331,7 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-6">
             {/* Math Problem Display */}
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border border-gray-200">
               <div className="text-center">
@@ -202,7 +343,7 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
                   <button
                     type="button"
                     onClick={generateCaptcha}
-                    disabled={isVerifying}
+                    disabled={isVerifying || isRateLimited}
                     className="p-1 hover:bg-gray-200 rounded transition-colors duration-200 disabled:opacity-50"
                     title="Generate new challenge"
                   >
@@ -222,14 +363,14 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
                 id="captcha-answer"
                 value={userAnswer}
                 onChange={handleInputChange}
-                disabled={isVerifying || isSuccess}
+                disabled={isVerifying || isSuccess || isRateLimited}
                 className="block w-full px-4 py-3 border border-gray-200 rounded-xl
                          focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none
                          text-center text-lg font-mono tracking-wider
                          transition-all duration-200
                          disabled:opacity-50 disabled:cursor-not-allowed
                          placeholder:text-gray-400
-                               text-gray-900"
+                         text-gray-900"
                 placeholder="Enter your answer"
                 autoComplete="off"
                 required
@@ -238,8 +379,8 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
 
             {/* Submit Button */}
             <button
-              type="submit"
-              disabled={isVerifying || isSuccess || attempts >= maxAttempts}
+              onClick={handleSubmit}
+              disabled={isVerifying || isSuccess || attempts >= maxAttempts || isRateLimited}
               className="w-full flex items-center justify-center py-3 px-4
                        bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400
                        text-white font-medium text-sm rounded-xl
@@ -257,21 +398,31 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
                   <CheckCircle className="w-4 h-4" />
                   <span>Verified</span>
                 </div>
+              ) : isRateLimited ? (
+                <div className="flex items-center space-x-2">
+                  <Clock className="w-4 h-4" />
+                  <span>Rate Limited</span>
+                </div>
               ) : (
                 'Verify Answer'
               )}
             </button>
-          </form>
+          </div>
 
           {/* Footer Info */}
           <div className="mt-6 pt-4 border-t border-gray-100">
             <div className="flex items-center justify-center space-x-4 text-xs text-gray-400">
               <span>SECURE</span>
               <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-              <span>AUTOMATED</span>
+              <span>RATE LIMITED</span>
               <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
               <span>PROTECTED</span>
             </div>
+            {rateLimitStatus && !isRateLimited && (
+              <div className="text-center mt-2 text-xs text-gray-400">
+                {rateLimitStatus.remainingAttempts} of {maxTotalAttempts} total attempts remaining
+              </div>
+            )}
           </div>
         </div>
       </div>

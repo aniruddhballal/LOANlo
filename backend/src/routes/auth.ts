@@ -15,7 +15,29 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
+// Interface for captcha attempt tracking
+interface CaptchaAttempt {
+  ip: string;
+  sessionCount: number;
+  totalAttempts: number;
+  firstAttempt: Date;
+  lastAttempt: Date;
+}
+
 const router = express.Router();
+
+// In-memory store for captcha rate limiting (use Redis in production)
+const captchaAttempts = new Map<string, CaptchaAttempt>();
+
+// Cleanup old entries every 5 minutes
+setInterval(() => {
+  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+  for (const [ip, attempt] of captchaAttempts.entries()) {
+    if (attempt.firstAttempt < fiveMinutesAgo) {
+      captchaAttempts.delete(ip);
+    }
+  }
+}, 5 * 60 * 1000);
 
 // Rate limiting configurations
 const authLimiter = rateLimit({
@@ -46,6 +68,166 @@ const verifyLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+});
+
+// Captcha rate limiter middleware
+const captchaRateLimiter = (req: Request, res: Response, next: express.NextFunction) => {
+  const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+  const now = new Date();
+  const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+
+  let attempt = captchaAttempts.get(clientIP);
+
+  // If no previous attempt or it's been more than 5 minutes, reset
+  if (!attempt || attempt.firstAttempt < fiveMinutesAgo) {
+    attempt = {
+      ip: clientIP,
+      sessionCount: 0,
+      totalAttempts: 0,
+      firstAttempt: now,
+      lastAttempt: now
+    };
+    captchaAttempts.set(clientIP, attempt);
+  }
+
+  // Check if user has exceeded the limit (3 sessions * 3 attempts = 9 total attempts)
+  if (attempt.totalAttempts >= 9) {
+    const timeRemaining = Math.ceil((attempt.firstAttempt.getTime() + 5 * 60 * 1000 - now.getTime()) / 1000);
+    return res.status(429).json({
+      error: 'Captcha rate limit exceeded',
+      message: `Too many captcha attempts. Please try again in ${Math.ceil(timeRemaining / 60)} minutes.`,
+      retryAfter: timeRemaining,
+      rateLimited: true
+    });
+  }
+
+  // Add current attempt info to request for use in routes
+  (req as any).captchaAttempt = attempt;
+  next();
+};
+
+// Helper function to update captcha attempts
+const updateCaptchaAttempts = (clientIP: string, isNewSession: boolean = false, failed: boolean = false) => {
+  let attempt = captchaAttempts.get(clientIP);
+  if (attempt) {
+    if (isNewSession) {
+      attempt.sessionCount++;
+    }
+    if (failed) {
+      attempt.totalAttempts++;
+    }
+    attempt.lastAttempt = new Date();
+    captchaAttempts.set(clientIP, attempt);
+  }
+};
+
+// Captcha verification endpoint
+router.post('/captcha/verify', captchaRateLimiter, async (req: Request, res: Response) => {
+  try {
+    const { answer, num1, num2, operator, isNewSession = false } = req.body;
+    const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+
+    // Input validation
+    if (answer === undefined || num1 === undefined || num2 === undefined || !operator) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Missing required captcha data' 
+      });
+    }
+
+    // Calculate correct answer
+    let correctAnswer: number;
+    switch (operator) {
+      case '+':
+        correctAnswer = num1 + num2;
+        break;
+      case '-':
+        correctAnswer = num1 - num2;
+        break;
+      case '*':
+        correctAnswer = num1 * num2;
+        break;
+      default:
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid operator' 
+        });
+    }
+
+    const userAnswer = parseInt(answer);
+    const isCorrect = userAnswer === correctAnswer;
+
+    // Update attempt tracking
+    updateCaptchaAttempts(clientIP, isNewSession, !isCorrect);
+
+    const attempt = captchaAttempts.get(clientIP);
+    const remainingAttempts = 9 - (attempt?.totalAttempts || 0);
+
+    if (isCorrect) {
+      res.json({
+        success: true,
+        message: 'Captcha verified successfully',
+        remainingAttempts
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Incorrect answer',
+        remainingAttempts: Math.max(0, remainingAttempts)
+      });
+    }
+  } catch (error: any) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error during captcha verification', 
+      error: error.message 
+    });
+  }
+});
+
+// Get captcha rate limit status
+router.get('/captcha/status', (req: Request, res: Response) => {
+  const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+  const attempt = captchaAttempts.get(clientIP);
+  const now = new Date();
+  
+  if (!attempt) {
+    return res.json({
+      totalAttempts: 0,
+      remainingAttempts: 9,
+      sessionCount: 0,
+      rateLimited: false,
+      timeRemaining: 0
+    });
+  }
+
+  const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+  const isExpired = attempt.firstAttempt < fiveMinutesAgo;
+  
+  if (isExpired) {
+    captchaAttempts.delete(clientIP);
+    return res.json({
+      totalAttempts: 0,
+      remainingAttempts: 9,
+      sessionCount: 0,
+      rateLimited: false,
+      timeRemaining: 0
+    });
+  }
+
+  const remainingAttempts = Math.max(0, 9 - attempt.totalAttempts);
+  const rateLimited = attempt.totalAttempts >= 9;
+  const timeRemaining = rateLimited 
+    ? Math.ceil((attempt.firstAttempt.getTime() + 5 * 60 * 1000 - now.getTime()) / 1000)
+    : 0;
+
+  res.json({
+    totalAttempts: attempt.totalAttempts,
+    remainingAttempts,
+    sessionCount: attempt.sessionCount,
+    rateLimited,
+    timeRemaining: Math.max(0, timeRemaining)
+  });
 });
 
 // Register with rate limiting
