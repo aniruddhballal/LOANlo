@@ -138,7 +138,7 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
     }
   }, [isOpen])
 
-  // Handle form submission
+  // Replace the handleSubmit function in your CaptchaModal.tsx with this fixed version:
   const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
     e?.preventDefault()
     
@@ -171,6 +171,7 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
           ? {
               ...prev,
               remainingAttempts: data.remainingAttempts || 0,
+              totalAttempts: 9 - (data.remainingAttempts || 0), // Calculate from remaining
             }
           : null
       );
@@ -183,48 +184,87 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
           onClose();
         }, 1000);
       } else {
-        // ❌ Wrong answer
-        const newAttempts = attempts + 1;
-        setAttempts(newAttempts);
-        setIsNewSession(false); // no longer new session after first attempt
+        // This block should not execute since incorrect answers return 400 status
+        // but keeping it as fallback
+        handleIncorrectAnswer(data);
+      }
+    } catch (err: any) {
+      console.error("Captcha verification error:", err);
+      
+      // Check if we have a response from the server
+      if (err.response) {
+        const status = err.response.status;
+        const data = err.response.data || {};
+        
+        if (status === 400) {
+          // ❌ Wrong answer - this is the key fix!
+          if (data.success === false && data.message === 'Incorrect answer') {
+            handleIncorrectAnswer(data);
+          } else {
+            // Other 400 errors (validation, etc.)
+            setError(data.message || 'Invalid request. Please try again.');
+          }
+        } else if (status === 429) {
+          // Rate limit exceeded
+          setIsRateLimited(true);
+          setTimeRemaining(data.retryAfter || 300);
+          setError(data.message || "Rate limit exceeded");
 
-        if (newAttempts >= maxAttempts) {
-          setError("Maximum attempts reached for this session.");
           setTimeout(() => {
             onFail();
             onClose();
           }, 2000);
+        } else if (status >= 500) {
+          // Server errors
+          setError("Server error. Please try again later.");
         } else {
-          const remainingInSession = maxAttempts - newAttempts;
-          const totalRemaining = data.remainingAttempts || 0;
-          setError(
-            `Incorrect answer. ${remainingInSession} attempts remaining in this session. ${totalRemaining} total attempts remaining.`
-          );
-          generateCaptcha(); // New challenge
+          // Other client errors
+          setError(data.message || "An error occurred. Please try again.");
         }
-      }
-    } catch (err: any) {
-      // Axios puts status under err.response
-      if (err.response?.status === 429) {
-        const data = err.response.data || {};
-        setIsRateLimited(true);
-        setTimeRemaining(data.retryAfter || 300);
-        setError(data.message || "Rate limit exceeded");
-
-        setTimeout(() => {
-          onFail();
-          onClose();
-        }, 2000);
+      } else if (err.code === 'NETWORK_ERROR' || !err.response) {
+        // Network/connection errors
+        setError("Unable to connect to server. Please check your connection and try again.");
       } else {
-        console.error("Captcha verification error:", err);
-        setError(
-          "Unable to connect to server. Please check your connection and try again."
-        );
+        // Unknown errors
+        setError("An unexpected error occurred. Please try again.");
       }
     }
     
     setIsVerifying(false)
   }
+
+  // Add this helper function to handle incorrect answers
+  const handleIncorrectAnswer = (data: any) => {
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
+    setIsNewSession(false); // no longer new session after first attempt
+
+    // Update rate limit status with the latest data
+    setRateLimitStatus((prev) => 
+      prev 
+        ? {
+            ...prev,
+            remainingAttempts: data.remainingAttempts || 0,
+            totalAttempts: 9 - (data.remainingAttempts || 0), // Calculate from remaining
+          }
+        : null
+    );
+
+    if (newAttempts >= maxAttempts) {
+      setError("Maximum attempts reached for this session.");
+      setTimeout(() => {
+        onFail();
+        onClose();
+      }, 2000);
+    } else {
+      const remainingInSession = maxAttempts - newAttempts;
+      const totalRemaining = data.remainingAttempts || 0;
+      setError(
+        `Incorrect answer. ${remainingInSession} attempts remaining in this session. ${totalRemaining} total attempts remaining.`
+      );
+      generateCaptcha(); // New challenge
+    }
+  };
 
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
