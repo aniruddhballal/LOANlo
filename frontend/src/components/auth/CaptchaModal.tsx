@@ -42,7 +42,6 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
   const [isNewSession, setIsNewSession] = useState(true)
 
   const maxAttempts = 3
-  const maxTotalAttempts = 9
 
   // Generate new captcha challenge
   const generateCaptcha = () => {
@@ -260,10 +259,11 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
       // Only update attempts if we haven't exceeded the max
       setAttempts(newAttempts);
       
-      const remainingInSession = maxAttempts - newAttempts;
-      const totalRemaining = data.remainingAttempts || 0;
+      // Show completed attempts for both counters (consistent counting)
+      const completedInSession = newAttempts; // attempts completed in this session
+      
       setError(
-        `Incorrect answer. ${remainingInSession} attempts remaining in this session. ${totalRemaining} total attempts remaining.`
+        `Incorrect answer. ${completedInSession} out of ${maxAttempts} attempts remaining in this session.`
       );
       generateCaptcha(); // New challenge
     }
@@ -330,15 +330,6 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-              <div className="flex items-center space-x-2 text-xs text-gray-500 mt-0.5">
-                <span>Session: {attempts + 1} of {maxAttempts}</span>
-                {rateLimitStatus && (
-                  <>
-                    <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                    <span>Total: {rateLimitStatus.totalAttempts}/{maxTotalAttempts}</span>
-                  </>
-                )}
-              </div>
             </div>
           </div>
           <button
@@ -361,7 +352,7 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
             <div className="mb-4 p-3 rounded-xl border border-yellow-200 bg-yellow-50 flex items-start space-x-2">
               <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" />
               <div className="text-yellow-700 text-xs font-medium">
-                Warning: Only {rateLimitStatus.remainingAttempts} attempts remaining before rate limit.
+                Warning: Only {rateLimitStatus.remainingAttempts} attempts remaining.
               </div>
             </div>
           )}
@@ -450,22 +441,6 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
                 'Verify Answer'
               )}
             </button>
-          </div>
-
-          {/* Footer Info */}
-          <div className="mt-6 pt-4 border-t border-gray-100">
-            <div className="flex items-center justify-center space-x-4 text-xs text-gray-400">
-              <span>SECURE</span>
-              <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-              <span>RATE LIMITED</span>
-              <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-              <span>PROTECTED</span>
-            </div>
-            {rateLimitStatus && !isRateLimited && (
-              <div className="text-center mt-2 text-xs text-gray-400">
-                {rateLimitStatus.remainingAttempts} of {maxTotalAttempts} total attempts remaining
-              </div>
-            )}
           </div>
         </div>
       </div>
