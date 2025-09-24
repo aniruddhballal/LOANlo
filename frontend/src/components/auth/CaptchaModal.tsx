@@ -256,10 +256,10 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
       // Don't update attempts state if we've reached the max (to prevent "4 out of 3")
       setError("CAPTCHA verification failed. Please try again.");
       
-      setTimeout(() => {
-        onFail();
-        onClose();
-      }, 2000);
+      // setTimeout(() => {
+      onFail();
+      onClose();
+      // }, 0);
     } else {
       // Only update attempts if we haven't exceeded the max
       setAttempts(newAttempts);
