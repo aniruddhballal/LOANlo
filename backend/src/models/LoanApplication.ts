@@ -16,7 +16,6 @@ export interface IApprovalDetails {
 
 export interface ILoanApplication extends Document {
   userId: Types.ObjectId;
-  applicantName: string;
 
   loanType: 'personal' | 'home' | 'vehicle' | 'business' | 'education';
   amount: number;
@@ -38,8 +37,6 @@ export interface ILoanApplication extends Document {
 
 const loanApplicationSchema: Schema<ILoanApplication> = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-
-  applicantName: { type: String, required: true },
 
   loanType: {
     type: String,

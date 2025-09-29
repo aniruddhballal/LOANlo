@@ -112,7 +112,6 @@ router.post(
         purpose,
         tenure,
         userId: req.user?.userId,
-        applicantName: `${user.firstName} ${user.lastName}`,
         statusHistory: [
           { status: 'pending', timestamp: new Date(), comment: 'Application submitted' },
         ],

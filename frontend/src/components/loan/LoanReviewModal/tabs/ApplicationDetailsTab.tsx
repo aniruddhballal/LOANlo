@@ -65,8 +65,7 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
                 </div>
               </div>
               <p className="text-gray-700 mb-6">
-                Are you sure you want to delete this loan application for{' '}
-                <span className="font-medium text-gray-900">{application.applicantName}</span>?
+                Are you sure you want to delete this loan application?
               </p>
             </div>
             <div className="border-t border-gray-200 px-6 py-4 bg-gray-50 rounded-b-lg flex justify-end space-x-3">
@@ -101,7 +100,7 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 text-lg">
-                {application.applicantName}
+                {application.userId?.firstName} {application.userId?.lastName}
               </h3>
               <p className="text-gray-600">{application.userId?.email}</p>
             </div>

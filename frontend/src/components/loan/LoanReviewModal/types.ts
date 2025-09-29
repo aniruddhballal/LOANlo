@@ -17,7 +17,6 @@ export interface LoanApplication {
     phone: string
     role: string
   }
-  applicantName: string
   loanType: 'personal' | 'home' | 'vehicle' | 'business' | 'education'
   amount: number
   purpose: string
