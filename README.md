@@ -1,5 +1,6 @@
 ## Tasks/Features - Stacked
 
+- [ ] log all the user-details/kyc updates - every update must be recorded with timestamp
 - [ ] doesnt clear the number of attempts completed/left on successful logins
 - [ ] doesnt handle edge cases where even after it says incorrect answer, if i click on verify answer again, before the modal closes, it updates the number of attempts taken - shouldnt happen
 - [X] Should failed Captcha attempts cause prevention of login for a while? like ratelimited? DONE
