@@ -1,6 +1,7 @@
 ## Tasks/Features - Stacked
 
-- [ ] log all the user-details/kyc updates - every update must be recorded with timestamp
+- [ ] Applicant name in loanapplication collection does not reflect changes in the profile/user collection - it should not be redundantly stored as a new field, it should simply refer to the applicants userid right
+- [x] log all the user-details/kyc updates - every update must be recorded with timestamp
 - [x] doesnt clear the number of attempts completed/left on successful logins
 - [x] doesnt handle edge cases where even after it says incorrect answer, if i click on verify answer again, before the modal closes, it updates the number of attempts taken - shouldnt happen
 - [X] Should failed Captcha attempts cause prevention of login for a while? like ratelimited? DONE
@@ -8,7 +9,7 @@
 - [x] User can make the details incomplete and then navigate back and then can be stuck there - because the filed they need to fill, to complete the profile - is on the next page and the continue/next button is not taking them there because the details are incomplete
 - [x] Take inputs from dropdown of locations, pincode autofilling based on address
 - [ ] allow for gmaps pinpoint drop of location + change the loading animation for the pincode + modularise the pincode fetching thing into a new component maybe - check which other components can be modularised
-- [ ] Error displays in PII page is animated poorly
+- [x] Error displays in PII page is animated poorly
 - [x] Stylise the delete application/document - all the features that have been added on the go - unify them
 - [ ] Clean up the interfaces and props - might have fields that I am not using in that page
 - [ ] Should applicants be allowed to apply for multiple loans? What's the category of people who can do that? Is there a category?
@@ -22,7 +23,7 @@
 - [x] Clear up backend unused routes - loans.ts, profile.ts, documents.ts, auth,ts
 - [x] Blocked view at the bottom of the screen for Underwriter's LoanReviewModal
 - [x] Loading/Skeleton screen for the Applicant and Underwriter Dashboard page, and the RoleProtectedRoute component
-- [ ] Add the Loan Application Delete functionality back - this time, make sure only applicants can delete it? Should under-writers have all that power? Check auto-refresh/re-render the loan applications once one has been deleted?
+- [x] Add the Loan Application Delete functionality back - this time, make sure only applicants can delete it? Should under-writers have all that power? Check auto-refresh/re-render the loan applications once one has been deleted?
 - [x] Shift from JavaScript backend to TypeScript backend
 - [x] Modularise LoanApplication page
 - [x] Autoscroll, autoclose, auto-highlight to make errors/succes states more visible to the User
