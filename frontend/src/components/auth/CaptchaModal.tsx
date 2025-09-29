@@ -301,7 +301,7 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
                 <div className="w-12 h-12 bg-green-100 rounded-full mx-auto mb-3 flex items-center justify-center animate-bounce">
                   <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
-                <p className="text-green-800 font-medium text-sm">Verification Successful!</p>
+                <p className="text-green-800 font-medium text-sm">Captcha Validated!</p>
               </div>
             </div>
           </div>
@@ -315,7 +315,7 @@ const CaptchaModal: React.FC<CaptchaModalProps> = ({
                 <div className="w-12 h-12 bg-red-100 rounded-full mx-auto mb-3 flex items-center justify-center">
                   <Clock className="w-6 h-6 text-red-600" />
                 </div>
-                <p className="text-red-800 font-medium text-sm mb-2">Failed Captcha Verification</p>
+                <p className="text-red-800 font-medium text-sm mb-2">Failed Multiple Captcha Verifications</p>
                 <p className="text-red-600 text-xs">
                   Try again in: {formatTimeRemaining(timeRemaining)}
                 </p>
