@@ -1,8 +1,8 @@
 ## Tasks/Features - Stacked
 
 - [ ] log all the user-details/kyc updates - every update must be recorded with timestamp
-- [ ] doesnt clear the number of attempts completed/left on successful logins
-- [ ] doesnt handle edge cases where even after it says incorrect answer, if i click on verify answer again, before the modal closes, it updates the number of attempts taken - shouldnt happen
+- [x] doesnt clear the number of attempts completed/left on successful logins
+- [x] doesnt handle edge cases where even after it says incorrect answer, if i click on verify answer again, before the modal closes, it updates the number of attempts taken - shouldnt happen
 - [X] Should failed Captcha attempts cause prevention of login for a while? like ratelimited? DONE
 - [x] Field specific errors are not shown right now, because errors are displayed only on handling the submit/next button and invalid entries in any of the input fields disable the submit/next/previous buttons
 - [x] User can make the details incomplete and then navigate back and then can be stuck there - because the filed they need to fill, to complete the profile - is on the next page and the continue/next button is not taking them there because the details are incomplete
