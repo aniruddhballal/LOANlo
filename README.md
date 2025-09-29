@@ -6,7 +6,8 @@
 - [X] Should failed Captcha attempts cause prevention of login for a while? like ratelimited? DONE
 - [x] Field specific errors are not shown right now, because errors are displayed only on handling the submit/next button and invalid entries in any of the input fields disable the submit/next/previous buttons
 - [x] User can make the details incomplete and then navigate back and then can be stuck there - because the filed they need to fill, to complete the profile - is on the next page and the continue/next button is not taking them there because the details are incomplete
-- [ ] Take inputs from dropdown of locations, pincode autofilling based on address, and allow for gmaps pinpoint drop of location
+- [x] Take inputs from dropdown of locations, pincode autofilling based on address
+- [ ] allow for gmaps pinpoint drop of location + change the loading animation for the pincode + modularise the pincode fetching thing into a new component maybe - check which other components can be modularised
 - [ ] Error displays in PII page is animated poorly
 - [x] Stylise the delete application/document - all the features that have been added on the go - unify them
 - [ ] Clean up the interfaces and props - might have fields that I am not using in that page
