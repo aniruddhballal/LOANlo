@@ -4,6 +4,7 @@ import User from '../models/User';
 import { authenticateToken } from '../middleware/auth';
 import validator from 'validator';
 import { isProfileComplete, UserProfile } from '../../../shared/validation';
+import { logProfileChange, getProfileHistory } from '../middleware/profileAudit';
 
 const router = Router();
 
@@ -269,6 +270,12 @@ router.post('/save', profileUpdateLimiter, validateProfileInput, authenticateTok
       return res.status(400).json({ success: false, message: 'Invalid work experience' });
     }
 
+    const oldUser = await User.findById(userId).lean();
+    
+    if (!oldUser) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
     // Update user in DB
     const user = await User.findByIdAndUpdate(
       userId,
@@ -283,6 +290,11 @@ router.post('/save', profileUpdateLimiter, validateProfileInput, authenticateTok
       await user.save();
     }
 
+    // NEW: Log the profile changes asynchronously (non-blocking)
+    logProfileChange(userId, oldUser, user.toObject(), req).catch(err => {
+      console.error('Profile audit logging failed:', err);
+    });
+
     res.json({
       success: true,
       user,
@@ -293,6 +305,31 @@ router.post('/save', profileUpdateLimiter, validateProfileInput, authenticateTok
     res.status(500).json({
       success: false,
       message: 'Failed to save profile details',
+      error: err.message
+    });
+  }
+});
+
+router.get('/history', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const limit = parseInt(req.query.limit as string) || 50;
+    const history = await getProfileHistory(userId, limit);
+
+    res.json({
+      success: true,
+      history,
+      count: history.length
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch profile history',
       error: err.message
     });
   }
