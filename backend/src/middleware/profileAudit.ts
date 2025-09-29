@@ -78,8 +78,6 @@ export const logProfileChange = async (
         userAgent: req.get('user-agent'),
         profileSnapshot: Object.keys(profileSnapshot).length > 0 ? profileSnapshot : undefined
       });
-
-      console.log(`Profile change logged for user ${userId}: ${changedFields.size} fields changed`);
     }
   } catch (error) {
     // Log error but don't block the main operation

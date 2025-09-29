@@ -81,7 +81,6 @@ export default function DocumentsTab({ application, onDocumentUpdate, isApplican
 
     } catch (error: any) {
       console.error('Error deleting document:', error)
-      console.log('Backend response:', error.response?.data)
       
       let errorMessage = `Failed to delete ${doc.name}.`
       if (error.response?.status === 404) {
@@ -163,9 +162,6 @@ export default function DocumentsTab({ application, onDocumentUpdate, isApplican
         document.body.removeChild(link)
         window.URL.revokeObjectURL(url)
       }, 100)
-
-      console.log('Download initiated for:', link.download)
-
     } catch (error: any) {
       console.error('Error downloading document:', error)
       
