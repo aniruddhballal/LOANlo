@@ -44,6 +44,22 @@ const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
   </div>
 );
 
+// Success message component
+const SuccessMessage: React.FC<{ message: string }> = ({ message }) => (
+  <div className="mt-2 p-3 bg-green-50/30 border border-green-200 rounded-lg">
+    <div className="flex items-center">
+      <div className="flex-shrink-0">
+        <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+      </div>
+      <div className="ml-2">
+        <p className="text-sm font-light text-green-700">{message}</p>
+      </div>
+    </div>
+  </div>
+);
+
 export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
   formData,
   focusedField,
@@ -193,6 +209,17 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
   );
 };
 
+// Define interface before the component
+interface PincodeApiResponse {
+  Status: string;
+  Message: string;
+  PostOffice?: Array<{
+    Name: string;
+    District: string;
+    State: string;
+  }>;
+}
+
 export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
   formData,
   focusedField,
@@ -201,6 +228,8 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
   onBlur
 }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [pincodeLoading, setPincodeLoading] = useState(false);
+  const [pincodeSuccess, setPincodeSuccess] = useState(false);
 
   const handleEmailChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -240,14 +269,84 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
     }
   };
 
+  const fetchPincodeDetails = async (pincode: string) => {
+    if (!isValidPincode(pincode)) {
+      return;
+    }
+
+    setPincodeLoading(true);
+    setPincodeSuccess(false);
+    setErrors(prev => {
+      const { pincode: _, ...rest } = prev;
+      return rest;
+    });
+
+    try {
+      const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+      const data: PincodeApiResponse[] = await response.json();
+
+      if (data[0].Status === "Success" && data[0].PostOffice && data[0].PostOffice.length > 0) {
+        const postOffice = data[0].PostOffice[0];
+                
+        // Use setTimeout to batch updates and prevent pincode field interference
+        setTimeout(() => {
+          // Create synthetic events to trigger the form update
+          const cityEvent = {
+            target: { 
+              name: 'city', 
+              value: postOffice.District,
+              type: 'text'
+            }
+          } as React.ChangeEvent<HTMLInputElement>;
+          
+          const stateEvent = {
+            target: { 
+              name: 'state', 
+              value: postOffice.State,
+              type: 'text'
+            }
+          } as React.ChangeEvent<HTMLInputElement>;
+
+          // Call onFieldChange for both fields
+          onFieldChange(cityEvent);
+          onFieldChange(stateEvent);
+          
+          setPincodeSuccess(true);
+          setTimeout(() => setPincodeSuccess(false), 3000);
+        }, 0);
+      } else {
+        setErrors(prev => ({ 
+          ...prev, 
+          pincode: "Invalid pincode or no data found" 
+        }));
+      }
+    } catch (error) {
+      console.error('Pincode API Error:', error); // Debug log
+      setErrors(prev => ({ 
+        ...prev, 
+        pincode: "Failed to fetch pincode details. Please try again." 
+      }));
+    } finally {
+      setPincodeLoading(false);
+    }
+  };
+
   const handlePincodeChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
   > = (e) => {
-    let value = '';
-    if (e.target instanceof HTMLInputElement) {
-      value = e.target.value;
-    }
-    onFieldChange(e);
+    let value = e.target.value.replace(/\D/g, '');
+        
+    // Create a new event with the cleaned value
+    const syntheticEvent = {
+      ...e,
+      target: {
+        ...e.target,
+        name: 'pincode',
+        value: value
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    onFieldChange(syntheticEvent);
 
     if (value && !isValidPincode(value)) {
       setErrors(prev => ({ ...prev, pincode: "Pincode must be 6 digits" }));
@@ -256,6 +355,11 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
         const { pincode, ...rest } = prev;
         return rest;
       });
+      
+      // Fetch pincode details when valid
+      if (value.length === 6) {
+        fetchPincodeDetails(value);
+      }
     }
   };
 
@@ -306,6 +410,32 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
             onBlur={onBlur}
           />
         </div>
+        <div className="lg:col-span-2">
+          <div className="relative">
+            <InputField
+              name="pincode"
+              label="Pincode"
+              maxLength={6}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              focusedField={focusedField}
+              formData={formData}
+              onChange={handlePincodeChange}
+              onFocus={onFocus}
+              onBlur={onBlur}
+            />
+            {pincodeLoading && (
+              <div className="absolute right-3 top-9">
+                <svg className="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+            )}
+          </div>
+          {errors.pincode && <ErrorMessage message={errors.pincode} />}
+          {pincodeSuccess && <SuccessMessage message="City and State auto-filled successfully!" />}
+        </div>
         <div>
           <InputField
             name="city"
@@ -327,19 +457,6 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
             onFocus={onFocus}
             onBlur={onBlur}
           />
-        </div>
-        <div>
-          <InputField
-            name="pincode"
-            label="Pincode"
-            maxLength={6}
-            focusedField={focusedField}
-            formData={formData}
-            onChange={handlePincodeChange}
-            onFocus={onFocus}
-            onBlur={onBlur}
-          />
-          {errors.pincode && <ErrorMessage message={errors.pincode} />}
         </div>
       </div>
     </div>
