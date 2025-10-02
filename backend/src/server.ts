@@ -20,7 +20,6 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
-app.use('/api/profile', profileRoutes); // mount under /api/profile
 
 // Create uploads directory if it doesn't exist
 if (!fs.existsSync('uploads')) {
@@ -31,6 +30,7 @@ if (!fs.existsSync('uploads')) {
 app.use('/api/auth', authRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/documents', documentRoutes);
+app.use('/api/profile', profileRoutes); // mount under /api/profile
 
 // Connect to MongoDB and start server
 connectDB()
