@@ -11,7 +11,7 @@ import ProgressBar from './ProgressBar';
 import { PersonalInfoStep, ContactInfoStep, EmploymentInfoStep, validateStep } from './PersonalDetailsSteps';
 import { LoadingState, ApplicationSuccess } from '../../ui/StatusMessages';
 
-import { isProfileComplete } from '../../../../../shared/validation';
+import { isProfileComplete } from '../../../../../backend/src/shared/validation';
 
 const PersonalDetails = () => {
   const navigate = useNavigate();

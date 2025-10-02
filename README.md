@@ -1,6 +1,7 @@
 ## Tasks/Features - Stacked
 
-- [ ] Applicant name in loanapplication collection does not reflect changes in the profile/user collection - it should not be redundantly stored as a new field, it should simply refer to the applicants userid right
+- [ ] integrate AI risk thingy
+- [x] Applicant name in loanapplication collection does not reflect changes in the profile/user collection - it should not be redundantly stored as a new field, it should simply refer to the applicants userid right
 - [x] log all the user-details/kyc updates - every update must be recorded with timestamp
 - [x] doesnt clear the number of attempts completed/left on successful logins
 - [x] doesnt handle edge cases where even after it says incorrect answer, if i click on verify answer again, before the modal closes, it updates the number of attempts taken - shouldnt happen
