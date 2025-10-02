@@ -68,6 +68,7 @@ const verifyLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS', // <-- skip preflight
 });
 
 // Captcha rate limiter middleware
