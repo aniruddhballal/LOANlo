@@ -1,7 +1,6 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import fs from 'fs';
-import path from 'path';
 import config from './config';
 import connectDB from './config/database';
 
@@ -22,14 +21,6 @@ app.use(cors({
 app.use(express.json());
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
 app.use('/api/profile', profileRoutes); // mount under /api/profile
-
-// Serve frontend static files
-app.use(express.static(path.join(__dirname, '../public')));
-
-// SPA routing
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
-});
 
 // Create uploads directory if it doesn't exist
 if (!fs.existsSync('uploads')) {
