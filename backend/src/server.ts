@@ -26,6 +26,11 @@ if (!fs.existsSync('uploads')) {
   fs.mkdirSync('uploads');
 }
 
+app.options('*', cors({
+  origin: "https://loanlo.vercel.app",
+  credentials: true
+}));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/loans', loanRoutes);

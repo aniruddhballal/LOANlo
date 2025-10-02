@@ -20,6 +20,12 @@ export const authenticateToken = (
   res: Response,
   next: NextFunction
 ): void => {
+
+  // Allow preflight requests
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
