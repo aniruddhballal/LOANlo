@@ -15,7 +15,10 @@ const app: Application = express();
 const PORT: number = Number(config.PORT) || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "https://loanlo.vercel.app",
+  credentials: true
+}));
 app.use(express.json());
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
 app.use('/api/profile', profileRoutes); // mount under /api/profile
