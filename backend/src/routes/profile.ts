@@ -3,7 +3,7 @@ import rateLimit from 'express-rate-limit';
 import User from '../models/User';
 import { authenticateToken } from '../middleware/auth';
 import validator from 'validator';
-import { isProfileComplete, UserProfile } from '../../../shared/validation';
+import { isProfileComplete, UserProfile } from '../shared/validation';
 import { logProfileChange, getProfileHistory } from '../middleware/profileAudit';
 
 const router = Router();
