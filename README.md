@@ -1,5 +1,6 @@
 ## Tasks/Features - Stacked
 
+- [ ] profile complete/update rate limiting combined with the "invalid income range" for fresh applicants who havent filled any other detail out - is a deadly combination that must be prevented at all costs
 - [ ] integrate AI risk thingy
 - [x] deploy the website
 - [ ] it doesnt show why the "continue" or the "previous" buttons are disabled in case of invlaid format of inputs in the personal details form fields - so, modify the label, to hold the formats required for aadhaar, pan, DOB - the errors arent thrown only - the user is just prevewnted from going forward; currently it just says "enter <label_name>"
