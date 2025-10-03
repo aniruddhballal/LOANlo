@@ -186,48 +186,50 @@ router.post('/save', profileUpdateLimiter, validateProfileInput, authenticateTok
       monthlyIncome: isNaN(Number(monthlyIncome)) ? undefined : Number(monthlyIncome),
     };
 
-    // Aadhaar validation
-    if (aadhaarNumber && !/^\d{12}$/.test(aadhaarNumber)) {
+    // ONLY validate fields that have been provided (non-empty)
+    
+    // Aadhaar validation - only if provided
+    if (aadhaarNumber && aadhaarNumber.trim() !== '' && !/^\d{12}$/.test(aadhaarNumber)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid Aadhaar number format. It must be 12 digits.'
       });
     }
 
-    // PAN validation
-    if (panNumber && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(panNumber)) {
+    // PAN validation - only if provided
+    if (panNumber && panNumber.trim() !== '' && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(panNumber)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid PAN number format. Example: ABCDE1234F'
       });
     }
 
-    // Email validation
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    // Email validation - only if provided
+    if (email && email.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid email format'
       });
     }
 
-    // Phone validation
-    if (phone && !/^[6-9]\d{9}$/.test(phone)) {
+    // Phone validation - only if provided
+    if (phone && phone.trim() !== '' && !/^[6-9]\d{9}$/.test(phone)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid phone number format'
       });
     }
 
-    // Pincode validation
-    if (pincode && !/^\d{6}$/.test(pincode)) {
+    // Pincode validation - only if provided
+    if (pincode && pincode.trim() !== '' && !/^\d{6}$/.test(pincode)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid pincode format'
       });
     }
 
-    // Age validation (18+ for loans)
-    if (sanitizedData.dateOfBirth) {
+    // Age validation (18+ for loans) - only if provided
+    if (sanitizedData.dateOfBirth && sanitizedData.dateOfBirth.trim() !== '') {
       const birthDate = new Date(sanitizedData.dateOfBirth);
 
       if (isNaN(birthDate.getTime())) {
@@ -249,11 +251,13 @@ router.post('/save', profileUpdateLimiter, validateProfileInput, authenticateTok
       }
     }
 
-    // Income validation (reasonable bounds)
+    // Income validation - only if provided
     const monthlyIncomeNum = Number(sanitizedData.monthlyIncome);
     if (
       sanitizedData.monthlyIncome != null &&
-      (isNaN(monthlyIncomeNum) || monthlyIncomeNum < 1000 || monthlyIncomeNum > 10000000)
+      !isNaN(monthlyIncomeNum) && // If it's a valid number, then validate range
+      monthlyIncomeNum !== 0 && // Allow 0 as "not provided"
+      (monthlyIncomeNum < 1000 || monthlyIncomeNum > 10000000)
     ) {
       return res.status(400).json({
         success: false,
@@ -261,11 +265,12 @@ router.post('/save', profileUpdateLimiter, validateProfileInput, authenticateTok
       });
     }
 
-    // Work experience validation
+    // Work experience validation - only if provided
     const workExpNum = Number(sanitizedData.workExperience);
     if (
       sanitizedData.workExperience != null &&
-      (isNaN(workExpNum) || workExpNum < 0)
+      !isNaN(workExpNum) &&
+      workExpNum < 0
     ) {
       return res.status(400).json({ success: false, message: 'Invalid work experience' });
     }
@@ -276,10 +281,20 @@ router.post('/save', profileUpdateLimiter, validateProfileInput, authenticateTok
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
+    // Only update fields that are provided (not empty)
+    const updateData: any = {};
+    Object.keys(sanitizedData).forEach(key => {
+      const value = sanitizedData[key as keyof UserProfile];
+      // Only include non-empty values or explicitly set numbers
+      if (value !== '' && value !== null && value !== undefined) {
+        updateData[key] = value;
+      }
+    });
+
     // Update user in DB
     const user = await User.findByIdAndUpdate(
       userId,
-      sanitizedData,
+      updateData,
       { new: true, runValidators: true }
     );
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
@@ -290,7 +305,7 @@ router.post('/save', profileUpdateLimiter, validateProfileInput, authenticateTok
       await user.save();
     }
 
-    // NEW: Log the profile changes asynchronously (non-blocking)
+    // Log the profile changes asynchronously (non-blocking)
     logProfileChange(userId, oldUser, user.toObject(), req).catch(err => {
       console.error('Profile audit logging failed:', err);
     });

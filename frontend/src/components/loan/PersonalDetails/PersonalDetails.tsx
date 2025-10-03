@@ -268,7 +268,7 @@ const PersonalDetails = () => {
                     {!isStepValid(currentStep) && (
                       <div className="absolute inset-0 bg-red-500/20 animate-pulse"></div>
                     )}
-                    <span>CONTINUE</span>
+                    <span>SAVE & CONTINUE</span>
                     <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>

@@ -1,6 +1,7 @@
 ## Tasks/Features - Stacked
 
-- [ ] profile complete/update rate limiting combined with the "invalid income range" for fresh applicants who havent filled any other detail out - is a deadly combination that must be prevented at all costs - Update the /save route or create new route for saving/updating details
+- [ ] check if all ratelimiters are valid (it seems like it prevents all users from given ip address to not be able to update their profile if some other account has spammed profile update requests) - also check if the limits are set reasonably
+- [x] profile complete/update rate limiting combined with the "invalid income range" for fresh applicants who havent filled any other detail out - is a deadly combination that must be prevented at all costs - Update the /save route or create new route for saving/updating details
 - [ ] integrate AI risk thingy
 - [x] deploy the website
 - [x] it doesnt show why the "continue" or the "previous" buttons are disabled in case of invlaid format of inputs in the personal details form fields - so, modify the label, to hold the formats required for aadhaar, pan, DOB - the errors arent thrown only - the user is just prevented from going forward; currently it just says "enter <label_name>"
