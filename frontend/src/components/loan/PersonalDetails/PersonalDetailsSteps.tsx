@@ -186,7 +186,7 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
         <div className="lg:col-span-2">
           <InputField
             name="aadhaarNumber"
-            label="Aadhaar Number (12 digits)"
+            label="Aadhaar Number"
             maxLength={12}
             inputMode="numeric"
             pattern="[0-9]*"
@@ -204,7 +204,7 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
         <div className="lg:col-span-2">
           <InputField
             name="panNumber"
-            label="PAN Number (Format: ABCDE1234F)"
+            label="PAN Number"
             maxLength={10}
             focusedField={focusedField}
             formData={formData}
