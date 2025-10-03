@@ -241,7 +241,7 @@ const PersonalDetails = () => {
                     disabled={!isStepValid(currentStep)}
                     className={`inline-flex items-center px-8 py-4 rounded-xl font-light tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-lg relative overflow-hidden ${
                       isStepValid(currentStep)
-                        ? 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 hover:scale-105'
+                        ? 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 hover:scale-105 cursor-pointer'
                         : 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed opacity-60'
                     }`}
                   >
@@ -255,62 +255,137 @@ const PersonalDetails = () => {
                 )}
                 
                 {currentStep < 3 ? (
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={nextStep}
                     disabled={!isStepValid(currentStep)}
-                    className={`inline-flex items-center px-8 py-4 rounded-xl font-light tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-lg relative overflow-hidden ${
+                    className={`group relative cursor-pointer border-none font-light overflow-hidden rounded-xl ${
                       isStepValid(currentStep)
-                      ? 'bg-green-50 border-2 border-green-600 text-green-700 hover:bg-green-100 hover:border-green-700 hover:scale-105 focus:ring-4 focus:ring-green-200'
-                      : 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed opacity-60'
+                      ? 'cursor-pointer'
+                      : 'cursor-not-allowed opacity-60'
                     }`}
+                    style={{
+                      background: 'transparent'
+                    }}
                   >
-                    {!isStepValid(currentStep) && (
-                      <div className="absolute inset-0 bg-red-500/20 animate-pulse"></div>
-                    )}
-                    <span>SAVE & CONTINUE</span>
-                    <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    {/* Rotating gradient border */}
                     {isStepValid(currentStep) && (
-                      <div className="absolute inset-0 bg-white/10 animate-ping rounded-xl"></div>
+                      <div 
+                        className="absolute inset-0 transition-transform group-hover:rotate-180"
+                        style={{
+                          background: 'linear-gradient(to right, #10b981, #22c55e, #34d399)',
+                          borderRadius: '0.75rem',
+                          transitionDuration: '600ms',
+                          transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                        }}
+                      />
                     )}
+                    
+                    {/* Disabled state background */}
+                    {!isStepValid(currentStep) && (
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          background: '#fca5a5',
+                          borderRadius: '0.75rem'
+                        }}
+                      />
+                    )}
+                    
+                    {/* Inner button content */}
+                    <span 
+                      className={`relative z-10 flex items-center px-8 py-4 m-[3px] rounded-[0.6875rem] tracking-wide ${
+                        isStepValid(currentStep)
+                        ? 'bg-green-50 text-green-700'
+                        : 'bg-red-50/30 text-red-600'
+                      }`}
+                    >
+                      <span>SAVE & CONTINUE</span>
+                      <svg
+                        className="w-5 h-5 ml-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
                   </button>
                 ) : (
-                  <button 
-                    type="submit" 
+<button
+                    type="submit"
                     disabled={loading || !isStepValid(currentStep)}
-                    className={`inline-flex items-center px-12 py-4 rounded-xl font-light tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-xl relative overflow-hidden ${
-                    loading || !isStepValid(currentStep)
-                      ? 'bg-red-50/30 border-2 border-red-400 text-red-600 cursor-not-allowed opacity-60'
-                      : 'bg-green-50 border-2 border-green-700 text-green-800 hover:bg-green-100 hover:border-green-800 hover:scale-105 focus:ring-4 focus:ring-green-200'
+                    className={`group relative cursor-pointer border-none font-light overflow-hidden rounded-xl ${
+                      loading || !isStepValid(currentStep)
+                      ? 'cursor-not-allowed opacity-60'
+                      : 'cursor-pointer'
                     }`}
+                    style={{
+                      background: 'transparent'
+                    }}
                   >
+                    {/* Rotating gradient border */}
+                    {!loading && isStepValid(currentStep) && (
+                      <div
+                        className="absolute inset-0 transition-transform group-hover:rotate-180"
+                        style={{
+                          background: 'linear-gradient(to right, #10b981, #22c55e, #34d399)',
+                          borderRadius: '0.75rem',
+                          transitionDuration: '600ms',
+                          transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                        }}
+                      />
+                    )}
+                    
+                    {/* Loading state background */}
                     {loading && (
-                      <div className="absolute inset-0 bg-yellow-400/30 animate-pulse"></div>
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background: '#fcd34d',
+                          borderRadius: '0.75rem'
+                        }}
+                      />
                     )}
-                    {!isStepValid(currentStep) && !loading && (
-                      <div className="absolute inset-0 bg-red-500/20 animate-pulse"></div>
+                   
+                    {/* Disabled state background */}
+                    {!loading && !isStepValid(currentStep) && (
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background: '#fca5a5',
+                          borderRadius: '0.75rem'
+                        }}
+                      />
                     )}
-                    {loading ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span>{isPersonalDetailsComplete ? 'UPDATING...' : 'SUBMITTING...'}</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>{isPersonalDetailsComplete ? 'UPDATE DETAILS' : 'SUBMIT DETAILS'}</span>
-                        <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        {isStepValid(currentStep) && (
-                          <div className="absolute inset-0 bg-white/10 animate-ping rounded-xl"></div>
-                        )}
-                      </>
-                    )}
+                   
+                    {/* Inner button content */}
+                    <span
+                      className={`relative z-10 flex items-center px-12 py-4 m-[3px] rounded-[0.6875rem] tracking-wide ${
+                        loading
+                        ? 'bg-yellow-50 text-yellow-700'
+                        : !isStepValid(currentStep)
+                        ? 'bg-red-50/30 text-red-600'
+                        : 'bg-green-50 text-green-700'
+                      }`}
+                    >
+                      {loading ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <span>{isPersonalDetailsComplete ? 'UPDATING...' : 'SUBMITTING...'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>{isPersonalDetailsComplete ? 'UPDATE DETAILS' : 'SUBMIT DETAILS'}</span>
+                          <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </>
+                      )}
+                    </span>
                   </button>
                 )}
               </div>
