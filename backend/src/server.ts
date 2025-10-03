@@ -13,9 +13,18 @@ import profileRoutes from './routes/profile';
 const app: Application = express();
 const PORT: number = Number(config.PORT) || 5000;
 
+// Allowed origins from .env (comma-separated)
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",");
+
 // Middleware
 app.use(cors({
-  origin: "https://loanlo.vercel.app",
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
   methods: ['GET','POST','PUT','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
