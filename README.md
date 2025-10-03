@@ -1,6 +1,8 @@
 ## Tasks/Features - Stacked
 
 - [ ] integrate AI risk thingy
+- [x] deploy the website
+- [ ] it doesnt show why the "continue" or the "previous" buttons are disabled in case of invlaid format of inputs in the personal details form fields - so, modify the label, to hold the formats required for aadhaar, pan etc; currently it just says "enter <label_name>"
 - [x] Applicant name in loanapplication collection does not reflect changes in the profile/user collection - it should not be redundantly stored as a new field, it should simply refer to the applicants userid right
 - [x] log all the user-details/kyc updates - every update must be recorded with timestamp
 - [x] doesnt clear the number of attempts completed/left on successful logins
