@@ -149,6 +149,15 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
             onFocus={onFocus}
             onBlur={onBlur}
           />
+          {formData.dateOfBirth && (() => {
+            const dob = new Date(formData.dateOfBirth);
+            if (isNaN(dob.getTime())) return null;
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDiff = today.getMonth() - dob.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
+            return age < 18 ? <ErrorMessage message="You must be at least 18 years old to apply" /> : null;
+          })()}
         </div>
         <div>
           <SelectField
@@ -177,7 +186,7 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
         <div className="lg:col-span-2">
           <InputField
             name="aadhaarNumber"
-            label="Aadhaar Number"
+            label="Aadhaar Number (12 digits)"
             maxLength={12}
             inputMode="numeric"
             pattern="[0-9]*"
@@ -188,11 +197,14 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
             onBlur={onBlur}
           />
           {errors.aadhaarNumber && <ErrorMessage message={errors.aadhaarNumber} />}
+          {!errors.aadhaarNumber && formData.aadhaarNumber && formData.aadhaarNumber.length > 0 && formData.aadhaarNumber.length < 12 && (
+            <ErrorMessage message="Aadhaar number must be exactly 12 digits" />
+          )}
         </div>
         <div className="lg:col-span-2">
           <InputField
             name="panNumber"
-            label="PAN Number"
+            label="PAN Number (Format: ABCDE1234F)"
             maxLength={10}
             focusedField={focusedField}
             formData={formData}
@@ -203,6 +215,9 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
             pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
           />
           {errors.panNumber && <ErrorMessage message={errors.panNumber} />}
+          {!errors.panNumber && formData.panNumber && formData.panNumber.length > 0 && formData.panNumber.length < 10 && (
+            <ErrorMessage message="PAN must be 10 characters in format: ABCDE1234F" />
+          )}
         </div>
       </div>
     </div>
@@ -375,7 +390,7 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
         <div>
           <InputField
             name="email"
-            label="Email Address"
+            label="Email Address (e.g., example@email.com)"
             type="email"
             focusedField={focusedField}
             formData={formData}
@@ -388,7 +403,7 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
         <div>
           <InputField
             name="phone"
-            label="Phone Number"
+            label="Phone Number (10 digits, starting with 6-9)"
             type="tel"
             maxLength={10}
             focusedField={focusedField}
@@ -414,7 +429,7 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
           <div className="relative">
             <InputField
               name="pincode"
-              label="Pincode"
+              label="Pincode (6 digits)"
               maxLength={6}
               inputMode="numeric"
               pattern="[0-9]*"
