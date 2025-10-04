@@ -1,6 +1,7 @@
 ## Tasks/Features - Stacked
 
-- [ ] on clicking previous button, it stays on the clicked/active state even in the "previous" page that it goes to
+- [ ] add the delete account feature back, but then dont actually remove from database, but log it and make sure that it will not be login-able anymore for the user (unless you wanna add the 30-day to delete account feature where if you login within the span of 30 days of applying for account deletion, it will be revived)
+- [x] on clicking previous button, it stays on the clicked/active state even in the "previous" page that it goes to
 - [ ] on hover of "save & continue" make the cursor turn into another design
 - [ ] check if all ratelimiters are valid (it seems like it prevents all users from given ip address to not be able to update their profile if some other account has spammed profile update requests) - also check if the limits are set reasonably
 - [x] profile complete/update rate limiting combined with the "invalid income range" for fresh applicants who havent filled any other detail out - is a deadly combination that must be prevented at all costs - Update the /save route or create new route for saving/updating details

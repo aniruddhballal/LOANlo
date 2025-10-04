@@ -235,8 +235,11 @@ const PersonalDetails = () => {
                 {currentStep > 1 ? (
                   <button 
                     type="button" 
-                    onClick={() => {
-                      if (isStepValid(currentStep)) prevStep();
+                    onClick={(e) => {
+                      if (isStepValid(currentStep)) {
+                        prevStep();
+                        e.currentTarget.blur();
+                      }
                     }}
                     disabled={!isStepValid(currentStep)}
                     className={`inline-flex items-center px-8 py-4 rounded-xl font-light tracking-wide focus:outline-none focus:ring-4 transition-all duration-200 transform shadow-lg relative overflow-hidden ${
@@ -312,7 +315,7 @@ const PersonalDetails = () => {
                     </span>
                   </button>
                 ) : (
-<button
+                  <button
                     type="submit"
                     disabled={loading || !isStepValid(currentStep)}
                     className={`group relative cursor-pointer border-none font-light overflow-hidden rounded-xl ${
