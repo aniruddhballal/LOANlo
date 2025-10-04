@@ -27,9 +27,14 @@ const profileUpdateLimiter = rateLimit({
   },
   standardHeaders: true, // Return rate limit info in headers
   legacyHeaders: false,
-  keyGenerator: (req: AuthRequest) : string => {
-    // Rate limit per user ID instead of IP to prevent circumvention
-    return req.user?.userId ?? req.ip ?? "unknown";
+  keyGenerator: (req: AuthRequest) => {
+    // If authenticated, rate limit by userId (most secure)
+    // If not authenticated, return undefined to use express-rate-limit's default IP handling
+    // The default handler properly handles IPv6 addresses
+    if (req.user?.userId) {
+      return `user:${req.user.userId}`;
+    }
+    return undefined as any;
   },
   skipSuccessfulRequests: false, // Count all attempts, not just failed ones
   skipFailedRequests: false
@@ -43,8 +48,12 @@ const profileFetchLimiter = rateLimit({
     success: false,
     message: 'Too many requests. Please try again later.'
   },
-  keyGenerator: (req: AuthRequest): string => {
-    return req.user?.userId ?? req.ip ?? "unknown";
+  keyGenerator: (req: AuthRequest) => {
+    // Same approach: userId for authenticated, default IP handling for unauthenticated
+    if (req.user?.userId) {
+      return `user:${req.user.userId}`;
+    }
+    return undefined as any;
   }
 });
 
