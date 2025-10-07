@@ -1,6 +1,6 @@
 ## Tasks/Features - Stacked
 
-- [ ] it should refetch the status under applciation overview for example after approving loan, i should not be asked to refresh the page
+- [ ] what if applicant deletes a document right at the same time as the underwriter approving it
 - [ ] when loan application gets approved - "Updated by: Unknown" is shown
 - [ ] make sure every deletion does not actually mean deletion; keep logs of everything
 - [ ] dont allow deletion of documents once approved
