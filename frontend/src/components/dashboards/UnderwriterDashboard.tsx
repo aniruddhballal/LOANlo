@@ -238,7 +238,7 @@ export default function UnderwriterDashboard() {
                     placeholder="Search by reference, name, email, phone, status, or amount..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900"
                   />
                   {searchQuery && (
                     <button
@@ -253,9 +253,9 @@ export default function UnderwriterDashboard() {
                 {/* Filter Toggle */}
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors relative"
+                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors relative text-gray-900"                
                 >
-                  <SlidersHorizontal className="w-5 h-5" />
+                  <SlidersHorizontal className="w-5 h-5 text-gray-900" />
                   <span className="font-medium">Filters</span>
                   {activeFilterCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-gray-900 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -284,7 +284,7 @@ export default function UnderwriterDashboard() {
                       <select
                         value={filters.status}
                         onChange={(e) => handleFilterChange('status', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900"
                       >
                         <option value="all">All Statuses</option>
                         <option value="pending">Pending</option>
@@ -298,22 +298,30 @@ export default function UnderwriterDashboard() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Min Amount</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
                         placeholder="₹0"
                         value={filters.amountMin}
                         onChange={(e) => handleFilterChange('amountMin', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                        onInput={(e) => {
+                          e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Max Amount</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
                         placeholder="₹10,00,000"
                         value={filters.amountMax}
                         onChange={(e) => handleFilterChange('amountMax', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                        onInput={(e) => {
+                          e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900"
                       />
                     </div>
 
@@ -324,7 +332,7 @@ export default function UnderwriterDashboard() {
                         type="date"
                         value={filters.dateFrom}
                         onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900"
                       />
                     </div>
 
@@ -334,7 +342,7 @@ export default function UnderwriterDashboard() {
                         type="date"
                         value={filters.dateTo}
                         onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900"
                       />
                     </div>
                   </div>
