@@ -28,7 +28,7 @@ const ApplicationStatus = () => {
 
   const { user } = useAuth()
 
-  let dashboardPath = "/dashboard/applicant" // default
+  let dashboardPath = "/dashboard/applicant"
   if (user?.role === "underwriter") {
     dashboardPath = "/dashboard/underwriter"
   } else if (user?.role === "system_admin") {
@@ -47,57 +47,12 @@ const ApplicationStatus = () => {
   }
 
   const handleApplicationUpdated = () => {
-    fetchApplications() // This should refetch the list
-  }
-
-  const getStatusClasses = (status: string) => {
-    switch (status) {
-      case 'approved': return 'bg-green-50 text-green-900 border-green-200 shadow-sm'
-      case 'rejected': return 'bg-red-50 text-red-900 border-red-200 shadow-sm'
-      case 'under_review': return 'bg-blue-50 text-blue-900 border-blue-200 shadow-sm'
-      default: return 'bg-amber-50 text-amber-900 border-amber-200 shadow-sm'
-    }
-  }
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'approved': return (
-        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-        </svg>
-      )
-      case 'rejected': return (
-        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-        </svg>
-      )
-      case 'under_review': return (
-        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-          <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-        </svg>
-      )
-      case 'pending': return (
-        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-        </svg>
-      )
-      default: return (
-        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-        </svg>
-      )
-    }
-  }
-
-  const formatStatus = (status: string) => {
-    return status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+    fetchApplications()
   }
 
   const handleSubmitForReview = async (applicationId: string) => {
     try {
-      await api.patch(`/loans/${applicationId}/submit-for-review`) // or whatever your API endpoint is
-      // Update the local state to reflect the status change
+      await api.patch(`/loans/${applicationId}/submit-for-review`)
       setApplications(applications.map(app => 
         app._id === applicationId 
           ? { ...app, status: 'under_review' as const }
@@ -106,7 +61,93 @@ const ApplicationStatus = () => {
     } catch (err: any) {
       alert(err.response?.data?.message || 'Failed to submit for review')
     }
-  };
+  }
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'approved': return (
+        <svg className="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+        </svg>
+      )
+      case 'rejected': return (
+        <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+        </svg>
+      )
+      case 'under_review': return (
+        <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+          <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+        </svg>
+      )
+      default: return (
+        <svg className="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+        </svg>
+      )
+    }
+  }
+
+  const getStatusBadge = (status: string) => {
+    const baseClasses = "inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold border"
+    
+    switch (status) {
+      case 'approved':
+        return (
+          <span className={`${baseClasses} bg-emerald-50 text-emerald-700 border-emerald-200`}>
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+            <span>Approved</span>
+          </span>
+        )
+      case 'rejected':
+        return (
+          <span className={`${baseClasses} bg-red-50 text-red-700 border-red-200`}>
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+            <span>Rejected</span>
+          </span>
+        )
+      case 'under_review':
+        return (
+          <span className={`${baseClasses} bg-blue-50 text-blue-700 border-blue-200`}>
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+              <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+            </svg>
+            <span>Under Review</span>
+          </span>
+        )
+      default:
+        return (
+          <span className={`${baseClasses} bg-amber-50 text-amber-700 border-amber-200`}>
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+            </svg>
+            <span>Pending</span>
+          </span>
+        )
+    }
+  }
+
+  const formatCurrency = (amount: number) => {
+    return `₹${amount.toLocaleString('en-IN')}`
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
+  const formatApplicationId = (id: string) => {
+    return `#${id.slice(-8).toUpperCase()}`
+  }
 
   if (loading) {
     return <LoadingState 
@@ -139,7 +180,7 @@ const ApplicationStatus = () => {
           </div>
         </div>
         
-        {/* Error State with professional styling */}
+        {/* Error State */}
         {error && (
           <div className="mb-8 border-l-4 border-red-400 bg-red-50 p-6 rounded-r-lg shadow-sm">
             <div className="flex items-center">
@@ -154,7 +195,7 @@ const ApplicationStatus = () => {
           </div>
         )}
 
-        {/* Refined Empty State */}
+        {/* Empty State */}
         {applications.length === 0 ? (
           <div className="text-center py-24">
             <div className="max-w-md mx-auto">
@@ -180,153 +221,151 @@ const ApplicationStatus = () => {
           </div>
         ) : (
           <div>
-            {/* Executive Summary */}
-            <div className="mb-10">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="px-8 py-6 border-b border-gray-100 bg-gray-50">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-medium text-gray-900">Application Overview</h2>
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <div className="text-2xl font-light text-gray-900">{applications.length}</div>
-                        <div className="text-sm text-gray-600 font-medium">
-                          {applications.length === 1 ? 'Application' : 'Applications'}
-                        </div>
-                      </div>
-                      <div className="w-12 h-12 bg-gray-900 rounded-lg flex items-center justify-center">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                      </div>
+            {/* Applications Section with Card Layout */}
+            <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-2xl font-light text-gray-900 mb-1">All Applications</h2>
+                    <p className="text-sm text-gray-600 font-light">Complete portfolio of your loan applications</p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm">
+                      <span className="text-sm font-medium text-gray-700">
+                        {applications.length} {applications.length === 1 ? 'Application' : 'Applications'}
+                      </span>
                     </div>
                   </div>
                 </div>
-                
-                {/* Executive Table */}
-                <div className="overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-8 py-5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">Reference</th>
-                          <th className="px-6 py-5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">Loan Type</th>
-                          <th className="px-6 py-5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">Principal Amount</th>
-                          <th className="px-6 py-5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">Status</th>
-                          <th className="px-6 py-5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">Submitted</th>
-                          <th className="px-6 py-5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">Documentation</th>
-                          <th className="px-6 py-5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-100">
-                        {applications.map((app) => (
-                          <tr key={app._id} className="hover:bg-gray-50 transition-colors duration-150">
-                            <td className="px-8 py-6 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <div className="w-2 h-2 bg-gray-400 rounded-full mr-3"></div>
-                                <span className="font-mono text-xs font-medium text-gray-900 bg-gray-100 px-3 py-1.5 rounded-md tracking-wider">
-                                  #{app._id.slice(-8).toUpperCase()}
+              </header>
+
+              <div className="p-8">
+                <div className="space-y-4">
+                  {applications.map((app) => (
+                    <div 
+                      key={app._id} 
+                      className="border border-gray-200 rounded-xl p-6 hover:bg-gray-50/50 hover:border-gray-300 transition-all duration-200 group"
+                    >
+                      {/* Main Content Row */}
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center space-x-6 flex-1 min-w-0">
+                          <div className="flex-shrink-0">
+                            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                              {getStatusIcon(app.status)}
+                            </div>
+                          </div>
+                          
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-4 mb-3">
+                              <h3 className="font-semibold text-gray-900 text-lg">{app.loanType}</h3>
+                              {getStatusBadge(app.status)}
+                            </div>
+                            
+                            <div className="flex items-center space-x-6 text-sm text-gray-600">
+                              <div className="flex items-center space-x-2">
+                                <span className="font-light">Amount:</span>
+                                <span className="font-semibold text-gray-900 text-lg">{formatCurrency(app.amount)}</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <span className="font-light">Tenure:</span>
+                                <span className="font-medium">{app.tenure} months</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <span className="font-light">Reference:</span>
+                                <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs font-medium">
+                                  {formatApplicationId(app._id)}
                                 </span>
                               </div>
-                            </td>
-                            <td className="px-6 py-6 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">{app.loanType}</div>
-                              <div className="text-xs text-gray-500 mt-1">{app.tenure} months tenure</div>
-                            </td>
-                            <td className="px-6 py-6 whitespace-nowrap">
-                              <div className="text-lg font-light text-gray-900">₹{app.amount.toLocaleString('en-IN')}</div>
-                            </td>
-                            <td className="px-6 py-6 whitespace-nowrap">
-                              <div
-                                className={`inline-flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium border ${getStatusClasses(app.status)}`}
-                              >
-                                {getStatusIcon(app.status)}
-                                <span>{formatStatus(app.status)}</span>
+                              <div className="flex items-center space-x-2">
+                                <span className="font-light">Submitted:</span>
+                                <span className="font-medium">{formatDate(app.createdAt)}</span>
                               </div>
-                            </td>
-                            <td className="px-6 py-6 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">
-                                {new Date(app.createdAt).toLocaleDateString('en-IN', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric'
-                                })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons Row */}
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <div className="flex items-center">
+                          {app.documentsUploaded ? (
+                            <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-white text-emerald-700 border-2 border-emerald-200 shadow-sm">
+                              <div className="w-4 h-4 mr-2 bg-emerald-100 rounded-full flex items-center justify-center">
+                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"/>
+                                </svg>
                               </div>
-                            </td>
-                            <td className="px-6 py-6 whitespace-nowrap">
-                              {app.documentsUploaded ? (
-                                <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                  </svg>
-                                  Complete
-                                </div>
-                              ) : (
-                                <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
-                                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                  </svg>
-                                  Pending
-                                </div>
-                              )}
-                            </td>
-                            <td className="px-6 py-6 whitespace-nowrap">
-                              <div className="flex items-center space-x-3">
-                                <button 
-                                  onClick={() => {
-                                    setSelectedApplication(app)
-                                  }}
-                                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                >
-                                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                  </svg>
-                                  Review
-                                </button>
-                                {!app.documentsUploaded ? (
-                                  <Link 
-                                    to="/upload-documents" 
-                                    state={{ applicationId: app._id }}
-                                    className="inline-flex items-center px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                  >
-                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                    </svg>
-                                    Upload
-                                  </Link>
-                                ) : app.documentsUploaded && app.status === 'pending' ? (
-                                  <button
-                                    onClick={() => handleSubmitForReview(app._id)}
-                                    className="inline-flex items-center px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                  >
-                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Submit for Review
-                                  </button>
-                                ) : null}
+                              Documentation Complete
+                            </div>
+                          ) : (
+                            <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-white text-amber-700 border-2 border-amber-200 shadow-sm">
+                              <div className="w-4 h-4 mr-2 bg-amber-100 rounded-full flex items-center justify-center">
+                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
                               </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                              Documents Pending
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center space-x-3">
+                          <button 
+                            onClick={() => setSelectedApplication(app)}
+                            className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-medium bg-white text-gray-700 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 shadow-sm"
+                          >
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            Review Details
+                          </button>
+
+                          {!app.documentsUploaded ? (
+                            <Link
+                              to="/upload-documents"
+                              state={{ applicationId: app._id }}
+                              className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold bg-white text-amber-700 border-2 border-amber-200 hover:border-amber-300 hover:bg-amber-50 transition-all duration-200 shadow-sm hover:shadow-md group"
+                            >
+                              <div className="w-4 h-4 mr-2 bg-amber-100 rounded-full flex items-center justify-center group-hover:bg-amber-200">
+                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                              </div>
+                              Upload Documents
+                              <svg width="12" height="12" className="ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                              </svg>
+                            </Link>
+                          ) : app.status === 'pending' ? (
+                            <button
+                              onClick={() => handleSubmitForReview(app._id)}
+                              className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                            >
+                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              Submit for Review
+                            </button>
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
+            </section>
 
             <LoanReviewModal
-            isOpen={!!selectedApplication}
-            onClose={() => setSelectedApplication(null)}
-            applicationId={selectedApplication?._id || ''}
-            onApplicationUpdated={handleApplicationUpdated}
+              isOpen={!!selectedApplication}
+              onClose={() => setSelectedApplication(null)}
+              applicationId={selectedApplication?._id || ''}
+              onApplicationUpdated={handleApplicationUpdated}
             />
           </div>
         )}
 
-        {/* Executive Navigation */}
+        {/* Navigation */}
         <div className="mt-12 flex justify-between items-center">
           <Link 
             to={dashboardPath}
@@ -351,28 +390,6 @@ const ApplicationStatus = () => {
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-      `}</style>
     </div>
   )
 }
