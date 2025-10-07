@@ -188,19 +188,29 @@ router.delete(
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { applicationId } = req.params as { applicationId: string };
-
-      // Only allow the owner to delete their application
-      const deleted = await LoanApplication.findOneAndDelete({
+      
+      // First, find the application to check its status
+      const application = await LoanApplication.findOne({
         _id: applicationId,
         userId: req.user?.userId
       });
-
-      if (!deleted) {
+      
+      if (!application) {
         return res.status(404).json({
           message: 'Application not found or not authorized'
         });
       }
-
+      
+      // Prevent deletion of approved applications
+      if (application.status === 'approved') {
+        return res.status(400).json({
+          message: 'Cannot delete approved applications'
+        });
+      }
+      
+      // Delete the application
+      await LoanApplication.findByIdAndDelete(applicationId);
+      
       res.json({ success: true, message: 'Application deleted successfully' });
     } catch (error: any) {
       res.status(500).json({ message: 'Server error', error: error.message });

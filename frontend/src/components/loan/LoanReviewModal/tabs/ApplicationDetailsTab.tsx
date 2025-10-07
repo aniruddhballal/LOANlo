@@ -51,7 +51,7 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
   return (
     <div className="space-y-6">
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
+      {showDeleteConfirm && application.status !== "approved" && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg max-w-md mx-4 border border-gray-200 shadow-xl">
             <div className="p-6">
@@ -106,8 +106,8 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
             </div>
           </div>
           
-          {/* Delete Button - Only visible for the applicant who owns this application */}
-          {onDelete && user && user.role === 'applicant' && isOwner && (
+          {/* Delete Button - Only visible for the applicant who owns this application and not approved */}
+          {onDelete && user && user.role === 'applicant' && isOwner && application.status !== 'approved' && (
             <button
               onClick={handleDeleteClick}
               className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200"
