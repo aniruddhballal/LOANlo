@@ -1,5 +1,8 @@
 ## Tasks/Features - Stacked
 
+- [ ] when loan application gets approved - "Updated by: Unknown" is shown
+- [ ] make sure every deletion does not actually mean deletion; keep logs of everything
+- [ ] dont allow deletion of documents once approved
 - [ ] on application status page, if all required documents are uploaded, then instead of "upload" button it should say "submit for review"
 - [ ] ~~~document storage`~~~
 - [ ] ~~~document view/download fetch api call~~~
