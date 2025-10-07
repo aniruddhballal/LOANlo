@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { Search, SlidersHorizontal, X, ChevronDown, ChevronUp, ArrowUpDown } from 'lucide-react'
 import { DashboardLayout } from './shared/DashboardLayout'
-import { UnderwriterTableSkeleton } from './shared/SkeletonComponents'
+import { UnderwriterTableSkeleton } from '../ui/SkeletonComponents'
 import { ErrorAlert } from './shared/ErrorAlert'
 import { EmptyState } from './shared/EmptyState'
 import { StatusBadge } from './shared/StatusBadge'

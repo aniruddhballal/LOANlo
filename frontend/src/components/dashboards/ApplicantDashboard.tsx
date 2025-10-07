@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { DashboardLayout } from './shared/DashboardLayout'
-import { PersonalDetailsSkeleton, ServiceActionsSkeleton } from './shared/SkeletonComponents'
+import { PersonalDetailsSkeleton, ServiceActionsSkeleton } from '../ui/SkeletonComponents'
 import api from '../../api'
 
 const ApplicantDashboard = () => {

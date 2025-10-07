@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import api from '../../api'
 import LoanReviewModal from './LoanReviewModal'
 import { useAuth } from '../../context/AuthContext'
-import { ApplicationStatusSkeleton } from '../dashboards/shared/SkeletonComponents'
+import { ApplicationStatusSkeleton } from '../ui/SkeletonComponents'
 
 interface LoanApplication {
   _id: string
