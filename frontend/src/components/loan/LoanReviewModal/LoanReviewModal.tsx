@@ -96,6 +96,8 @@ export default function LoanReviewModal({
         setComment('')
         onApplicationUpdated()
         if (status !== 'under_review') {
+          // Switch to details tab before closing modal
+          setActiveTab('details')
           setTimeout(() => onClose(), 1500)
         }
       } else {

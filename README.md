@@ -1,12 +1,13 @@
 ## Tasks/Features - Stacked
 
+- [ ] it should refetch the status under applciation overview for example after approving loan, i should not be asked to refresh the page
 - [ ] when loan application gets approved - "Updated by: Unknown" is shown
 - [ ] make sure every deletion does not actually mean deletion; keep logs of everything
 - [ ] dont allow deletion of documents once approved
 - [ ] on application status page, if all required documents are uploaded, then instead of "upload" button it should say "submit for review"
 - [ ] ~~~document storage`~~~
 - [ ] ~~~document view/download fetch api call~~~
-- [ ] after approving/rejecting -> shouldn't load into actions tab again
+- [x] after approving/rejecting -> shouldn't load into actions tab again
 - [ ] show user edit/delete option for users
 - [ ] simple fetch and show applicant profile updation history for underwriter to view each profile of the applicant
 - [ ] stylise all the buttons, and make the interactiveness better
