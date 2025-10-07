@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
+import { Search, SlidersHorizontal, X, ChevronDown, ChevronUp, ArrowUpDown } from 'lucide-react'
 import { DashboardLayout } from './shared/DashboardLayout'
 import { UnderwriterTableSkeleton } from './shared/SkeletonComponents'
 import { ErrorAlert } from './shared/ErrorAlert'
@@ -28,6 +29,21 @@ export default function UnderwriterDashboard() {
   const [error, setError] = useState<string | null>(null)
   const [selectedApplicationId, setSelectedApplicationId] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+
+  // Search and Filter States
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showFilters, setShowFilters] = useState(false)
+  const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: 'asc' | 'desc' }>({ 
+    key: null, 
+    direction: 'asc' 
+  })
+  const [filters, setFilters] = useState({
+    status: 'all',
+    amountMin: '',
+    amountMax: '',
+    dateFrom: '',
+    dateTo: ''
+  })
 
   useEffect(() => {
     fetchApplications()
@@ -69,6 +85,123 @@ export default function UnderwriterDashboard() {
     }
   }
 
+  // Global search function
+  const searchInApplication = (app: LoanApplication, query: string) => {
+    const searchLower = query.toLowerCase()
+    return (
+      formatApplicationId(app._id).toLowerCase().includes(searchLower) ||
+      `${app.userId?.firstName} ${app.userId?.lastName}`.toLowerCase().includes(searchLower) ||
+      app.userId?.email?.toLowerCase().includes(searchLower) ||
+      app.userId?.phone?.toLowerCase().includes(searchLower) ||
+      app.status?.toLowerCase().includes(searchLower) ||
+      formatCurrency(app.amount).toLowerCase().includes(searchLower) ||
+      formatDate(app.createdAt).toLowerCase().includes(searchLower)
+    )
+  }
+
+  // Filter and sort logic
+  const filteredAndSortedApplications = useMemo(() => {
+    let result = [...applications]
+
+    // Apply global search
+    if (searchQuery) {
+      result = result.filter(app => searchInApplication(app, searchQuery))
+    }
+
+    // Apply filters
+    if (filters.status !== 'all') {
+      result = result.filter(app => app.status === filters.status)
+    }
+
+    if (filters.amountMin) {
+      result = result.filter(app => app.amount >= Number(filters.amountMin))
+    }
+
+    if (filters.amountMax) {
+      result = result.filter(app => app.amount <= Number(filters.amountMax))
+    }
+
+    if (filters.dateFrom) {
+      result = result.filter(app => new Date(app.createdAt) >= new Date(filters.dateFrom))
+    }
+
+    if (filters.dateTo) {
+      result = result.filter(app => new Date(app.createdAt) <= new Date(filters.dateTo))
+    }
+
+    // Apply sorting
+    if (sortConfig.key) {
+      result.sort((a, b) => {
+        let aVal: any, bVal: any
+
+        switch (sortConfig.key) {
+          case 'reference':
+            aVal = a._id
+            bVal = b._id
+            break
+          case 'applicant':
+            aVal = `${a.userId?.firstName} ${a.userId?.lastName}`.toLowerCase()
+            bVal = `${b.userId?.firstName} ${b.userId?.lastName}`.toLowerCase()
+            break
+          case 'amount':
+            aVal = a.amount
+            bVal = b.amount
+            break
+          case 'status':
+            aVal = a.status
+            bVal = b.status
+            break
+          case 'submitted':
+            aVal = new Date(a.createdAt).getTime()
+            bVal = new Date(b.createdAt).getTime()
+            break
+          default:
+            return 0
+        }
+
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1
+        return 0
+      })
+    }
+
+    return result
+  }, [applications, searchQuery, filters, sortConfig])
+
+  const handleSort = (key: string) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }))
+  }
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }))
+  }
+
+  const clearFilters = () => {
+    setFilters({
+      status: 'all',
+      amountMin: '',
+      amountMax: '',
+      dateFrom: '',
+      dateTo: ''
+    })
+    setSearchQuery('')
+    setSortConfig({ key: null, direction: 'asc' })
+  }
+
+  const activeFilterCount = Object.values(filters).filter(v => v && v !== 'all').length + (searchQuery ? 1 : 0)
+
+  const SortIcon = ({ columnKey }: { columnKey: string }) => {
+    if (sortConfig.key !== columnKey) {
+      return <ArrowUpDown className="w-4 h-4 text-gray-400" />
+    }
+    return sortConfig.direction === 'asc' 
+      ? <ChevronUp className="w-4 h-4 text-gray-900" />
+      : <ChevronDown className="w-4 h-4 text-gray-900" />
+  }
+
   return (
     <>
       <DashboardLayout 
@@ -78,7 +211,7 @@ export default function UnderwriterDashboard() {
       >
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-6">
               <div>
                 <h2 className="text-2xl font-light text-gray-900 mb-1">
                   Loan Applications
@@ -90,8 +223,123 @@ export default function UnderwriterDashboard() {
               <div className="text-sm font-medium text-gray-700">
                 {loading 
                   ? <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
-                  : `${applications.length} ${applications.length === 1 ? "Application" : "Applications"}`}
+                  : `${filteredAndSortedApplications.length} of ${applications.length} ${applications.length === 1 ? "Application" : "Applications"}`}
               </div>
+            </div>
+
+            {/* Search and Filter Bar */}
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                {/* Global Search */}
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by reference, name, email, phone, status, or amount..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Filter Toggle */}
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors relative"
+                >
+                  <SlidersHorizontal className="w-5 h-5" />
+                  <span className="font-medium">Filters</span>
+                  {activeFilterCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-gray-900 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {activeFilterCount}
+                    </span>
+                  )}
+                </button>
+
+                {activeFilterCount > 0 && (
+                  <button
+                    onClick={clearFilters}
+                    className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900"
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
+
+              {/* Filter Panel */}
+              {showFilters && (
+                <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Status Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                      <select
+                        value={filters.status}
+                        onChange={(e) => handleFilterChange('status', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                      >
+                        <option value="all">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="under_review">Under Review</option>
+                      </select>
+                    </div>
+
+                    {/* Amount Range */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Min Amount</label>
+                      <input
+                        type="number"
+                        placeholder="₹0"
+                        value={filters.amountMin}
+                        onChange={(e) => handleFilterChange('amountMin', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Max Amount</label>
+                      <input
+                        type="number"
+                        placeholder="₹10,00,000"
+                        value={filters.amountMax}
+                        onChange={(e) => handleFilterChange('amountMax', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                      />
+                    </div>
+
+                    {/* Date Range */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+                      <input
+                        type="date"
+                        value={filters.dateFrom}
+                        onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+                      <input
+                        type="date"
+                        value={filters.dateTo}
+                        onChange={(e) => handleFilterChange('dateTo', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </header>
           
@@ -103,14 +351,21 @@ export default function UnderwriterDashboard() {
             
             {error && <ErrorAlert message={error} />}
 
-            {!loading && applications.length === 0 && (
+            {!loading && filteredAndSortedApplications.length === 0 && !searchQuery && activeFilterCount === 0 && (
               <EmptyState 
                 title="No Applications Found"
                 description="There are currently no loan applications to review."
               />
             )}
 
-            {!loading && applications.length > 0 && (
+            {!loading && filteredAndSortedApplications.length === 0 && (searchQuery || activeFilterCount > 0) && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg mb-2">No applications found</p>
+                <p className="text-gray-400 text-sm">Try adjusting your search or filters</p>
+              </div>
+            )}
+
+            {!loading && filteredAndSortedApplications.length > 0 && (
               <div className="overflow-hidden">
                 {/* Desktop Table View */}
                 <div className="hidden lg:block">
@@ -118,23 +373,53 @@ export default function UnderwriterDashboard() {
                     <table className="w-full">
                       <thead className="bg-gray-50/50 border-b border-gray-200">
                         <tr>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Reference
+                          <th 
+                            onClick={() => handleSort('reference')}
+                            className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                          >
+                            <div className="flex items-center gap-2">
+                              Reference
+                              <SortIcon columnKey="reference" />
+                            </div>
                           </th>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Applicant
+                          <th 
+                            onClick={() => handleSort('applicant')}
+                            className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                          >
+                            <div className="flex items-center gap-2">
+                              Applicant
+                              <SortIcon columnKey="applicant" />
+                            </div>
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Contact
                           </th>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Amount
+                          <th 
+                            onClick={() => handleSort('amount')}
+                            className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                          >
+                            <div className="flex items-center gap-2">
+                              Amount
+                              <SortIcon columnKey="amount" />
+                            </div>
                           </th>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Status
+                          <th 
+                            onClick={() => handleSort('status')}
+                            className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                          >
+                            <div className="flex items-center gap-2">
+                              Status
+                              <SortIcon columnKey="status" />
+                            </div>
                           </th>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Submitted
+                          <th 
+                            onClick={() => handleSort('submitted')}
+                            className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                          >
+                            <div className="flex items-center gap-2">
+                              Submitted
+                              <SortIcon columnKey="submitted" />
+                            </div>
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Actions
@@ -142,7 +427,7 @@ export default function UnderwriterDashboard() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {applications.map((app) => (
+                        {filteredAndSortedApplications.map((app) => (
                           <tr key={app._id} className="hover:bg-gray-50/50 transition-colors duration-150">
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className="font-mono bg-gray-900 text-white px-2 py-1 rounded text-xs font-medium">
@@ -198,7 +483,7 @@ export default function UnderwriterDashboard() {
 
                 {/* Mobile Card View */}
                 <div className="lg:hidden space-y-4">
-                  {applications.map((app) => (
+                  {filteredAndSortedApplications.map((app) => (
                     <div 
                       key={app._id} 
                       className="border border-gray-200 rounded-xl p-6 hover:bg-gray-50/50 hover:border-gray-300 transition-all duration-200 group"

@@ -1,6 +1,7 @@
 ## Tasks/Features - Stacked
 
-- [ ] underwriter dashboard - search + filter/sort option
+- [ ] empty waste space in the dashboard? make the table wider?
+- [X] underwriter dashboard - search + filter/sort option
 - [ ] what if applicant deletes a document right at the same time as the underwriter approving it
 - [ ] when loan application gets approved - "Updated by: Unknown" is shown
 - [ ] make sure every deletion does not actually mean deletion; keep logs of everything
