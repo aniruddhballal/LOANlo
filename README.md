@@ -1,7 +1,7 @@
 ## Tasks/Features - Stacked
 
 - [ ] make use of skeletons in the applicationstatus pages, just like how it was imported and used in applicantdashboard from skeletoncomponents.tsx
-- [ ] remove the "personal details are complete" message
+- [x] remove the "personal details are complete" message
 - [x] adjust the header of the dashboard page such that it fits the overly (?) wide tabular content below
 - [x] display all the loans in the application status page, in the classy style that exists for the recent applications in the landing applicant dashboard page 
 - [x] empty waste space in the dashboard? make the table wider?

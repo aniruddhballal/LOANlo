@@ -39,51 +39,35 @@ const ApplicantDashboard = () => {
       {/* Personal Details Section */}
       {hasPersonalDetails === null ? (
         <PersonalDetailsSkeleton />
-      ) : (
-        <div className={`mb-8 rounded-xl p-6 shadow-sm border transition-all duration-300 ${
-          hasPersonalDetails 
-            ? 'bg-gradient-to-r from-gray-900 to-black text-white border-gray-300 shadow-md' 
-            : 'bg-white text-gray-900 border-amber-200 shadow-amber-100'
-        }`}>
+      ) : !hasPersonalDetails ? (
+        <div className="mb-8 rounded-xl p-6 shadow-sm border transition-all duration-300 bg-white text-gray-900 border-amber-200 shadow-amber-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-5">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                hasPersonalDetails ? 'bg-white/10 backdrop-blur' : 'bg-amber-100'
-              }`}>
-                {hasPersonalDetails ? (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path d="M6 12.5L10.5 17L18 9.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                ) : (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="#D97706" strokeWidth="1.5"/>
-                    <rect x="11" y="7" width="2" height="7" rx="1" fill="#D97706"/>
-                    <rect x="11" y="16" width="2" height="2" rx="1" fill="#D97706"/>
-                  </svg>
-                )}
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-amber-100">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="#D97706" strokeWidth="1.5"/>
+                  <rect x="11" y="7" width="2" height="7" rx="1" fill="#D97706"/>
+                  <rect x="11" y="16" width="2" height="2" rx="1" fill="#D97706"/>
+                </svg>
               </div>
               <div>
                 <h2 className="text-xl font-semibold mb-1">
-                  {hasPersonalDetails ? 'Personal Details Complete' : 'Personal Details Required'}
+                  Personal Details Required
                 </h2>
-                <p className={`text-sm font-light ${hasPersonalDetails ? 'text-gray-200' : 'text-gray-600'}`}>
-                  {hasPersonalDetails 
-                     ? 'Your personal details are complete and your profile is ready for loan applications.'
-                     : 'Please complete your personal details to continue with loan applications.'}
+                <p className="text-sm font-light text-gray-600">
+                  Please complete your personal details to continue with loan applications.
                 </p>
               </div>
             </div>
-            {!hasPersonalDetails && (
-              <Link 
-                to="/personal-details" 
-                className="px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                Complete Profile
-              </Link>
-            )}
+            <Link
+              to="/personal-details"
+              className="px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              Complete Profile
+            </Link>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Service Actions */}
       {loading && hasPersonalDetails === null ? (
