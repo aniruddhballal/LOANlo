@@ -1,5 +1,10 @@
 ## Tasks/Features - Stacked
 
+- [ ] document storage
+- [ ] document view/download fetch api call
+- [ ] after approving/rejecting -> shouldn't load into actions tab again
+- [ ] show user edit/delete option for users
+- [ ] simple fetcn and show applicant profile updation history for underwriter to view each profile of the applicant
 - [ ] stylise all the buttons, and make the interactiveness better
 - [ ] add the delete account feature back, but then dont actually remove from database, but log it and make sure that it will not be login-able anymore for the user (unless you wanna add the 30-day to delete account feature where if you login within the span of 30 days of applying for account deletion, it will be revived)
 - [x] on clicking previous button, it stays on the clicked/active state even in the "previous" page that it goes to
