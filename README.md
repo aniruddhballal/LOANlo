@@ -1,6 +1,7 @@
 ## Tasks/Features - Stacked
 
-- [ ] empty waste space in the dashboard? make the table wider?
+- [ ] display all the loans in the application status page, in the classy style that exists for the recent applications in the landing applicant dashboard page 
+- [x] empty waste space in the dashboard? make the table wider?
 - [X] underwriter dashboard - search + filter/sort option
 - [ ] what if applicant deletes a document right at the same time as the underwriter approving it
 - [ ] when loan application gets approved - "Updated by: Unknown" is shown
