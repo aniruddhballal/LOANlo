@@ -1,5 +1,6 @@
 ## Tasks/Features - Stacked
 
+- [ ] dont allow deletion of documents once approved - frontend and backend
 - [x] make use of skeletons in the applicationstatus pages, just like how it was imported and used in applicantdashboard from skeletoncomponents.tsx
 - [x] remove the "personal details are complete" message
 - [x] adjust the header of the dashboard page such that it fits the overly (?) wide tabular content below
@@ -9,7 +10,7 @@
 - [ ] what if applicant deletes a document right at the same time as the underwriter approving it
 - [ ] when loan application gets approved - "Updated by: Unknown" is shown
 - [ ] make sure every deletion does not actually mean deletion; keep logs of everything
-- [ ] dont allow deletion of documents and the loan application once approved
+- [x] dont allow deletion of loan applications once approved - frontend and backend
 - [ ] on application status page, if all required documents are uploaded, then instead of "upload" button it should say "submit for review"
 - [ ] ~~~document storage`~~~
 - [ ] ~~~document view/download fetch api call~~~
