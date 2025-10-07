@@ -35,7 +35,7 @@ export const DashboardLayout = ({
       }`}>
         <DashboardHeader title={title} subtitle={subtitle} />
         
-        <main className={`max-w-7xl mx-auto px-6 lg:px-8 py-8 transition-all duration-1000 delay-300 ${
+        <main className={`max-w-[1600px] mx-auto px-6 lg:px-8 py-8 transition-all duration-1000 delay-300 ${
           justLoggedIn ? 'animate-in slide-in-from-bottom-8 fade-in' : ''
         }`}>
           {children}
