@@ -1,5 +1,6 @@
 ## Tasks/Features - Stacked
 
+- [x] adjust the header of the dashboard page such that it fits the overly (?) wide tabular content below
 - [ ] display all the loans in the application status page, in the classy style that exists for the recent applications in the landing applicant dashboard page 
 - [x] empty waste space in the dashboard? make the table wider?
 - [X] underwriter dashboard - search + filter/sort option
