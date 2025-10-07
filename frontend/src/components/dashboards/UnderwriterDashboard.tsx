@@ -151,15 +151,12 @@ export default function UnderwriterDashboard() {
                             </td>
                             <td className="px-6 py-4">
                               <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                                <div className="w-12 h-8 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-semibold text-sm">
                                   {app.userId?.firstName?.charAt(0)}{app.userId?.lastName?.charAt(0)}
                                 </div>
                                 <div>
                                   <div className="font-semibold text-gray-900">
                                     {app.userId?.firstName} {app.userId?.lastName}
-                                  </div>
-                                  <div className="text-sm text-gray-600 font-light">
-                                    {app.userId?.role}
                                   </div>
                                 </div>
                               </div>
