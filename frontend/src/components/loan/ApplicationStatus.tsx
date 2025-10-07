@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import api from '../../api'
 import LoanReviewModal from './LoanReviewModal'
 import { useAuth } from '../../context/AuthContext'
-import { LoadingState } from '../ui/StatusMessages'
+import { ApplicationStatusSkeleton } from '../dashboards/shared/SkeletonComponents'
 
 interface LoanApplication {
   _id: string
@@ -150,10 +150,7 @@ const ApplicationStatus = () => {
   }
 
   if (loading) {
-    return <LoadingState 
-      title="Loading Your Applications"
-      message="Hang tight, we're reviewing your details..."
-    />
+    return <ApplicationStatusSkeleton />
   }
 
   return (

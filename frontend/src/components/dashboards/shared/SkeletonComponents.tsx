@@ -258,3 +258,90 @@ export const CompactLoadingSpinner = ({ text = "Loading..." }) => (
     </div>
   </div>
 );
+
+// Application Status Page Skeleton
+export const ApplicationStatusSkeleton = () => (
+  <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+    {/* Subtle geometric background */}
+    <div className="absolute inset-0 overflow-hidden opacity-30">
+      <div className="absolute top-0 left-0 w-full h-full" style={{
+        backgroundImage: `linear-gradient(30deg, transparent 40%, rgba(0,0,0,0.02) 40%, rgba(0,0,0,0.02) 60%, transparent 60%),
+                         linear-gradient(150deg, transparent 40%, rgba(0,0,0,0.01) 40%, rgba(0,0,0,0.01) 60%, transparent 60%)`
+      }}></div>
+    </div>
+
+    <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
+      <SkeletonBase>
+        {/* Header Skeleton */}
+        <div className="mb-12">
+          <div className="border-l-4 border-gray-300 pl-6">
+            <SkeletonText className="w-96 h-10 mb-3" />
+            <SkeletonText className="w-[500px] h-6" />
+          </div>
+        </div>
+
+        {/* Applications Section Skeleton */}
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          {/* Header */}
+          <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+            <div className="flex justify-between items-center">
+              <div>
+                <SkeletonText className="w-48 h-7 mb-2" />
+                <SkeletonText className="w-72 h-4" />
+              </div>
+              <SkeletonBox className="w-32 h-10 rounded-lg" />
+            </div>
+          </header>
+
+          {/* Application Cards */}
+          <div className="p-8">
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div 
+                  key={i}
+                  className="border border-gray-200 rounded-xl p-6"
+                >
+                  {/* Main Content Row */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-6 flex-1 min-w-0">
+                      <SkeletonCircle className="w-10 h-10" />
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center space-x-4 mb-3">
+                          <SkeletonText className="w-40 h-6" />
+                          <SkeletonBox className="w-24 h-6 rounded-full" />
+                        </div>
+                        
+                        <div className="flex items-center space-x-6">
+                          <SkeletonText className="w-32 h-5" />
+                          <SkeletonText className="w-28 h-5" />
+                          <SkeletonText className="w-36 h-5" />
+                          <SkeletonText className="w-32 h-5" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons Row */}
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <SkeletonBox className="w-48 h-10 rounded-lg" />
+                    <div className="flex items-center space-x-3">
+                      <SkeletonBox className="w-32 h-10 rounded-lg" />
+                      <SkeletonBox className="w-36 h-10 rounded-lg" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Navigation Skeleton */}
+        <div className="mt-12 flex justify-between items-center">
+          <SkeletonBox className="w-48 h-12 rounded-lg" />
+          <SkeletonBox className="w-56 h-12 rounded-lg" />
+        </div>
+      </SkeletonBase>
+    </div>
+  </div>
+);
