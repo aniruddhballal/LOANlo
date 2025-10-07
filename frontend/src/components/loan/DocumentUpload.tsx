@@ -251,24 +251,6 @@ const DocumentUpload = () => {
     }
   }
 
-  const completeDocumentSubmission = async () => {
-    const requiredDocsUploaded = documents
-      .filter(doc => doc.required)
-      .every(doc => doc.uploaded)
-
-    if (!requiredDocsUploaded) {
-      setError('Please upload all required documents before proceeding')
-      return
-    }
-
-    try {
-      await api.post(`/documents/complete/${applicationId}`)
-      navigate('/application-status')
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to complete submission')
-    }
-  }
-
   // Show loading state while fetching initial data
   if (isInitialLoading) {
     return (
@@ -670,15 +652,6 @@ const DocumentUpload = () => {
           >
             <CloudUploadIcon />
             <span>Upload All Selected</span>
-          </button>
-          
-          <button 
-            className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={completeDocumentSubmission}
-            disabled={requiredDocsUploaded !== requiredDocsCount}
-          >
-            <DocumentIcon />
-            <span>Submit for Review</span>
           </button>
         </div>
 

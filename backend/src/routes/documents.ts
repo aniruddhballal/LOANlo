@@ -286,6 +286,38 @@ router.post(
 
       await document.save();
 
+      // Check if all required documents are now uploaded
+      const requiredDocs: DocumentType[] = [
+        'aadhaar',
+        'pan',
+        'salary_slips',
+        'bank_statements',
+        'employment_certificate',
+        'photo',
+      ];
+
+      const allUploadedDocs = await Document.find({ applicationId });
+      const uploadedTypes: DocumentType[] = allUploadedDocs.map(
+        (doc) => doc.documentType
+      );
+
+      const allRequiredDocsUploaded = requiredDocs.every((doc) =>
+        uploadedTypes.includes(doc)
+      );
+
+      // Update application status if all required documents are uploaded
+      if (allRequiredDocsUploaded && !application.documentsUploaded) {
+        application.documentsUploaded = true;
+        application.status = 'under_review';
+        application.statusHistory.push({
+          status: 'under_review',
+          timestamp: new Date(),
+          comment: 'All required documents uploaded, application under review',
+        });
+        application.updatedAt = new Date();
+        await application.save();
+      }
+
       res.json({
         success: true,
         message: 'Document uploaded successfully',
@@ -295,6 +327,7 @@ router.post(
           fileName: document.fileName,
           uploadedAt: document.uploadedAt,
         },
+        allRequiredDocsUploaded, // Let frontend know if all docs are complete
       });
     } catch (error: any) {
       res.status(500).json({ message: 'Server error', error: error.message });
