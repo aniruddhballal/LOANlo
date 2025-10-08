@@ -1,6 +1,6 @@
 ## Tasks/Features - Stacked
 
-- [ ] dont allow deletion of documents once approved - frontend and backend
+- [x] dont allow deletion of documents once approved - frontend and backend
 - [x] make use of skeletons in the applicationstatus pages, just like how it was imported and used in applicantdashboard from skeletoncomponents.tsx
 - [x] remove the "personal details are complete" message
 - [x] adjust the header of the dashboard page such that it fits the overly (?) wide tabular content below

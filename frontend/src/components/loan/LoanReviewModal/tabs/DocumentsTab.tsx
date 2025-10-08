@@ -185,7 +185,7 @@ export default function DocumentsTab({ application, onDocumentUpdate, isApplican
   return (
     <div className="space-y-6">
       {/* Delete Confirmation Modal */}
-      {isApplicant && showDeleteConfirm && (
+      {isApplicant && showDeleteConfirm && application.status !== "approved" && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg max-w-md mx-4 border border-gray-200 shadow-xl">
             <div className="p-6">
@@ -401,7 +401,7 @@ export default function DocumentsTab({ application, onDocumentUpdate, isApplican
                   </button>
 
                   {/* Delete Document Button - Only visible for applicants */}
-                  {isApplicant && (
+                  {isApplicant && application.status !== "approved" && (
                     <button
                       onClick={() => handleDeleteConfirm(doc)}
                       disabled={deletingDocument === doc.type}
