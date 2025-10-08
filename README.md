@@ -11,9 +11,9 @@
 - [ ] when loan application gets approved - "Updated by: Unknown" is shown
 - [ ] make sure every deletion does not actually mean deletion; keep logs of everything
 - [x] dont allow deletion of loan applications once approved - frontend and backend
-- [ ] on application status page, if all required documents are uploaded, then instead of "upload" button it should say "submit for review"
-- [ ] ~~~document storage`~~~
-- [ ] ~~~document view/download fetch api call~~~
+- [ ] ~~~on application status page, if all required documents are uploaded, then instead of "upload" button it should say "submit for review"~~~
+- [ ] document storage
+- [ ] document view/download fetch api call
 - [x] after approving/rejecting -> shouldn't load into actions tab again
 - [ ] show user edit/delete option for users
 - [ ] simple fetch and show applicant profile updation history for underwriter to view each profile of the applicant
