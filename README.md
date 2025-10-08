@@ -1,5 +1,6 @@
 ## Tasks/Features - Stacked
 
+- [ ] documents deletion, loan application deletion, profile deletion - hwo to store redundant copies of all of these?
 - [x] dont allow deletion of documents once approved - frontend and backend
 - [x] make use of skeletons in the applicationstatus pages, just like how it was imported and used in applicantdashboard from skeletoncomponents.tsx
 - [x] remove the "personal details are complete" message
@@ -15,7 +16,7 @@
 - [ ] document storage
 - [ ] document view/download fetch api call
 - [x] after approving/rejecting -> shouldn't load into actions tab again
-- [ ] show user edit/delete option for users
+- [ ] user profile deletion? should it be allowed?
 - [ ] simple fetch and show applicant profile updation history for underwriter to view each profile of the applicant
 - [ ] stylise all the buttons, and make the interactiveness better
 - [ ] add the delete account feature back, but then dont actually remove from database, but log it and make sure that it will not be login-able anymore for the user (unless you wanna add the 30-day to delete account feature where if you login within the span of 30 days of applying for account deletion, it will be revived)
