@@ -1,102 +1,59 @@
-## Tasks/Features - Stacked
+## 📋 Tasks & Features Overview
 
-- [ ] storing personal details is plain right now, do i need to salt it - am i storing the passwords securely?
-- [ ] documents deletion, loan application deletion, profile deletion - how to store redundant copies of all of these?
-- [x] dont allow deletion of documents once approved - frontend and backend
-- [x] make use of skeletons in the applicationstatus pages, just like how it was imported and used in applicantdashboard from skeletoncomponents.tsx
-- [x] remove the "personal details are complete" message
-- [x] adjust the header of the dashboard page such that it fits the overly (?) wide tabular content below
-- [x] display all the loans in the application status page, in the classy style that exists for the recent applications in the landing applicant dashboard page 
-- [x] empty waste space in the dashboard? make the table wider?
-- [X] underwriter dashboard - search + filter/sort option
-- [ ] what if applicant deletes a document right at the same time as the underwriter approving it
-- [ ] when loan application gets approved - "Updated by: Unknown" is shown
-- [ ] make sure every deletion does not actually mean deletion; keep logs of everything
-- [x] dont allow deletion of loan applications once approved - frontend and backend
-- [ ] ~~~on application status page, if all required documents are uploaded, then instead of "upload" button it should say "submit for review"~~~
-- [x] document storage
-- [x] document view/download fetch api call
-- [x] after approving/rejecting -> shouldn't load into actions tab again
-- [ ] user profile deletion? should it be allowed?
-- [ ] simple fetch and show applicant profile updation history for underwriter to view each profile of the applicant
-- [ ] stylise all the buttons, and make the interactiveness better
-- [ ] add the delete account feature back, but then dont actually remove from database, but log it and make sure that it will not be login-able anymore for the user (unless you wanna add the 30-day to delete account feature where if you login within the span of 30 days of applying for account deletion, it will be revived)
-- [x] on clicking previous button, it stays on the clicked/active state even in the "previous" page that it goes to
-- [ ] ~~on hover of "save & continue" make the cursor turn into another design~~
-- [ ] check if all ratelimiters are valid (it seems like it prevents all users from given ip address to not be able to update their profile if some other account has spammed profile update requests) - also check if the limits are set reasonably
-- [x] profile complete/update rate limiting combined with the "invalid income range" for fresh applicants who havent filled any other detail out - is a deadly combination that must be prevented at all costs - Update the /save route or create new route for saving/updating details
-- [ ] integrate AI risk thingy
-- [x] deploy the website
-- [x] it doesnt show why the "continue" or the "previous" buttons are disabled in case of invlaid format of inputs in the personal details form fields - so, modify the label, to hold the formats required for aadhaar, pan, DOB - the errors arent thrown only - the user is just prevented from going forward; currently it just says "enter <label_name>"
-- [ ] consider renaming middleware auth.ts to middleware.ts and i feel that the original routes/auth.ts is growing too big?
-- [x] Applicant name in loanapplication collection does not reflect changes in the profile/user collection - it should not be redundantly stored as a new field, it should simply refer to the applicants userid right
-- [x] log all the user-details/kyc updates - every update must be recorded with timestamp
-- [x] doesnt clear the number of attempts completed/left on successful logins
-- [x] doesnt handle edge cases where even after it says incorrect answer, if i click on verify answer again, before the modal closes, it updates the number of attempts taken - shouldnt happen
-- [X] Should failed Captcha attempts cause prevention of login for a while? like ratelimited? DONE
-- [x] Field specific errors are not shown right now, because errors are displayed only on handling the submit/next button and invalid entries in any of the input fields disable the submit/next/previous buttons
-- [x] User can make the details incomplete and then navigate back and then can be stuck there - because the filed they need to fill, to complete the profile - is on the next page and the continue/next button is not taking them there because the details are incomplete
-- [x] Take inputs from dropdown of locations, pincode autofilling based on address
-- [ ] allow for gmaps pinpoint drop of location + change the loading animation for the pincode + modularise the pincode fetching thing into a new component maybe - check which other components can be modularised
-- [x] Error displays in PII page is animated poorly
-- [x] Stylise the delete application/document - all the features that have been added on the go - unify them
-- [ ] Clean up the interfaces and props - might have fields that I am not using in that page
-- [ ] Should applicants be allowed to apply for multiple loans? What's the category of people who can do that? Is there a category?
-- [x] Add a check if the current logged in user is the one who is even viewing/clicking on the delete application/documents button. dont need these checks for the Underwriter because they won't have these features either ways - only Applicants can delete the documents, or the entire loan application. Underwriter should not be able to delete application.
-- [ ] Allow User profile deletion
-- [ ] Begin Application Process-> button onclick, has informal/unmatched styles
-- [x] Deleting documents is causing entire ApplicationStatus page to reload
-- [ ] Individual document submission/uploading is causing glitches in all the individual document submitting boxes?
-- [x] LoanReviewModal features are not User Role specific - anyone can view/interact with the upload/delete documents buttons
-- [ ] Implement Auth0/O-Auth
-- [x] Clear up backend unused routes - loans.ts, profile.ts, documents.ts, auth,ts
-- [x] Blocked view at the bottom of the screen for Underwriter's LoanReviewModal
-- [x] Loading/Skeleton screen for the Applicant and Underwriter Dashboard page, and the RoleProtectedRoute component
-- [x] Add the Loan Application Delete functionality back - this time, make sure only applicants can delete it? Should under-writers have all that power? Check auto-refresh/re-render the loan applications once one has been deleted?
-- [x] Shift from JavaScript backend to TypeScript backend
-- [x] Modularise LoanApplication page
-- [x] Autoscroll, autoclose, auto-highlight to make errors/succes states more visible to the User
-- [x] Continue button in KYC/PII form has fire-forget model 
-- [x] Input validation for Aadhaar and PAN details
-- [x] Modularise the Dashboard page, and make it user-dynamic (reusing same components, pass states and parameters)
-- [x] Merge UserKYC and PII/User details collections - reflect it onto the frontend features
-- [x] Modularise the KYC Component
-- [x] Remove edit/delete account feature
-- [x] Display success/error messages for all modals, forms, submits - consider switching to toast messages
-- [x] Flow between pending<->under_review->accepted/rejected/request_documents->pending<->
-- [x] Loading spinner states or skeletons for all the pages
-- [x] Review/Download/Delete functionality for all the uploaded documents
-- [x] Revamp the whole project directory structure
-- [x] Modularise the LoanReviewModal
-- [x] Cross tab auth sync
-- [x] Add a global 403 Access Denied Page
-- [x] Conditions to be met for underwriter to take any actions on the loan applications (statuses of the documents uploaded)
-- [x] Global token expiration handling interceptor
-- [x] Switch to central axios
-- [x] Create modals that can be shared across the website, for all users (dynamic-user-customisable)
-- [x] State driven routing instead of parameter driven - usecase in DocumentsUpload page
-- [x] UI/UX check
-- [x] Underwriter dashboard - special functions, and API calls
-- [x] Keep a check on the naming conventions
-- [x] Role protected routing - dynamic redirection
-- [x] Create and Assign newer User roles - use them (session/login auth details) to navigate through pages of the website
-- [x] ~~UI/UX for the edit/delete profile~~ Neither feature exists currently
-- [x] Add Conditional Welcome/Congratulations/Error displays - landing animations
-- [x] Show colours for progress/completion of document uploads
-- [x] Fix all ts compile errors
-- [x] ~~User account deletion~~ Temporarily removed, waiting for better PII-KYC logic separation
-- [x] Enter key form submit (Rogin/Register pages)
-- [x] Convert Login/Register div tags into form tags
-- [x] Explore better styling formats and icons from Tailwind
-- [x] Switch from vanilla module.css to Tailwind
-- [x] ~~Allow deletion of Loan Application~~ Temporarily removed
-- [x] Support multiple loan applications for a single individual
-- [x] ~~Concept of KYC - create new collection to store UserKYC, set up routing. Check for KYC completion status before giving User access to features of the app.~~ There is a new definition of KYC now
-- [x] Improve styles of all pages by shifting from the dark and irregularly styled theme into white based formal, corporate, sleek and modern design
-- [x] ~~Unify all the module.css files, so the pages look alike in style~~ No more vanilla module.css files
-- [x] ~~Ask User for password in case they want to edit their profile~~ User profile and "kyc" has been merged
-- [x] ~~User Password edit feature~~ Currently removed
-- [x] Modularise the backend server code
-- [x] Shift from MongoDB Compass to MongoDB Atlas
-- [x] Stylise the Login, Register, Dashboardpages, ApplicationStatus, Profile, LoanApplication and DocumentUpload pages (module.css)
-- [X] Start project + initial commit
+This section categorizes and tracks all ongoing, completed, and planned development tasks across key areas of the project.
+
+---
+
+<details>
+  <summary>🎨 <strong>UI/UX & Feature Enhancements</strong></summary>
+
+  **Description:**  
+  Tasks related to the design, enhancement, or modification of features, functionality, and visual elements of the application, aimed at improving user experience, intuitive navigation, usability, and overall interaction flow.
+
+  <details>
+    <summary>✅ <strong>Completed</strong></summary>
+
+    1. **TASK 1**  
+    2. **TASK 2**  
+    3. **TASK N**
+
+  </details>
+
+  <details>
+    <summary>⚡ <strong>Ongoing</strong></summary>
+
+    1. **TASK 1**  
+    2. **TASK 2**  
+    3. **TASK N**
+
+  </details>
+
+</details>
+
+---
+
+<details>
+  <summary>🔒 <strong>Code Quality & Optimization</strong></summary>
+
+  **Description:**  
+  Tasks focused on improving the underlying codebase, including structure, security, and optimization, to ensure maintainability, scalability, and adherence to best development practices.
+
+  <details>
+    <summary>✅ <strong>Completed</strong></summary>
+
+    1. **TASK 1**  
+    2. **TASK 2**  
+    3. **TASK N**
+
+  </details>
+
+  <details>
+    <summary>⚡ <strong>Ongoing</strong></summary>
+
+    1. **TASK 1**  
+    2. **TASK 2**  
+    3. **TASK N**
+
+  </details>
+
+</details>
