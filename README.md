@@ -1,6 +1,7 @@
 ## Tasks/Features - Stacked
 
-- [ ] documents deletion, loan application deletion, profile deletion - hwo to store redundant copies of all of these?
+- [ ] storing personal details is plain right now, do i need to salt it - am i storing the passwords securely?
+- [ ] documents deletion, loan application deletion, profile deletion - how to store redundant copies of all of these?
 - [x] dont allow deletion of documents once approved - frontend and backend
 - [x] make use of skeletons in the applicationstatus pages, just like how it was imported and used in applicantdashboard from skeletoncomponents.tsx
 - [x] remove the "personal details are complete" message
@@ -13,8 +14,8 @@
 - [ ] make sure every deletion does not actually mean deletion; keep logs of everything
 - [x] dont allow deletion of loan applications once approved - frontend and backend
 - [ ] ~~~on application status page, if all required documents are uploaded, then instead of "upload" button it should say "submit for review"~~~
-- [ ] document storage
-- [ ] document view/download fetch api call
+- [x] document storage
+- [x] document view/download fetch api call
 - [x] after approving/rejecting -> shouldn't load into actions tab again
 - [ ] user profile deletion? should it be allowed?
 - [ ] simple fetch and show applicant profile updation history for underwriter to view each profile of the applicant
