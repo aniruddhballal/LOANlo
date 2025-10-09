@@ -7,8 +7,7 @@ This section categorizes and tracks all ongoing, completed, and planned developm
   <summary>🎨 <strong>Frontend Design, UI/UX & Feature Enhancements</strong></summary>
 
   **Description:**  
-  Tasks related to the design, enhancement, or modification of features, functionality, and visual elements of the application, aimed at improving user experience, intuitive navigation, usability, and overall interaction flow.
-
+    Tasks focused on designing and refining the application's visual elements, interactive features, and user interface components to enhance usability, accessibility, and overall user experience.
   <br/>
 
   <details>
@@ -54,92 +53,92 @@ This section categorizes and tracks all ongoing, completed, and planned developm
 ---
 
 <details>
-  <summary>🔒 <strong>Code Quality & Optimization, Security, Actual Bugs</strong></summary>
+  <summary>🔒 <strong>Backend Development, Security & Architecture</strong></summary>
 
   **Description:**  
-  Tasks focused on improving the underlying codebase, including structure, security, and optimization, to ensure maintainability, scalability, and adherence to best development practices.
+  Tasks encompassing backend development, architectural restructuring, security implementation, and system optimization to ensure robust, maintainable, and scalable application infrastructure aligned with industry best practices.
 
   <details>
     <summary>✅ <strong>Completed</strong></summary>
 
-1. Start project, make all the initial commits onto git
-3. Shift from MongoDB Compass to MongoDB Atlas
-4. Modularise the backend server code - break into more files and change the directory structure, consequentially
-5. ~~User Password edit feature~~ Currently removed
-6. ~~Ask User for password in case they want to edit their profile~~ edit profile feature doesnt ask for password right now, as there is no separate User profile and separate kyc - everything comes under user profile/personal details, and kyc has been redefined from filling text of "extra personal details form" to uploading legal documents that verify work, residence and other details
-9. ~~Concept of KYC - create new collection to store UserKYC, set up routing. Check for KYC completion status before giving User access to features of the app.~~ There is a new definition of KYC now, there was a lot of redundancy with the old definition of kyc (which was just additional personal details - but no document as such) - now kyc is purely document based
-10. Support multiple loan applications for a single individual
-11. Allow for deletion of Loan Application
-16. ~~User account deletion~~ Temporarily removed, waiting for better PII-KYC logic separation
-17. Fix all the typescript compile errors
-21. Create and Assign newer User roles - use them (session/login auth details) to navigate through pages of the website - user role driven access for the pages as the user navigates through
-22. Role protected routing - dynamic redirection based on user details
-23. Keep a check on the naming conventions of the pages, the features, the roles
-24. Underwriter dashboard should have special functionalities and separate api calls? to display the loan applications? and user details?
-26. State driven routing instead of parameter driven - usecase in DocumentsUpload page
-27. Create modals that can be shared across the website, for all users (dynamic-user role-customisable)
-28. Switch to central axios (central api.ts)
-29. Global token expiration handling interceptor
-30. Conditions to be met for underwriter to take any actions on the loan applications (statuses of the documents uploaded)
-31. Add a global 403 Access Denied Page
-32. Cross tab auth sync, on logout etc
-33. Modularise the LoanReviewModal
-34. Revamp the whole project directory structure
-35. Review/Download/Delete functionality for all the uploaded documents
-39. Remove the delete account feature
-40. Modularise the KYC Component
-41. Merge UserKYC and Personal User details collections - reflect it onto the frontend features
-42. Modularise the Dashboard page, and make it user-dynamic for underwriter, admin and applicant (reusing same components, pass states and parameters)
-43. Input validation for Aadhaar and PAN details etc, and prevention of sql injections, and invalid data in
-44. Continue button in KYC/PII form has fire-forget model
-46. Modularise LoanApplication page
-47. Shift the entire backend from JavaScript to TypeScript
-48. Add the Loan Application Delete functionality back - this time, make sure only applicants can delete it? Should under-writers have all that power? Check auto-refresh/re-render the loan applications once one has been deleted?
-51. Clear up backend unused routes - loans.ts, profile.ts, documents.ts, auth.ts
-53. LoanReviewModal features are not User Role specific - anyone can view/interact with the upload/delete documents buttons
-58. Add a check if the current logged in user is the one who is even viewing/clicking on the delete application/documents button. dont need these checks for the Underwriter because they won't have these features either ways - only Applicants can delete the documents, or the entire loan application. Underwriter should not be able to delete application.
-64. Pincode autofilling based on address
-65. User can make the details incomplete and then navigate back and then can be stuck there - because the filed they need to fill, to complete the profile - is on the next page and the continue/next button is not taking them there because the details are incomplete - fix this bug
-66. individual/ singular Field specific errors in the personal details filling pages are not shown right now, because errors are displayed only on handling the submit/next button and invalid entries in any of the input fields disable the submit/next/previous buttons - so, there is no clicking of the button, and hence there is no "error display" for any input - but it is visible that one of the inputs is invalid - so the user is stuck - fix this
-67. Should failed Captcha attempts cause prevention of login for a while? like ratelimited?
-68. doesnt handle edge cases where even after the captcha verification says incorrect answer, if i click on verify answer again for the same old answer, before the captcha modal closes, it updates the number of attempts (increments by one) taken - shouldnt happen
-69. doesnt clear the number of captcha attempts completed/left on successful logins
-70. log all the user-details/kyc updates - every update must be recorded with timestamp - profile history - new collection in backend
-71. Applicant name in loanapplication collection does not reflect changes in the profile/user collection - it should not be redundantly stored as a new field, it should simply refer to the applicants userid, so any changes will happen in the user collection, and the loan application collection will point to the updated/new user collection
-73. it doesnt show why the "continue" or the "previous" buttons are disabled in case of individual/singular invlaid format of inputs in the personal details form fields - so, modify the label/placeholder of the inputs in the personal details form, to hold the formats required for aadhaar, pan, DOB. another issue is that the errors thrown arent visible to the user only - the user is just prevented from going forward; currently it just says "enter <label_name>" - can modify to either including the format of the valid input along with the label, or be able to display the error (which does contain the right/valid format for the expected input)
-74. deploy the website (render for backend, vercel for frontend)
-76. there exists ratelimiting on profile complete/update, which when combined with the "invalid income range error" (invalid income range error is an exmpale of an error from a future/unfilled field in the personal details form being thrown in the step-1 of filling the personal details as a fresh applicant - and the save and continue button sends a post request to the backedn with new inputs from setp-1 but then inputs from steps 2- and 3 arent filled yet, so they are counted as empty and the backend doesnt allow for this invalid input - so i need to update/post only those fields that i fill in that particular step) for fresh applicants who havent filled any other detail out - is a deadly combination that must be prevented at all costs - Update the /save route or create new route for saving/updating partial details
-84. after approving/rejecting (from the kid component of the actions tab) -> shouldn't load into actions tab again, because once loan is approved or rejected, access to the actions tab of a loan is not granted - so it throws an error. hence, switch to the application details tab of that loan as soon as the loan application is accepted or rejected
-85. document view/download fetch api call differs for local vs deployed - take care of that
-86. document storage issues - redployment, ephemeral issues - switch to persistent gridfs instead of renders ephemeral
-87. on application status page, if all required documents are uploaded, then instead of "upload" button it should say "submit for review - this idea has been removed -> the loan application automatically gets "submitted" i.e., status changes from "pending" to "under_review"; this eliminates the extra complexity that used to come with "uploading all required documents" and then still having the "submit for review" button - from the applicant's side.
-88. dont allow deletion of loan applications once approved - frontend and backend
-98. dont allow deletion of documents once approved - frontend and backend
+1. Initialized project repository and established version control with initial Git commits
+3. Migrated database infrastructure from MongoDB Compass to MongoDB Atlas for enhanced scalability and cloud-based management
+4. Refactored backend server architecture through modularization, implementing improved file structure and optimized directory organization
+5. ~~Implemented User Password edit feature~~ Feature temporarily deprecated
+6. ~~Implemented password verification requirement for profile editing~~ Removed password verification for profile edits as User profile and KYC have been consolidated into a unified Personal Details system, with KYC redefined from textual information to document-based verification
+9. ~~Implemented KYC system with dedicated UserKYC collection, routing infrastructure, and KYC completion verification for feature access~~ Redefined KYC architecture to eliminate redundancy between personal details and KYC data; transitioned to purely document-based verification model
+10. Implemented support for multiple concurrent loan applications per individual user
+11. Developed loan application deletion functionality with appropriate safeguards
+16. ~~Implemented user account deletion functionality~~ Temporarily removed pending improved PII-KYC logic separation
+17. Resolved all TypeScript compilation errors to ensure type safety across the codebase
+21. Implemented role-based access control system with new user roles, leveraging session authentication to enforce role-driven page navigation
+22. Developed role-protected routing with dynamic redirection based on user credentials and permissions
+23. Established and enforced consistent naming conventions across pages, features, and user roles
+24. Developed specialized Underwriter Dashboard with role-specific functionalities and dedicated API endpoints for loan application and user data retrieval
+26. Refactored routing architecture from parameter-driven to state-driven navigation, implemented in DocumentsUpload page
+27. Developed reusable modal components with dynamic customization capabilities based on user roles
+28. Migrated to centralized Axios configuration (api.ts) for consistent API communication
+29. Implemented global token expiration handling with request interceptors for seamless authentication management
+30. Established prerequisite conditions for Underwriter actions on loan applications based on document upload status validation
+31. Implemented global 403 Access Denied page for unauthorized access attempts
+32. Developed cross-tab authentication synchronization to handle logout events across multiple browser tabs
+33. Refactored LoanReviewModal into modular components for improved maintainability
+34. Restructured entire project directory architecture for enhanced organization and scalability
+35. Implemented comprehensive review, download, and delete functionality for all uploaded documents
+39. Removed account deletion feature from production environment
+40. Refactored KYC component into modular, reusable architecture
+41. Consolidated UserKYC and Personal User Details collections into unified data model with corresponding frontend integration
+42. Refactored Dashboard page into role-agnostic modular components supporting Underwriter, Admin, and Applicant roles through dynamic state and parameter passing
+43. Implemented comprehensive input validation for Aadhaar, PAN, and other sensitive fields, including SQL injection prevention and invalid data sanitization
+44. Resolved fire-and-forget model issue in KYC/PII form "Continue" button to ensure proper request completion
+46. Refactored LoanApplication page into modular component architecture
+47. Migrated entire backend codebase from JavaScript to TypeScript for enhanced type safety and developer experience
+48. Reimplemented Loan Application deletion with role-based access control restricting deletion to Applicants only, including automatic UI refresh post-deletion
+51. Performed comprehensive cleanup of unused backend routes across loans.ts, profile.ts, documents.ts, and auth.ts
+53. Implemented role-based access control for LoanReviewModal features, restricting document upload/delete interactions based on user permissions
+58. Implemented authentication verification to ensure only the authorized user can access delete functionality for applications and documents, with Underwriter-specific restrictions preventing deletion capabilities
+64. Implemented automated pincode-based address autofill functionality
+65. Resolved navigation bug preventing users from completing profile when required fields existed on subsequent pages due to incomplete data validation blocking forward navigation
+66. Enhanced field-specific error display in Personal Details forms to show validation errors for individual inputs without requiring form submission, resolving user confusion from disabled navigation buttons
+67. Implemented rate-limiting mechanism for failed CAPTCHA attempts to prevent brute-force attacks
+68. Resolved edge case where repeated verification attempts for incorrect CAPTCHA answers inappropriately incremented attempt counter before modal closure
+69. Implemented CAPTCHA attempt counter reset upon successful login to prevent persistent attempt tracking
+70. Implemented comprehensive audit logging system for all user details and KYC updates, recording timestamps in dedicated profile history collection
+71. Eliminated redundant applicant name storage in loan application collection by implementing reference-based architecture pointing to user collection, ensuring data consistency across profile updates
+73. Enhanced user experience in Personal Details form by adding input format specifications to labels/placeholders for Aadhaar, PAN, and DOB fields, and improving error visibility to clearly communicate validation requirements when navigation buttons are disabled
+74. Deployed application infrastructure with Render for backend services and Vercel for frontend hosting
+76. Resolved critical issue combining rate-limiting on profile completion/update with validation errors from unfilled future form steps by implementing step-specific partial data persistence through dedicated save route
+84. Implemented automatic tab switching from Actions to Application Details upon loan approval/rejection to prevent error states from unauthorized Actions tab access post-decision
+85. Resolved environment-specific API endpoint discrepancies for document view/download functionality between local and deployed environments
+86. Migrated document storage from Render's ephemeral filesystem to persistent GridFS solution to ensure data durability across redeployments
+87. Implemented automatic loan status transition from "pending" to "under_review" upon completion of required document uploads, eliminating manual "Submit for Review" step and reducing application complexity
+88. Implemented frontend and backend safeguards preventing deletion of approved loan applications
+98. Implemented frontend and backend safeguards preventing deletion of documents associated with approved loan applications
 
   </details>
 
   <details>
     <summary>⚡ <strong>Ongoing</strong></summary>
 
-37. organise the flow between a loan's status changing from pending<->under_review->accepted/rejected/request_documents->pending<-> and back and forth
-52. Implement Auth0/O-Auth
-57. Allow User profile deletion
-59. Should applicants be allowed to apply for multiple loans? What's the category of people who can do that? Is there a category?
-60. Clean up the interfaces and props - might have fields that I am not using in that page
-63. allow for gmaps pinpoint drop of location + change the loading animation for the pincode + modularise the pincode fetching thing into a new component maybe - check which other components can be modularised
-72. consider renaming middleware auth.ts to middleware.ts and i feel that the original routes/auth.ts is growing too big?
-75. integrate AI risk prediction/ credit assessment ai model (xgboost) into this mern stack app - i have the separate loan risk prediction streamlit app but it isnt integrable into this mern stack app
-77. check if all ratelimiters are valid (it seems like it prevents all users from given ip address to not be able to update their profile if some other account has spammed profile update requests) - also check if the limits are set reasonably
-80. add the delete account feature back, but then dont actually remove from database, but log it and make sure that it will not be login-able anymore for the user (unless you wanna add the 30-day to delete account feature where if you login within the span of 30 days of applying for account deletion, it will be revived)
-82. fetch individual applicant profile details and show when underwriter clicks on any of the user's details (hover intimation) in the loan application -> and then, show history of profile updation for each individual applicant profile
-83. user profile deletion? should it be allowed?
-89. make sure every deletion does not actually mean deletion; keep logs of everything
-90. when loan application gets approved - "Updated by: Unknown" is shown
-91. what if applicant deletes a document right at the same time as the underwriter approving it
-99. documents deletion, loan application deletion, profile deletion - how to store redundant copies of all of these?
-100. storing personal details is plain right now, do i need to salt it or hash it like how im storing passwords? is the way im storing anything at all in the database secure right now?
-101. adding to the underwriter's search/filter/sort feature - dont fetch all loan applications from the backend at once? load issue? fetch those loan applications which the underwriter searches for, instead of displaying all of them and then giving the search option?
-102. auto logout after a certain time duration
+37. Designing comprehensive state machine logic for loan status transitions across pending ↔ under_review → approved/rejected/request_documents → pending states with bidirectional flow management
+52. Integrating Auth0/OAuth authentication infrastructure for enhanced security and third-party authentication support
+57. Evaluating and implementing user profile deletion functionality with appropriate data retention policies
+59. Defining business logic for multiple concurrent loan applications, including eligibility criteria and user categorization
+60. Auditing and optimizing interfaces and props across components to remove unused fields and improve type safety
+63. Implementing Google Maps location pinpointing functionality, modernizing pincode loading animations, and evaluating component modularization opportunities for pincode fetching logic
+72. Evaluating middleware restructuring including potential renaming of auth.ts to middleware.ts and refactoring of routes/auth.ts to address growing file complexity
+75. Integrating XGBoost-based AI risk prediction and credit assessment model from standalone Streamlit application into MERN stack architecture
+77. Auditing rate-limiting implementation to ensure IP-based restrictions don't inadvertently affect legitimate users, and validating appropriateness of configured rate limits
+80. Reimplementing account deletion with soft-delete architecture, maintaining database records while preventing login access, with optional 30-day grace period for account recovery
+82. Developing Underwriter feature to fetch and display individual applicant profile details on-demand, including comprehensive profile update history
+83. Finalizing decision framework for user profile deletion permissions and implementation approach
+89. Implementing comprehensive audit trail system ensuring all deletion operations are logged rather than permanently removed from database
+90. Resolving "Updated by: Unknown" display issue occurring when loan applications receive approval status
+91. Implementing conflict resolution mechanism for concurrent document deletion by Applicant during Underwriter approval process
+99. Designing and implementing redundant data archival strategy for deleted documents, loan applications, and user profiles
+100. Evaluating security requirements for personal data storage, including potential implementation of salting and hashing mechanisms similar to password storage practices
+101. Optimizing Underwriter dashboard performance by implementing on-demand data fetching with search/filter/sort parameters rather than client-side filtering of bulk data
+102. Implementing automatic session timeout and logout functionality after defined period of user inactivity
 
   </details>
 
