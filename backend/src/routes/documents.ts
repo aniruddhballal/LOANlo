@@ -1,10 +1,10 @@
 import { Router, Response } from 'express';
-import fs from 'fs';
-import path from 'path';
 import upload from '../middleware/upload';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
 import LoanApplication from '../models/LoanApplication';
 import Document, { DocumentType } from '../models/Document'; // import type if needed
+import mongoose from 'mongoose';
+import { Readable } from 'stream';
 
 const router = Router();
 // this route is used for both viewing and downloading the file - logic is slightly complex, but same api endpoint is used for both the functionalities - can switch to native/default downloading later if this seems too complex
@@ -18,11 +18,8 @@ router.get(
         documentType: string;
       };
 
-      // Find the document record
-      const document = await Document.findOne({
-        applicationId,
-        documentType,
-      });
+      // Find the document metadata
+      const document = await Document.findOne({ applicationId, documentType });
 
       if (!document) {
         return res.status(404).json({
@@ -31,17 +28,15 @@ router.get(
         });
       }
 
-      // For admin/reviewer access, skip user ownership check
-      // For regular users, verify ownership
-        if (
-            req.user &&
-            !['underwriter', 'system_admin', 'admin', 'reviewer'].includes(req.user.role)
-        ) {
-            const application = await LoanApplication.findOne({
-            _id: applicationId,
-            userId: req.user.userId,
+      // Verify ownership for regular users
+      if (
+        req.user &&
+        !['underwriter', 'system_admin', 'admin', 'reviewer'].includes(req.user.role)
+      ) {
+        const application = await LoanApplication.findOne({
+          _id: applicationId,
+          userId: req.user.userId,
         });
-
         if (!application) {
           return res.status(403).json({
             success: false,
@@ -50,87 +45,57 @@ router.get(
         }
       }
 
-      // Check if file exists on disk
-      if (!fs.existsSync(document.filePath)) {
+      const conn = mongoose.connection;
+      const bucket = new mongoose.mongo.GridFSBucket(conn.db, { bucketName: 'documents' });
+
+      // ✅ Verify file exists in GridFS BEFORE streaming
+      const files = await bucket.find({ _id: document.gridFsId }).toArray();
+      if (files.length === 0) {
         return res.status(404).json({
           success: false,
-          message: 'File not found on server',
+          message: 'File not found in storage',
         });
       }
 
-      // Get file stats and determine content type
-      const fileStat = fs.statSync(document.filePath);
-      const fileExtension = path.extname(document.fileName).toLowerCase();
-
-      let contentType: string;
-      switch (fileExtension) {
-        case '.pdf':
-          contentType = 'application/pdf';
-          break;
-        case '.jpg':
-        case '.jpeg':
-          contentType = 'image/jpeg';
-          break;
-        case '.png':
-          contentType = 'image/png';
-          break;
-        case '.gif':
-          contentType = 'image/gif';
-          break;
-        case '.doc':
-          contentType = 'application/msword';
-          break;
-        case '.docx':
-          contentType =
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-          break;
-        case '.xls':
-          contentType = 'application/vnd.ms-excel';
-          break;
-        case '.xlsx':
-          contentType =
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-          break;
-        default:
-          contentType = 'application/octet-stream';
-      }
-
-      // Set appropriate headers - important for frontend content-type detection
+      // Set headers BEFORE piping
       res.set({
-        'Content-Type': contentType,
-        'Content-Length': fileStat.size,
+        'Content-Type': document.fileType,
+        'Content-Length': files[0]?.length?.toString() || '0', // ✅ Safe access
         'Content-Disposition': `inline; filename="${document.fileName}"`,
         'Cache-Control': 'private, no-cache, no-store, must-revalidate',
         Pragma: 'no-cache',
         Expires: '0',
-        // Add CORS headers if needed
-        'Access-Control-Expose-Headers':
-          'Content-Type, Content-Length, Content-Disposition',
       });
 
-      // Stream the file
-      const fileStream = fs.createReadStream(document.filePath);
-      fileStream.pipe(res);
+      // Stream file from GridFS
+      const downloadStream = bucket.openDownloadStream(document.gridFsId);
 
-      fileStream.on('error', (error) => {
+      downloadStream.pipe(res);
+
+      // ✅ Handle stream errors properly
+      downloadStream.on('error', (err) => {
+        console.error('GridFS download stream error:', err);
+        // Can't send JSON response here, just end the response
         if (!res.headersSent) {
-          res.status(500).json({
-            success: false,
-            message: 'Error reading file',
-          });
+          res.status(500).end();
+        } else {
+          res.end();
         }
       });
+
     } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: 'Server error',
-        error: error.message,
-      });
+      console.error('Document download error:', error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          message: 'Server error',
+          error: error.message,
+        });
+      }
     }
   }
 );
 
-// Delete document
 router.delete(
   '/delete/:applicationId/:documentType',
   authenticateToken,
@@ -141,12 +106,8 @@ router.delete(
         documentType: string;
       };
 
-      // Find the document record
-      const document = await Document.findOne({
-        applicationId,
-        documentType,
-      });
-
+      // Find the document metadata
+      const document = await Document.findOne({ applicationId, documentType });
       if (!document) {
         return res.status(404).json({
           success: false,
@@ -154,12 +115,11 @@ router.delete(
         });
       }
 
-      // Verify user ownership (only the applicant can delete their own documents)
+      // Verify user ownership
       const application = await LoanApplication.findOne({
         _id: applicationId,
-        userId: req.user?.userId, // 👈 typed from AuthenticatedRequest
+        userId: req.user?.userId,
       });
-
       if (!application) {
         return res.status(403).json({
           success: false,
@@ -167,7 +127,7 @@ router.delete(
         });
       }
 
-      // Check if application is still in a state where documents can be modified
+      // Check if application allows modification
       if (['approved', 'disbursed'].includes(application.status)) {
         return res.status(400).json({
           success: false,
@@ -175,16 +135,12 @@ router.delete(
         });
       }
 
-      try {
-        // Delete file from disk if it exists
-        if (fs.existsSync(document.filePath)) {
-          fs.unlinkSync(document.filePath);
-        }
-      } catch (fileError) {
-        // Continue with database deletion even if file deletion fails
-      }
+      // Delete file from GridFS
+      const conn = mongoose.connection;
+      const bucket = new mongoose.mongo.GridFSBucket(conn.db, { bucketName: 'documents' });
+      await bucket.delete(document.gridFsId).catch(() => {}); // ignore if already missing
 
-      // Delete document record from database
+      // Delete document record
       await Document.deleteOne({ _id: document._id });
 
       // Update application's document status if needed
@@ -234,7 +190,6 @@ router.delete(
   }
 );
 
-// Upload document
 router.post(
   '/upload',
   authenticateToken,
@@ -268,69 +223,111 @@ router.post(
         return res.status(404).json({ message: 'Application not found' });
       }
 
-      // Remove existing document of same type for this application
+      const conn = mongoose.connection;
+      const bucket = new mongoose.mongo.GridFSBucket(conn.db, { bucketName: 'documents' });
+
+      // Delete existing document in GridFS if it exists
       const existingDoc = await Document.findOne({ applicationId, documentType });
-      if (existingDoc && fs.existsSync(existingDoc.filePath)) {
-        fs.unlinkSync(existingDoc.filePath); // Delete old file from disk
-      }
-      await Document.deleteMany({ applicationId, documentType });
-
-      // Save document record
-      const document = new Document({
-        applicationId,
-        userId: application.userId, // Use the application's userId for consistency
-        documentType,
-        fileName: req.file.originalname,
-        filePath: req.file.path,
-      });
-
-      await document.save();
-
-      // Check if all required documents are now uploaded
-      const requiredDocs: DocumentType[] = [
-        'aadhaar',
-        'pan',
-        'salary_slips',
-        'bank_statements',
-        'employment_certificate',
-        'photo',
-      ];
-
-      const allUploadedDocs = await Document.find({ applicationId });
-      const uploadedTypes: DocumentType[] = allUploadedDocs.map(
-        (doc) => doc.documentType
-      );
-
-      const allRequiredDocsUploaded = requiredDocs.every((doc) =>
-        uploadedTypes.includes(doc)
-      );
-
-      // Update application status if all required documents are uploaded
-      if (allRequiredDocsUploaded && !application.documentsUploaded) {
-        application.documentsUploaded = true;
-        application.status = 'under_review';
-        application.statusHistory.push({
-          status: 'under_review',
-          timestamp: new Date(),
-          comment: 'All required documents uploaded, application under review',
-        });
-        application.updatedAt = new Date();
-        await application.save();
+      if (existingDoc) {
+        await bucket.delete(existingDoc.gridFsId).catch(() => {});
+        await Document.deleteMany({ applicationId, documentType });
       }
 
-      res.json({
-        success: true,
-        message: 'Document uploaded successfully',
-        document: {
-          id: document._id,
-          documentType: document.documentType,
-          fileName: document.fileName,
-          uploadedAt: document.uploadedAt,
+      // Create readable stream from buffer
+      const readableStream = Readable.from(req.file.buffer);
+      
+      // Create upload stream to GridFS
+      const uploadStream = bucket.openUploadStream(req.file.originalname, {
+        metadata: {
+          applicationId,
+          documentType,
+          userId: application.userId,
         },
-        allRequiredDocsUploaded, // Let frontend know if all docs are complete
       });
+
+      let uploadError = false; // ✅ Add flag to track errors
+
+      // Upload new file to GridFS
+      readableStream.pipe(uploadStream)
+        .on('error', (err) => {
+          uploadError = true; // ✅ Set flag
+          if (!res.headersSent) { // ✅ Check if response already sent
+            return res.status(500).json({ message: 'Upload failed', error: err.message });
+          }
+        })
+        .on('finish', async () => {
+          if (uploadError) return; // ✅ Skip if error occurred
+          
+          try {
+            // Save document metadata in MongoDB
+            const document = new Document({
+              applicationId,
+              userId: application.userId,
+              documentType,
+              fileName: req.file!.originalname,
+              fileSize: req.file!.size,
+              fileType: req.file!.mimetype,
+              gridFsId: uploadStream.id,
+            });
+
+            await document.save();
+
+            // Check if all required documents are uploaded
+            const requiredDocs: DocumentType[] = [
+              'aadhaar',
+              'pan',
+              'salary_slips',
+              'bank_statements',
+              'employment_certificate',
+              'photo',
+            ];
+
+            const allUploadedDocs = await Document.find({ applicationId });
+            const uploadedTypes: DocumentType[] = allUploadedDocs.map(
+              (doc) => doc.documentType
+            );
+
+            const allRequiredDocsUploaded = requiredDocs.every((doc) =>
+              uploadedTypes.includes(doc)
+            );
+
+            // Update application status
+            if (allRequiredDocsUploaded && !application.documentsUploaded) {
+              application.documentsUploaded = true;
+              application.status = 'under_review';
+              application.statusHistory.push({
+                status: 'under_review',
+                timestamp: new Date(),
+                comment: 'All required documents uploaded, application under review',
+              });
+              application.updatedAt = new Date();
+              await application.save();
+            }
+
+            res.json({
+              success: true,
+              message: 'Document uploaded successfully',
+              document: {
+                id: document._id,
+                documentType: document.documentType,
+                fileName: document.fileName,
+                uploadedAt: document.uploadedAt,
+              },
+              allRequiredDocsUploaded,
+            });
+          } catch (saveError: any) {
+            if (!res.headersSent) { // ✅ Check before sending
+              return res.status(500).json({ 
+                message: 'Failed to save document metadata', 
+                error: saveError.message 
+              });
+            }
+          }
+        });
     } catch (error: any) {
-      res.status(500).json({ message: 'Server error', error: error.message });
+      if (!res.headersSent) { // ✅ Add check here too
+        res.status(500).json({ message: 'Server error', error: error.message });
+      }
     }
   }
 );

@@ -1,27 +1,8 @@
 import multer, { FileFilterCallback } from 'multer';
-import path from 'path';
-import fs from 'fs';
 import { Request } from 'express';
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = `uploads/${(req.body as { applicationId?: string }).applicationId}`;
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(
-      null,
-      `${(req.body as { documentType?: string }).documentType}-${uniqueSuffix}${path.extname(
-        file.originalname
-      )}`
-    );
-  },
-});
+// Use memory storage for GridFS
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,

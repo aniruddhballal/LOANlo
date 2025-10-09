@@ -17,7 +17,9 @@ export interface IDocument extends MongooseDocument {
   userId: mongoose.Types.ObjectId;
   documentType: DocumentType; // use the exported type
   fileName: string;
-  filePath: string;
+  fileSize: number;
+  fileType: string; // MIME type (e.g. image/png, application/pdf)
+  gridFsId: mongoose.Types.ObjectId; // Reference to file in GridFS
   uploadedAt: Date;
 }
 
@@ -39,7 +41,9 @@ const documentSchema = new Schema<IDocument>({
     required: true,
   },
   fileName: { type: String, required: true },
-  filePath: { type: String, required: true },
+  fileSize: { type: Number, required: true },
+  fileType: { type: String, required: true },
+  gridFsId: { type: Schema.Types.ObjectId, required: true },
   uploadedAt: { type: Date, default: Date.now },
 });
 
