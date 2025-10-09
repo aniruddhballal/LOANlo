@@ -13,50 +13,43 @@ This section categorizes and tracks all ongoing, completed, and planned developm
 
   <details>
     <summary>✅ <strong>Completed</strong></summary>
-
-2. Stylise the Login, Register, Dashboardpages, ApplicationStatus, Profile, LoanApplication and DocumentUpload pages (module.css)
-7. ~~Unify all the module.css files, so the pages look alike in style~~ No more vanilla module.css files
-8. Improve styles of all pages by shifting from the dark and irregularly styled theme into white based formal, corporate, sleek and modern design
-12. Switch from vanilla module.css to Tailwind
-13. Explore better styling formats and icons from Tailwind
-14. Convert Login/Register div tags into form tags
-15. Enter key should submit forms on the Login/Register pages
-18. Show colours for fractional progress of total number of document uploads
-19. Add conditional landing Welcome/Congratulations/Error animated displays based on what action of the user caused him or her to land on the page they landed
-20. UI/UX for the edit/delete profile
-25. UI/UX check
-36. Loading/Buffer spinner states or skeletons for all the pages
-38. Display success/error messages for all modals, forms, submits - check if these are better or toast messages are
-45. Autoscroll, autoclose, auto-highlight the particular input fields in the personal details form to make errors/success states more visible to the User
-49. Loading/Skeleton component display for the Applicant and Underwriter Dashboard page, and the RoleProtectedRoute component
-50. Resolve the random block that covers the view at the bottom of the screen for Underwriter's LoanReviewModal
-54. Individual document submission/uploading is causing glitches in all the individual document submitting boxes - take care of these size resize glitches
-55. Deleting documents is causing entire ApplicationStatus page to reload - prevent this
-61. Stylise the delete loan application/document confirmation modal - look into other features like this one component that have been created and added on the go - unify their styles
-78. on hover of "save & continue" make the cursor turn into another design
-79. on clicking previous button, it stays on the clicked/active state (has the thick black border) even in the "previous" page that it goes to - toggle its state once it goes back/forward
-92. give underwriter the feature of searching/sorting/filtering to view particular selected loan applications - display only mathcing results
-93. Empty waste space in the dashboard — make the table wider, to occupy the space
-94. The way loan applications are displayed in the application status page can be made to match with the styles used to display the recent applications on the applicant dashboard - then, the recent applications can be removed from the dashboard  
-95. Adjust dashboard header alignment to fit wide tabular content
-96. Remove the "Personal details are complete" message for people who have completed their profile; only display the "personal details are required" message for the newly created accounts.
-97. Use skeleton loaders in ApplicationStatus page (just like how its used in ApplicantDashboard which makes use of the SkeletonComponents file), instead of the loading spinners
-
+    
+2. Implemented comprehensive styling for Login, Register, Dashboard, ApplicationStatus, Profile, LoanApplication, and DocumentUpload pages using modular CSS (module.css)
+7. ~~Unified all module.css files to ensure consistent styling across pages~~ Deprecated vanilla module.css files
+8. Enhanced application-wide styling by transitioning from a dark, inconsistent theme to a white-based, formal, corporate, sleek, and modern design system
+12. Migrated from vanilla module.css to Tailwind CSS framework for improved maintainability and consistency
+13. Integrated enhanced styling components and iconography from Tailwind CSS library
+14. Refactored Login and Register page structures by converting div elements to semantic form tags
+15. Implemented keyboard accessibility by enabling Enter key submission for Login and Register forms
+18. Developed color-coded visual indicators to display fractional progress of document upload completion
+19. Implemented conditional landing animations (Welcome/Congratulations/Error states) that dynamically respond to user actions and navigation context
+20. Designed and implemented intuitive UI/UX flows for profile editing and deletion functionalities
+25. Conducted comprehensive UI/UX audit and quality assurance review
+36. Integrated loading spinners and skeleton screen components across all application pages to improve perceived performance
+38. Implemented comprehensive success and error messaging system for all modals, forms, and submission workflows
+45. Developed intelligent form behavior including auto-scroll, auto-close, and auto-highlight features for Personal Details form input fields to enhance error and success state visibility
+49. Implemented skeleton loading components for Applicant Dashboard, Underwriter Dashboard, and RoleProtectedRoute component
+50. Resolved UI obstruction issue affecting the bottom viewport area in Underwriter's LoanReviewModal
+54. Fixed dimensional resize glitches occurring in individual document upload submission containers
+55. Optimized document deletion functionality to prevent unnecessary full-page reloads on ApplicationStatus page
+61. Standardized styling for delete confirmation modals across loan applications and documents, ensuring design consistency for dynamically created components
+78. Enhanced "Save & Continue" button with custom cursor hover state for improved user feedback
+79. Resolved persistent active state styling issue on "Previous" button that incorrectly carried over to subsequent pages after navigation
+92. Implemented advanced search, sort, and filter capabilities for Underwriters to view specific loan applications with matching results display
+93. Optimized Dashboard layout by expanding table width to eliminate unused whitespace and improve content density
+94. Redesigned loan application display on ApplicationStatus page to match the styling pattern used for recent applications on Applicant Dashboard, subsequently removing redundant recent applications section from Dashboard
+95. Adjusted Dashboard header alignment to accommodate wider tabular content layouts
+96. Refined profile completion messaging to display "Personal details are required" only for newly created accounts, removing redundant completion messages for users with completed profiles
+97. Replaced loading spinners with skeleton loaders on ApplicationStatus page for consistency with ApplicantDashboard implementation using SkeletonComponents
   </details>
-
   <br/>
-
   <details>
     <summary>⚡ <strong>Ongoing</strong></summary>
-
-56. Begin Application Process-> button onclick, has informal/unmatched styles
-62. The individual field Error displays in personal details page are styled and animated poorly
-81. stylise all the buttons, and make the interactiveness better - refer to the "save & continue" button in the personal details forms/page
-
+56. Refining "Begin Application Process" button styles to ensure consistency with application-wide design system
+62. Enhancing styling and animation quality for individual field error displays on Personal Details page
+81. Standardizing button styles and improving interactive feedback across all components, using "Save & Continue" button as design reference
   </details>
-
 </details>
-
 ---
 
 <details>
