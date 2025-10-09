@@ -3,23 +3,26 @@
 This section categorizes and tracks all ongoing, completed, and planned development tasks across key areas of the project.
 
 ---
-
 <details>
   <summary>🎨 <strong>UI/UX & Feature Enhancements</strong></summary>
 
   **Description:**  
   Tasks related to the design, enhancement, or modification of features, functionality, and visual elements of the application, aimed at improving user experience, intuitive navigation, usability, and overall interaction flow.
 
+  <br/>
+
   <details>
     <summary>✅ <strong>Completed</strong></summary>
 
-93. **empty waste space in the dashboard? make the table wider?**  
-94. **display all the loans in the application status page, in the classy style that exists for the recent applications in the landing applicant dashboard page**  
-95. **adjust the header of the dashboard page such that it fits the overly (?) wide tabular content below**
-96. **remove the "personal details are complete" message**  
-97. **make use of skeletons in the applicationstatus pages, just like how it was imported and used in applicantdashboard from skeletoncomponents.tsx**  
- 
+    93. **Empty waste space in the dashboard — make the table wider.**  
+    94. **Display all loans in the application status page, matching the style of recent applications on the applicant dashboard.**  
+    95. **Adjust dashboard header alignment to fit wide tabular content.**  
+    96. **Remove the "Personal details are complete" message.**  
+    97. **Use skeleton loaders in application status pages (as in `ApplicantDashboard` from `SkeletonComponents.tsx`).**
+
   </details>
+
+  <br/>
 
   <details>
     <summary>⚡ <strong>Ongoing</strong></summary>
