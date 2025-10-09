@@ -11,28 +11,29 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import PersonalDetails from './components/loan/PersonalDetails/PersonalDetails'
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 import AccessDenied from './components/auth/AccessDenied'
+import { LoadingSpinner } from './components/ui/SkeletonComponents'
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth()
 
-  if (loading) return <div>Loading...</div>
+  if (loading) return <LoadingSpinner text="Checking authentication..." />
 
   if (!user) {
     return <>{children}</>
   }
 
-  // user.role comes from MongoDB via backend -> AuthContext
   return <Navigate to={`/dashboard/${user.role}`} />
 }
 
 // Root Redirector — handles `/`
 const RootRedirect = () => {
   const { user, loading } = useAuth()
-  if (loading) return <div>Loading...</div>
+  if (loading) return <LoadingSpinner text="Redirecting..." />
   if (!user) return <Navigate to="/login" />
   return <Navigate to={`/dashboard/${user.role}`} />
 }
+
 
 function AppContent() {
   return (
