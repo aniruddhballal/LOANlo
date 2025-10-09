@@ -14,11 +14,11 @@ This section categorizes and tracks all ongoing, completed, and planned developm
   <details>
     <summary>✅ <strong>Completed</strong></summary>
 
-    93. **Empty waste space in the dashboard — make the table wider.**  
-    94. **Display all loans in the application status page, matching the style of recent applications on the applicant dashboard.**  
-    95. **Adjust dashboard header alignment to fit wide tabular content.**  
-    96. **Remove the "Personal details are complete" message.**  
-    97. **Use skeleton loaders in application status pages (as in `ApplicantDashboard` from `SkeletonComponents.tsx`).**
+93. Empty waste space in the dashboard — make the table wider.
+94. Display all loans in the application status page, matching the style of recent applications on the applicant dashboard.  
+95. Adjust dashboard header alignment to fit wide tabular content.  
+96. Remove the "Personal details are complete" message.
+97. Use skeleton loaders in application status pages (as in `ApplicantDashboard` from `SkeletonComponents.tsx`).
 
   </details>
 
