@@ -121,6 +121,7 @@
 | 104 | **Email Verification Gate for ApplicantDashboard** | Added email verification check to ApplicantDashboard - introduced isEmailVerified state, updated API call to fetch verification status, added red-themed email verification banner prompting users to check inbox, and modified logic to only display "Personal Details Required" section and "Complete Profile" button after email is verified, ensuring users must verify email before accessing profile completion |
 | 105 | **Email Verification System** | Added `isEmailVerified`, `verificationToken`, and `verificationTokenExpiry` fields to the User schema, enabling backend support for email verification workflows |
 | 106 | **Email Verification Endpoints** | Implemented `/verify-email` and `/resend-verification` routes with rate limiting (max 3 resends/hour), enabling secure and efficient backend handling of email verification and onboarding |
+| 107 | **Email Service & Templates** | Created `emailService.ts` for sending verification, welcome, and resend emails via Nodemailer, and `emailTemplates.ts` for dynamic, branded HTML templates supporting LOANLO’s onboarding and account activation flow |
 
 
 ### ⚡ In Progress
@@ -149,6 +150,6 @@
 
 ---
 
-**Document Version:** 67
+**Document Version:** 72
 **Last Updated:** 9th October 2025
 **Maintained By:** Aniruddh Ballal
