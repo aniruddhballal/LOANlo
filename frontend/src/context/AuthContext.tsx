@@ -8,15 +8,18 @@ export interface User {
   lastName: string
   role: 'applicant' | 'underwriter' | 'system_admin'
   phone?: string
+  isEmailVerified: boolean
 }
 
 interface AuthContextType {
   user: User | null
   loading: boolean
   login: (email: string, password: string, options?: { skipDelay?: boolean }) => Promise<void>
-  register: (userData: RegisterData) => Promise<void>
+  register: (userData: RegisterData) => Promise<{ requiresVerification: boolean }>
   logout: () => void
   completeLogin: () => void
+  verifyEmail: (token: string) => Promise<void>
+  resendVerification: () => Promise<void>
 }
 
 interface RegisterData {
@@ -100,6 +103,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         localStorage.setItem('pendingUser', JSON.stringify(data.user))
       }
+      
+      // If email is not verified, we don't throw an error
+      // The UI will handle showing the verification message
     } catch (error) {
       throw error
     }
@@ -114,11 +120,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  const register = async (userData: RegisterData) => {
+  const register = async (userData: RegisterData): Promise<{ requiresVerification: boolean }> => {
     try {
       const { data } = await api.post('/auth/register', userData)
       localStorage.setItem('token', data.token)
       setUser(data.user)
+      
+      return { requiresVerification: data.requiresVerification || false }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const verifyEmail = async (token: string) => {
+    try {
+      const { data } = await api.get(`/auth/verify-email?token=${token}`)
+      
+      if (data.success && data.user) {
+        // Update the current user state with verified status
+        setUser(data.user)
+        
+        // Also update token verification
+        const currentToken = localStorage.getItem('token')
+        if (currentToken) {
+          // Re-verify token to get updated user data
+          const verifyResponse = await api.get('/auth/verify')
+          if (verifyResponse.data.success) {
+            setUser(verifyResponse.data.user)
+          }
+        }
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const resendVerification = async () => {
+    try {
+      await api.post('/auth/resend-verification')
     } catch (error) {
       throw error
     }
@@ -136,7 +175,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     login,
     register,
     logout,
-    completeLogin // Expose this for manual completion
+    completeLogin,
+    verifyEmail,
+    resendVerification,
   }
 
   return (
