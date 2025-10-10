@@ -120,6 +120,7 @@
 | 98 | **Document Protection** | Implemented frontend and backend safeguards preventing deletion of documents associated with approved loan applications |
 | 104 | **Email Verification Gate for ApplicantDashboard** | Added email verification check to ApplicantDashboard - introduced isEmailVerified state, updated API call to fetch verification status, added red-themed email verification banner prompting users to check inbox, and modified logic to only display "Personal Details Required" section and "Complete Profile" button after email is verified, ensuring users must verify email before accessing profile completion |
 | 105 | **Email Verification System** | Added `isEmailVerified`, `verificationToken`, and `verificationTokenExpiry` fields to the User schema, enabling backend support for email verification workflows |
+| 106 | **Email Verification Endpoints** | Implemented `/verify-email` and `/resend-verification` routes with rate limiting (max 3 resends/hour), enabling secure and efficient backend handling of email verification and onboarding |
 
 
 ### ⚡ In Progress

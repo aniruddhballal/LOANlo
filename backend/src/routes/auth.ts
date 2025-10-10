@@ -1,10 +1,12 @@
 import express, { Request, Response, RequestHandler } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
 import config from '../config';
 import User from '../models/User';
 import { authenticateToken } from '../middleware/auth';
+import { sendVerificationEmail, sendWelcomeEmail, resendVerificationEmail } from '../services/emailService';
 
 // Define interface for authenticated request
 interface AuthenticatedRequest extends Request {
@@ -69,6 +71,16 @@ const verifyLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => req.method === 'OPTIONS', // <-- skip preflight
+});
+
+const resendVerificationLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3, // Limit to 3 resend attempts per hour
+  message: {
+    error: 'Too many resend attempts, please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 // Captcha rate limiter middleware
@@ -231,7 +243,7 @@ router.get('/captcha/status', (req: Request, res: Response) => {
   });
 });
 
-// Register with rate limiting
+// Register with rate limiting and email verification
 router.post('/register', registerLimiter, async (req: Request, res: Response) => {
   try {
     const { firstName, lastName, email, password, phone } = req.body;
@@ -247,15 +259,31 @@ router.post('/register', registerLimiter, async (req: Request, res: Response) =>
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    
     const user = new User({
       firstName,
       lastName,
       email,
       password: hashedPassword,
       phone,
+      isEmailVerified: false,
+      verificationToken,
+      verificationTokenExpiry,
     });
 
     await user.save();
+
+    // Send verification email
+    try {
+      await sendVerificationEmail(email, firstName, verificationToken);
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      // Continue with registration even if email fails
+    }
 
     const expiresIn =
       typeof config.JWT_EXPIRES_IN === 'string' ? config.JWT_EXPIRES_IN : Number(config.JWT_EXPIRES_IN);
@@ -268,7 +296,7 @@ router.post('/register', registerLimiter, async (req: Request, res: Response) =>
 
     res.status(201).json({
       success: true,
-      message: 'User registered successfully',
+      message: 'User registered successfully. Please check your email to verify your account.',
       token,
       user: {
         id: user._id,
@@ -277,10 +305,126 @@ router.post('/register', registerLimiter, async (req: Request, res: Response) =>
         email: user.email,
         phone: user.phone,
         role: user.role,
+        isEmailVerified: user.isEmailVerified,
       },
+      requiresVerification: true,
     });
   } catch (error: any) {
     res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Verify email endpoint
+router.get('/verify-email', async (req: Request, res: Response) => {
+  try {
+    const { token } = req.query;
+
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Verification token is required' 
+      });
+    }
+
+    // Find user with this verification token
+    const user = await User.findOne({
+      verificationToken: token,
+      verificationTokenExpiry: { $gt: new Date() }, // Token not expired
+    });
+
+    if (!user) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid or expired verification token' 
+      });
+    }
+
+    // Check if already verified
+    if (user.isEmailVerified) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Email is already verified' 
+      });
+    }
+
+    // Update user
+    user.isEmailVerified = true;
+    delete user.verificationToken;
+    delete user.verificationTokenExpiry;
+    await user.save();
+
+    // Send welcome email
+    try {
+      await sendWelcomeEmail(user.email, user.firstName);
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Don't fail the verification if welcome email fails
+    }
+
+    res.json({
+      success: true,
+      message: 'Email verified successfully',
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        isEmailVerified: user.isEmailVerified,
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error during verification', 
+      error: error.message 
+    });
+  }
+});
+
+// Resend verification email
+router.post('/resend-verification', resendVerificationLimiter, authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as AuthenticatedRequest).user.userId;
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'User not found' 
+      });
+    }
+
+    // Check if already verified
+    if (user.isEmailVerified) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Email is already verified' 
+      });
+    }
+
+    // Generate new verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    
+    user.verificationToken = verificationToken;
+    user.verificationTokenExpiry = verificationTokenExpiry;
+    await user.save();
+
+    // Resend verification email
+    await resendVerificationEmail(user.email, user.firstName, verificationToken);
+
+    res.json({
+      success: true,
+      message: 'Verification email resent successfully',
+    });
+  } catch (error: any) {
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to resend verification email', 
+      error: error.message 
+    });
   }
 });
 
@@ -328,7 +472,9 @@ router.post('/login', authLimiter, async (req: Request, res: Response) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+        isEmailVerified: user.isEmailVerified,
       },
+      requiresVerification: !user.isEmailVerified,
     });
   } catch (error: any) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -354,6 +500,7 @@ router.get(
         email: user.email,
         phone: user.phone,
         role: user.role,
+        isEmailVerified: user.isEmailVerified,
       },
     });
   }) as RequestHandler
