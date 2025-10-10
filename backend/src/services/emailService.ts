@@ -66,14 +66,8 @@ export const sendVerificationEmail = async (
     };
     
     // Send email
-    const info = await transporter.sendMail(mailOptions);
-    
-    console.log('Verification email sent:', info.messageId);
-    
-    // For development with Ethereal
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
-    }
+    await transporter.sendMail(mailOptions);
+
   } catch (error) {
     console.error('Error sending verification email:', error);
     throw new Error('Failed to send verification email');
@@ -109,14 +103,8 @@ export const sendWelcomeEmail = async (
     };
     
     // Send email
-    const info = await transporter.sendMail(mailOptions);
-    
-    console.log('Welcome email sent:', info.messageId);
-    
-    // For development with Ethereal
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
-    }
+    await transporter.sendMail(mailOptions);
+
   } catch (error) {
     console.error('Error sending welcome email:', error);
     // Don't throw error for welcome email as it's not critical
