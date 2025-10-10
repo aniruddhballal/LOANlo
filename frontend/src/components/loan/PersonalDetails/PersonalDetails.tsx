@@ -23,6 +23,7 @@ const PersonalDetails = () => {
   const [isPersonalDetailsComplete, setIsPersonalDetailsComplete] = useState(false);
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [isEmailVerified, setIsEmailVerified] = useState<boolean | null>(null);
 
   useEffect(() => {
     const fetchPersonalDetails = async () => {
@@ -31,7 +32,8 @@ const PersonalDetails = () => {
         const { data } = await api.get('/profile/me');
         if (data.user) {
           setFormData(prev => ({ ...prev, ...data.user }));
-
+          setIsEmailVerified(data.user.isEmailVerified ?? false);
+          
           const detailsComplete = isProfileComplete(data.user);
           setIsPersonalDetailsComplete(detailsComplete);
         }
@@ -167,6 +169,36 @@ const PersonalDetails = () => {
         message="Please wait while we fetch your information..."
       />
     )
+  }
+
+  // Redirect if email is not verified
+  if (isEmailVerified === false) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-8 px-4 flex items-center justify-center">
+        <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl border border-red-200 p-12 text-center">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="#DC2626" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="17" cy="17" r="4" fill="#DC2626"/>
+              <path d="M17 15v2M17 19h.01" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <h2 className="text-3xl font-light text-gray-900 mb-4">Email Verification Required</h2>
+          <p className="text-lg text-gray-600 font-light mb-8">
+            Please verify your email address before accessing personal details. Check your inbox for the verification link.
+          </p>
+          <button
+            onClick={() => navigate('/dashboard/applicant')}
+            className="inline-flex items-center px-8 py-4 bg-gray-900 text-white rounded-xl font-light hover:bg-black transition-all duration-300 shadow-lg hover:shadow-xl"
+          >
+            <svg width="20" height="20" className="mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+            </svg>
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -123,6 +123,7 @@
 | 106 | **Email Verification Endpoints** | Implemented `/verify-email` and `/resend-verification` routes with rate limiting (max 3 resends/hour), enabling secure and efficient backend handling of email verification and onboarding |
 | 107 | **Email Service & Templates** | Created `emailService.ts` for sending verification, welcome, and resend emails via Nodemailer, and `emailTemplates.ts` for dynamic, branded HTML templates supporting LOANLO’s onboarding and account activation flow |
 | 108 | **Verify Email Page (Frontend)** | Created `VerifyEmail.tsx` with full UI/UX for verifying, resending, and handling expired email links — featuring animated status states, secure redirects, and LOANLO-branded design |
+| 109 | **Email Verification Gate (Personal Details)** | Added email verification check in `PersonalDetails.tsx`, restricting access to unverified users with a branded warning UI and redirect option to dashboard |
 
 
 ### ⚡ In Progress
@@ -151,6 +152,6 @@
 
 ---
 
-**Document Version:** 73
-**Last Updated:** 9th October 2025
+**Document Version:** 74
+**Last Updated:** 10th October 2025
 **Maintained By:** Aniruddh Ballal
