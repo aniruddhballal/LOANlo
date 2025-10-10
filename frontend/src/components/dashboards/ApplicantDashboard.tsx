@@ -7,6 +7,7 @@ import api from '../../api'
 const ApplicantDashboard = () => {
   const [loading] = useState(true)
   const [hasPersonalDetails, setHasPersonalDetails] = useState<boolean | null>(null)
+  const [isEmailVerified, setIsEmailVerified] = useState<boolean | null>(null)
 
   useEffect(() => {
     checkPersonalDetailsStatus()
@@ -24,9 +25,11 @@ const ApplicantDashboard = () => {
       const user = data.user
       const allFieldsFilled = user && requiredFields.every(field => user[field] && user[field].toString().trim() !== '')
       setHasPersonalDetails(!!user && allFieldsFilled)
+      setIsEmailVerified(user?.isEmailVerified ?? false)
     } catch (err) {
       console.error('Failed to check User Details status:', err)
       setHasPersonalDetails(false)
+      setIsEmailVerified(false)
     }
   }
 
@@ -36,43 +39,72 @@ const ApplicantDashboard = () => {
       welcomeTitle="Welcome Back!"
       welcomeSubtitle="Successfully authenticated to LoanLo Platform"
     >
-      {/* Personal Details Section */}
-      {hasPersonalDetails === null ? (
+      {/* Email Verification Section */}
+      {isEmailVerified === null ? (
         <PersonalDetailsSkeleton />
-      ) : !hasPersonalDetails ? (
-        <div className="mb-8 rounded-xl p-6 shadow-sm border transition-all duration-300 bg-white text-gray-900 border-amber-200 shadow-amber-100">
+      ) : !isEmailVerified ? (
+        <div className="mb-8 rounded-xl p-6 shadow-sm border transition-all duration-300 bg-white text-gray-900 border-red-200 shadow-red-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-5">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-amber-100">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-red-100">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" stroke="#D97706" strokeWidth="1.5"/>
-                  <rect x="11" y="7" width="2" height="7" rx="1" fill="#D97706"/>
-                  <rect x="11" y="16" width="2" height="2" rx="1" fill="#D97706"/>
+                  <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="#DC2626" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="17" cy="17" r="4" fill="#DC2626"/>
+                  <path d="M17 15v2M17 19h.01" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
               </div>
               <div>
                 <h2 className="text-xl font-semibold mb-1">
-                  Personal Details Required
+                  Email Verification Required
                 </h2>
                 <p className="text-sm font-light text-gray-600">
-                  Please complete your personal details to continue with loan applications.
+                  Please check your email inbox for a verification link to activate your account.
                 </p>
               </div>
             </div>
-            <Link
-              to="/personal-details"
-              className="px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
-            >
-              Complete Profile
-            </Link>
           </div>
         </div>
       ) : null}
 
+      {/* Personal Details Section - Only show if email is verified */}
+      {isEmailVerified === true && (
+        hasPersonalDetails === null ? (
+          <PersonalDetailsSkeleton />
+        ) : !hasPersonalDetails ? (
+          <div className="mb-8 rounded-xl p-6 shadow-sm border transition-all duration-300 bg-white text-gray-900 border-amber-200 shadow-amber-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-5">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-amber-100">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="#D97706" strokeWidth="1.5"/>
+                    <rect x="11" y="7" width="2" height="7" rx="1" fill="#D97706"/>
+                    <rect x="11" y="16" width="2" height="2" rx="1" fill="#D97706"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold mb-1">
+                    Personal Details Required
+                  </h2>
+                  <p className="text-sm font-light text-gray-600">
+                    Please complete your personal details to continue with loan applications.
+                  </p>
+                </div>
+              </div>
+              <Link
+                to="/personal-details"
+                className="px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                Complete Profile
+              </Link>
+            </div>
+          </div>
+        ) : null
+      )}
+
       {/* Service Actions */}
       {loading && hasPersonalDetails === null ? (
         <ServiceActionsSkeleton />
-      ) : hasPersonalDetails === true && (
+      ) : isEmailVerified === true && hasPersonalDetails === true && (
         <section className="mb-10">
           <div className="mb-6">
             <h2 className="text-2xl font-light text-gray-900 mb-2">Available Services</h2>

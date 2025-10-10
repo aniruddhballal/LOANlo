@@ -118,6 +118,8 @@
 | 87 | **Workflow Automation** | Implemented automatic loan status transition from "pending" to "under_review" upon completion of required document uploads |
 | 88 | **Data Protection** | Implemented frontend and backend safeguards preventing deletion of approved loan applications |
 | 98 | **Document Protection** | Implemented frontend and backend safeguards preventing deletion of documents associated with approved loan applications |
+| 104 | **Email Verification Gate for ApplicantDashboard** | Added email verification check to ApplicantDashboard - introduced isEmailVerified state, updated API call to fetch verification status, added red-themed email verification banner prompting users to check inbox, and modified logic to only display "Personal Details Required" section and "Complete Profile" button after email is verified, ensuring users must verify email before accessing profile completion |
+
 
 ### ⚡ In Progress
 
