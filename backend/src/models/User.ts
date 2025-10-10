@@ -23,10 +23,14 @@ export interface IUser extends Document {
   designation?: string;
   workExperience?: string;
   monthlyIncome?: string;
-
   createdAt: Date;
-
-  // New additions for profile check
+  
+  // Email verification fields
+  isEmailVerified: boolean;
+  verificationToken?: string;
+  verificationTokenExpiry?: Date;
+  
+  // Profile completion
   isProfileComplete: boolean;
   calculateProfileCompletion(): number;
 }
@@ -58,10 +62,14 @@ const userSchema: Schema<IUser> = new Schema({
   designation: String,
   workExperience: String,
   monthlyIncome: String,
-
   createdAt: { type: Date, default: Date.now },
-
-  // New field
+  
+  // Email verification fields
+  isEmailVerified: { type: Boolean, default: false },
+  verificationToken: { type: String },
+  verificationTokenExpiry: { type: Date },
+  
+  // Profile completion
   isProfileComplete: { type: Boolean, default: false },
 });
 
@@ -83,5 +91,4 @@ userSchema.methods.calculateProfileCompletion = function (): number {
 
 // Create and export model
 const User = mongoose.model<IUser>('User', userSchema);
-
 export default User;
