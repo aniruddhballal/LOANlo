@@ -12,6 +12,7 @@ import PersonalDetails from './components/loan/PersonalDetails/PersonalDetails'
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 import AccessDenied from './components/auth/AccessDenied'
 import { LoadingSpinner } from './components/ui/SkeletonComponents'
+import VerifyEmail from './components/auth/VerifyEmail'
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -54,7 +55,7 @@ function AppContent() {
               <Register />
             </PublicRoute>
           } />
-          
+          <Route path="/verify-email" element={<VerifyEmail />} />
           {/* Protected Routes */}
           <Route path="/dashboard/applicant" element={
             <RoleProtectedRoute allowedRoles={['applicant']}>

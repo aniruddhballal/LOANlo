@@ -122,6 +122,7 @@
 | 105 | **Email Verification System** | Added `isEmailVerified`, `verificationToken`, and `verificationTokenExpiry` fields to the User schema, enabling backend support for email verification workflows |
 | 106 | **Email Verification Endpoints** | Implemented `/verify-email` and `/resend-verification` routes with rate limiting (max 3 resends/hour), enabling secure and efficient backend handling of email verification and onboarding |
 | 107 | **Email Service & Templates** | Created `emailService.ts` for sending verification, welcome, and resend emails via Nodemailer, and `emailTemplates.ts` for dynamic, branded HTML templates supporting LOANLO’s onboarding and account activation flow |
+| 108 | **Verify Email Page (Frontend)** | Created `VerifyEmail.tsx` with full UI/UX for verifying, resending, and handling expired email links — featuring animated status states, secure redirects, and LOANLO-branded design |
 
 
 ### ⚡ In Progress
@@ -150,6 +151,6 @@
 
 ---
 
-**Document Version:** 72
+**Document Version:** 73
 **Last Updated:** 9th October 2025
 **Maintained By:** Aniruddh Ballal
