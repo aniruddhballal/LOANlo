@@ -124,7 +124,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data } = await api.post('/auth/register', userData)
       localStorage.setItem('token', data.token)
-      setUser(data.user)
       
       return { requiresVerification: data.requiresVerification || false }
     } catch (error) {

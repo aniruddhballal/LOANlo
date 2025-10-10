@@ -127,7 +127,7 @@
 | 108 | **Verify Email Page (Frontend)** | Created `VerifyEmail.tsx` with full UI/UX for verifying, resending, and handling expired email links — featuring animated status states, secure redirects, and LOANLO-branded design |
 | 109 | **Email Verification Gate (Personal Details)** | Added email verification check in `PersonalDetails.tsx`, restricting access to unverified users with a branded warning UI and redirect option to dashboard |
 | 110 | **Email Verification & Auth Enhancements** | Extended `AuthContext.tsx` to include `isEmailVerified` in `User`, added `verifyEmail` and `resendVerification` methods, updated `register` to indicate if verification is required, enabling email verification flows across the app |
-
+| 112 | **Auth Flow: Enable Registration Success Screen** | Modified `register()` in `AuthContext.tsx` by removing immediate user state update, allowing `requiresVerification` flag to trigger success screen display with email verification instructions before user proceeds to dashboard |
 
 ### ⚡ In Progress
 
@@ -155,6 +155,6 @@
 
 ---
 
-**Document Version:** 76
+**Document Version:** 77
 **Last Updated:** 10th October 2025
 **Maintained By:** Aniruddh Ballal
