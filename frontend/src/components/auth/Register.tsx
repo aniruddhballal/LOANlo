@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, AlertCircle, Check, X, Shield } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, AlertCircle, Check, X, Shield, CheckCircle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const Register = () => {
@@ -17,6 +17,7 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState(0)
   const [focusedField, setFocusedField] = useState('')
+  const [registrationSuccess, setRegistrationSuccess] = useState(false)
   
   const { register } = useAuth()
   
@@ -58,13 +59,18 @@ const Register = () => {
   
     setLoading(true)
     try {
-      await register({
+      const result = await register({
         email: formData.email,
         password: formData.password,
         firstName: formData.firstName,
         lastName: formData.lastName,
         phone: formData.phone
       })
+      
+      // Show success message
+      if (result.requiresVerification) {
+        setRegistrationSuccess(true)
+      }
     } catch (err: any) {
       setError(err.message || 'Account registration failed. Please try again.')
     } finally {
@@ -87,6 +93,116 @@ const Register = () => {
 
   const isPasswordMatch = formData.confirmPassword && formData.password === formData.confirmPassword
   const isPasswordMismatch = formData.confirmPassword && formData.password !== formData.confirmPassword
+
+  // Success screen
+  if (registrationSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-6 relative">
+        <div className="w-full max-w-2xl relative z-10">
+          {/* Success Card */}
+          <div className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-10 py-12 text-center border-b border-green-100">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-green-500 rounded-full mb-6 animate-bounce">
+                <CheckCircle className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-3xl font-light text-gray-900 mb-3 tracking-wide">
+                Registration Successful
+              </h2>
+              <p className="text-gray-600 text-base">
+                Welcome to LOANLO, {formData.firstName}!
+              </p>
+            </div>
+            
+            <div className="px-10 py-10">
+              <div className="mb-8 p-6 rounded-2xl border border-blue-200 bg-blue-50">
+                <div className="flex items-start space-x-3">
+                  <Mail className="h-6 w-6 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="text-lg font-medium text-blue-900 mb-2">
+                      Verify Your Email Address
+                    </h3>
+                    <p className="text-blue-700 text-sm leading-relaxed mb-3">
+                      We've sent a verification email to:
+                    </p>
+                    <p className="text-blue-900 font-medium text-sm mb-4">
+                      {formData.email}
+                    </p>
+                    <p className="text-blue-700 text-sm leading-relaxed">
+                      Please check your inbox and click the verification link to activate your account. 
+                      The link will expire in 24 hours.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                <h3 className="text-sm font-medium text-gray-700 tracking-widest">
+                  WHAT'S NEXT?
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-xl">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">
+                      1
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Check your email inbox</p>
+                      <p className="text-xs text-gray-600 mt-1">Look for an email from LOANLO</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-xl">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">
+                      2
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Click the verification link</p>
+                      <p className="text-xs text-gray-600 mt-1">This will activate your account</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-xl">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">
+                      3
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Start your loan application</p>
+                      <p className="text-xs text-gray-600 mt-1">Access all features once verified</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl border border-yellow-200 bg-yellow-50 mb-8">
+                <p className="text-yellow-800 text-xs leading-relaxed">
+                  <strong>Didn't receive the email?</strong> Check your spam folder or contact support for assistance.
+                </p>
+              </div>
+
+              <div className="pt-4">
+                <a
+                  href="/login"
+                  className="relative w-full flex items-center justify-center py-4 px-6 
+                           border border-gray-900 rounded-2xl text-white bg-gray-900 
+                           font-medium text-sm tracking-wider transition-all duration-300 
+                           hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5"
+                >
+                  <span>GO TO LOGIN</span>
+                  <ArrowRight className="ml-3 h-4 w-4" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="text-center mt-8 opacity-60">
+            <p className="text-xs text-gray-400 tracking-widest font-light">
+              ENTERPRISE GRADE SECURITY
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-6 relative">
