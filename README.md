@@ -46,7 +46,7 @@
 | 95 | **Header Alignment** | Adjusted Dashboard header alignment to accommodate wider tabular content layouts |
 | 96 | **Contextual Messaging** | Refined profile completion messaging to display "Personal details are required" only for newly created accounts, removing redundant completion messages for users with completed profiles |
 | 97 | **Loading Consistency** | Replaced loading spinners with skeleton loaders on ApplicationStatus page for consistency with ApplicantDashboard implementation using SkeletonComponents |
-
+| 103 | **PersonalDetailsRequired Page Styling** | Updated PersonalDetailsRequired component to match email verification page styling - replaced gradient header and decorative elements with centered card layout, changed from red to amber theme, simplified to font-light typography, matched button styling with dashboard theme (gray-900), added back arrow icon, and reduced visual complexity for more formal, professional appearance |
 ### ⚡ In Progress
 
 | ID | Initiative | Status |
