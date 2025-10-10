@@ -45,8 +45,13 @@ export const sendVerificationEmail = async (
     const transporter = createTransporter();
     
     // Create verification link
-    const verificationLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${verificationToken}`;
-    
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',');
+    const frontendUrl = allowedOrigins.includes(process.env.FRONTEND_URL || '')
+      ? process.env.FRONTEND_URL
+      : allowedOrigins[0]; // fallback to the first origin
+
+    const verificationLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
+
     // Prepare email data
     const emailData: VerificationEmailData = {
       firstName,
