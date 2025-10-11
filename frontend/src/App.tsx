@@ -11,26 +11,36 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import PersonalDetails from './components/loan/PersonalDetails/PersonalDetails'
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 import AccessDenied from './components/auth/AccessDenied'
-import { LoadingSpinner } from './components/ui/SkeletonComponents'
 import VerifyEmail from './components/auth/VerifyEmail'
+import { LoadingState } from './components/ui/StatusMessages'
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth()
 
-  if (loading) return <LoadingSpinner text="Checking authentication..." />
+  if (loading)
+    return (
+      <LoadingState 
+        title="Checking Authentication"
+        message="Please wait while we confirm your session..."
+      />
+    )
 
-  if (!user) {
-    return <>{children}</>
-  }
-
+  if (!user) return <>{children}</>
   return <Navigate to={`/dashboard/${user.role}`} />
 }
 
-// Root Redirector — handles `/`
 const RootRedirect = () => {
   const { user, loading } = useAuth()
-  if (loading) return <LoadingSpinner text="Redirecting..." />
+
+  if (loading)
+    return (
+      <LoadingState 
+        title="Redirecting You"
+        message="Please wait while we confirm your session..."
+      />
+    )
+
   if (!user) return <Navigate to="/login" />
   return <Navigate to={`/dashboard/${user.role}`} />
 }

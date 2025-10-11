@@ -48,6 +48,7 @@
 | 97 | **Loading Consistency** | Replaced loading spinners with skeleton loaders on ApplicationStatus page for consistency with ApplicantDashboard implementation using SkeletonComponents |
 | 103 | **PersonalDetailsRequired Page Styling** | Updated PersonalDetailsRequired component to match email verification page styling - replaced gradient header and decorative elements with centered card layout, changed from red to amber theme, simplified to font-light typography, matched button styling with dashboard theme (gray-900), added back arrow icon, and reduced visual complexity for more formal, professional appearance |
 | 111 | **Registration Email Verification UI** | Added `registrationSuccess` state in `Register.tsx` to show a success screen when a user registers but still needs to verify their email, including instructions and verification info. |
+| 114 | **Unified Loading Experience for Auth Routes** | Replaced the basic `LoadingSpinner` with the animated `LoadingState` component in both `RootRedirect` and `PublicRoute`, creating a consistent, elegant, and user-friendly loading experience during authentication and redirection. |
 
 ### ⚡ In Progress
 
@@ -157,6 +158,6 @@ Got it! Here’s the task message in your exact table format:
 
 ---
 
-**Document Version:** 78
-**Last Updated:** 10th October 2025
+**Document Version:** 79
+**Last Updated:** 11th October 2025
 **Maintained By:** Aniruddh Ballal
