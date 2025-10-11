@@ -186,7 +186,7 @@ const Register = () => {
                            font-medium text-sm tracking-wider transition-all duration-300 
                            hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5"
                 >
-                  <span>GO TO LOGIN</span>
+                  <span>LOGIN TO CONTINUE</span>
                   <ArrowRight className="ml-3 h-4 w-4" />
                 </a>
               </div>
