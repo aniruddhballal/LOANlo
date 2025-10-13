@@ -155,9 +155,10 @@ Got it! Here’s the task message in your exact table format:
 | 100 | **Security Evaluation** | Evaluating security requirements for personal data storage, including potential implementation of salting and hashing mechanisms |
 | 101 | **Performance Optimization** | Optimizing Underwriter dashboard performance by implementing on-demand data fetching with search/filter/sort parameters |
 | 102 | **Session Management** | Implementing automatic session timeout and logout functionality after defined period of user inactivity |
+| 115 | **Auth Flow: Post-Registration Login Behavior** | Decide and implement flow for user access after successful registration — whether to auto-login, require manual login, or enable login only after email verification via the verification link |
 
 ---
 
-**Document Version:** 79
+**Document Version:** 80
 **Last Updated:** 11th October 2025
 **Maintained By:** Aniruddh Ballal
