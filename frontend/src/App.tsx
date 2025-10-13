@@ -28,7 +28,10 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
     )
 
   if (!user) return <>{children}</>
-  return <Navigate to={`/dashboard/${user.role}`} />
+  if (user && user.isEmailVerified) {  // Only redirect if VERIFIED
+    return <Navigate to={`/dashboard/${user.role}`} />
+  }
+  return <>{children}</>  // Let unverified users stay on login/register
 }
 
 const RootRedirect = () => {
@@ -49,79 +52,79 @@ const RootRedirect = () => {
 
 function AppContent() {
   return (
-    <Router>
-      <div className="app">
-        <Routes>
-          {/* Root path */}
-          <Route path="/" element={<RootRedirect />} />
-          
-          {/* Public */}
-          <Route path="/login" element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          } />
-          <Route path="/register" element={
-            <PublicRoute>
-              <Register />
-            </PublicRoute>
-          } />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/email-verification-required" element={<EmailVerificationRequired />} />
-          {/* Protected Routes */}
-          <Route path="/dashboard/applicant" element={
-            <RoleProtectedRoute allowedRoles={['applicant']}>
-              <ApplicantDashboard />
-            </RoleProtectedRoute>
-          } />
+    <div className="app">
+      <Routes>
+        {/* Root path */}
+        <Route path="/" element={<RootRedirect />} />
+        
+        {/* Public */}
+        <Route path="/login" element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        } />
+        <Route path="/register" element={
+          <PublicRoute>
+            <Register />
+          </PublicRoute>
+        } />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/email-verification-required" element={<EmailVerificationRequired />} />
+        {/* Protected Routes */}
+        <Route path="/dashboard/applicant" element={
+          <RoleProtectedRoute allowedRoles={['applicant']}>
+            <ApplicantDashboard />
+          </RoleProtectedRoute>
+        } />
 
-          <Route path="/dashboard/underwriter" element={
-            <RoleProtectedRoute allowedRoles={['underwriter']}>
-              <UnderwriterDashboard />
-            </RoleProtectedRoute>
-          } />
+        <Route path="/dashboard/underwriter" element={
+          <RoleProtectedRoute allowedRoles={['underwriter']}>
+            <UnderwriterDashboard />
+          </RoleProtectedRoute>
+        } />
 
-          <Route path="/dashboard/system_admin" element={
-            <RoleProtectedRoute allowedRoles={['system_admin']}>
-              <SystemAdminDashboard />
-            </RoleProtectedRoute>
-          } />
+        <Route path="/dashboard/system_admin" element={
+          <RoleProtectedRoute allowedRoles={['system_admin']}>
+            <SystemAdminDashboard />
+          </RoleProtectedRoute>
+        } />
 
-          <Route path="/access-denied" element={
-            <AccessDenied />
-          } />
-          
-          <Route path="/loan-application" element={
-            <RoleProtectedRoute allowedRoles={['applicant']}>
-              <LoanApplication />
-            </RoleProtectedRoute>
-          } />
-          <Route path="/personal-details" element={
-            <RoleProtectedRoute allowedRoles={['applicant']}>
-              <PersonalDetails  />
-            </RoleProtectedRoute>
-          } />
-          <Route path="/upload-documents" element={
-            <RoleProtectedRoute allowedRoles={['applicant']}>
-              <DocumentUpload />
-            </RoleProtectedRoute>
-          } />
-          <Route path="/application-status" element={
-            <RoleProtectedRoute allowedRoles={['applicant']}>
-              <ApplicationStatus />
-            </RoleProtectedRoute>
-          } />
-        </Routes>
-      </div>
-    </Router>
+        <Route path="/access-denied" element={
+          <AccessDenied />
+        } />
+        
+        <Route path="/loan-application" element={
+          <RoleProtectedRoute allowedRoles={['applicant']}>
+            <LoanApplication />
+          </RoleProtectedRoute>
+        } />
+        <Route path="/personal-details" element={
+          <RoleProtectedRoute allowedRoles={['applicant']}>
+            <PersonalDetails  />
+          </RoleProtectedRoute>
+        } />
+        <Route path="/upload-documents" element={
+          <RoleProtectedRoute allowedRoles={['applicant']}>
+            <DocumentUpload />
+          </RoleProtectedRoute>
+        } />
+        <Route path="/application-status" element={
+          <RoleProtectedRoute allowedRoles={['applicant']}>
+            <ApplicationStatus />
+          </RoleProtectedRoute>
+        } />
+      </Routes>
+    </div>
   )
 }
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Router>
   )
 }
 
