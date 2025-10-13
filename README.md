@@ -131,6 +131,7 @@
 | 112 | **Auth Flow: Enable Registration Success Screen** | Modified `register()` in `AuthContext.tsx` by removing immediate user state update, allowing `requiresVerification` flag to trigger success screen display with email verification instructions before user proceeds to dashboard |
 Got it! Here’s the task message in your exact table format:
 | 113 | **Auth Flow: Use ALLOWED_ORIGINS for Verification Link** | Modified email verification link generation to parse `ALLOWED_ORIGINS` environment variable instead of hardcoding `FRONTEND_URL`, ensuring correct link in both development and production environments |
+| 116 | **Auth Flow: Add Email Verification Required Component** | Created `EmailVerificationRequired.tsx` to display a dedicated screen prompting users to verify their email before accessing their account, with resend functionality, error handling, and navigation back to login for unverified users |
 
 ### ⚡ In Progress
 
@@ -159,6 +160,6 @@ Got it! Here’s the task message in your exact table format:
 
 ---
 
-**Document Version:** 80
-**Last Updated:** 11th October 2025
+**Document Version:** 81
+**Last Updated:** 13th October 2025
 **Maintained By:** Aniruddh Ballal
