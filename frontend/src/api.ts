@@ -28,7 +28,7 @@ api.interceptors.response.use(
       localStorage.removeItem("pendingUser");
       window.location.href = "/login";
     }
-    if (status === 403) {
+    if (status === 403 && window.location.pathname !== "/access-denied") {
       window.location.href = "/access-denied";
     }
     return Promise.reject(error);
