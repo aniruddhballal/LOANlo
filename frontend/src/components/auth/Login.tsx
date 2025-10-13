@@ -110,13 +110,16 @@ const Login = () => {
                 <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center animate-bounce">
                   <CheckCircle className="w-8 h-8 text-green-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-green-900 mb-2">Authentication Successful!</h3>
-                <p className="text-green-700 text-sm">Redirecting to dashboard...</p>
+                <h3 className="text-xl font-semibold text-green-900 mb-2">
+                  {user?.isEmailVerified ? 'Authentication Successful!' : 'Login Successful!'}
+                </h3>
+                <p className="text-green-700 text-sm">
+                  {user?.isEmailVerified ? 'Redirecting to dashboard...' : 'Please verify your email...'}
+                </p>
               </div>
             </div>
           </div>
         )}
-
         <div className="w-full max-w-lg relative z-10">
           {/* Corporate Header */}
           <div className={`text-center mb-12 transition-all duration-700 ${loginSuccess ? 'opacity-50 scale-95' : ''}`}>

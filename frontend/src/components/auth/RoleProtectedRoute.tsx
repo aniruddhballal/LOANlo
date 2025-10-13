@@ -8,27 +8,33 @@ interface RoleProtectedRouteProps {
 }
 
 const RoleProtectedRoute = ({ children, allowedRoles }: RoleProtectedRouteProps) => {
-  const { user, loading } = useAuth()
+  const { user, loading } = useAuth();
 
+  // Show loading until AuthProvider finishes
   if (loading) {
     return (
       <LoadingState 
         title="Authenticating" 
         message="Please wait while we log you in..." 
       />
-    )
+    );
   }
 
-  // not logged in
-  if (!user) return <Navigate to="/login" />
+  // User exists but email not verified
+  if (user && !user.isEmailVerified && window.location.pathname !== '/email-verification-required') {
+    return <Navigate to="/email-verification-required" />;
+  }
 
-  // logged in but wrong role
-  if (!allowedRoles.includes(user.role)) {
+  // User exists but role not allowed
+  if (user && !allowedRoles.includes(user.role)) {
     return <Navigate to={`/dashboard/${user.role}`} /> 
   }
 
-  // allowed
-  return <>{children}</>
+  // Not logged in
+  if (!user) return <Navigate to="/login" />;
+
+  // Everything okay
+  return <>{children}</>;
 }
 
 export default RoleProtectedRoute

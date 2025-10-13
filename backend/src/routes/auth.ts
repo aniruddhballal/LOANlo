@@ -285,19 +285,10 @@ router.post('/register', registerLimiter, async (req: Request, res: Response) =>
       // Continue with registration even if email fails
     }
 
-    const expiresIn =
-      typeof config.JWT_EXPIRES_IN === 'string' ? config.JWT_EXPIRES_IN : Number(config.JWT_EXPIRES_IN);
-
-    const token = jwt.sign(
-      { userId: user._id, email: user.email, role: user.role },
-      config.JWT_SECRET as string,
-      { expiresIn } as any
-    );
 
     res.status(201).json({
       success: true,
       message: 'User registered successfully. Please check your email to verify your account.',
-      token,
       user: {
         id: user._id,
         firstName: user.firstName,
@@ -452,6 +443,25 @@ router.post('/login', authLimiter, async (req: Request, res: Response) => {
       return res.status(500).json({ message: 'Server configuration error' });
     }
 
+    // Check email verification BEFORE calculating expiresIn
+    if (!user.isEmailVerified) {
+      return res.status(200).json({
+        success: false,
+        code: 'EMAIL_NOT_VERIFIED',
+        message: 'Please verify your email before logging in.',
+        user: {
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+          isEmailVerified: user.isEmailVerified,
+        }
+      });
+    }
+
+    // Only calculate expiresIn if we're creating a token
     const expiresIn =
       typeof config.JWT_EXPIRES_IN === 'string' ? config.JWT_EXPIRES_IN : Number(config.JWT_EXPIRES_IN);
 

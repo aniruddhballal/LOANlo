@@ -96,6 +96,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string, options?: { skipDelay?: boolean }) => {
     try {
       const { data } = await api.post('/auth/login', { email, password })
+
+      if (data.code === 'EMAIL_NOT_VERIFIED') {
+        setUser(data.user);
+        return;
+      }
+
       localStorage.setItem('token', data.token)
 
       if (options?.skipDelay) {
@@ -104,7 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('pendingUser', JSON.stringify(data.user))
       }
       
-      // If email is not verified, we don't throw an error
+      // If email is not verified, don't throw an error
       // The UI will handle showing the verification message
     } catch (error) {
       throw error
@@ -123,7 +129,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (userData: RegisterData): Promise<{ requiresVerification: boolean }> => {
     try {
       const { data } = await api.post('/auth/register', userData)
-      localStorage.setItem('token', data.token)
+      if(data.token){
+        localStorage.setItem('token', data.token)
+      }
       
       return { requiresVerification: data.requiresVerification || false }
     } catch (error) {

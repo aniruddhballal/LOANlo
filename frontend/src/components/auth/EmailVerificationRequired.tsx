@@ -5,23 +5,24 @@ import { useAuth } from '../../context/AuthContext'
 
 const EmailVerificationRequired = () => {
   const navigate = useNavigate()
-  const { resendVerification } = useAuth()
+  const { user, resendVerification, logout } = useAuth()
   
-  const [email, setEmail] = useState('')
   const [resending, setResending] = useState(false)
   const [resendSuccess, setResendSuccess] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
-    // Get email from localStorage (set by the interceptor)
-    const pendingEmail = localStorage.getItem('pendingVerificationEmail')
-    if (pendingEmail) {
-      setEmail(pendingEmail)
-    } else {
-      // If no email found, redirect to login
+    // If no user, redirect to login
+    if (!user) {
       navigate('/login')
+      return
     }
-  }, [navigate])
+    
+    // If user is verified, redirect to their dashboard
+    if (user.isEmailVerified) {
+      navigate(`/dashboard/${user.role}`)
+    }
+  }, [user, navigate])
 
   const handleResendVerification = async () => {
     setResending(true)
@@ -29,7 +30,7 @@ const EmailVerificationRequired = () => {
     setErrorMessage('')
     
     try {
-      await resendVerification(email)
+      await resendVerification()
       setResendSuccess(true)
     } catch (error: any) {
       setErrorMessage(error.response?.data?.message || 'Failed to resend verification email')
@@ -39,8 +40,13 @@ const EmailVerificationRequired = () => {
   }
 
   const handleGoToLogin = () => {
-    localStorage.removeItem('pendingVerificationEmail')
+    logout() // Clear the user state
     navigate('/login')
+  }
+
+  // Show nothing while checking user state
+  if (!user) {
+    return null
   }
 
   return (
@@ -84,7 +90,7 @@ const EmailVerificationRequired = () => {
                     Verification Email Sent
                   </h3>
                   <p className="text-blue-700 text-sm leading-relaxed mb-3">
-                    We've sent a verification email to <strong>{email}</strong>. 
+                    We've sent a verification email to <strong>{user.email}</strong>. 
                     Please check your inbox and click the verification link to activate your account.
                   </p>
                   {resendSuccess && (
