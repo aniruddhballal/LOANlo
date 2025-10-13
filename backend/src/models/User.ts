@@ -27,8 +27,8 @@ export interface IUser extends Document {
   
   // Email verification fields
   isEmailVerified: boolean;
-  verificationToken?: string;
-  verificationTokenExpiry?: Date;
+  verificationToken?: string | undefined;
+  verificationTokenExpiry?: Date | undefined;
   
   // Profile completion
   isProfileComplete: boolean;
