@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import config from '../config';
 import { verificationEmailTemplate, welcomeEmailTemplate, VerificationEmailData, WelcomeEmailData } from '../utils/emailTemplates';
 
 // Create reusable transporter
