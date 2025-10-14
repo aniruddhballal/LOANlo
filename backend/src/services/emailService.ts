@@ -1,63 +1,41 @@
 import nodemailer from 'nodemailer';
 import { verificationEmailTemplate, welcomeEmailTemplate, VerificationEmailData, WelcomeEmailData } from '../utils/emailTemplates';
 
-// Create reusable transporter
+/**
+ * Create a strict SendGrid transporter
+ */
 const createTransporter = () => {
-  // For development, you can use Gmail or other SMTP services
-  // For production, use services like SendGrid, AWS SES, or Mailgun
-  
-  if (process.env.NODE_ENV === 'production') {
-    // Production transporter (configure based on your email service)
-    return nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: parseInt(process.env.EMAIL_PORT || '587'),
-      secure: process.env.EMAIL_SECURE === 'true', // true for 465, false for other ports
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-  } else {
-    // Development transporter (uses Ethereal for testing)
-    // You can also use Gmail for development
-    return nodemailer.createTransport({
-      host: process.env.EMAIL_HOST || 'smtp.ethereal.email',
-      port: parseInt(process.env.EMAIL_PORT || '587'),
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
+  if (!process.env.SENDGRID_API_KEY) {
+    throw new Error('❌ SENDGRID_API_KEY is missing in environment variables.');
   }
+
+  return nodemailer.createTransport({
+    host: 'smtp.sendgrid.net',
+    port: 587,
+    secure: false,
+    auth: {
+      user: 'apikey', // Always this literal value for SendGrid
+      pass: process.env.SENDGRID_API_KEY,
+    },
+  });
 };
 
 /**
- * Send verification email to user
+ * Send verification email
  */
 export const sendVerificationEmail = async (
   email: string,
   firstName: string,
   verificationToken: string
 ): Promise<void> => {
+  const transporter = createTransporter();
+
   try {
-    const transporter = createTransporter();
-    
-    // Create verification link
     const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',');
-    const frontendUrl = allowedOrigins.includes(process.env.FRONTEND_URL || '')
-      ? process.env.FRONTEND_URL
-      : allowedOrigins[0]; // fallback to the first origin
-
+    const frontendUrl = allowedOrigins.find(origin => origin.includes('localhost')) || allowedOrigins[0];
     const verificationLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
+    const emailData: VerificationEmailData = { firstName, verificationLink };
 
-    // Prepare email data
-    const emailData: VerificationEmailData = {
-      firstName,
-      verificationLink,
-    };
-    
-    // Email options
     const mailOptions = {
       from: {
         name: 'LOANLO',
@@ -66,35 +44,28 @@ export const sendVerificationEmail = async (
       to: email,
       subject: 'Verify Your Email Address - LOANLO',
       html: verificationEmailTemplate(emailData),
-      text: `Dear ${firstName},\n\nThank you for registering with LOANLO. Please verify your email address by clicking the link below:\n\n${verificationLink}\n\nThis link will expire in 24 hours.\n\nIf you did not create an account with LOANLO, please disregard this email.\n\nBest regards,\nLOANLO Team`,
+      text: `Dear ${firstName},\n\nPlease verify your email: ${verificationLink}\n\nThis link expires in 24 hours.\n\nLOANLO Team`,
     };
-    
-    // Send email
-    await transporter.sendMail(mailOptions);
 
-  } catch (error) {
-    console.error('Error sending verification email:', error);
+    await transporter.sendMail(mailOptions);
+  } catch (error: any) {
+    console.error('❌ Error sending verification email:', error.message);
     throw new Error('Failed to send verification email');
   }
 };
 
 /**
- * Send welcome email after successful verification
+ * Send welcome email
  */
 export const sendWelcomeEmail = async (
   email: string,
   firstName: string
 ): Promise<void> => {
+  const transporter = createTransporter();
+
   try {
-    const transporter = createTransporter();
-    
-    // Prepare email data
-    const emailData: WelcomeEmailData = {
-      firstName,
-      email,
-    };
-    
-    // Email options
+    const emailData: WelcomeEmailData = { firstName, email };
+
     const mailOptions = {
       from: {
         name: 'LOANLO',
@@ -103,15 +74,12 @@ export const sendWelcomeEmail = async (
       to: email,
       subject: 'Welcome to LOANLO - Account Verified',
       html: welcomeEmailTemplate(emailData),
-      text: `Dear ${firstName},\n\nCongratulations! Your email address has been successfully verified, and your account is now fully activated.\n\nYour account ${email} is now ready to use.\n\nNext Steps:\n1. Complete Your Profile\n2. Explore Loan Options\n3. Submit Your Application\n\nThank you for choosing LOANLO for your financial needs.\n\nBest regards,\nLOANLO Team`,
+      text: `Dear ${firstName},\n\nYour account ${email} is now verified and ready.\n\nLOANLO Team`,
     };
-    
-    // Send email
-    await transporter.sendMail(mailOptions);
 
-  } catch (error) {
-    console.error('Error sending welcome email:', error);
-    // Don't throw error for welcome email as it's not critical
+    await transporter.sendMail(mailOptions);
+  } catch (error: any) {
+    console.error('❌ Error sending welcome email:', error.message);
   }
 };
 
@@ -122,10 +90,7 @@ export const resendVerificationEmail = async (
   email: string,
   firstName: string,
   verificationToken: string
-): Promise<void> => {
-  // Same as sendVerificationEmail
-  await sendVerificationEmail(email, firstName, verificationToken);
-};
+) => sendVerificationEmail(email, firstName, verificationToken);
 
 export default {
   sendVerificationEmail,
