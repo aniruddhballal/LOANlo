@@ -375,11 +375,32 @@ router.get('/verify-email', async (req: Request, res: Response) => {
 });
 
 // Resend verification email
-router.post('/resend-verification', resendVerificationLimiter, authenticateToken, async (req: Request, res: Response) => {
+router.post('/resend-verification', resendVerificationLimiter, async (req: Request, res: Response) => {
   try {
-    const userId = (req as AuthenticatedRequest).user.userId;
+    let user;
     
-    const user = await User.findById(userId);
+    // Check if user is authenticated (has token)
+    if ((req as AuthenticatedRequest).user?.userId) {
+      // Authenticated request - get user from token
+      user = await User.findById((req as AuthenticatedRequest).user.userId);
+    } else if (req.body.email) {
+      // Unauthenticated request - get user from email in body
+      user = await User.findOne({ email: req.body.email });
+      
+      // Don't reveal if email exists or not (security best practice)
+      if (!user) {
+        return res.json({
+          success: true,
+          message: 'If that email exists and is unverified, a verification email has been sent',
+        });
+      }
+    } else {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Authentication token or email required' 
+      });
+    }
+    
     if (!user) {
       return res.status(404).json({ 
         success: false,

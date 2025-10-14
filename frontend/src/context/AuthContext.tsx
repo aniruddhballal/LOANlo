@@ -169,7 +169,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resendVerification = async () => {
     try {
-      await api.post('/auth/resend-verification')
+      // Always include email in request body if we have it
+      if (user?.email) {
+        await api.post('/auth/resend-verification', { email: user.email })
+      } else {
+        await api.post('/auth/resend-verification')
+      }
     } catch (error) {
       throw error
     }

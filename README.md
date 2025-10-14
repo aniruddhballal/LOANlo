@@ -136,6 +136,8 @@ Got it! Here’s the task message in your exact table format:
 | 116 | **Auth Flow: Add Email Verification Required Component** | Created `EmailVerificationRequired.tsx` to display a dedicated screen prompting users to verify their email before accessing their account, with resend functionality, error handling, and navigation back to login for unverified users |
 | 117 | **User Schema: Fix Optional Type Definitions** | Updated `IUser` interface in `User.ts` to explicitly allow `undefined` for `verificationToken` and `verificationTokenExpiry` fields, resolving strict TypeScript errors under `exactOptionalPropertyTypes` mode |
 | 118 | **Router Structure: Fix AuthProvider Hook Context** | Restructured component hierarchy to wrap `<AuthProvider>` inside `<Router>` instead of vice versa, enabling `AuthContext` to use `useNavigate()` hook for programmatic navigation during authentication flows (e.g., redirecting to email verification page after login with unverified email) |
+Perfect — since both your **frontend (`AuthContext.tsx`)** and **backend (`auth.ts`)** were updated to work together for the same feature, here’s the unified changelog task message in your usual README style 👇
+| 120 | **Auth Flow: Unified Resend Verification for Authenticated & Unauthenticated Users** | Refactored `/resend-verification` route in `backend/routes/auth.ts` to support both authenticated (token-based) and unauthenticated (email-based) requests, removing the need for forced login before verification. Implemented security-safe response for non-existent emails. Updated `AuthContext.tsx` to automatically include the user’s email in the resend request when available, ensuring smooth behavior for both logged-in and pending-verification users. This improves usability, maintains security, and aligns frontend–backend verification flow. |
 
 ### ⚡ In Progress
 
@@ -163,6 +165,6 @@ Got it! Here’s the task message in your exact table format:
 
 ---
 
-**Document Version:** 85
+**Document Version:** 86
 **Last Updated:** 14th October 2025
 **Maintained By:** Aniruddh Ballal
