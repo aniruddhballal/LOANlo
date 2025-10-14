@@ -330,18 +330,27 @@ router.get('/verify-email', async (req: Request, res: Response) => {
       });
     }
 
-    // Check if already verified
+    // Check if already verified - RETURN SUCCESS INSTEAD OF ERROR
     if (user.isEmailVerified) {
-      return res.status(400).json({ 
-        success: false,
-        message: 'Email is already verified' 
+      return res.status(200).json({ 
+        success: true,
+        message: 'Email is already verified',
+        user: {
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+          isEmailVerified: user.isEmailVerified,
+        },
       });
     }
 
     // Update user
     user.isEmailVerified = true;
-    delete user.verificationToken;
-    delete user.verificationTokenExpiry;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiry = undefined;
     await user.save();
 
     // Send welcome email

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CheckCircle, XCircle, Loader2, Mail, Shield, ArrowRight, RefreshCw } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
@@ -12,6 +12,9 @@ const VerifyEmail = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const [resending, setResending] = useState(false)
   const [resendSuccess, setResendSuccess] = useState(false)
+  
+  // Use ref to prevent double verification
+  const hasVerified = useRef(false)
 
   useEffect(() => {
     const token = searchParams.get('token')
@@ -22,25 +25,45 @@ const VerifyEmail = () => {
       return
     }
 
+    // Prevent double execution in React StrictMode or re-renders
+    if (hasVerified.current) {
+      return
+    }
+
     // Perform verification
     const performVerification = async () => {
+      hasVerified.current = true
+      
       try {
         await verifyEmail(token)
         setStatus('success')
         
         // Redirect to dashboard after 3 seconds
         setTimeout(() => {
-          if(user)
+          if(user) {
             navigate(`/dashboard/${user.role}`)
+          }
         }, 3000)
       } catch (error: any) {
         console.error('Verification error:', error)
         
         if (error.response?.data?.message) {
           const message = error.response.data.message
+          
+          // If email is already verified, treat it as success
+          if (message.toLowerCase().includes('already verified')) {
+            setStatus('success')
+            setTimeout(() => {
+              if(user) {
+                navigate(`/dashboard/${user.role}`)
+              }
+            }, 3000)
+            return
+          }
+          
           setErrorMessage(message)
           
-          if (message.includes('expired')) {
+          if (message.toLowerCase().includes('expired')) {
             setStatus('expired')
           } else {
             setStatus('error')
@@ -53,7 +76,7 @@ const VerifyEmail = () => {
     }
 
     performVerification()
-  }, [searchParams, verifyEmail, navigate])
+  }, [searchParams.get('token')]) // Only depend on the token value
 
   const handleResendVerification = async () => {
     setResending(true)
@@ -75,7 +98,9 @@ const VerifyEmail = () => {
   }
 
   const handleGoToDashboard = () => {
-    navigate('/dashboard/${user.role}')
+    if (user) {
+      navigate(`/dashboard/${user.role}`)
+    }
   }
 
   return (

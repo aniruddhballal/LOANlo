@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
 import api from '../api'
 
 export interface User {
@@ -43,6 +43,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const verificationInProgress = useRef(false)
 
   // Check if user is logged in on app start
   useEffect(() => {
@@ -145,6 +146,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const verifyEmail = async (token: string) => {
+    // Prevent multiple simultaneous verification calls
+    if (verificationInProgress.current) {
+      return
+    }
+
+    verificationInProgress.current = true
+
     try {
       const { data } = await api.get(`/auth/verify-email?token=${token}`)
       
@@ -152,10 +160,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Update the current user state with verified status
         setUser(data.user)
         
-        // Also update token verification
+        // Only re-verify if we have a token AND the backend didn't return updated user
         const currentToken = localStorage.getItem('token')
-        if (currentToken) {
-          // Re-verify token to get updated user data
+        if (currentToken && !data.user.isEmailVerified) {
           const verifyResponse = await api.get('/auth/verify')
           if (verifyResponse.data.success) {
             setUser(verifyResponse.data.user)
@@ -164,6 +171,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error) {
       throw error
+    } finally {
+      verificationInProgress.current = false
     }
   }
 

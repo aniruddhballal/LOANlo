@@ -138,6 +138,7 @@ Got it! Here’s the task message in your exact table format:
 | 118 | **Router Structure: Fix AuthProvider Hook Context** | Restructured component hierarchy to wrap `<AuthProvider>` inside `<Router>` instead of vice versa, enabling `AuthContext` to use `useNavigate()` hook for programmatic navigation during authentication flows (e.g., redirecting to email verification page after login with unverified email) |
 Perfect — since both your **frontend (`AuthContext.tsx`)** and **backend (`auth.ts`)** were updated to work together for the same feature, here’s the unified changelog task message in your usual README style 👇
 | 120 | **Auth Flow: Unified Resend Verification for Authenticated & Unauthenticated Users** | Refactored `/resend-verification` route in `backend/routes/auth.ts` to support both authenticated (token-based) and unauthenticated (email-based) requests, removing the need for forced login before verification. Implemented security-safe response for non-existent emails. Updated `AuthContext.tsx` to automatically include the user’s email in the resend request when available, ensuring smooth behavior for both logged-in and pending-verification users. This improves usability, maintains security, and aligns frontend–backend verification flow. |
+| 121 | **Auth Flow: Fix Email Verification Double-Call and Already-Verified Error** | Resolved critical bug where clicking verification link would briefly show success then immediately display "Verification Failed: Email is already verified" error. Modified backend `auth.ts` to return success response (200) instead of error (400) when email is already verified, and fixed Mongoose field deletion using `undefined`. Updated `AuthContext.tsx` to prevent duplicate verification API calls using `useRef` flag and removed redundant second `/auth/verify` call causing race conditions. Enhanced `VerifyEmail.tsx` with `useRef` to prevent React StrictMode double-execution, simplified `useEffect` dependencies to only track token value, added graceful "already verified" handling to show success screen, and fixed template literal bug in dashboard navigation. |
 
 ### ⚡ In Progress
 
@@ -165,6 +166,6 @@ Perfect — since both your **frontend (`AuthContext.tsx`)** and **backend (`aut
 
 ---
 
-**Document Version:** 86
+**Document Version:** 87
 **Last Updated:** 14th October 2025
 **Maintained By:** Aniruddh Ballal
