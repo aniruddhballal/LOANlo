@@ -11,6 +11,10 @@ import documentRoutes from './routes/documents';
 import profileRoutes from './routes/profile';
 
 const app: Application = express();
+
+// Trust Render / Vercel proxy headers
+app.set('trust proxy', 1);
+
 const PORT: number = Number(config.PORT) || 5000;
 
 // Allowed origins from .env (comma-separated)
