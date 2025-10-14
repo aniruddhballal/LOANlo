@@ -1,99 +1,51 @@
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 import { verificationEmailTemplate, welcomeEmailTemplate, VerificationEmailData, WelcomeEmailData } from '../utils/emailTemplates';
 
-/**
- * Create a strict SendGrid transporter
- */
-const createTransporter = () => {
-  if (!process.env.SENDGRID_API_KEY) {
-    throw new Error('❌ SENDGRID_API_KEY is missing in environment variables.');
-  }
+sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
-  return nodemailer.createTransport({
-    host: 'smtp.sendgrid.net',
-    port: 587,
-    secure: false,
-    auth: {
-      user: 'apikey', // Always this literal value for SendGrid
-      pass: process.env.SENDGRID_API_KEY,
-    },
-  });
+const getFrontendUrl = () => {
+  const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',');
+  return allowedOrigins.find(origin => origin.includes('localhost')) || allowedOrigins[0];
 };
 
-/**
- * Send verification email
- */
-export const sendVerificationEmail = async (
-  email: string,
-  firstName: string,
-  verificationToken: string
-): Promise<void> => {
-  const transporter = createTransporter();
-
+export const sendVerificationEmail = async (email: string, firstName: string, verificationToken: string) => {
   try {
-    const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',');
-    const frontendUrl = allowedOrigins.find(origin => origin.includes('localhost')) || allowedOrigins[0];
+    const frontendUrl = getFrontendUrl();
     const verificationLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
     const emailData: VerificationEmailData = { firstName, verificationLink };
 
-    const mailOptions = {
-      from: {
-        name: 'LOANLO',
-        address: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      },
+    const msg = {
       to: email,
+      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
       subject: 'Verify Your Email Address - LOANLO',
       html: verificationEmailTemplate(emailData),
-      text: `Dear ${firstName},\n\nPlease verify your email: ${verificationLink}\n\nThis link expires in 24 hours.\n\nLOANLO Team`,
+      text: `Dear ${firstName},\n\nPlease verify your email: ${verificationLink}\n\nLOANLO Team`,
     };
 
-    await transporter.sendMail(mailOptions);
-  } catch (error: any) {
-    console.error('❌ Error sending verification email:', error.message);
+    await sgMail.send(msg);
+  } catch (error) {
+    console.error('❌ Error sending verification email:', error);
     throw new Error('Failed to send verification email');
   }
 };
 
-/**
- * Send welcome email
- */
-export const sendWelcomeEmail = async (
-  email: string,
-  firstName: string
-): Promise<void> => {
-  const transporter = createTransporter();
-
+export const sendWelcomeEmail = async (email: string, firstName: string) => {
   try {
     const emailData: WelcomeEmailData = { firstName, email };
-
-    const mailOptions = {
-      from: {
-        name: 'LOANLO',
-        address: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      },
+    const msg = {
       to: email,
+      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
       subject: 'Welcome to LOANLO - Account Verified',
       html: welcomeEmailTemplate(emailData),
-      text: `Dear ${firstName},\n\nYour account ${email} is now verified and ready.\n\nLOANLO Team`,
+      text: `Dear ${firstName},\n\nYour account ${email} is now verified.\n\nLOANLO Team`,
     };
-
-    await transporter.sendMail(mailOptions);
-  } catch (error: any) {
-    console.error('❌ Error sending welcome email:', error.message);
+    await sgMail.send(msg);
+  } catch (error) {
+    console.error('❌ Error sending welcome email:', error);
   }
 };
 
-/**
- * Resend verification email
- */
-export const resendVerificationEmail = async (
-  email: string,
-  firstName: string,
-  verificationToken: string
-) => sendVerificationEmail(email, firstName, verificationToken);
+export const resendVerificationEmail = async (email: string, firstName: string, verificationToken: string) =>
+  sendVerificationEmail(email, firstName, verificationToken);
 
-export default {
-  sendVerificationEmail,
-  sendWelcomeEmail,
-  resendVerificationEmail,
-};
+export default { sendVerificationEmail, sendWelcomeEmail, resendVerificationEmail };
