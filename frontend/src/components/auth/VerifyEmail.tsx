@@ -30,7 +30,8 @@ const VerifyEmail = () => {
         
         // Redirect to dashboard after 3 seconds
         setTimeout(() => {
-          navigate('/dashboard/${user.role}')
+          if(user)
+            navigate(`/dashboard/${user.role}`)
         }, 3000)
       } catch (error: any) {
         console.error('Verification error:', error)
