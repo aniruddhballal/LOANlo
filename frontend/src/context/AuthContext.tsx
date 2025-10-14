@@ -14,7 +14,7 @@ export interface User {
 interface AuthContextType {
   user: User | null
   loading: boolean
-  login: (email: string, password: string, options?: { skipDelay?: boolean }) => Promise<void>
+  login: (email: string, password: string, options?: { skipDelay?: boolean }) => Promise<User> // CHANGED: Return User
   register: (userData: RegisterData) => Promise<{ requiresVerification: boolean }>
   logout: () => void
   completeLogin: () => void
@@ -94,13 +94,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [])
 
 
-  const login = async (email: string, password: string, options?: { skipDelay?: boolean }) => {
+  const login = async (email: string, password: string, options?: { skipDelay?: boolean }): Promise<User> => {
     try {
       const { data } = await api.post('/auth/login', { email, password })
 
       if (data.code === 'EMAIL_NOT_VERIFIED') {
         setUser(data.user);
-        return;
+        return data.user; // CHANGED: Return the user
       }
 
       localStorage.setItem('token', data.token)
@@ -113,6 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // If email is not verified, don't throw an error
       // The UI will handle showing the verification message
+      return data.user; // CHANGED: Return the user
     } catch (error) {
       throw error
     }

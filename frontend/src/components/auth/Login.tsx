@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle, Shield, CheckCircle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import CaptchaModal from './CaptchaModal' // Import the CAPTCHA component
+import CaptchaModal from './CaptchaModal'
 import axios from "axios"
 
 const Login = () => {
@@ -15,6 +15,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [focusedField, setFocusedField] = useState('')
   const [loginSuccess, setLoginSuccess] = useState(false)
+  const [isEmailVerified, setIsEmailVerified] = useState(false)
   
   // CAPTCHA states
   const [showCaptcha, setShowCaptcha] = useState(false)
@@ -50,31 +51,31 @@ const Login = () => {
     setLoading(true)
 
     try {
-      // Login without setting user state immediately
-      await login(pendingFormData.email, pendingFormData.password)
+      // CHANGED: Capture the login response
+      const loginResponse = await login(pendingFormData.email, pendingFormData.password)
+      
+      // CHANGED: Capture email verification status from login response
+      setIsEmailVerified(loginResponse?.isEmailVerified || false)
       
       // Show success animation
       setLoginSuccess(true)
       
       setTimeout(() => {
         completeLogin()
-        // Note: Removed sessionStorage usage as per artifact restrictions
         
         // Redirect based on role
         if (user?.role) {
           navigate(`/dashboard/${user.role}`)
         } else {
-          navigate('/dashboard/applicant') // fallback
+          navigate('/dashboard/applicant')
         }
-      }, 1000) // Match your animation duration
+      }, 1000)
     } catch (err: unknown) {
       let errorMsg = "Login failed"
 
       if (axios.isAxiosError(err)) {
-        // Axios error type guard
         errorMsg = err.response?.data?.message || err.message
       } else if (err instanceof Error) {
-        // Regular JS error
         errorMsg = err.message
       }
 
@@ -110,11 +111,12 @@ const Login = () => {
                 <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center animate-bounce">
                   <CheckCircle className="w-8 h-8 text-green-600" />
                 </div>
+                {/* CHANGED: Use isEmailVerified state instead of user?.isEmailVerified */}
                 <h3 className="text-xl font-semibold text-green-900 mb-2">
-                  {user?.isEmailVerified ? 'Authentication Successful!' : 'Login Successful!'}
+                  {isEmailVerified ? 'Authentication Successful!' : 'Login Successful!'}
                 </h3>
                 <p className="text-green-700 text-sm">
-                  {user?.isEmailVerified ? 'Redirecting to dashboard...' : 'Please verify your email...'}
+                  {isEmailVerified ? 'Redirecting to dashboard...' : 'Please verify your email...'}
                 </p>
               </div>
             </div>

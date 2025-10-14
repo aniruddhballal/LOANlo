@@ -50,6 +50,7 @@
 | 111 | **Registration Email Verification UI** | Added `registrationSuccess` state in `Register.tsx` to show a success screen when a user registers but still needs to verify their email, including instructions and verification info. |
 | 114 | **Unified Loading Experience for Auth Routes** | Replaced the basic `LoadingSpinner` with the animated `LoadingState` component in both `RootRedirect` and `PublicRoute`, creating a consistent, elegant, and user-friendly loading experience during authentication and redirection. |
 | 119 | **Auth Flow: Reuse Centralized Email Verification Component** | Refactored `Register.tsx` to remove inline email verification success UI and reuse the existing `EmailVerificationRequired.tsx` component. Implemented redirect via `navigate('/email-verification-required')` and stored pending user email in `localStorage` for persistence. This unifies verification UX across the app, improves maintainability, and ensures consistent flow between registration and login stages. |
+| 122 | **Login Success Animation: Dynamic Message Based on Email Verification Status** | Fixed the login success animation to display the correct message based on email verification status. Added `isEmailVerified` state to `Login.tsx` to capture verification status from the login response immediately. Updated `AuthContext.tsx` to make the `login` function return `Promise<User>` instead of `Promise<void>`, and added `return data.user` statements in both success paths. Changed the success overlay to use `isEmailVerified` state instead of `user?.isEmailVerified` context. Now verified users see "Authentication Successful! Redirecting to dashboard..." while unverified users see "Login Successful! Please verify your email..." ensuring accurate feedback during the login animation. |
 
 ### ⚡ In Progress
 
@@ -166,6 +167,6 @@ Perfect — since both your **frontend (`AuthContext.tsx`)** and **backend (`aut
 
 ---
 
-**Document Version:** 87
+**Document Version:** 88
 **Last Updated:** 14th October 2025
 **Maintained By:** Aniruddh Ballal
