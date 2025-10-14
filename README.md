@@ -49,6 +49,7 @@
 | 103 | **PersonalDetailsRequired Page Styling** | Updated PersonalDetailsRequired component to match email verification page styling - replaced gradient header and decorative elements with centered card layout, changed from red to amber theme, simplified to font-light typography, matched button styling with dashboard theme (gray-900), added back arrow icon, and reduced visual complexity for more formal, professional appearance |
 | 111 | **Registration Email Verification UI** | Added `registrationSuccess` state in `Register.tsx` to show a success screen when a user registers but still needs to verify their email, including instructions and verification info. |
 | 114 | **Unified Loading Experience for Auth Routes** | Replaced the basic `LoadingSpinner` with the animated `LoadingState` component in both `RootRedirect` and `PublicRoute`, creating a consistent, elegant, and user-friendly loading experience during authentication and redirection. |
+| 119 | **Auth Flow: Reuse Centralized Email Verification Component** | Refactored `Register.tsx` to remove inline email verification success UI and reuse the existing `EmailVerificationRequired.tsx` component. Implemented redirect via `navigate('/email-verification-required')` and stored pending user email in `localStorage` for persistence. This unifies verification UX across the app, improves maintainability, and ensures consistent flow between registration and login stages. |
 
 ### ⚡ In Progress
 
@@ -162,6 +163,6 @@ Got it! Here’s the task message in your exact table format:
 
 ---
 
-**Document Version:** 84
+**Document Version:** 85
 **Last Updated:** 14th October 2025
 **Maintained By:** Aniruddh Ballal
