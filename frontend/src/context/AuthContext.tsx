@@ -132,6 +132,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if(data.token){
         localStorage.setItem('token', data.token)
       }
+
+      // Set the user in context (even though unverified)
+      if (data.user) {
+        setUser(data.user)
+      }
       
       return { requiresVerification: data.requiresVerification || false }
     } catch (error) {
