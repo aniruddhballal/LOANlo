@@ -47,11 +47,21 @@ const EmailVerification = () => {
         await verifyEmail(token)
         setStatus('success')
         
+        // After successful verification, backend returns token and verifyEmail stores it
+        // User state is also updated, so we can now redirect to dashboard
         setTimeout(() => {
-          if (user) {
-            navigate(`/dashboard/${user.role}`)
+          // Check if we now have a token (means auto-login was successful)
+          const authToken = localStorage.getItem('token')
+          if (authToken) {
+            // Token exists, redirect to root which will figure out the correct dashboard
+            navigate('/')
           } else {
-            navigate('/login')
+            navigate('/login', { 
+              state: { 
+                message: 'Email verified successfully! Please log in to continue.',
+                verified: true 
+              } 
+            })
           }
         }, 3000)
       } catch (error: any) {
@@ -63,10 +73,17 @@ const EmailVerification = () => {
           if (message.toLowerCase().includes('already verified')) {
             setStatus('success')
             setTimeout(() => {
-              if (user) {
-                navigate(`/dashboard/${user.role}`)
+              const authToken = localStorage.getItem('token')
+              if (authToken) {
+                // Token exists, redirect to root which will figure out the correct dashboard
+                navigate('/')
               } else {
-                navigate('/login')
+                navigate('/login', { 
+                  state: { 
+                    message: 'Email verified successfully! Please log in to continue.',
+                    verified: true 
+                  } 
+                })
               }
             }, 3000)
             return

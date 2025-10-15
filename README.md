@@ -142,6 +142,7 @@ Perfect — since both your **frontend (`AuthContext.tsx`)** and **backend (`aut
 | 121 | **Auth Flow: Fix Email Verification Double-Call and Already-Verified Error** | Resolved critical bug where clicking verification link would briefly show success then immediately display "Verification Failed: Email is already verified" error. Modified backend `auth.ts` to return success response (200) instead of error (400) when email is already verified, and fixed Mongoose field deletion using `undefined`. Updated `AuthContext.tsx` to prevent duplicate verification API calls using `useRef` flag and removed redundant second `/auth/verify` call causing race conditions. Enhanced `VerifyEmail.tsx` with `useRef` to prevent React StrictMode double-execution, simplified `useEffect` dependencies to only track token value, added graceful "already verified" handling to show success screen, and fixed template literal bug in dashboard navigation. |
 | 123 | **Email Service: Migrated from SMTP to SendGrid API** | Replaced Nodemailer SMTP configuration with SendGrid API integration in `emailService.ts`, simplifying deployment and ensuring reliable email delivery on cloud platforms. Updated `.env` to use `SENDGRID_API_KEY` and `EMAIL_FROM` instead of SMTP credentials. |
 | 124 | **Email Verification: Merged duplicate components into single intelligent component** | Consolidated `VerifyEmail.tsx` and `EmailVerificationRequired.tsx` into a single `EmailVerification.tsx` component that intelligently handles both token-based verification (from email links) and awaiting verification states. The component detects URL token presence to determine flow, eliminating ~400 lines of duplicate code while maintaining all functionality. Updated `App.tsx` routing to use single component for both `/verify-email` and `/email-verification-required` paths. |
+| 125 | **Email Verification: Implemented automatic login after email verification** | Modified backend `/auth/verify-email` endpoint to return JWT token upon successful verification, enabling seamless auto-login. Updated `AuthContext.verifyEmail()` to store token in localStorage and update user state. Enhanced `EmailVerification.tsx` to check for token after verification and automatically redirect users to their dashboard via root route, eliminating the need for manual login post-verification. Users now experience a smooth flow: click verification link → see success message → auto-redirect to dashboard. |
 
 ### ⚡ In Progress
 
@@ -169,6 +170,6 @@ Perfect — since both your **frontend (`AuthContext.tsx`)** and **backend (`aut
 
 ---
 
-**Document Version:** 90
+**Document Version:** 91
 **Last Updated:** 15th October 2025
 **Maintained By:** Aniruddh Ballal

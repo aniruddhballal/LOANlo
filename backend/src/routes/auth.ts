@@ -330,11 +330,19 @@ router.get('/verify-email', async (req: Request, res: Response) => {
       });
     }
 
-    // Check if already verified - RETURN SUCCESS INSTEAD OF ERROR
+    // Check if already verified
     if (user.isEmailVerified) {
+      // GENERATE TOKEN FOR ALREADY VERIFIED USER
+      const authToken = jwt.sign(
+        { userId: user._id, email: user.email, role: user.role },
+        config.JWT_SECRET as string,
+        { expiresIn: config.JWT_EXPIRES_IN } as any
+      );
+
       return res.status(200).json({ 
         success: true,
         message: 'Email is already verified',
+        token: authToken, // ADD THIS
         user: {
           id: user._id,
           firstName: user.firstName,
@@ -353,17 +361,24 @@ router.get('/verify-email', async (req: Request, res: Response) => {
     user.verificationTokenExpiry = undefined;
     await user.save();
 
+    // GENERATE TOKEN FOR NEWLY VERIFIED USER
+    const authToken = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role },
+      config.JWT_SECRET as string,
+      { expiresIn: config.JWT_EXPIRES_IN } as any
+    );
+
     // Send welcome email
     try {
       await sendWelcomeEmail(user.email, user.firstName);
     } catch (emailError) {
       console.error('Failed to send welcome email:', emailError);
-      // Don't fail the verification if welcome email fails
     }
 
     res.json({
       success: true,
       message: 'Email verified successfully',
+      token: authToken, // ADD THIS
       user: {
         id: user._id,
         firstName: user.firstName,

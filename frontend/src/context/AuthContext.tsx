@@ -157,17 +157,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data } = await api.get(`/auth/verify-email?token=${token}`)
       
-      if (data.success && data.user) {
-        // Update the current user state with verified status
-        setUser(data.user)
+      if (data.success) {
+        // Store the token if backend returns it
+        if (data.token) {
+          localStorage.setItem('token', data.token)
+        }
         
-        // Only re-verify if we have a token AND the backend didn't return updated user
-        const currentToken = localStorage.getItem('token')
-        if (currentToken && !data.user.isEmailVerified) {
-          const verifyResponse = await api.get('/auth/verify')
-          if (verifyResponse.data.success) {
-            setUser(verifyResponse.data.user)
-          }
+        // Update user state with verified user
+        if (data.user) {
+          setUser(data.user)
         }
       }
     } catch (error) {
