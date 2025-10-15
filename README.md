@@ -169,11 +169,11 @@ Perfect — since both your **frontend (`AuthContext.tsx`)** and **backend (`aut
 | 102 | **Session Management** | Implementing automatic session timeout and logout functionality after defined period of user inactivity |
 | 126 | **Google reCAPTCHA Integration** | Replacing custom numeric CAPTCHA with Google reCAPTCHA for enhanced bot protection |
 | 127 | **Passwordless Authentication** | Implementing Google passwordless login/signup to replace traditional email and password authentication |
-| 128 | **SMTP Email Transport** | Switching email delivery system from SendGrid back to SMTP with Nodemailer for improved control and reliability |
+| 128 | **SMTP Email Transport** | ~~Switching email delivery system from SendGrid back to SMTP with Nodemailer for improved control and reliability~~ *(Deprecated: Render and most free hosting providers block SMTP; use an email API (SendGrid, Resend, Mailgun) instead.)* |
 | 129 | **Automated Email Notifications** | Sending email to applicants on loan status updates and notifying underwriters upon new application submissions |
 
 ---
 
-**Document Version:** 92
+**Document Version:** 93
 **Last Updated:** 15th October 2025
 **Maintained By:** Aniruddh Ballal
