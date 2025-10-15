@@ -167,9 +167,13 @@ Perfect — since both your **frontend (`AuthContext.tsx`)** and **backend (`aut
 | 100 | **Security Evaluation** | Evaluating security requirements for personal data storage, including potential implementation of salting and hashing mechanisms |
 | 101 | **Performance Optimization** | Optimizing Underwriter dashboard performance by implementing on-demand data fetching with search/filter/sort parameters |
 | 102 | **Session Management** | Implementing automatic session timeout and logout functionality after defined period of user inactivity |
+| 126 | **Google reCAPTCHA Integration** | Replacing custom numeric CAPTCHA with Google reCAPTCHA for enhanced bot protection |
+| 127 | **Passwordless Authentication** | Implementing Google passwordless login/signup to replace traditional email and password authentication |
+| 128 | **SMTP Email Transport** | Switching email delivery system from SendGrid back to SMTP with Nodemailer for improved control and reliability |
+| 129 | **Automated Email Notifications** | Sending email to applicants on loan status updates and notifying underwriters upon new application submissions |
 
 ---
 
-**Document Version:** 91
+**Document Version:** 92
 **Last Updated:** 15th October 2025
 **Maintained By:** Aniruddh Ballal
