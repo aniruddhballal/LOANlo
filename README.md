@@ -141,6 +141,7 @@ Perfect — since both your **frontend (`AuthContext.tsx`)** and **backend (`aut
 | 120 | **Auth Flow: Unified Resend Verification for Authenticated & Unauthenticated Users** | Refactored `/resend-verification` route in `backend/routes/auth.ts` to support both authenticated (token-based) and unauthenticated (email-based) requests, removing the need for forced login before verification. Implemented security-safe response for non-existent emails. Updated `AuthContext.tsx` to automatically include the user’s email in the resend request when available, ensuring smooth behavior for both logged-in and pending-verification users. This improves usability, maintains security, and aligns frontend–backend verification flow. |
 | 121 | **Auth Flow: Fix Email Verification Double-Call and Already-Verified Error** | Resolved critical bug where clicking verification link would briefly show success then immediately display "Verification Failed: Email is already verified" error. Modified backend `auth.ts` to return success response (200) instead of error (400) when email is already verified, and fixed Mongoose field deletion using `undefined`. Updated `AuthContext.tsx` to prevent duplicate verification API calls using `useRef` flag and removed redundant second `/auth/verify` call causing race conditions. Enhanced `VerifyEmail.tsx` with `useRef` to prevent React StrictMode double-execution, simplified `useEffect` dependencies to only track token value, added graceful "already verified" handling to show success screen, and fixed template literal bug in dashboard navigation. |
 | 123 | **Email Service: Migrated from SMTP to SendGrid API** | Replaced Nodemailer SMTP configuration with SendGrid API integration in `emailService.ts`, simplifying deployment and ensuring reliable email delivery on cloud platforms. Updated `.env` to use `SENDGRID_API_KEY` and `EMAIL_FROM` instead of SMTP credentials. |
+| 124 | **Email Verification: Merged duplicate components into single intelligent component** | Consolidated `VerifyEmail.tsx` and `EmailVerificationRequired.tsx` into a single `EmailVerification.tsx` component that intelligently handles both token-based verification (from email links) and awaiting verification states. The component detects URL token presence to determine flow, eliminating ~400 lines of duplicate code while maintaining all functionality. Updated `App.tsx` routing to use single component for both `/verify-email` and `/email-verification-required` paths. |
 
 ### ⚡ In Progress
 
@@ -168,6 +169,6 @@ Perfect — since both your **frontend (`AuthContext.tsx`)** and **backend (`aut
 
 ---
 
-**Document Version:** 89
-**Last Updated:** 14th October 2025
+**Document Version:** 90
+**Last Updated:** 15th October 2025
 **Maintained By:** Aniruddh Ballal

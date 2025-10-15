@@ -1,36 +1,45 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { CheckCircle, XCircle, Loader2, Mail, Shield, ArrowRight, RefreshCw } from 'lucide-react'
+import { CheckCircle, XCircle, Loader2, Mail, Shield, ArrowRight, RefreshCw, AlertCircle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
-const VerifyEmail = () => {
+const EmailVerification = () => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { verifyEmail, resendVerification, user } = useAuth()
+  const { verifyEmail, resendVerification, user, logout } = useAuth()
   
-  const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'expired'>('verifying')
+  const token = searchParams.get('token')
+  const hasToken = !!token
+  
+  // States
+  const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'expired' | 'awaiting'>('verifying')
   const [errorMessage, setErrorMessage] = useState('')
   const [resending, setResending] = useState(false)
   const [resendSuccess, setResendSuccess] = useState(false)
   
-  // Use ref to prevent double verification
   const hasVerified = useRef(false)
 
+  // Effect for token-based verification
   useEffect(() => {
-    const token = searchParams.get('token')
-    
-    if (!token) {
-      setStatus('error')
-      setErrorMessage('No verification token provided')
+    if (!hasToken) {
+      // No token = user is waiting for verification
+      setStatus('awaiting')
+      
+      // Redirect if no user or already verified
+      if (!user) {
+        navigate('/login')
+        return
+      }
+      if (user.isEmailVerified) {
+        navigate(`/dashboard/${user.role}`)
+        return
+      }
       return
     }
 
-    // Prevent double execution in React StrictMode or re-renders
-    if (hasVerified.current) {
-      return
-    }
+    // Has token = perform verification
+    if (hasVerified.current) return
 
-    // Perform verification
     const performVerification = async () => {
       hasVerified.current = true
       
@@ -38,10 +47,11 @@ const VerifyEmail = () => {
         await verifyEmail(token)
         setStatus('success')
         
-        // Redirect to dashboard after 3 seconds
         setTimeout(() => {
-          if(user) {
+          if (user) {
             navigate(`/dashboard/${user.role}`)
+          } else {
+            navigate('/login')
           }
         }, 3000)
       } catch (error: any) {
@@ -50,12 +60,13 @@ const VerifyEmail = () => {
         if (error.response?.data?.message) {
           const message = error.response.data.message
           
-          // If email is already verified, treat it as success
           if (message.toLowerCase().includes('already verified')) {
             setStatus('success')
             setTimeout(() => {
-              if(user) {
+              if (user) {
                 navigate(`/dashboard/${user.role}`)
+              } else {
+                navigate('/login')
               }
             }, 3000)
             return
@@ -76,16 +87,21 @@ const VerifyEmail = () => {
     }
 
     performVerification()
-  }, [searchParams.get('token')]) // Only depend on the token value
+  }, [token, hasToken, user?.isEmailVerified])
 
   const handleResendVerification = async () => {
     setResending(true)
     setResendSuccess(false)
+    setErrorMessage('')
     
     try {
       await resendVerification()
       setResendSuccess(true)
-      setErrorMessage('A new verification email has been sent to your inbox.')
+      if (status === 'awaiting') {
+        // Don't override the message for awaiting state
+      } else {
+        setErrorMessage('A new verification email has been sent to your inbox.')
+      }
     } catch (error: any) {
       setErrorMessage(error.response?.data?.message || 'Failed to resend verification email')
     } finally {
@@ -94,6 +110,9 @@ const VerifyEmail = () => {
   }
 
   const handleGoToLogin = () => {
+    if (status === 'awaiting') {
+      logout() // Clear user state when going back from awaiting page
+    }
     navigate('/login')
   }
 
@@ -101,6 +120,11 @@ const VerifyEmail = () => {
     if (user) {
       navigate(`/dashboard/${user.role}`)
     }
+  }
+
+  // Show nothing while checking states
+  if (status === 'awaiting' && !user) {
+    return null
   }
 
   return (
@@ -124,7 +148,7 @@ const VerifyEmail = () => {
         <div className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
           
           {/* Verifying State */}
-          {status === 'verifying' && (
+          {status === 'verifying' && hasToken && (
             <>
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-10 py-12 text-center border-b border-blue-100">
                 <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-500 rounded-full mb-6">
@@ -142,6 +166,144 @@ const VerifyEmail = () => {
                 <div className="inline-flex items-center space-x-2 text-blue-600">
                   <Loader2 className="w-5 h-5 animate-spin" />
                   <span className="text-sm font-medium tracking-wide">PROCESSING VERIFICATION</span>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Awaiting Verification State (No Token) */}
+          {status === 'awaiting' && (
+            <>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-10 py-12 text-center border-b border-blue-100">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-500 rounded-full mb-6">
+                  <Mail className="w-10 h-10 text-white" />
+                </div>
+                <h2 className="text-3xl font-light text-gray-900 mb-3 tracking-wide">
+                  Email Verification Required
+                </h2>
+                <p className="text-gray-600 text-base">
+                  Please verify your email to access your account
+                </p>
+              </div>
+              
+              <div className="px-10 py-10">
+                <div className="mb-8 p-6 rounded-2xl border border-blue-200 bg-blue-50">
+                  <div className="flex items-start space-x-3">
+                    <Mail className="h-6 w-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="text-lg font-medium text-blue-900 mb-2">
+                        Verification Email Sent
+                      </h3>
+                      <p className="text-blue-700 text-sm leading-relaxed mb-3">
+                        We've sent a verification email to <strong>{user?.email}</strong>. 
+                        Please check your inbox and click the verification link to activate your account.
+                      </p>
+                      {resendSuccess && (
+                        <div className="p-3 rounded-lg bg-green-100 border border-green-200 mt-3">
+                          <div className="flex items-center space-x-2">
+                            <CheckCircle className="w-4 h-4 text-green-600" />
+                            <p className="text-green-800 text-xs font-medium">
+                              New verification email sent! Please check your inbox.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {errorMessage && (
+                        <div className="p-3 rounded-lg bg-red-100 border border-red-200 mt-3">
+                          <div className="flex items-center space-x-2">
+                            <AlertCircle className="w-4 h-4 text-red-600" />
+                            <p className="text-red-800 text-xs font-medium">
+                              {errorMessage}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                  <h3 className="text-sm font-medium text-gray-700 tracking-widest">
+                    WHAT TO DO NEXT
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-xl">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">
+                        1
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Check your email inbox</p>
+                        <p className="text-xs text-gray-600 mt-1">Look for an email from LOANLO</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-xl">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">
+                        2
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Click the verification link</p>
+                        <p className="text-xs text-gray-600 mt-1">This will activate your account</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-xl">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">
+                        3
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Log in to your account</p>
+                        <p className="text-xs text-gray-600 mt-1">After verification, you can access all features</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <button
+                    onClick={handleResendVerification}
+                    disabled={resending || resendSuccess}
+                    className="relative w-full flex items-center justify-center py-4 px-6 
+                             border border-gray-900 rounded-2xl text-white bg-gray-900 
+                             font-medium text-sm tracking-wider transition-all duration-300 
+                             hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5
+                             disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                  >
+                    {resending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-3 animate-spin" />
+                        <span>SENDING EMAIL...</span>
+                      </>
+                    ) : resendSuccess ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 mr-3" />
+                        <span>EMAIL SENT</span>
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-3" />
+                        <span>RESEND VERIFICATION EMAIL</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={handleGoToLogin}
+                    className="relative w-full flex items-center justify-center py-4 px-6 
+                             border border-gray-300 rounded-2xl text-gray-900 bg-white 
+                             font-medium text-sm tracking-wider transition-all duration-300 
+                             hover:bg-gray-50 hover:shadow-lg hover:-translate-y-0.5"
+                  >
+                    <span>BACK TO LOGIN</span>
+                    <ArrowRight className="ml-3 h-4 w-4" />
+                  </button>
+                </div>
+
+                <div className="mt-6 p-4 rounded-xl border border-yellow-200 bg-yellow-50">
+                  <p className="text-yellow-800 text-xs leading-relaxed">
+                    <strong>Can't find the email?</strong> Check your spam or junk folder. 
+                    If you still don't see it, try resending the verification email.
+                  </p>
                 </div>
               </div>
             </>
@@ -382,4 +544,4 @@ const VerifyEmail = () => {
   )
 }
 
-export default VerifyEmail
+export default EmailVerification

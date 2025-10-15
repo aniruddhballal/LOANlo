@@ -11,9 +11,8 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import PersonalDetails from './components/loan/PersonalDetails/PersonalDetails'
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 import AccessDenied from './components/auth/AccessDenied'
-import VerifyEmail from './components/auth/VerifyEmail'
 import { LoadingState } from './components/ui/StatusMessages'
-import EmailVerificationRequired from './components/auth/EmailVerificationRequired'
+import EmailVerification from './components/auth/EmailVerification'
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -68,8 +67,8 @@ function AppContent() {
             <Register />
           </PublicRoute>
         } />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/email-verification-required" element={<EmailVerificationRequired />} />
+        <Route path="/verify-email" element={<EmailVerification />} />
+        <Route path="/email-verification-required" element={<EmailVerification />} />
         {/* Protected Routes */}
         <Route path="/dashboard/applicant" element={
           <RoleProtectedRoute allowedRoles={['applicant']}>
