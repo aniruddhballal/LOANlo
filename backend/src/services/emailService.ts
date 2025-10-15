@@ -4,7 +4,12 @@ import { verificationEmailTemplate, welcomeEmailTemplate, VerificationEmailData,
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
 const getFrontendUrl = () => {
-  const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',');
+  const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim());
+  // In production, don't use localhost
+  if (process.env.NODE_ENV === 'production') {
+    return allowedOrigins.find(origin => !origin.includes('localhost')) || allowedOrigins[0];
+  }
+  // In development, prefer localhost
   return allowedOrigins.find(origin => origin.includes('localhost')) || allowedOrigins[0];
 };
 
