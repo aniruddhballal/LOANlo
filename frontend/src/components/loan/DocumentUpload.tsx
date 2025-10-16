@@ -211,9 +211,13 @@ const DocumentUpload = () => {
       formData.append('documentType', documentType)
       formData.append('applicationId', applicationId!)
 
-      await api.post('/documents/upload', formData, {
+      const res = await api.post('/documents/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
+
+      if (res.data.allRequiredDocsUploaded) {
+        navigate('/application-status') // redirect when all 6 uploaded
+      }
 
       clearInterval(progressInterval)
       setUploadProgress(prev => ({ ...prev, [documentType]: 100 }))
