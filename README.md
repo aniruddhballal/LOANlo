@@ -143,6 +143,7 @@ Perfect — since both your **frontend (`AuthContext.tsx`)** and **backend (`aut
 | 123 | **Email Service: Migrated from SMTP to SendGrid API** | Replaced Nodemailer SMTP configuration with SendGrid API integration in `emailService.ts`, simplifying deployment and ensuring reliable email delivery on cloud platforms. Updated `.env` to use `SENDGRID_API_KEY` and `EMAIL_FROM` instead of SMTP credentials. |
 | 124 | **Email Verification: Merged duplicate components into single intelligent component** | Consolidated `VerifyEmail.tsx` and `EmailVerificationRequired.tsx` into a single `EmailVerification.tsx` component that intelligently handles both token-based verification (from email links) and awaiting verification states. The component detects URL token presence to determine flow, eliminating ~400 lines of duplicate code while maintaining all functionality. Updated `App.tsx` routing to use single component for both `/verify-email` and `/email-verification-required` paths. |
 | 125 | **Email Verification: Implemented automatic login after email verification** | Modified backend `/auth/verify-email` endpoint to return JWT token upon successful verification, enabling seamless auto-login. Updated `AuthContext.verifyEmail()` to store token in localStorage and update user state. Enhanced `EmailVerification.tsx` to check for token after verification and automatically redirect users to their dashboard via root route, eliminating the need for manual login post-verification. Users now experience a smooth flow: click verification link → see success message → auto-redirect to dashboard. |
+| 129 | **Automated Email Notifications: Implemented comprehensive loan application email system** | Created modular email system with separate templates (`loanApplicationSubmittedTemplate.ts`, `loanStatusUpdateTemplate.ts`, `newApplicationNotificationTemplate.ts`, `documentsRequestedTemplate.ts`) and centralized `loanEmailService.ts` using SendGrid. Integrated four notification triggers into `routes/loans.ts`: applicant confirmation on submission, status updates with conditional approval/rejection content, underwriter alerts via `UNDERWRITER_EMAILS` env variable on review submission, and document request notifications. Modified endpoints (`/apply`, `/update-status/:applicationId`, `/request-documents/:applicationId`, `/:applicationId/submit-for-review`) to trigger emails with responsive HTML templates, application tracking, and dashboard links. |
 
 ### ⚡ In Progress
 
@@ -170,10 +171,9 @@ Perfect — since both your **frontend (`AuthContext.tsx`)** and **backend (`aut
 | 126 | **Google reCAPTCHA Integration** | Replacing custom numeric CAPTCHA with Google reCAPTCHA for enhanced bot protection |
 | 127 | **Passwordless Authentication** | Implementing Google passwordless login/signup to replace traditional email and password authentication |
 | 128 | **SMTP Email Transport** | ~~Switching email delivery system from SendGrid back to SMTP with Nodemailer for improved control and reliability~~ *(Deprecated: Render and most free hosting providers block SMTP; use an email API (SendGrid, Resend, Mailgun) instead.)* |
-| 129 | **Automated Email Notifications** | Sending email to applicants on loan status updates and notifying underwriters upon new application submissions |
 
 ---
 
-**Document Version:** 93
-**Last Updated:** 15th October 2025
+**Document Version:** 94
+**Last Updated:** 16th October 2025
 **Maintained By:** Aniruddh Ballal

@@ -4,6 +4,13 @@ import { AuthenticatedRequest, authenticateToken } from '../middleware/auth';
 import User from '../models/User';
 import DocumentModel, { IDocument, DocumentType } from '../models/Document';
 
+import {
+  sendLoanApplicationSubmittedEmail,
+  sendLoanStatusUpdateEmail,
+  sendNewApplicationNotificationToUnderwriters,
+  sendDocumentsRequestedEmail,
+} from '../utils/loanEmailService';
+
 const router = Router();
 
 // Type for document requirement objects
@@ -119,7 +126,21 @@ router.post(
 
       await loanApplication.save();
 
-      res.status(201).json({ success: true, message: 'Loan application submitted successfully', applicationId: loanApplication._id });
+      // Send confirmation email to applicant
+      await sendLoanApplicationSubmittedEmail(
+        user.email,
+        user.firstName,
+        loanApplication._id.toString(),
+        loanType,
+        amount
+      );
+
+      res.status(201).json({ 
+        success: true, 
+        message: 'Loan application submitted successfully', 
+        applicationId: loanApplication._id 
+      });
+
     } catch (error: any) {
       res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
@@ -353,6 +374,22 @@ router.put(
         { new: true, runValidators: true }
       ).populate('userId', 'firstName lastName email phone role');
 
+      // Send status update email to applicant
+      if (updatedApplication && updatedApplication.userId) {
+        const applicant = updatedApplication.userId as any;
+        await sendLoanStatusUpdateEmail(
+          applicant.email,
+          applicant.firstName,
+          updatedApplication._id.toString(),
+          updatedApplication.loanType,
+          updatedApplication.amount,
+          status,
+          comment,
+          rejectionReason,
+          approvalDetails
+        );
+      }
+
       res.json({
         success: true,
         message: `Application ${status} successfully`,
@@ -413,7 +450,17 @@ router.post(
         { new: true }
       ).populate('userId', 'firstName lastName email phone role');
 
-      // Optional: send notification/email about document request
+      // Send documents requested email to applicant
+      if (updatedApplication && updatedApplication.userId) {
+        const applicant = updatedApplication.userId as any;
+        await sendDocumentsRequestedEmail(
+          applicant.email,
+          applicant.firstName,
+          updatedApplication._id.toString(),
+          updatedApplication.loanType,
+          message
+        );
+      }
 
       res.json({
         success: true,
@@ -491,6 +538,30 @@ router.patch(
         },
         { new: true }
       ).populate('userId', 'firstName lastName email phone');
+
+      // Notify underwriters about new application for review
+      if (updatedApplication && updatedApplication.userId) {
+        const applicant = updatedApplication.userId as any;
+        const applicantName = `${applicant.firstName} ${applicant.lastName}`;
+        
+        await sendNewApplicationNotificationToUnderwriters(
+          applicantName,
+          updatedApplication._id.toString(),
+          updatedApplication.loanType,
+          updatedApplication.amount
+        );
+
+        // Also send status update to applicant
+        await sendLoanStatusUpdateEmail(
+          applicant.email,
+          applicant.firstName,
+          updatedApplication._id.toString(),
+          updatedApplication.loanType,
+          updatedApplication.amount,
+          'under_review',
+          'Application submitted for review by applicant'
+        );
+      }
 
       res.json({
         success: true,
