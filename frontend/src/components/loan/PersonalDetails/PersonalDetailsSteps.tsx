@@ -214,8 +214,7 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
             inputMode="text"
             pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
           />
-          {errors.panNumber && <ErrorMessage message={errors.panNumber} />}
-          {!errors.panNumber && formData.panNumber && formData.panNumber.length > 0 && formData.panNumber.length < 10 && (
+          {(errors.panNumber || (formData.panNumber && !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(formData.panNumber))) && (
             <ErrorMessage message="PAN must be 10 characters in format: ABCDE1234F" />
           )}
         </div>
