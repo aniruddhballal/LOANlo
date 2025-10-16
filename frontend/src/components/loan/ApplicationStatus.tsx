@@ -186,7 +186,7 @@ const ApplicationStatus = () => {
     return <ApplicationStatusSkeleton />
   }
 
-// Add this inside your component, right before the return statement:
+  // Add this inside your component, right before the return statement:
   const styles = `
     @keyframes colorTransition {
       0% {
