@@ -381,4 +381,102 @@ router.get('/me', profileFetchLimiter, authenticateToken, async (req: AuthReques
   }
 });
 
+// Soft delete user account
+router.delete('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Check if already deleted
+    if (user.isDeleted) {
+      return res.status(400).json({
+        success: false,
+        message: 'Account is already deleted'
+      });
+    }
+
+    // Perform soft delete
+    user.isDeleted = true;
+    user.deletedAt = new Date();
+    await user.save();
+
+    // Optional: Log the deletion for audit purposes
+    console.log(`User ${userId} (${user.email}) soft deleted at ${user.deletedAt}`);
+
+    res.json({
+      success: true,
+      message: 'Account deleted successfully'
+    });
+  } catch (err: any) {
+    console.error('Error deleting account:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete account',
+      error: err.message
+    });
+  }
+});
+
+// Optional: Add an endpoint to restore deleted accounts (admin only)
+router.post('/restore/:userId', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    // Check if user is admin
+    if (req.user?.role !== 'system_admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized. Admin access required.'
+      });
+    }
+
+    const { userId } = req.params;
+
+    // Find user including soft-deleted ones
+    const user = await User.findOne({ _id: userId }).exec();
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    if (!user.isDeleted) {
+      return res.status(400).json({
+        success: false,
+        message: 'Account is not deleted'
+      });
+    }
+
+    // Restore the account
+    user.isDeleted = false;
+    user.deletedAt = undefined;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Account restored successfully',
+      user
+    });
+  } catch (err: any) {
+    console.error('Error restoring account:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to restore account',
+      error: err.message
+    });
+  }
+});
+
 export default router;

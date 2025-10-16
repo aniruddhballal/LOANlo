@@ -120,6 +120,7 @@
 | 73 | **User Guidance Enhancement** | Enhanced user experience in Personal Details form by adding input format specifications to labels/placeholders for Aadhaar, PAN, and DOB fields |
 | 74 | **Production Deployment** | Deployed application infrastructure with Render for backend services and Vercel for frontend hosting |
 | 76 | **Rate-Limiting Refinement** | Resolved critical issue combining rate-limiting on profile completion/update with validation errors by implementing step-specific partial data persistence through dedicated save route |
+| 80 | **Soft-Delete User Accounts** | Added backend endpoints for soft-deleting (`DELETE /profile/me`) and restoring (`POST /profile/restore/:userId`) users, updated frontend `Profile.tsx` to show delete modal, handle deletion with API call, and prevent login post-deletion |
 | 84 | **Tab Switching Logic** | Implemented automatic tab switching from Actions to Application Details upon loan approval/rejection to prevent error states from unauthorized Actions tab access post-decision |
 | 85 | **Environment Configuration** | Resolved environment-specific API endpoint discrepancies for document view/download functionality between local and deployed environments |
 | 86 | **Storage Migration** | Migrated document storage from Render's ephemeral filesystem to persistent GridFS solution to ensure data durability across redeployments |
@@ -160,7 +161,6 @@
 | 72 | **Middleware Restructuring** | Evaluating middleware restructuring including potential renaming of auth.ts to middleware.ts and refactoring of routes/auth.ts |
 | 75 | **AI Integration** | Integrating XGBoost-based AI risk prediction and credit assessment model from standalone Streamlit application into MERN stack architecture |
 | 77 | **Rate-Limiting Audit** | Auditing rate-limiting implementation to ensure IP-based restrictions don't inadvertently affect legitimate users |
-| 80 | **Soft-Delete Architecture** | Reimplementing account deletion with soft-delete architecture, maintaining database records while preventing login access, with optional 30-day grace period |
 | 82 | **Profile Management Feature** | Developing Underwriter feature to fetch and display individual applicant profile details on-demand, including comprehensive profile update history |
 | 83 | **Permissions Framework** | Finalizing decision framework for user profile deletion permissions and implementation approach |
 | 89 | **Audit Trail System** | Implementing comprehensive audit trail system ensuring all deletion operations are logged rather than permanently removed from database |
@@ -176,6 +176,6 @@
 
 ---
 
-**Document Version:** 100
+**Document Version:** 101
 **Last Updated:** 16th October 2025
 **Maintained By:** Aniruddh Ballal

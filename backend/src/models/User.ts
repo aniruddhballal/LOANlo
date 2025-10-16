@@ -8,7 +8,6 @@ export interface IUser extends Document {
   password: string;
   phone?: string;
   role: 'applicant' | 'underwriter' | 'system_admin';
-
   dateOfBirth?: string;
   gender?: string;
   maritalStatus?: string;
@@ -24,15 +23,19 @@ export interface IUser extends Document {
   workExperience?: string;
   monthlyIncome?: string;
   createdAt: Date;
-  
+ 
   // Email verification fields
   isEmailVerified: boolean;
   verificationToken?: string | undefined;
   verificationTokenExpiry?: Date | undefined;
-  
+ 
   // Profile completion
   isProfileComplete: boolean;
   calculateProfileCompletion(): number;
+  
+  // Soft delete fields
+  isDeleted: boolean;
+  deletedAt?: Date | undefined; // Changed to explicitly allow undefined
 }
 
 // Schema definition
@@ -47,7 +50,6 @@ const userSchema: Schema<IUser> = new Schema({
     enum: ['applicant', 'underwriter', 'system_admin'],
     default: 'applicant'
   },
-
   dateOfBirth: String,
   gender: String,
   maritalStatus: String,
@@ -63,14 +65,18 @@ const userSchema: Schema<IUser> = new Schema({
   workExperience: String,
   monthlyIncome: String,
   createdAt: { type: Date, default: Date.now },
-  
+ 
   // Email verification fields
   isEmailVerified: { type: Boolean, default: false },
   verificationToken: { type: String },
   verificationTokenExpiry: { type: Date },
-  
+ 
   // Profile completion
   isProfileComplete: { type: Boolean, default: false },
+  
+  // Soft delete fields
+  isDeleted: { type: Boolean, default: false },
+  deletedAt: { type: Date },
 });
 
 // Add method to calculate profile completion
@@ -88,6 +94,13 @@ userSchema.methods.calculateProfileCompletion = function (): number {
   if (this.pincode) score += 10;
   return score;
 };
+
+// Add query middleware to exclude soft-deleted users by default
+userSchema.pre(/^find/, function(next) {
+  // @ts-ignore
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
 
 // Create and export model
 const User = mongoose.model<IUser>('User', userSchema);
