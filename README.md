@@ -133,7 +133,6 @@
 | 109 | **Email Verification Gate (Personal Details)** | Added email verification check in `PersonalDetails.tsx`, restricting access to unverified users with a branded warning UI and redirect option to dashboard |
 | 110 | **Email Verification & Auth Enhancements** | Extended `AuthContext.tsx` to include `isEmailVerified` in `User`, added `verifyEmail` and `resendVerification` methods, updated `register` to indicate if verification is required, enabling email verification flows across the app |
 | 112 | **Auth Flow: Enable Registration Success Screen** | Modified `register()` in `AuthContext.tsx` by removing immediate user state update, allowing `requiresVerification` flag to trigger success screen display with email verification instructions before user proceeds to dashboard |
-Got it! Here’s the task message in your exact table format:
 | 113 | **Auth Flow: Use ALLOWED_ORIGINS for Verification Link** | Modified email verification link generation to parse `ALLOWED_ORIGINS` environment variable instead of hardcoding `FRONTEND_URL`, ensuring correct link in both development and production environments |
 | 115 | **Auth Flow: Post-Registration Login Behavior** | Implemented new flow for user access after successful registration — enabling login only after email verification via the verification link |
 | 116 | **Auth Flow: Add Email Verification Required Component** | Created `EmailVerificationRequired.tsx` to display a dedicated screen prompting users to verify their email before accessing their account, with resend functionality, error handling, and navigation back to login for unverified users |
@@ -175,6 +174,6 @@ Got it! Here’s the task message in your exact table format:
 
 ---
 
-**Document Version:** 97
+**Document Version:** 98
 **Last Updated:** 16th October 2025
 **Maintained By:** Aniruddh Ballal
