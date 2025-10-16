@@ -186,75 +186,40 @@ const ApplicationStatus = () => {
     return <ApplicationStatusSkeleton />
   }
 
-  // Add this inside your component, right before the return statement:
+// Add this inside your component, right before the return statement:
   const styles = `
-    @keyframes statusChange {
+    @keyframes colorTransition {
       0% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      25% {
-        transform: scale(0.95);
-        opacity: 0.7;
+        background-color: rgb(249 250 251 / 0.5);
+        border-color: rgb(229 231 235);
       }
       50% {
-        transform: scale(1.05);
-        opacity: 0.9;
+        background-color: rgb(236 253 245 / 0.6);
+        border-color: rgb(167 243 208);
       }
       100% {
-        transform: scale(1);
-        opacity: 1;
+        background-color: rgb(236 253 245 / 0.3);
+        border-color: rgb(52 211 153);
       }
     }
     
     @keyframes docStatusChange {
       0% {
-        transform: translateX(0) scale(1);
-        opacity: 1;
+        opacity: 0.5;
+        transform: scale(0.95);
       }
-      30% {
-        transform: translateX(-5px) scale(0.98);
-        opacity: 0.8;
-      }
-      70% {
-        transform: translateX(5px) scale(1.02);
-        opacity: 0.9;
-      }
-      100% {
-        transform: translateX(0) scale(1);
-        opacity: 1;
-      }
-    }
-    
-    @keyframes highlightCard {
-      0% {
-        transform: scale(1);
-        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-      }
-      15% {
+      50% {
+        opacity: 0.7;
         transform: scale(1.02);
-        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 10px 25px -5px rgba(16, 185, 129, 0.3);
-      }
-      30% {
-        transform: scale(0.98);
-        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.15), 0 10px 25px -5px rgba(16, 185, 129, 0.3);
-      }
-      45% {
-        transform: scale(1.015);
-        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1), 0 10px 25px -5px rgba(16, 185, 129, 0.2);
-      }
-      60% {
-        transform: scale(0.995);
-        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.05), 0 4px 15px -3px rgba(16, 185, 129, 0.15);
       }
       100% {
+        opacity: 1;
         transform: scale(1);
-        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
       }
     }
     
     .highlight-card {
-      animation: highlightCard 2s ease-out;
+      animation: colorTransition 1.5s ease-out;
     }
   `
 
