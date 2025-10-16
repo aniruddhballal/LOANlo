@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 
 import api from '../../api'
 import LoanReviewModal from './LoanReviewModal'
@@ -22,9 +23,41 @@ const ApplicationStatus = () => {
   const [error, setError] = useState('')
   const [selectedApplication, setSelectedApplication] = useState<LoanApplication | null>(null)
 
+  const [highlightedAppId, setHighlightedAppId] = useState<string | null>(null)
+  const [animatingDocs, setAnimatingDocs] = useState<string | null>(null)
+  const location = useLocation()
+  const docStatusChangeAnimation = "animate-[docStatusChange_0.5s_ease-out]"
+
   useEffect(() => {
     fetchApplications()
   }, [])
+
+  useEffect(() => {
+    // Check if we were redirected with an updated application ID
+    const state = location.state as { updatedApplicationId?: string } | null
+    
+    if (state?.updatedApplicationId && applications.length > 0) {
+      setHighlightedAppId(state.updatedApplicationId)
+      setAnimatingDocs(state.updatedApplicationId)
+      
+      // Scroll to the highlighted application
+      setTimeout(() => {
+        const element = document.getElementById(`app-${state.updatedApplicationId}`)
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 100)
+      
+      // Remove highlight after animation completes
+      setTimeout(() => {
+        setHighlightedAppId(null)
+        setAnimatingDocs(null)
+      }, 2500)
+      
+      // Clear the location state so refresh doesn't re-trigger
+      window.history.replaceState({}, document.title)
+    }
+  }, [location.state, applications])
 
   const { user } = useAuth()
 
@@ -153,8 +186,81 @@ const ApplicationStatus = () => {
     return <ApplicationStatusSkeleton />
   }
 
+  // Add this inside your component, right before the return statement:
+  const styles = `
+    @keyframes statusChange {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      25% {
+        transform: scale(0.95);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes docStatusChange {
+      0% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+      }
+      30% {
+        transform: translateX(-5px) scale(0.98);
+        opacity: 0.8;
+      }
+      70% {
+        transform: translateX(5px) scale(1.02);
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes highlightCard {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+      }
+      15% {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 10px 25px -5px rgba(16, 185, 129, 0.3);
+      }
+      30% {
+        transform: scale(0.98);
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.15), 0 10px 25px -5px rgba(16, 185, 129, 0.3);
+      }
+      45% {
+        transform: scale(1.015);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1), 0 10px 25px -5px rgba(16, 185, 129, 0.2);
+      }
+      60% {
+        transform: scale(0.995);
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.05), 0 4px 15px -3px rgba(16, 185, 129, 0.15);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+      }
+    }
+    
+    .highlight-card {
+      animation: highlightCard 2s ease-out;
+    }
+  `
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+        <style>{styles}</style>
       {/* Subtle geometric background */}
       <div className="absolute inset-0 overflow-hidden opacity-30">
         <div className="absolute top-0 left-0 w-full h-full" style={{
@@ -240,8 +346,13 @@ const ApplicationStatus = () => {
                 <div className="space-y-4">
                   {applications.map((app) => (
                     <div 
-                      key={app._id} 
-                      className="border border-gray-200 rounded-xl p-6 hover:bg-gray-50/50 hover:border-gray-300 transition-all duration-200 group"
+                      key={app._id}
+                      id={`app-${app._id}`}
+                      className={`border rounded-xl p-6 transition-all duration-200 group ${
+                        highlightedAppId === app._id
+                          ? 'highlight-card border-emerald-400 bg-emerald-50/30'
+                          : 'border-gray-200 hover:bg-gray-50/50 hover:border-gray-300'
+                      }`}
                     >
                       {/* Main Content Row */}
                       <div className="flex items-start justify-between mb-4">
@@ -284,7 +395,7 @@ const ApplicationStatus = () => {
 
                       {/* Action Buttons Row */}
                       <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <div className="flex items-center">
+                        <div className={animatingDocs === app._id ? docStatusChangeAnimation : ''}>
                           {app.documentsUploaded ? (
                             <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-white text-emerald-700 border-2 border-emerald-200 shadow-sm">
                               <div className="w-4 h-4 mr-2 bg-emerald-100 rounded-full flex items-center justify-center">

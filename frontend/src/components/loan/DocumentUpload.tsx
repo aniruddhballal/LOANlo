@@ -216,7 +216,9 @@ const DocumentUpload = () => {
       })
 
       if (res.data.allRequiredDocsUploaded) {
-        navigate('/application-status') // redirect when all 6 uploaded
+        navigate('/application-status', {
+          state: { updatedApplicationId: applicationId }
+        })
       }
 
       clearInterval(progressInterval)
