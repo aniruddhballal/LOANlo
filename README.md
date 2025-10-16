@@ -173,9 +173,14 @@
 | 126 | **Google reCAPTCHA Integration** | Replacing custom numeric CAPTCHA with Google reCAPTCHA for enhanced bot protection |
 | 127 | **Passwordless Authentication** | Implementing Google passwordless login/signup to replace traditional email and password authentication |
 | 128 | **SMTP Email Transport** | ~~Switching email delivery system from SendGrid back to SMTP with Nodemailer for improved control and reliability~~ *(Deprecated: Render and most free hosting providers block SMTP; use an email API (SendGrid, Resend, Mailgun) instead.)* |
+| 134 | **Restore Account Endpoint (Frontend)** | Implementing frontend UI and API integration for admin-triggered account restoration via `POST /profile/restore/:userId` |
+| 135 | **Underwriter Profile Access** | Enabling underwriters to view applicant profiles directly from loan application details |
+| 136 | **Underwriter Email Notifications** | Investigating why underwriters are not receiving email notifications for new loan applications despite `.env` configuration |
+| 137 | **Approval/Reject Comments Visibility** | Evaluating how and where underwriter comments on approvals/rejections should be visible to applicants (modal or email) |
+| 138 | **Loan Action History Attribution** | Fixing underwriter actions on loan applications being logged as "unknown" in status history |
 
 ---
 
-**Document Version:** 101
+**Document Version:** 102
 **Last Updated:** 16th October 2025
 **Maintained By:** Aniruddh Ballal
