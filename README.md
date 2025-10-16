@@ -53,6 +53,7 @@
 | 122 | **Login Success Animation: Dynamic Message Based on Email Verification Status** | Fixed the login success animation to display the correct message based on email verification status. Added `isEmailVerified` state to `Login.tsx` to capture verification status from the login response immediately. Updated `AuthContext.tsx` to make the `login` function return `Promise<User>` instead of `Promise<void>`, and added `return data.user` statements in both success paths. Changed the success overlay to use `isEmailVerified` state instead of `user?.isEmailVerified` context. Now verified users see "Authentication Successful! Redirecting to dashboard..." while unverified users see "Login Successful! Please verify your email..." ensuring accurate feedback during the login animation. |
 | 130 | **Upload Documents: Auto-Redirect After All Docs Uploaded** | In `UploadDocuments.tsx`, updated `uploadDocument` to check `allRequiredDocsUploaded` from API response. On `true`, call `navigate('/application-status')`. Handles post-upload redirect automatically when all 6 documents are uploaded. |
 | 131 | **Application Status: Document Upload Animation on Redirect** | Added `highlightedAppId` and `animatingDocs` state in `ApplicationStatus.tsx`. `useEffect` detects `location.state.updatedApplicationId`, triggers `docStatusChange` keyframe on badge and `highlightCard` keyframe on card. Auto-scrolls via `scrollIntoView`, clears after timeout. Fixed `DocumentUpload.tsx` navigation syntax to pass state object with `updatedApplicationId`. |
+| 132 | **Loan Application: Split Loading States** | In `LoanApplication.tsx`, separated `checkingPersonalDetails` and `loading` conditions. Added submission-specific loading state with "Submitting Application" title and email confirmation message. |
 
 ### ⚡ In Progress
 
@@ -174,6 +175,6 @@
 
 ---
 
-**Document Version:** 98
+**Document Version:** 99
 **Last Updated:** 16th October 2025
 **Maintained By:** Aniruddh Ballal

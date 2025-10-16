@@ -144,11 +144,21 @@ const LoanApplication = () => {
   }
 
   // Loading state while checking Personal Details Completion
-  if (checkingPersonalDetails || loading) {
+  if (checkingPersonalDetails) {
     return (
       <LoadingState
         title="Verifying Personal Details"
         message="Please wait while we confirm your information..."
+      />
+    )
+  }
+
+  // Loading state while submitting application
+  if (loading) {
+    return (
+      <LoadingState
+        title="Submitting Application"
+        message="Processing your application and sending confirmation email..."
       />
     )
   }
