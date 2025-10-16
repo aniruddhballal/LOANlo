@@ -145,6 +145,7 @@
 | 124 | **Email Verification: Merged duplicate components into single intelligent component** | Consolidated `VerifyEmail.tsx` and `EmailVerificationRequired.tsx` into a single `EmailVerification.tsx` component that intelligently handles both token-based verification (from email links) and awaiting verification states. The component detects URL token presence to determine flow, eliminating ~400 lines of duplicate code while maintaining all functionality. Updated `App.tsx` routing to use single component for both `/verify-email` and `/email-verification-required` paths. |
 | 125 | **Email Verification: Implemented automatic login after email verification** | Modified backend `/auth/verify-email` endpoint to return JWT token upon successful verification, enabling seamless auto-login. Updated `AuthContext.verifyEmail()` to store token in localStorage and update user state. Enhanced `EmailVerification.tsx` to check for token after verification and automatically redirect users to their dashboard via root route, eliminating the need for manual login post-verification. Users now experience a smooth flow: click verification link → see success message → auto-redirect to dashboard. |
 | 129 | **Automated Email Notifications: Implemented comprehensive loan application email system** | Created modular email system with separate templates (`loanApplicationSubmittedTemplate.ts`, `loanStatusUpdateTemplate.ts`, `newApplicationNotificationTemplate.ts`, `documentsRequestedTemplate.ts`) and centralized `loanEmailService.ts` using SendGrid. Integrated four notification triggers into `routes/loans.ts`: applicant confirmation on submission, status updates with conditional approval/rejection content, underwriter alerts via `UNDERWRITER_EMAILS` env variable on review submission, and document request notifications. Modified endpoints (`/apply`, `/update-status/:applicationId`, `/request-documents/:applicationId`, `/:applicationId/submit-for-review`) to trigger emails with responsive HTML templates, application tracking, and dashboard links. |
+| 133 | **Profile Page & Navigation Button** | Created `Profile.tsx` with comprehensive user information display including personal details, identity documents, contact info, employment details, and account status — featuring sectioned layouts, formatted data display, and edit profile CTA. Added Profile navigation button to `DashboardHeader.tsx` with user icon, hover effects, and route integration for seamless profile access |
 
 ### ⚡ In Progress
 
@@ -175,6 +176,6 @@
 
 ---
 
-**Document Version:** 99
+**Document Version:** 100
 **Last Updated:** 16th October 2025
 **Maintained By:** Aniruddh Ballal
