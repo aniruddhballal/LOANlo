@@ -62,6 +62,7 @@
 | 56 | **Button Style Refinement** | Refining "Begin Application Process" button styles to ensure consistency with application-wide design system |
 | 62 | **Error Display Enhancement** | Enhancing styling and animation quality for individual field error displays on Personal Details page |
 | 81 | **Interactive Feedback Standardization** | Standardizing button styles and improving interactive feedback across all components, using "Save & Continue" button as design reference |
+| 140 | **Reference Number Display Fix** | Fixing display of loan reference numbers on underwriter dashboard and applicant `ApplicationStatus` to show full 24-character ID instead of only last 8 characters |
 
 ---
 
@@ -182,6 +183,6 @@
 
 ---
 
-**Document Version:** 103
+**Document Version:** 104
 **Last Updated:** 17th October 2025
 **Maintained By:** Aniruddh Ballal
