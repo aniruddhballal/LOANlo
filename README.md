@@ -178,9 +178,10 @@
 | 136 | **Underwriter Email Notifications** | Investigating why underwriters are not receiving email notifications for new loan applications despite `.env` configuration |
 | 137 | **Approval/Reject Comments Visibility** | Evaluating how and where underwriter comments on approvals/rejections should be visible to applicants (modal or email) |
 | 138 | **Loan Action History Attribution** | Fixing underwriter actions on loan applications being logged as "unknown" in status history |
+| 139 | **Request for Additional Documents** | Auditing backend support and UX for additional document requests, ensuring `UploadDocuments.tsx` renders "additional documents" only after underwriter request, improving frontend headings/subheadings to distinguish required vs additional documents, and verifying Indian mandatory vs additional document requirements |
 
 ---
 
-**Document Version:** 102
-**Last Updated:** 16th October 2025
+**Document Version:** 103
+**Last Updated:** 17th October 2025
 **Maintained By:** Aniruddh Ballal
