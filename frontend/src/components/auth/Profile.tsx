@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { PersonalDetailsSkeleton } from '../ui/SkeletonComponents'
 import api from '../../api'
 
 const Profile = () => {
+  const { userId } = useParams<{ userId: string }>()
   const [loading, setLoading] = useState(true)
   const [userData, setUserData] = useState<any>(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -14,11 +15,14 @@ const Profile = () => {
 
   useEffect(() => {
     fetchUserData()
-  }, [])
+  }, [userId])
 
   const fetchUserData = async () => {
     try {
-      const { data } = await api.get('/profile/me')
+      // If userId exists in URL (underwriter viewing applicant), fetch that user
+      // Otherwise fetch own profile
+      const endpoint = userId ? `/profile/${userId}` : '/profile/me'
+      const { data } = await api.get(endpoint)
       setUserData(data.user)
     } catch (err) {
       console.error('Failed to fetch user data:', err)
@@ -142,44 +146,74 @@ const Profile = () => {
               <div className="flex items-center space-x-6">
                 <div className="relative">
                   <div className="w-14 h-14 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-semibold text-lg tracking-wider shadow-lg">
-                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                    {userData?.firstName?.charAt(0)}{userData?.lastName?.charAt(0)}
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white"></div>
                 </div>
                 <div>
                   <h1 className="text-3xl font-light text-gray-900 mb-1 tracking-tight">
-                    My Profile
+                    {userId ? 'User Profile' : 'My Profile'}
                   </h1>
                   <p className="text-base text-gray-600 font-light">
-                    Good {getGreeting()},
-                    <span className="font-medium text-gray-900 ml-1">
-                      {user?.firstName} {user?.lastName}
-                    </span>
-                    <span className="ml-2 text-gray-500">• View and manage your personal information</span>
+                    {userId ? (
+                      <>
+                        Viewing profile of
+                        <span className="font-medium text-gray-900 ml-1">
+                          {userData?.firstName} {userData?.lastName}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        Good {getGreeting()},
+                        <span className="font-medium text-gray-900 ml-1">
+                          {user?.firstName} {user?.lastName}
+                        </span>
+                        <span className="ml-2 text-gray-500">• View and manage your personal information</span>
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <Link
-                  to="/profile"
-                  className="relative px-5 py-2.5 text-sm font-medium text-gray-900 bg-white backdrop-blur-md border border-gray-300 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-400 group"
-                >
-                  <span className="relative z-10 flex items-center space-x-2">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-gray-700">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    <span>Profile</span>
-                  </span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-                </Link>
-                <button
-                  onClick={logout}
-                  className="relative px-5 py-2.5 text-sm font-medium text-white bg-black backdrop-blur-md border border-white/20 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-500 group"
-                >
-                  <span className="relative z-10">Sign Out</span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-                </button>
+                {userId ? (
+                  // If viewing another user's profile, show back button
+                  <button
+                    onClick={() => navigate(-1)}
+                    className="relative px-5 py-2.5 text-sm font-medium text-gray-900 bg-white backdrop-blur-md border border-gray-300 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-400 group"
+                  >
+                    <span className="relative z-10 flex items-center space-x-2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                        <path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Back</span>
+                    </span>
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+                  </button>
+                ) : (
+                  // If viewing own profile, show profile and sign out buttons
+                  <>
+                    <Link
+                      to="/profile"
+                      className="relative px-5 py-2.5 text-sm font-medium text-gray-900 bg-white backdrop-blur-md border border-gray-300 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-400 group"
+                    >
+                      <span className="relative z-10 flex items-center space-x-2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span>Profile</span>
+                      </span>
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+                    </Link>
+                    <button
+                      onClick={logout}
+                      className="relative px-5 py-2.5 text-sm font-medium text-white bg-black backdrop-blur-md border border-white/20 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-500 group"
+                    >
+                      <span className="relative z-10">Sign Out</span>
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -207,19 +241,22 @@ const Profile = () => {
                       </h2>
                       <p className="text-sm font-light text-gray-600">
                         {userData.isEmailVerified 
-                          ? 'Your account is fully verified and active'
-                          : 'Please verify your email to unlock all features'
+                          ? 'Account is fully verified and active'
+                          : 'Email verification pending'
                         }
                       </p>
                     </div>
                   </div>
-                  <Link
-                    to="/personal-details"
-                    className="relative px-5 py-2.5 text-sm font-medium text-white bg-black backdrop-blur-md border border-white/20 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-500 group"
-                  >
-                    <span className="relative z-10">Edit Profile</span>
-                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-                  </Link>
+                  {/* Only show Edit Profile button for own profile */}
+                  {!userId && (
+                    <Link
+                      to="/personal-details"
+                      className="relative px-5 py-2.5 text-sm font-medium text-white bg-black backdrop-blur-md border border-white/20 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-500 group"
+                    >
+                      <span className="relative z-10">Edit Profile</span>
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+                    </Link>
+                  )}
                 </div>
               </div>
 
@@ -271,7 +308,8 @@ const Profile = () => {
                   <InfoField label="Last Updated" value={formatDate(userData.updatedAt)} />
                 </div>
                 
-                {/* Danger Zone */}
+              {/* Danger Zone - Only show for own profile */}
+              {!userId && (
                 <div className="pt-6 border-t border-gray-200">
                   <div className="flex items-center justify-between">
                     <div>
@@ -289,6 +327,7 @@ const Profile = () => {
                     </button>
                   </div>
                 </div>
+              )}
               </div>
             </>
           ) : (

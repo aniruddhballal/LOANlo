@@ -1,8 +1,9 @@
-import { CheckCircle, XCircle, Trash2, AlertTriangle } from 'lucide-react'
+import { CheckCircle, XCircle, Trash2, AlertTriangle, User } from 'lucide-react'
 import { useState } from 'react'
 import type { LoanApplication } from '../types'
 import { formatCurrency, formatDate, getStatusColor, getLoanTypeLabel, getDocumentProgress } from '../utils'
 import { useAuth } from '../../../../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 interface ApplicationDetailsTabProps {
   application: LoanApplication
@@ -13,6 +14,8 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   
+  const navigate = useNavigate()
+
   const documentProgress = getDocumentProgress(application.documents)
   const allRequiredDocsUploaded = documentProgress.percentage === 100
 
@@ -46,6 +49,17 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
 
   const handleDeleteCancel = () => {
     setShowDeleteConfirm(false)
+  }
+
+  const handleVisitProfile = () => {
+    // Navigate to the user's profile page
+    const userId = typeof application.userId === 'string' 
+      ? application.userId 
+      : application.userId?._id?.toString()
+    
+    if (userId) {
+      navigate(`/profile/${userId}`)
+    }
   }
 
   return (
@@ -106,16 +120,29 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
             </div>
           </div>
           
-          {/* Delete Button - Only visible for the applicant who owns this application and not approved */}
-          {onDelete && user && user.role === 'applicant' && isOwner && application.status !== 'approved' && (
-            <button
-              onClick={handleDeleteClick}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete
-            </button>
-          )}
+          <div className="flex items-center space-x-2">
+            {/* Visit Profile Button */}
+            {user && user.role === 'underwriter' && (
+              <button
+                onClick={handleVisitProfile}
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors border border-gray-300 hover:border-gray-400"
+              >
+                <User className="w-4 h-4 mr-2" />
+                Visit Profile
+              </button>
+            )}
+            
+            {/* Delete Button - Only visible for the applicant who owns this application and not approved */}
+            {onDelete && user && user.role === 'applicant' && isOwner && application.status !== 'approved' && (
+              <button
+                onClick={handleDeleteClick}
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete
+              </button>
+            )}
+          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

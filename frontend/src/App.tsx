@@ -72,6 +72,12 @@ function AppContent() {
         <Route path="/email-verification-required" element={<EmailVerification />} />
         <Route path="/profile" element={<Profile />} />
         {/* Protected Routes */}
+        <Route path="/profile/:userId" element={
+          <RoleProtectedRoute allowedRoles={['underwriter']}>
+            <Profile />
+          </RoleProtectedRoute>
+        } />
+        
         <Route path="/dashboard/applicant" element={
           <RoleProtectedRoute allowedRoles={['applicant']}>
             <ApplicantDashboard />

@@ -381,6 +381,57 @@ router.get('/me', profileFetchLimiter, authenticateToken, async (req: AuthReques
   }
 });
 
+// Get any user's profile details by userId (for underwriter to viewing other users' profiles)
+router.get('/:userId', profileFetchLimiter, authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const requestingUserId = req.user?.userId;
+    const requestingUserRole = req.user?.role;
+
+    // Only allow underwriters to view other users' profiles
+    // Users can always view their own profile via /me endpoint
+    if (requestingUserRole !== 'underwriter' && requestingUserId !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized. Only underwriters can view other users\' profiles.'
+      });
+    }
+
+    // Validate userId format (basic MongoDB ObjectId validation)
+    if (!userId || !/^[0-9a-fA-F]{24}$/.test(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID format'
+      });
+    }
+
+    const user = await User.findById(userId).select('-password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Check if user is soft deleted
+    if (user.isDeleted) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.json({ success: true, user });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch profile details',
+      error: err.message
+    });
+  }
+});
+
 // Soft delete user account
 router.delete('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
