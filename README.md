@@ -109,6 +109,7 @@
 | 48 | **Deletion Authorization** | Reimplemented Loan Application deletion with role-based access control restricting deletion to Applicants only, including automatic UI refresh post-deletion |
 | 51 | **Route Cleanup** | Performed comprehensive cleanup of unused backend routes across loans.ts, profile.ts, documents.ts, and auth.ts |
 | 53 | **Permission Management** | Implemented role-based access control for LoanReviewModal features, restricting document upload/delete interactions based on user permissions |
+| 57 | **Deletion Policy Evaluation** | Evaluated and implemented user profile deletion functionality with appropriate data retention policies *(Implemented under Task - 80)*|
 | 58 | **Authorization Verification** | Implemented authentication verification to ensure only the authorized user can access delete functionality for applications and documents, with Underwriter-specific restrictions preventing deletion capabilities |
 | 64 | **Address Automation** | Implemented automated pincode-based address autofill functionality |
 | 65 | **Navigation Bug Fix** | Resolved navigation bug preventing users from completing profile when required fields existed on subsequent pages due to incomplete data validation blocking forward navigation |
@@ -146,6 +147,7 @@
 | 123 | **Email Service: Migrated from SMTP to SendGrid API** | Replaced Nodemailer SMTP configuration with SendGrid API integration in `emailService.ts`, simplifying deployment and ensuring reliable email delivery on cloud platforms. Updated `.env` to use `SENDGRID_API_KEY` and `EMAIL_FROM` instead of SMTP credentials. |
 | 124 | **Email Verification: Merged duplicate components into single intelligent component** | Consolidated `VerifyEmail.tsx` and `EmailVerificationRequired.tsx` into a single `EmailVerification.tsx` component that intelligently handles both token-based verification (from email links) and awaiting verification states. The component detects URL token presence to determine flow, eliminating ~400 lines of duplicate code while maintaining all functionality. Updated `App.tsx` routing to use single component for both `/verify-email` and `/email-verification-required` paths. |
 | 125 | **Email Verification: Implemented automatic login after email verification** | Modified backend `/auth/verify-email` endpoint to return JWT token upon successful verification, enabling seamless auto-login. Updated `AuthContext.verifyEmail()` to store token in localStorage and update user state. Enhanced `EmailVerification.tsx` to check for token after verification and automatically redirect users to their dashboard via root route, eliminating the need for manual login post-verification. Users now experience a smooth flow: click verification link → see success message → auto-redirect to dashboard. |
+| 128 | **SMTP Email Transport** | ~~Tried switching email delivery system from SendGrid back to SMTP with Nodemailer for improved control and reliability~~ *(Deprecated: Render and most free hosting providers block SMTP; use an email API (SendGrid, Resend, Mailgun) instead.)* |
 | 129 | **Automated Email Notifications: Implemented comprehensive loan application email system** | Created modular email system with separate templates (`loanApplicationSubmittedTemplate.ts`, `loanStatusUpdateTemplate.ts`, `newApplicationNotificationTemplate.ts`, `documentsRequestedTemplate.ts`) and centralized `loanEmailService.ts` using SendGrid. Integrated four notification triggers into `routes/loans.ts`: applicant confirmation on submission, status updates with conditional approval/rejection content, underwriter alerts via `UNDERWRITER_EMAILS` env variable on review submission, and document request notifications. Modified endpoints (`/apply`, `/update-status/:applicationId`, `/request-documents/:applicationId`, `/:applicationId/submit-for-review`) to trigger emails with responsive HTML templates, application tracking, and dashboard links. |
 | 133 | **Profile Page & Navigation Button** | Created `Profile.tsx` with comprehensive user information display including personal details, identity documents, contact info, employment details, and account status — featuring sectioned layouts, formatted data display, and edit profile CTA. Added Profile navigation button to `DashboardHeader.tsx` with user icon, hover effects, and route integration for seamless profile access |
 | 135 | **Underwriter Profile Access** | Added "Visit Profile" button to `ApplicationDetailsTab.tsx` with role-based visibility (underwriters only) using `User` icon, `useNavigate` hook, and `handleVisitProfile()` handler. Created backend route `GET /api/profile/:userId` in `profile.ts` with underwriter-only authorization, ObjectId validation, and soft-delete checks. Modified `Profile.tsx` to support dual-mode operation via `useParams` - dynamically fetching `/profile/me` or `/profile/${userId}`, conditional header/button rendering (back button for underwriter view, edit/delete hidden for other profiles). Added protected route `/profile/:userId` in `App.tsx` with `RoleProtectedRoute`. Security enforced at frontend (conditional rendering) and backend (role validation) |
@@ -157,7 +159,6 @@
 |----|-----------|--------|
 | 37 | **State Machine Design** | Designing comprehensive state machine logic for loan status transitions across pending ↔ under_review → approved/rejected/request_documents → pending states with bidirectional flow management |
 | 52 | **OAuth Integration** | Integrating Auth0/OAuth authentication infrastructure for enhanced security and third-party authentication support |
-| 57 | **Deletion Policy Evaluation** | Evaluating and implementing user profile deletion functionality with appropriate data retention policies |
 | 59 | **Business Logic Definition** | Defining business logic for multiple concurrent loan applications, including eligibility criteria and user categorization |
 | 60 | **Interface Optimization** | Auditing and optimizing interfaces and props across components to remove unused fields and improve type safety |
 | 63 | **Location Services** | Implementing Google Maps location pinpointing functionality, modernizing pincode loading animations, and evaluating component modularization opportunities |
@@ -169,13 +170,12 @@
 | 89 | **Audit Trail System** | Implementing comprehensive audit trail system ensuring all deletion operations are logged rather than permanently removed from database |
 | 90 | **Attribution Bug Fix** | Resolving "Updated by: Unknown" display issue occurring when loan applications receive approval status |
 | 91 | **Conflict Resolution** | Implementing conflict resolution mechanism for concurrent document deletion by Applicant during Underwriter approval process |
-| 99 | **Data Archival Strategy** | Designing and implementing redundant data archival strategy for deleted documents, loan applications, and user profiles |
+| 99 | **Data Archival Strategy** | ~~Designing and implementing redundant data archival strategy for deleted documents, loan applications, and user profiles~~ *(Deprecated: (ONLY LOANS AND PROFILES) Document Deletion should not be archived/soft. Profile deletions are soft already, implemented in Task - 80, only pending function is the soft delete the loan applications themselves)* |
 | 100 | **Security Evaluation** | Evaluating security requirements for personal data storage, including potential implementation of salting and hashing mechanisms |
 | 101 | **Performance Optimization** | Optimizing Underwriter dashboard performance by implementing on-demand data fetching with search/filter/sort parameters |
 | 102 | **Session Management** | Implementing automatic session timeout and logout functionality after defined period of user inactivity |
 | 126 | **Google reCAPTCHA Integration** | Replacing custom numeric CAPTCHA with Google reCAPTCHA for enhanced bot protection |
 | 127 | **Passwordless Authentication** | Implementing Google passwordless login/signup to replace traditional email and password authentication |
-| 128 | **SMTP Email Transport** | ~~Switching email delivery system from SendGrid back to SMTP with Nodemailer for improved control and reliability~~ *(Deprecated: Render and most free hosting providers block SMTP; use an email API (SendGrid, Resend, Mailgun) instead.)* |
 | 134 | **Restore Account Endpoint (Frontend)** | Implementing frontend UI and API integration for admin-triggered account restoration via `POST /profile/restore/:userId` |
 | 137 | **Approval/Reject Comments Visibility** | Evaluating how and where underwriter comments on approvals/rejections should be visible to applicants (modal or email) |
 | 138 | **Loan Action History Attribution** | Fixing underwriter actions on loan applications being logged as "unknown" in status history |
@@ -183,6 +183,6 @@
 
 ---
 
-**Document Version:** 107
+**Document Version:** 108
 **Last Updated:** 17th October 2025
 **Maintained By:** Aniruddh Ballal
