@@ -1,7 +1,7 @@
 import { CheckCircle, XCircle, Trash2, AlertTriangle, User } from 'lucide-react'
 import { useState } from 'react'
 import type { LoanApplication } from '../types'
-import { formatCurrency, formatDate, getStatusColor, getLoanTypeLabel, getDocumentProgress } from '../utils'
+import { formatCurrency, formatDate, getStatusColor, getLoanTypeLabel, getDocumentProgress } from '../../../utils'
 import { useAuth } from '../../../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 

@@ -7,11 +7,3 @@ export type {
   DocumentRequirement, 
   ApprovalData 
 } from './types'
-
-// Re-export utility functions that might be useful elsewhere
-export { 
-  formatCurrency, 
-  formatDate, 
-  getLoanTypeLabel,
-  getStatusColor 
-} from './utils'

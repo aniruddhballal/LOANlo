@@ -1,4 +1,4 @@
-import type { DocumentRequirement } from './types'
+import type { DocumentRequirement } from './loan/LoanReviewModal/types'
 
 export const getRequiredDocuments = (): DocumentRequirement[] => {
   return [
@@ -59,6 +59,13 @@ export const getRequiredDocuments = (): DocumentRequirement[] => {
       description: 'IT returns for additional income verification'
     }
   ]
+}
+
+export const getGreeting = () => {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Morning'
+  if (hour < 17) return 'Afternoon'
+  return 'Evening'
 }
 
 export const formatCurrency = (amount: number) => {

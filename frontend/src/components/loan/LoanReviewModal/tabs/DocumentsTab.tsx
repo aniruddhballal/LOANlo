@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { CheckCircle, XCircle, AlertCircle, Eye, Download, Loader, Trash2, AlertTriangle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { LoanApplication } from '../types'
-import { formatDate, getDocumentProgress, getProgressBarColor } from '../utils'
+import { formatDate, getDocumentProgress, getProgressBarColor } from '../../../utils'
 import api from '../../../../api'
 
 interface DocumentsTabProps {

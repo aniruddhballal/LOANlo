@@ -1,5 +1,6 @@
 import { useAuth } from '../../../context/AuthContext'
 import { Link } from 'react-router-dom'
+import { getGreeting } from '../../utils'
 
 interface DashboardHeaderProps {
   title: string
@@ -8,13 +9,6 @@ interface DashboardHeaderProps {
 
 export const DashboardHeader = ({ title, subtitle }: DashboardHeaderProps) => {
   const { user, logout } = useAuth()
-
-  const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 12) return 'Morning'
-    if (hour < 17) return 'Afternoon'
-    return 'Evening'
-  }
 
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm">

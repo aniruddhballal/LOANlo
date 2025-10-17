@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { PersonalDetailsSkeleton } from '../ui/SkeletonComponents'
 import api from '../../api'
+import { getGreeting } from '../utils'
+import { formatDate, formatCurrency } from '../utils'
 
 const Profile = () => {
   const { userId } = useParams<{ userId: string }>()
@@ -44,31 +46,6 @@ const Profile = () => {
       setDeleteLoading(false)
       setShowDeleteModal(false)
     }
-  }
-
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A'
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    })
-  }
-
-  const formatCurrency = (amount: number) => {
-    if (!amount) return 'N/A'
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(amount)
-  }
-
-  const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 12) return 'Morning'
-    if (hour < 17) return 'Afternoon'
-    return 'Evening'
   }
 
   const InfoSection = ({ title, children }: { title: string; children: React.ReactNode }) => (

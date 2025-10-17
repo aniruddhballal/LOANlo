@@ -152,6 +152,7 @@
 | 133 | **Profile Page & Navigation Button** | Created `Profile.tsx` with comprehensive user information display including personal details, identity documents, contact info, employment details, and account status — featuring sectioned layouts, formatted data display, and edit profile CTA. Added Profile navigation button to `DashboardHeader.tsx` with user icon, hover effects, and route integration for seamless profile access |
 | 135 | **Underwriter Profile Access** | Added "Visit Profile" button to `ApplicationDetailsTab.tsx` with role-based visibility (underwriters only) using `User` icon, `useNavigate` hook, and `handleVisitProfile()` handler. Created backend route `GET /api/profile/:userId` in `profile.ts` with underwriter-only authorization, ObjectId validation, and soft-delete checks. Modified `Profile.tsx` to support dual-mode operation via `useParams` - dynamically fetching `/profile/me` or `/profile/${userId}`, conditional header/button rendering (back button for underwriter view, edit/delete hidden for other profiles). Added protected route `/profile/:userId` in `App.tsx` with `RoleProtectedRoute`. Security enforced at frontend (conditional rendering) and backend (role validation) |
 | 136 | **Underwriter Email Notifications: Moved auto-review email trigger to document upload** | Refactored email logic for underwriter notifications by moving it from the unused `/submit-for-review` route to the `/upload` route. Now, when the final required document is uploaded and the application status auto-updates to `under_review`, underwriters receive notification emails and applicants receive status update emails. Discovered that the frontend “Submit for Review” button was never rendered due to automatic status updates, allowing removal of redundant UI elements. |
+| 141 | **Global Utils Refactor & Time-Based Greeting** | Moved `utils.ts` from `loan/loanreviewmodal/` to top-level `frontend/src/components/utils.ts` to improve reusability across shared components like `DashboardHeader.tsx` and `Profile.tsx`. Removed redundant re-exports from `loanreviewmodal/index.ts`. Updated all dependent imports to reference the new global utils path. Added new `getGreeting()` utility to generate dynamic greetings based on the current time of day. |
 
 ### ⚡ In Progress
 
@@ -183,6 +184,6 @@
 
 ---
 
-**Document Version:** 108
+**Document Version:** 109
 **Last Updated:** 17th October 2025
 **Maintained By:** Aniruddh Ballal

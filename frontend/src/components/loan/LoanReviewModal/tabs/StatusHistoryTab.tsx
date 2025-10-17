@@ -1,5 +1,5 @@
 import type { LoanApplication } from '../types'
-import { formatDate, getStatusColor } from '../utils'
+import { formatDate, getStatusColor } from '../../../utils'
 
 interface StatusHistoryTabProps {
   application: LoanApplication
