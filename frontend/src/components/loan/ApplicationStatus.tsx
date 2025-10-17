@@ -7,6 +7,8 @@ import LoanReviewModal from './LoanReviewModal'
 import { useAuth } from '../../context/AuthContext'
 import { ApplicationStatusSkeleton } from '../ui/SkeletonComponents'
 
+import { formatCurrency, formatDate, formatApplicationId } from '../dashboards/utils/formatters'
+
 interface LoanApplication {
   _id: string
   loanType: string
@@ -151,22 +153,6 @@ const ApplicationStatus = () => {
           </span>
         )
     }
-  }
-
-  const formatCurrency = (amount: number) => {
-    return `₹${amount.toLocaleString('en-IN')}`
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
-  }
-
-  const formatApplicationId = (id: string) => {
-    return `#${id.slice(-8).toUpperCase()}`
   }
 
   if (loading) {

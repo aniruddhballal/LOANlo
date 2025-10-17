@@ -22,6 +22,4 @@ export const formatTime = (dateString: string) => {
   })
 }
 
-export const formatApplicationId = (id: string) => {
-  return `#${id.slice(-8).toUpperCase()}`
-}
+export const formatApplicationId = (id: string) => `#${id.toUpperCase()}`

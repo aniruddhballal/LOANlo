@@ -54,6 +54,7 @@
 | 130 | **Upload Documents: Auto-Redirect After All Docs Uploaded** | In `UploadDocuments.tsx`, updated `uploadDocument` to check `allRequiredDocsUploaded` from API response. On `true`, call `navigate('/application-status')`. Handles post-upload redirect automatically when all 6 documents are uploaded. |
 | 131 | **Application Status: Document Upload Animation on Redirect** | Added `highlightedAppId` and `animatingDocs` state in `ApplicationStatus.tsx`. `useEffect` detects `location.state.updatedApplicationId`, triggers `docStatusChange` keyframe on badge and `highlightCard` keyframe on card. Auto-scrolls via `scrollIntoView`, clears after timeout. Fixed `DocumentUpload.tsx` navigation syntax to pass state object with `updatedApplicationId`. |
 | 132 | **Loan Application: Split Loading States** | In `LoanApplication.tsx`, separated `checkingPersonalDetails` and `loading` conditions. Added submission-specific loading state with "Submitting Application" title and email confirmation message. |
+| 140 | **Reference Number Display Fix** | Fixing display of loan reference numbers on underwriter dashboard and applicant `ApplicationStatus` to show full 24-character ID instead of only last 8 characters |
 
 ### ⚡ In Progress
 
@@ -62,7 +63,6 @@
 | 56 | **Button Style Refinement** | Refining "Begin Application Process" button styles to ensure consistency with application-wide design system |
 | 62 | **Error Display Enhancement** | Enhancing styling and animation quality for individual field error displays on Personal Details page |
 | 81 | **Interactive Feedback Standardization** | Standardizing button styles and improving interactive feedback across all components, using "Save & Continue" button as design reference |
-| 140 | **Reference Number Display Fix** | Fixing display of loan reference numbers on underwriter dashboard and applicant `ApplicationStatus` to show full 24-character ID instead of only last 8 characters |
 
 ---
 
@@ -183,6 +183,6 @@
 
 ---
 
-**Document Version:** 104
+**Document Version:** 106
 **Last Updated:** 17th October 2025
 **Maintained By:** Aniruddh Ballal
