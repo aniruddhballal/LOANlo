@@ -83,19 +83,6 @@ const ApplicationStatus = () => {
     fetchApplications()
   }
 
-  const handleSubmitForReview = async (applicationId: string) => {
-    try {
-      await api.patch(`/loans/${applicationId}/submit-for-review`)
-      setApplications(applications.map(app => 
-        app._id === applicationId 
-          ? { ...app, status: 'under_review' as const }
-          : app
-      ))
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to submit for review')
-    }
-  }
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved': return (
@@ -394,7 +381,7 @@ const ApplicationStatus = () => {
                             Review Details
                           </button>
 
-                          {!app.documentsUploaded ? (
+                          {!app.documentsUploaded && (
                             <Link
                               to="/upload-documents"
                               state={{ applicationId: app._id }}
@@ -410,17 +397,7 @@ const ApplicationStatus = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                               </svg>
                             </Link>
-                          ) : app.status === 'pending' ? (
-                            <button
-                              onClick={() => handleSubmitForReview(app._id)}
-                              className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
-                            >
-                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                              Submit for Review
-                            </button>
-                          ) : null}
+                          )}
                         </div>
                       </div>
                     </div>

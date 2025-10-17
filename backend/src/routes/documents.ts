@@ -5,6 +5,12 @@ import LoanApplication from '../models/LoanApplication';
 import Document, { DocumentType } from '../models/Document'; // import type if needed
 import mongoose from 'mongoose';
 import { Readable } from 'stream';
+import User from '../models/User';
+
+import {
+  sendNewApplicationNotificationToUnderwriters,
+  sendLoanStatusUpdateEmail
+ } from '../utils/loanEmailService';
 
 const router = Router();
 // this route is used for both viewing and downloading the file - logic is slightly complex, but same api endpoint is used for both the functionalities - can switch to native/default downloading later if this seems too complex
@@ -303,6 +309,34 @@ router.post(
               application.updatedAt = new Date();
               await application.save();
             }
+
+            // --- SEND EMAILS HERE ---
+            const applicant = await User.findById(application.userId); // or populate if needed
+
+            if (!applicant) {
+              console.warn(`Applicant not found for application ${application._id}`);
+            } else {
+              const applicantName = `${applicant.firstName} ${applicant.lastName}`;
+
+            // 1. Notify underwriters
+            await sendNewApplicationNotificationToUnderwriters(
+              applicantName,
+              application._id.toString(),
+              application.loanType,
+              application.amount
+            );
+
+            // 2. Notify applicant about status update
+            await sendLoanStatusUpdateEmail(
+              applicant.email,
+              applicant.firstName,
+              application._id.toString(),
+              application.loanType,
+              application.amount,
+              'under_review',
+              'All required documents uploaded, application is now under review'
+            );
+          }
 
             res.json({
               success: true,

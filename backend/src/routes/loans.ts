@@ -7,7 +7,6 @@ import DocumentModel, { IDocument, DocumentType } from '../models/Document';
 import {
   sendLoanApplicationSubmittedEmail,
   sendLoanStatusUpdateEmail,
-  sendNewApplicationNotificationToUnderwriters,
   sendDocumentsRequestedEmail,
 } from '../utils/loanEmailService';
 
@@ -473,107 +472,6 @@ router.post(
         success: false,
         message: 'Server error',
         error: error.message
-      });
-    }
-  }
-);
-
-// Submit application for review (for applicants)
-router.patch(
-  '/:applicationId/submit-for-review',
-  authenticateToken,
-  async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { applicationId } = req.params as { applicationId: string };
-
-      // Find the application and ensure it belongs to the current user
-      const application = await LoanApplication.findOne({
-        _id: applicationId,
-        userId: req.user?.userId,
-      });
-
-      if (!application) {
-        return res.status(404).json({
-          success: false,
-          message: 'Application not found or not authorized',
-        });
-      }
-
-      // Check if application is in a valid state to be submitted for review
-      if (application.status !== 'pending' && application.status !== 'documents_requested') {
-        return res.status(400).json({
-          success: false,
-          message: `Cannot submit application with status "${application.status}" for review`,
-        });
-      }
-
-      // Check required documents
-      const uploadedDocs = await DocumentModel.find({ applicationId });
-      const documentRequirements = buildDocumentRequirements(uploadedDocs);
-      const requiredDocs = documentRequirements.filter(doc => doc.required);
-      const uploadedRequiredDocs = requiredDocs.filter(doc => doc.uploaded);
-
-      if (uploadedRequiredDocs.length !== requiredDocs.length) {
-        return res.status(400).json({
-          success: false,
-          message: 'Please upload all required documents before submitting for review',
-          missingDocuments: requiredDocs.filter(doc => !doc.uploaded).map(doc => doc.name),
-        });
-      }
-
-      // Add status history entry
-      const historyEntry: any = {
-        status: 'under_review',
-        timestamp: new Date(),
-        comment: 'Application submitted for review by applicant',
-      };
-
-      // Update the application status
-      const updatedApplication = await LoanApplication.findByIdAndUpdate(
-        applicationId,
-        {
-          status: 'under_review',
-          updatedAt: new Date(),
-          $push: { statusHistory: historyEntry },
-        },
-        { new: true }
-      ).populate('userId', 'firstName lastName email phone');
-
-      // Notify underwriters about new application for review
-      if (updatedApplication && updatedApplication.userId) {
-        const applicant = updatedApplication.userId as any;
-        const applicantName = `${applicant.firstName} ${applicant.lastName}`;
-        
-        await sendNewApplicationNotificationToUnderwriters(
-          applicantName,
-          updatedApplication._id.toString(),
-          updatedApplication.loanType,
-          updatedApplication.amount
-        );
-
-        // Also send status update to applicant
-        await sendLoanStatusUpdateEmail(
-          applicant.email,
-          applicant.firstName,
-          updatedApplication._id.toString(),
-          updatedApplication.loanType,
-          updatedApplication.amount,
-          'under_review',
-          'Application submitted for review by applicant'
-        );
-      }
-
-      res.json({
-        success: true,
-        message: 'Application submitted for review successfully',
-        application: updatedApplication,
-      });
-
-    } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: 'Server error',
-        error: error.message,
       });
     }
   }
