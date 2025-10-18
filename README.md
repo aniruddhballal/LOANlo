@@ -155,6 +155,7 @@
 | 136 | **Underwriter Email Notifications: Moved auto-review email trigger to document upload** | Refactored email logic for underwriter notifications by moving it from the unused `/submit-for-review` route to the `/upload` route. Now, when the final required document is uploaded and the application status auto-updates to `under_review`, underwriters receive notification emails and applicants receive status update emails. Discovered that the frontend “Submit for Review” button was never rendered due to automatic status updates, allowing removal of redundant UI elements. |
 | 141 | **Global Utils Refactor & Time-Based Greeting** | Moved `utils.ts` from `loan/loanreviewmodal/` to top-level `frontend/src/components/utils.ts` to improve reusability across shared components like `DashboardHeader.tsx` and `Profile.tsx`. Removed redundant re-exports from `loanreviewmodal/index.ts`. Updated all dependent imports to reference the new global utils path. Added new `getGreeting()` utility to generate dynamic greetings based on the current time of day. |
 | 142 | **Soft-Delete Loan Applications** | Added `isDeleted` and `deletedAt` fields to `LoanApplication` model, modified `DELETE /:applicationId` endpoint to perform soft delete instead of hard delete, added pre-find middleware to automatically exclude deleted applications from queries, and created optional endpoints for restoring (`PATCH /restore/:applicationId`) and viewing deleted applications (`GET /deleted` for underwriters) |
+| 143 | **View Deleted Loan Applications (Underwriter)** | Added toggle button in `UnderwriterDashboard.tsx` to switch between active and deleted applications view, created `fetchDeletedApplications` function and state management for deleted applications, implemented `GET /loans/deleted` endpoint for underwriters to retrieve soft-deleted applications, and modified pre-find middleware in `LoanApplication` model to allow explicit querying of deleted documents when `isDeleted: true` is specified |
 
 ### ⚡ In Progress
 
@@ -185,6 +186,6 @@
 
 ---
 
-**Document Version:** 111
+**Document Version:** 112
 **Last Updated:** 18th October 2025
 **Maintained By:** Aniruddh Ballal

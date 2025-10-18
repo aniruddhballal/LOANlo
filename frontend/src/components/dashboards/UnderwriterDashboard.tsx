@@ -30,6 +30,9 @@ export default function UnderwriterDashboard() {
   const [selectedApplicationId, setSelectedApplicationId] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
 
+  const [showDeleted, setShowDeleted] = useState(false)
+  const [deletedApplications, setDeletedApplications] = useState<LoanApplication[]>([])
+
   // Search and Filter States
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
@@ -46,8 +49,12 @@ export default function UnderwriterDashboard() {
   })
 
   useEffect(() => {
-    fetchApplications()
-  }, [])
+    if (showDeleted) {
+      fetchDeletedApplications()
+    } else {
+      fetchApplications()
+    }
+  }, [showDeleted])
 
   const fetchApplications = async () => {
     try {
@@ -56,6 +63,22 @@ export default function UnderwriterDashboard() {
         setApplications(data.applications)
       } else {
         setError('Failed to fetch loan applications')
+      }
+    } catch {
+      setError('Server error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchDeletedApplications = async () => {
+    try {
+      setLoading(true)
+      const { data } = await api.get('/loans/deleted')
+      if (data.success) {
+        setDeletedApplications(data.applications)
+      } else {
+        setError('Failed to fetch deleted applications')
       }
     } catch {
       setError('Server error')
@@ -101,7 +124,7 @@ export default function UnderwriterDashboard() {
 
   // Filter and sort logic
   const filteredAndSortedApplications = useMemo(() => {
-    let result = [...applications]
+    let result = [...(showDeleted ? deletedApplications : applications)]
 
     // Apply global search
     if (searchQuery) {
@@ -166,7 +189,7 @@ export default function UnderwriterDashboard() {
     }
 
     return result
-  }, [applications, searchQuery, filters, sortConfig])
+  }, [applications, deletedApplications, showDeleted, searchQuery, filters, sortConfig])
 
   const handleSort = (key: string) => {
     setSortConfig(prev => ({
@@ -214,16 +237,31 @@ export default function UnderwriterDashboard() {
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h2 className="text-2xl font-light text-gray-900 mb-1">
-                  Loan Applications
+                  {showDeleted ? 'Deleted Loan Applications' : 'Loan Applications'}
                 </h2>
                 <p className="text-sm text-gray-600 font-light">
-                  Review and process submitted loan applications
+                  {showDeleted 
+                    ? 'Review applications that have been deleted' 
+                    : 'Review and process submitted loan applications'}
                 </p>
               </div>
-              <div className="text-sm font-medium text-gray-700">
-                {loading 
-                  ? <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
-                  : `${filteredAndSortedApplications.length} of ${applications.length} ${applications.length === 1 ? "Application" : "Applications"}`}
+
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setShowDeleted(!showDeleted)}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    showDeleted 
+                      ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {showDeleted ? 'View Active' : 'View Deleted'}
+                </button>
+                <div className="text-sm font-medium text-gray-700">
+                  {loading 
+                    ? <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
+                    : `${filteredAndSortedApplications.length} of ${showDeleted ? deletedApplications.length : applications.length} ${(showDeleted ? deletedApplications.length : applications.length) === 1 ? "Application" : "Applications"}`}
+                </div>
               </div>
             </div>
 

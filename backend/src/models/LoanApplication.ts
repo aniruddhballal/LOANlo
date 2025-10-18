@@ -90,10 +90,13 @@ loanApplicationSchema.pre<ILoanApplication>('save', function (next) {
   next();
 });
 
-// Automatically exclude soft-deleted documents from queries
+// Automatically exclude soft-deleted documents from queries (unless explicitly included)
 loanApplicationSchema.pre(/^find/, function (next) {
-  // @ts-ignore
-  this.where({ isDeleted: { $ne: true } });
+  // @ts-ignore - Only apply filter if not explicitly querying for deleted items
+  if (!this.getQuery().isDeleted) {
+    // @ts-ignore
+    this.where({ isDeleted: { $ne: true } });
+  }
   next();
 });
 
