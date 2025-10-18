@@ -32,7 +32,9 @@ export default function UnderwriterDashboard() {
 
   const [showDeleted, setShowDeleted] = useState(false)
   const [deletedApplications, setDeletedApplications] = useState<LoanApplication[]>([])
-
+  const [restoreModalOpen, setRestoreModalOpen] = useState(false)
+  const [applicationToRestore, setApplicationToRestore] = useState<string | null>(null)
+  const [restoreConfirmText, setRestoreConfirmText] = useState('')
   // Search and Filter States
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
@@ -223,6 +225,37 @@ export default function UnderwriterDashboard() {
     return sortConfig.direction === 'asc' 
       ? <ChevronUp className="w-4 h-4 text-gray-900" />
       : <ChevronDown className="w-4 h-4 text-gray-900" />
+  }
+
+  const handleRestoreClick = (applicationId: string) => {
+    setApplicationToRestore(applicationId)
+    setRestoreModalOpen(true)
+  }
+
+  const handleRestoreConfirm = async () => {
+    if (restoreConfirmText !== 'RESTORE') {
+      setError('Please type RESTORE to confirm')
+      return
+    }
+
+    try {
+      await api.patch(`/loans/restore/${applicationToRestore}`)
+      // Refresh both lists
+      fetchDeletedApplications()
+      fetchApplications()
+      // Close modal and reset
+      setRestoreModalOpen(false)
+      setApplicationToRestore(null)
+      setRestoreConfirmText('')
+    } catch {
+      setError('Failed to restore application')
+    }
+  }
+
+  const handleRestoreCancel = () => {
+    setRestoreModalOpen(false)
+    setApplicationToRestore(null)
+    setRestoreConfirmText('')
   }
 
   return (
@@ -513,12 +546,21 @@ export default function UnderwriterDashboard() {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <button 
-                                onClick={() => handleReviewClick(app._id)}
-                                className="px-3 py-1.5 text-xs font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
-                              >
-                                Review
-                              </button>
+                              {showDeleted ? (
+                                <button
+                                  onClick={() => handleRestoreClick(app._id)}
+                                  className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                                >
+                                  Restore
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleReviewClick(app._id)}
+                                  className="px-3 py-1.5 text-xs font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
+                                >
+                                  Review
+                                </button>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -571,12 +613,21 @@ export default function UnderwriterDashboard() {
                       </div>
 
                       <div className="flex items-center space-x-2 pt-4 border-t border-gray-100">
-                        <button 
-                          onClick={() => handleReviewClick(app._id)}
-                          className="flex-1 px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200"
-                        >
-                          Review
-                        </button>
+                        {showDeleted ? (
+                          <button
+                            onClick={() => handleRestoreClick(app._id)}
+                            className="flex-1 px-4 py-2 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200"
+                          >
+                            Restore
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleReviewClick(app._id)}
+                            className="flex-1 px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200"
+                          >
+                            Review
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -597,6 +648,51 @@ export default function UnderwriterDashboard() {
           onApplicationUpdated={refreshApplications}
         />
       )}
+
+      {/* Restore Confirmation Modal */}
+      {restoreModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              Confirm Restoration
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Are you sure you want to restore this loan application? This will make it active again and visible to the applicant.
+            </p>
+            <p className="text-sm text-gray-700 mb-2 font-medium">
+              Type <span className="font-mono bg-gray-100 px-2 py-1 rounded text-red-600">RESTORE</span> to confirm:
+            </p>
+            <input
+              type="text"
+              value={restoreConfirmText}
+              onChange={(e) => setRestoreConfirmText(e.target.value)}
+              placeholder="Type RESTORE"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 mb-4"
+              autoFocus
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={handleRestoreCancel}
+                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRestoreConfirm}
+                disabled={restoreConfirmText !== 'RESTORE'}
+                className={`flex-1 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${
+                  restoreConfirmText === 'RESTORE'
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-gray-300 cursor-not-allowed'
+                }`}
+              >
+                Confirm Restore
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </>
   )
 }
