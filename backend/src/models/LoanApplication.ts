@@ -33,6 +33,10 @@ export interface ILoanApplication extends Document {
 
   createdAt: Date;
   updatedAt: Date;
+
+  isDeleted: boolean;
+  deletedAt?: Date | undefined;
+
 }
 
 const loanApplicationSchema: Schema<ILoanApplication> = new Schema({
@@ -73,12 +77,23 @@ const loanApplicationSchema: Schema<ILoanApplication> = new Schema({
   },
 
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
+
+  isDeleted: { type: Boolean, default: false },
+  deletedAt: { type: Date, default: undefined }
+
 });
 
 // Automatically update `updatedAt` before save
 loanApplicationSchema.pre<ILoanApplication>('save', function (next) {
   this.updatedAt = new Date();
+  next();
+});
+
+// Automatically exclude soft-deleted documents from queries
+loanApplicationSchema.pre(/^find/, function (next) {
+  // @ts-ignore
+  this.where({ isDeleted: { $ne: true } });
   next();
 });
 

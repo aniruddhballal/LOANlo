@@ -201,7 +201,7 @@ router.get(
   }
 );
 
-// Delete a loan application
+// Soft delete a loan application
 router.delete(
   '/:applicationId',
   authenticateToken,
@@ -209,10 +209,11 @@ router.delete(
     try {
       const { applicationId } = req.params as { applicationId: string };
       
-      // First, find the application to check its status
+      // Find the application (bypassing the soft delete filter)
       const application = await LoanApplication.findOne({
         _id: applicationId,
-        userId: req.user?.userId
+        userId: req.user?.userId,
+        isDeleted: { $ne: true } // Explicitly check it's not already deleted
       });
       
       if (!application) {
@@ -228,12 +229,78 @@ router.delete(
         });
       }
       
-      // Delete the application
-      await LoanApplication.findByIdAndDelete(applicationId);
+      // Soft delete the application
+      application.isDeleted = true;
+      application.deletedAt = new Date();
+      await application.save();
       
       res.json({ success: true, message: 'Application deleted successfully' });
     } catch (error: any) {
       res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  }
+);
+
+// Restore a soft-deleted loan application
+router.patch(
+  '/restore/:applicationId',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { applicationId } = req.params as { applicationId: string };
+      
+      // Find deleted application
+      const application = await LoanApplication.findOne({
+        _id: applicationId,
+        userId: req.user?.userId,
+        isDeleted: true
+      });
+      
+      if (!application) {
+        return res.status(404).json({
+          message: 'Deleted application not found or not authorized'
+        });
+      }
+      
+      // Restore the application
+      application.isDeleted = false;
+      application.deletedAt = undefined;
+      await application.save();
+      
+      res.json({ success: true, message: 'Application restored successfully' });
+    } catch (error: any) {
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  }
+);
+
+// Get deleted loan applications (for underwriters only)
+router.get(
+  '/deleted',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      if (req.user?.role !== 'underwriter') {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. Underwriter role required.'
+        });
+      }
+
+      const deletedApps = await LoanApplication.find({ isDeleted: true })
+        .populate('userId', 'firstName lastName email phone role')
+        .sort({ deletedAt: -1 });
+
+      res.json({
+        success: true,
+        applications: deletedApps
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message
+      });
     }
   }
 );
