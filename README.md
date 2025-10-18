@@ -185,9 +185,12 @@ You're right! The backend endpoint was created earlier as an "optional" feature.
 | 137 | **Approval/Reject Comments Visibility** | Evaluating how and where underwriter comments on approvals/rejections should be visible to applicants (modal or email) |
 | 138 | **Loan Action History Attribution** | Fixing underwriter actions on loan applications being logged as "unknown" in status history |
 | 139 | **Request for Additional Documents** | Auditing backend support and UX for additional document requests, ensuring `UploadDocuments.tsx` renders "additional documents" only after underwriter request, improving frontend headings/subheadings to distinguish required vs additional documents, and verifying Indian mandatory vs additional document requirements |
+| 145 | **View & Restore Deleted User Profiles (Underwriter)** | Add toggle button in `UnderwriterDashboard.tsx` to switch between active and deleted user profiles, implement `GET /profile/deleted` endpoint for underwriters to retrieve soft-deleted user accounts, create restore confirmation modal requiring text verification, and add `PATCH /profile/restore/:userId` endpoint with frontend handlers to restore deleted user profiles with list refresh |
+| 146 | **Restrict Deleted Records Access to System Admin** | Update authorization middleware to restrict viewing and restoring soft-deleted loan applications and user profiles to `system_admin` role only, remove deleted records access from underwriter dashboard, add permanent delete endpoints (`DELETE /loans/permanent/:applicationId` and `DELETE /profile/permanent/:userId`) for system admins, and implement role-based access control checks in all relevant backend routes |
+| 147 | **System Admin Database Overview Dashboard** | Create comprehensive system admin dashboard to display all database tables (Users, LoanApplications, Documents, etc.), implement data grid views with filtering and sorting for each table, add statistics and analytics widgets showing total records, active/deleted counts, and recent activity, and provide navigation between different database collections with read-only access to all fields |
 
 ---
 
-**Document Version:** 112
+**Document Version:** 114
 **Last Updated:** 18th October 2025
 **Maintained By:** Aniruddh Ballal
