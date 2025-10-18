@@ -14,6 +14,7 @@ import AccessDenied from './components/auth/AccessDenied'
 import { LoadingState } from './components/ui/StatusMessages'
 import EmailVerification from './components/auth/EmailVerification'
 import Profile from './components/auth/Profile'
+import ProfileHistory from './components/auth/ProfileHistory'
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -78,6 +79,12 @@ function AppContent() {
           </RoleProtectedRoute>
         } />
         
+        <Route path="/profile/history/:userId" element={
+          <RoleProtectedRoute allowedRoles={['underwriter', 'applicant']}>
+            <ProfileHistory />
+          </RoleProtectedRoute>
+        } />
+
         <Route path="/dashboard/applicant" element={
           <RoleProtectedRoute allowedRoles={['applicant']}>
             <ApplicantDashboard />

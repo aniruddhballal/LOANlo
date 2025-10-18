@@ -9,6 +9,7 @@ import authRoutes from './routes/auth';
 import loanRoutes from './routes/loans';
 import documentRoutes from './routes/documents';
 import profileRoutes from './routes/profile';
+import profileHistoryRoutes from './routes/profileHistory';
 
 const app: Application = express();
 
@@ -49,6 +50,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/profile', profileRoutes); // mount under /api/profile
+app.use('/api/profile-history', profileHistoryRoutes);
 
 // Connect to MongoDB and start server
 connectDB()

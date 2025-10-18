@@ -48,6 +48,14 @@ const Profile = () => {
     }
   }
 
+  const handleViewHistory = () => {
+    // Navigate to profile history page
+    const targetUserId = userId || user?.id // Use URL userId or current user's id
+    if (targetUserId) {
+      navigate(`/profile/history/${targetUserId}`)
+    }
+  }
+
   const InfoSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
@@ -153,22 +161,48 @@ const Profile = () => {
               </div>
               <div className="flex items-center space-x-3">
                 {userId ? (
-                  // If viewing another user's profile, show back button
-                  <button
-                    onClick={() => navigate(-1)}
-                    className="relative px-5 py-2.5 text-sm font-medium text-gray-900 bg-white backdrop-blur-md border border-gray-300 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-400 group"
-                  >
-                    <span className="relative z-10 flex items-center space-x-2">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-gray-700">
-                        <path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span>Back</span>
-                    </span>
-                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-                  </button>
-                ) : (
-                  // If viewing own profile, show profile and sign out buttons
+                  // If viewing another user's profile (underwriter view)
                   <>
+                    <button
+                      onClick={handleViewHistory}
+                      className="relative px-5 py-2.5 text-sm font-medium text-gray-900 bg-white backdrop-blur-md border border-gray-300 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-400 group"
+                    >
+                      <span className="relative z-10 flex items-center space-x-2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                          <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span>View History</span>
+                      </span>
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+                    </button>
+                    <button
+                      onClick={() => navigate(-1)}
+                      className="relative px-5 py-2.5 text-sm font-medium text-gray-900 bg-white backdrop-blur-md border border-gray-300 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-400 group"
+                    >
+                      <span className="relative z-10 flex items-center space-x-2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                          <path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span>Back</span>
+                      </span>
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+                    </button>
+                  </>
+                ) : (
+                  // If viewing own profile
+                  <>
+                    <button
+                      onClick={handleViewHistory}
+                      className="relative px-5 py-2.5 text-sm font-medium text-gray-900 bg-white backdrop-blur-md border border-gray-300 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-400 group"
+                    >
+                      <span className="relative z-10 flex items-center space-x-2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                          <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span>View History</span>
+                      </span>
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/50 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+                    </button>
                     <Link
                       to="/profile"
                       className="relative px-5 py-2.5 text-sm font-medium text-gray-900 bg-white backdrop-blur-md border border-gray-300 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-400 group"
