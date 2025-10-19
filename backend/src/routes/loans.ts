@@ -675,19 +675,39 @@ router.post(
         });
       }
 
-      // Restore the application
-      const application = await LoanApplication.findById(request.applicationId);
-      
+      // CRITICAL FIX: Explicitly query for deleted applications
+      const application = await LoanApplication.findOne({
+        _id: request.applicationId,
+        isDeleted: true  // Only find if actually deleted
+      });
+     
       if (!application) {
         return res.status(404).json({
           success: false,
-          message: 'Application not found'
+          message: 'Deleted application not found or already restored'
         });
       }
 
+      // Business rule validation (customize as needed)
+      if (application.status === 'approved') {
+        return res.status(400).json({
+          success: false,
+          message: 'Cannot restore approved applications. Please contact compliance.'
+        });
+      }
+
+      // Restore the application with audit trail
       application.isDeleted = false;
       application.deletedAt = undefined;
-      await application.save();
+      
+      // Add restoration to status history
+      application.statusHistory.push({
+        status: application.status, // Keep current status
+        timestamp: new Date(),
+        comment: `Application restored by system admin. Reason: ${request.reason}`,
+        updatedBy: req.user.userId
+      });
+      
 
       // Update request status
       request.status = 'approved';
@@ -696,11 +716,15 @@ router.post(
       }
       request.reviewedAt = new Date();
       if (notes) request.reviewNotes = notes.trim();
-      await request.save();
+      
 
       res.json({
         success: true,
-        message: 'Application restored successfully'
+        message: 'Application restored successfully',
+        data: {
+          applicationId: application._id,
+          status: application.status
+        }
       });
     } catch (error: any) {
       res.status(500).json({
