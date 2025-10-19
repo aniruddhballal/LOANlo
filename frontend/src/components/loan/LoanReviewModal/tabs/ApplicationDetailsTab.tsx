@@ -58,7 +58,7 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
       : application.userId?._id?.toString()
     
     if (userId) {
-      navigate(`/profile/${userId}`)
+      navigate(`/applicant-profile/${userId}`)
     }
   }
 

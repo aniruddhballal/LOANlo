@@ -13,7 +13,8 @@ import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 import AccessDenied from './components/auth/AccessDenied'
 import { LoadingState } from './components/ui/StatusMessages'
 import EmailVerification from './components/auth/EmailVerification'
-import Profile from './components/auth/Profile'
+import ApplicantProfile from './components/auth/ApplicantProfile'
+import StaffProfile from './components/auth/StaffProfile'
 import ProfileHistory from './components/auth/ProfileHistory'
 
 // Public Route Component (redirect if already logged in)
@@ -58,7 +59,7 @@ function AppContent() {
         {/* Root path */}
         <Route path="/" element={<RootRedirect />} />
         
-        {/* Public */}
+        {/* Public Routes */}
         <Route path="/login" element={
           <PublicRoute>
             <Login />
@@ -71,20 +72,39 @@ function AppContent() {
         } />
         <Route path="/verify-email" element={<EmailVerification />} />
         <Route path="/email-verification-required" element={<EmailVerification />} />
-        <Route path="/profile" element={<Profile />} />
-        {/* Protected Routes */}
-        <Route path="/profile/:userId" element={
-          <RoleProtectedRoute allowedRoles={['underwriter']}>
-            <Profile />
+        
+        {/* Applicant Profile Routes */}
+        <Route path="/applicant-profile" element={
+          <RoleProtectedRoute allowedRoles={['applicant']}>
+            <ApplicantProfile />
+          </RoleProtectedRoute>
+        } />
+        <Route path="/applicant-profile/:userId" element={
+          <RoleProtectedRoute allowedRoles={['underwriter', 'system_admin']}>
+            <ApplicantProfile />
           </RoleProtectedRoute>
         } />
         
+        {/* Staff Profile Routes (for underwriters and system_admins) */}
+        <Route path="/staff-profile" element={
+          <RoleProtectedRoute allowedRoles={['underwriter', 'system_admin']}>
+            <StaffProfile />
+          </RoleProtectedRoute>
+        } />
+        <Route path="/staff-profile/:userId" element={
+          <RoleProtectedRoute allowedRoles={['underwriter', 'system_admin']}>
+            <StaffProfile />
+          </RoleProtectedRoute>
+        } />
+        
+        {/* Profile History Routes */}
         <Route path="/profile/history/:userId" element={
-          <RoleProtectedRoute allowedRoles={['underwriter', 'applicant']}>
+          <RoleProtectedRoute allowedRoles={['underwriter', 'applicant', 'system_admin']}>
             <ProfileHistory />
           </RoleProtectedRoute>
         } />
 
+        {/* Dashboard Routes */}
         <Route path="/dashboard/applicant" element={
           <RoleProtectedRoute allowedRoles={['applicant']}>
             <ApplicantDashboard />
@@ -107,6 +127,7 @@ function AppContent() {
           <AccessDenied />
         } />
         
+        {/* Loan Application Routes */}
         <Route path="/loan-application" element={
           <RoleProtectedRoute allowedRoles={['applicant']}>
             <LoanApplication />

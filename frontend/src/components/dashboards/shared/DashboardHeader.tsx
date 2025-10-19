@@ -36,7 +36,7 @@ export const DashboardHeader = ({ title, subtitle }: DashboardHeaderProps) => {
           </div>
           <div className="flex items-center space-x-3">
             <Link
-              to="/profile"
+              to={user?.role === 'applicant' ? '/applicant-profile' : '/staff-profile'}
               className="relative px-5 py-2.5 text-sm font-medium text-gray-900 bg-white backdrop-blur-md border border-gray-300 rounded-lg shadow-sm cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-400 group"
             >
               <span className="relative z-10 flex items-center space-x-2">
