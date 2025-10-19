@@ -63,6 +63,7 @@
 | 56 | **Button Style Refinement** | Refining "Begin Application Process" button styles to ensure consistency with application-wide design system |
 | 62 | **Error Display Enhancement** | Enhancing styling and animation quality for individual field error displays on Personal Details page |
 | 81 | **Interactive Feedback Standardization** | Standardizing button styles and improving interactive feedback across all components, using "Save & Continue" button as design reference |
+| 150 | **Underwriter Dashboard Skeleton UI Alignment** | Adjusting `UnderwriterTableSkeleton` component column widths to match actual table column dimensions in `UnderwriterDashboard.tsx` for consistent loading state presentation. Ensuring skeleton placeholders for Reference, Applicant, Contact, Amount, Status, Submitted, and Actions columns align with rendered table structure. |
 
 ---
 
@@ -188,9 +189,10 @@
 | 138 | **Loan Action History Attribution** | Fixing underwriter actions on loan applications being logged as "unknown" in status history |
 | 139 | **Request for Additional Documents** | Auditing backend support and UX for additional document requests, ensuring `UploadDocuments.tsx` renders "additional documents" only after underwriter request, improving frontend headings/subheadings to distinguish required vs additional documents, and verifying Indian mandatory vs additional document requirements |
 | 147 | **System Admin Database Overview Dashboard** | Create comprehensive system admin dashboard to display all database tables (Users, LoanApplications, Documents, etc.), implement data grid views with filtering and sorting for each table, add statistics and analytics widgets showing total records, active/deleted counts, and recent activity including logs of logging in (flagging of suspicious activities), and provide navigation between different database collections with read-only access to all fields |
+| 149 | **User Profile Restoration System** | Implementing user profile restoration workflow within System Admin Dashboard. Adding view for deleted user profiles with restoration request functionality that applicants can initiate for their own accounts. System admin reviews submitted requests and approves/rejects based on evaluation. Follows similar pattern to existing loan application restoration system with role-based access control (applicant self-request, system_admin review). |
 
 ---
 
-**Document Version:** 117
+**Document Version:** 118
 **Last Updated:** 19th October 2025
 **Maintained By:** Aniruddh Ballal
