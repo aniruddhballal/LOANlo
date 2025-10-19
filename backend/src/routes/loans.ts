@@ -3,6 +3,8 @@ import LoanApplication from '../models/LoanApplication';
 import { AuthenticatedRequest, authenticateToken } from '../middleware/auth';
 import User from '../models/User';
 import DocumentModel, { IDocument, DocumentType } from '../models/Document';
+import RestorationRequest from '../models/RestorationRequest';
+import mongoose from 'mongoose';
 
 import {
   sendLoanApplicationSubmittedEmail,
@@ -235,39 +237,6 @@ router.delete(
       await application.save();
       
       res.json({ success: true, message: 'Application deleted successfully' });
-    } catch (error: any) {
-      res.status(500).json({ message: 'Server error', error: error.message });
-    }
-  }
-);
-
-// Restore a soft-deleted loan application
-router.patch(
-  '/restore/:applicationId',
-  authenticateToken,
-  async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { applicationId } = req.params as { applicationId: string };
-      
-      // Find deleted application
-      const application = await LoanApplication.findOne({
-        _id: applicationId,
-        userId: req.user?.userId,
-        isDeleted: true
-      });
-      
-      if (!application) {
-        return res.status(404).json({
-          message: 'Deleted application not found or not authorized'
-        });
-      }
-      
-      // Restore the application
-      application.isDeleted = false;
-      application.deletedAt = undefined;
-      await application.save();
-      
-      res.json({ success: true, message: 'Application restored successfully' });
     } catch (error: any) {
       res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -534,6 +503,351 @@ router.post(
         application: updatedApplication
       });
 
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message
+      });
+    }
+  }
+);
+
+// 1. Request restoration (underwriters only)
+router.post(
+  '/request-restoration/:applicationId',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      if (req.user?.role !== 'underwriter') {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. Underwriter role required.'
+        });
+      }
+
+      const { applicationId } = req.params as { applicationId: string };
+      const { reason } = req.body;
+
+      if (!reason || reason.trim().length < 10) {
+        return res.status(400).json({
+          success: false,
+          message: 'Restoration reason must be at least 10 characters'
+        });
+      }
+
+      // Find deleted application
+      const application = await LoanApplication.findOne({
+        _id: applicationId,
+        isDeleted: true
+      });
+
+      if (!application) {
+        return res.status(404).json({
+          success: false,
+          message: 'Deleted application not found'
+        });
+      }
+
+      // Check if there's already a pending request for this application
+      const existingRequest = await RestorationRequest.findOne({
+        applicationId,
+        status: 'pending'
+      });
+
+      if (existingRequest) {
+        return res.status(400).json({
+          success: false,
+          message: 'A restoration request is already pending for this application'
+        });
+      }
+
+      // Create restoration request
+      const restorationRequest = new RestorationRequest({
+        applicationId,
+        requestedBy: req.user.userId,
+        reason: reason.trim()
+      });
+
+      await restorationRequest.save();
+
+      res.json({
+        success: true,
+        message: 'Restoration request submitted successfully',
+        request: restorationRequest
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message
+      });
+    }
+  }
+);
+
+// 2. Get all restoration requests (system_admin only)
+router.get(
+  '/restoration-requests',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      if (req.user?.role !== 'system_admin') {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. System admin role required.'
+        });
+      }
+      const { status } = req.query;
+      const filter: any = {};
+     
+      if (status && status !== 'all') {
+        filter.status = status;
+      }
+      // First, get restoration requests with basic population
+      const requests = await RestorationRequest.find(filter)
+        .populate('requestedBy', 'firstName lastName email role')
+        .populate('reviewedBy', 'firstName lastName email role')
+        .sort({ createdAt: -1 })
+        .lean(); // Use lean() for better performance
+
+      // Manually populate applicationId including soft-deleted ones
+      const populatedRequests = await Promise.all(
+        requests.map(async (request) => {
+          // Find the application WITHOUT the soft-delete filter by explicitly querying with isDeleted
+          const application = await LoanApplication.findOne({
+            _id: request.applicationId,
+            isDeleted: { $in: [true, false] } // This forces the query to include both deleted and non-deleted
+          })
+          .populate('userId', 'firstName lastName email phone')
+          .lean();
+
+          return {
+            ...request,
+            applicationId: application
+          };
+        })
+      );
+      
+      res.json({
+        success: true,
+        requests: populatedRequests
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message
+      });
+    }
+  }
+);
+
+// 3. Approve restoration request (system_admin only)
+router.post(
+  '/restoration-requests/:requestId/approve',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      if (req.user?.role !== 'system_admin') {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. System admin role required.'
+        });
+      }
+
+      const { requestId } = req.params;
+      const { notes } = req.body;
+
+      const request = await RestorationRequest.findById(requestId);
+
+      if (!request) {
+        return res.status(404).json({
+          success: false,
+          message: 'Restoration request not found'
+        });
+      }
+
+      if (request.status !== 'pending') {
+        return res.status(400).json({
+          success: false,
+          message: 'This request has already been reviewed'
+        });
+      }
+
+      // Restore the application
+      const application = await LoanApplication.findById(request.applicationId);
+      
+      if (!application) {
+        return res.status(404).json({
+          success: false,
+          message: 'Application not found'
+        });
+      }
+
+      application.isDeleted = false;
+      application.deletedAt = undefined;
+      await application.save();
+
+      // Update request status
+      request.status = 'approved';
+      if (mongoose.Types.ObjectId.isValid(req.user.userId)) {
+        request.reviewedBy = new mongoose.Types.ObjectId(req.user.userId);
+      }
+      request.reviewedAt = new Date();
+      if (notes) request.reviewNotes = notes.trim();
+      await request.save();
+
+      res.json({
+        success: true,
+        message: 'Application restored successfully'
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message
+      });
+    }
+  }
+);
+
+// 4. Reject restoration request (system_admin only)
+router.post(
+  '/restoration-requests/:requestId/reject',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      if (req.user?.role !== 'system_admin') {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. System admin role required.'
+        });
+      }
+
+      const { requestId } = req.params;
+      const { notes } = req.body;
+
+      if (!notes || notes.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Rejection reason is required'
+        });
+      }
+
+      const request = await RestorationRequest.findById(requestId);
+
+      if (!request) {
+        return res.status(404).json({
+          success: false,
+          message: 'Restoration request not found'
+        });
+      }
+
+      if (request.status !== 'pending') {
+        return res.status(400).json({
+          success: false,
+          message: 'This request has already been reviewed'
+        });
+      }
+
+      // Update request status
+      request.status = 'rejected';
+      if (mongoose.Types.ObjectId.isValid(req.user.userId)) {
+        request.reviewedBy = new mongoose.Types.ObjectId(req.user.userId);
+      }
+      request.reviewedAt = new Date();
+      request.reviewNotes = notes.trim();
+      await request.save();
+
+      res.json({
+        success: true,
+        message: 'Restoration request rejected'
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message
+      });
+    }
+  }
+);
+
+// 5. Permanently delete application (system_admin only)
+router.delete(
+  '/permanent-delete/:applicationId',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      if (req.user?.role !== 'system_admin') {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. System admin role required.'
+        });
+      }
+
+      const { applicationId } = req.params as { applicationId: string };
+
+      // Find deleted application
+      const application = await LoanApplication.findOne({
+        _id: applicationId,
+        isDeleted: true
+      });
+
+      if (!application) {
+        return res.status(404).json({
+          success: false,
+          message: 'Deleted application not found'
+        });
+      }
+
+      // Permanently delete the application and related data
+      await LoanApplication.findByIdAndDelete(applicationId);
+      
+      // Also delete any related documents
+      await DocumentModel.deleteMany({ applicationId });
+      
+      // Delete any restoration requests for this application
+      await RestorationRequest.deleteMany({ applicationId });
+
+      res.json({
+        success: true,
+        message: 'Application permanently deleted'
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message
+      });
+    }
+  }
+);
+
+// Get my restoration requests (underwriter only)
+router.get(
+  '/my-restoration-requests',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      if (req.user?.role !== 'underwriter') {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. Underwriter role required.'
+        });
+      }
+
+      const requests = await RestorationRequest.find({ 
+        requestedBy: req.user.userId 
+      })
+        .select('applicationId status createdAt')
+        .sort({ createdAt: -1 });
+
+      res.json({
+        success: true,
+        requests
+      });
     } catch (error: any) {
       res.status(500).json({
         success: false,

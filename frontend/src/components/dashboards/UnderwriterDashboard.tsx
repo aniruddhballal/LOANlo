@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Search, SlidersHorizontal, X, ChevronDown, ChevronUp, ArrowUpDown } from 'lucide-react'
+import { Search, SlidersHorizontal, X, ChevronDown, ChevronUp, ArrowUpDown, Clock } from 'lucide-react'
 import { DashboardLayout } from './shared/DashboardLayout'
 import { UnderwriterTableSkeleton } from '../ui/SkeletonComponents'
 import { ErrorAlert } from './shared/ErrorAlert'
@@ -21,6 +21,10 @@ interface LoanApplication {
     phone: string
     role: string
   }
+  restorationRequest?: {
+    _id: string
+    status: 'pending' | 'approved' | 'rejected'
+  }
 }
 
 export default function UnderwriterDashboard() {
@@ -32,9 +36,12 @@ export default function UnderwriterDashboard() {
 
   const [showDeleted, setShowDeleted] = useState(false)
   const [deletedApplications, setDeletedApplications] = useState<LoanApplication[]>([])
-  const [restoreModalOpen, setRestoreModalOpen] = useState(false)
-  const [applicationToRestore, setApplicationToRestore] = useState<string | null>(null)
-  const [restoreConfirmText, setRestoreConfirmText] = useState('')
+
+  const [requestModalOpen, setRequestModalOpen] = useState(false)
+  const [applicationToRequest, setApplicationToRequest] = useState<string | null>(null)
+  const [restorationReason, setRestorationReason] = useState('')
+  const [pendingRestorationRequests, setPendingRestorationRequests] = useState<Set<string>>(new Set())
+
   // Search and Filter States
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
@@ -53,6 +60,7 @@ export default function UnderwriterDashboard() {
   useEffect(() => {
     if (showDeleted) {
       fetchDeletedApplications()
+      fetchPendingRestorationRequests()
     } else {
       fetchApplications()
     }
@@ -86,6 +94,23 @@ export default function UnderwriterDashboard() {
       setError('Server error')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchPendingRestorationRequests = async () => {
+    try {
+      const { data } = await api.get('/loans/my-restoration-requests')
+      if (data.success) {
+        // Create a set of application IDs that have pending requests
+        const pendingIds = new Set<string>(
+          data.requests
+            .filter((req: any) => req.status === 'pending')
+            .map((req: any) => req.applicationId as string)
+        )
+        setPendingRestorationRequests(pendingIds)
+      }
+    } catch (err) {
+      console.error('Failed to fetch restoration requests', err)
     }
   }
 
@@ -227,35 +252,43 @@ export default function UnderwriterDashboard() {
       : <ChevronDown className="w-4 h-4 text-gray-900" />
   }
 
-  const handleRestoreClick = (applicationId: string) => {
-    setApplicationToRestore(applicationId)
-    setRestoreModalOpen(true)
+  const handleRequestRestoration = (applicationId: string) => {
+    setApplicationToRequest(applicationId)
+    setRequestModalOpen(true)
   }
 
-  const handleRestoreConfirm = async () => {
-    if (restoreConfirmText !== 'RESTORE') {
-      setError('Please type RESTORE to confirm')
+  const handleSubmitRequest = async () => {
+    if (restorationReason.trim().length < 10) {
+      setError('Restoration reason must be at least 10 characters')
       return
     }
 
     try {
-      await api.patch(`/loans/restore/${applicationToRestore}`)
-      // Refresh both lists
-      fetchDeletedApplications()
-      fetchApplications()
-      // Close modal and reset
-      setRestoreModalOpen(false)
-      setApplicationToRestore(null)
-      setRestoreConfirmText('')
-    } catch {
-      setError('Failed to restore application')
+      const { data } = await api.post(`/loans/request-restoration/${applicationToRequest}`, {
+        reason: restorationReason
+      })
+      
+      if (data.success) {
+        // Add to pending requests
+        setPendingRestorationRequests(prev => new Set([...prev, applicationToRequest!]))
+        
+        // Close modal and reset
+        setRequestModalOpen(false)
+        setApplicationToRequest(null)
+        setRestorationReason('')
+        
+        // Show success message
+        alert('Restoration request submitted successfully! System admin will review it.')
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to submit restoration request')
     }
   }
 
-  const handleRestoreCancel = () => {
-    setRestoreModalOpen(false)
-    setApplicationToRestore(null)
-    setRestoreConfirmText('')
+  const handleCancelRequest = () => {
+    setRequestModalOpen(false)
+    setApplicationToRequest(null)
+    setRestorationReason('')
   }
 
   return (
@@ -501,7 +534,7 @@ export default function UnderwriterDashboard() {
                             </div>
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Actions
+                            {showDeleted ? 'Restoration Status' : 'Actions'}
                           </th>
                         </tr>
                       </thead>
@@ -547,12 +580,21 @@ export default function UnderwriterDashboard() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               {showDeleted ? (
-                                <button
-                                  onClick={() => handleRestoreClick(app._id)}
-                                  className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md"
-                                >
-                                  Restore
-                                </button>
+                                pendingRestorationRequests.has(app._id) ? (
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="w-4 h-4 text-yellow-600" />
+                                    <span className="text-xs font-medium text-yellow-700">
+                                      Awaiting Admin Review
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => handleRequestRestoration(app._id)}
+                                    className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                                  >
+                                    Request Admin
+                                  </button>
+                                )
                               ) : (
                                 <button
                                   onClick={() => handleReviewClick(app._id)}
@@ -614,12 +656,21 @@ export default function UnderwriterDashboard() {
 
                       <div className="flex items-center space-x-2 pt-4 border-t border-gray-100">
                         {showDeleted ? (
-                          <button
-                            onClick={() => handleRestoreClick(app._id)}
-                            className="flex-1 px-4 py-2 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200"
-                          >
-                            Restore
-                          </button>
+                          pendingRestorationRequests.has(app._id) ? (
+                            <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
+                              <Clock className="w-4 h-4 text-yellow-600" />
+                              <span className="text-sm font-medium text-yellow-700">
+                                Awaiting Admin Review
+                              </span>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => handleRequestRestoration(app._id)}
+                              className="flex-1 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200"
+                            >
+                              Request Admin
+                            </button>
+                          )
                         ) : (
                           <button
                             onClick={() => handleReviewClick(app._id)}
@@ -649,44 +700,54 @@ export default function UnderwriterDashboard() {
         />
       )}
 
-      {/* Restore Confirmation Modal */}
-      {restoreModalOpen && (
+      {/* Request Restoration Modal */}
+      {requestModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">
-              Confirm Restoration
+              Request Restoration
             </h3>
             <p className="text-gray-600 mb-4">
-              Are you sure you want to restore this loan application? This will make it active again and visible to the applicant.
+              Submit a restoration request for this deleted loan application. A system administrator will review and approve or reject your request.
             </p>
-            <p className="text-sm text-gray-700 mb-2 font-medium">
-              Type <span className="font-mono bg-gray-100 px-2 py-1 rounded text-red-600">RESTORE</span> to confirm:
-            </p>
-            <input
-              type="text"
-              value={restoreConfirmText}
-              onChange={(e) => setRestoreConfirmText(e.target.value)}
-              placeholder="Type RESTORE"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 mb-4"
-              autoFocus
-            />
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Reason for Restoration <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={restorationReason}
+                onChange={(e) => setRestorationReason(e.target.value)}
+                placeholder="Explain why this application should be restored (minimum 10 characters)..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-gray-900 resize-none"
+                rows={4}
+                autoFocus
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {restorationReason.length}/500 characters
+              </p>
+            </div>
+            {error && restorationReason.length > 0 && restorationReason.length < 10 && (
+              <p className="text-sm text-red-600 mb-4">
+                Reason must be at least 10 characters long
+              </p>
+            )}
             <div className="flex gap-3">
               <button
-                onClick={handleRestoreCancel}
+                onClick={handleCancelRequest}
                 className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
               <button
-                onClick={handleRestoreConfirm}
-                disabled={restoreConfirmText !== 'RESTORE'}
+                onClick={handleSubmitRequest}
+                disabled={restorationReason.trim().length < 10}
                 className={`flex-1 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${
-                  restoreConfirmText === 'RESTORE'
-                    ? 'bg-green-600 hover:bg-green-700'
+                  restorationReason.trim().length >= 10
+                    ? 'bg-blue-600 hover:bg-blue-700'
                     : 'bg-gray-300 cursor-not-allowed'
                 }`}
               >
-                Confirm Restore
+                Submit Request
               </button>
             </div>
           </div>
