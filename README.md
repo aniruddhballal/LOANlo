@@ -187,10 +187,10 @@
 | 137 | **Approval/Reject Comments Visibility** | Evaluating how and where underwriter comments on approvals/rejections should be visible to applicants (modal or email) |
 | 138 | **Loan Action History Attribution** | Fixing underwriter actions on loan applications being logged as "unknown" in status history |
 | 139 | **Request for Additional Documents** | Auditing backend support and UX for additional document requests, ensuring `UploadDocuments.tsx` renders "additional documents" only after underwriter request, improving frontend headings/subheadings to distinguish required vs additional documents, and verifying Indian mandatory vs additional document requirements |
-| 147 | **System Admin Database Overview Dashboard** | Create comprehensive system admin dashboard to display all database tables (Users, LoanApplications, Documents, etc.), implement data grid views with filtering and sorting for each table, add statistics and analytics widgets showing total records, active/deleted counts, and recent activity, and provide navigation between different database collections with read-only access to all fields |
+| 147 | **System Admin Database Overview Dashboard** | Create comprehensive system admin dashboard to display all database tables (Users, LoanApplications, Documents, etc.), implement data grid views with filtering and sorting for each table, add statistics and analytics widgets showing total records, active/deleted counts, and recent activity including logs of logging in (flagging of suspicious activities), and provide navigation between different database collections with read-only access to all fields |
 
 ---
 
-**Document Version:** 116
+**Document Version:** 117
 **Last Updated:** 19th October 2025
 **Maintained By:** Aniruddh Ballal
