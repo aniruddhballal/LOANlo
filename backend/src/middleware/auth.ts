@@ -60,3 +60,29 @@ export const authenticateToken = async (
     return;
   }
 };
+
+/**
+ * Middleware to check if authenticated user has required role
+ * Must be used AFTER authenticateToken middleware
+ */
+export const requireRole = (...allowedRoles: string[]) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+      return;
+    }
+
+    if (!allowedRoles.includes(req.user.role)) {
+      res.status(403).json({
+        success: false,
+        message: `Access denied. Required role: ${allowedRoles.join(' or ')}`
+      });
+      return;
+    }
+
+    next();
+  };
+};
