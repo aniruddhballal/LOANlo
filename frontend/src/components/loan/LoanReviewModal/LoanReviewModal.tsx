@@ -90,7 +90,7 @@ export default function LoanReviewModal({
         ...(status === 'rejected' && { rejectionReason: comment })
       }
 
-      const { data } = await api.put(`/loans/update-status/${applicationId}`, payload)
+      const { data } = await api.put(`/loans/underwriter/update-status/${applicationId}`, payload)
       if (data.success) {
         await fetchApplicationDetails()
         setComment('')
@@ -127,7 +127,7 @@ export default function LoanReviewModal({
         documentsUploaded: false  // Add this line to set documentsUploaded to false
       }
 
-      const { data } = await api.put(`/loans/update-status/${applicationId}`, payload)
+      const { data } = await api.put(`/loans/underwriter/update-status/${applicationId}`, payload)
       if (data.success) {
         await fetchApplicationDetails()
         setComment('')

@@ -68,7 +68,7 @@ export default function UnderwriterDashboard() {
 
   const fetchApplications = async () => {
     try {
-      const { data } = await api.get('/loans/all')
+      const { data } = await api.get('/loans/underwriter/all')
       if (data.success) {
         setApplications(data.applications)
       } else {
@@ -84,7 +84,7 @@ export default function UnderwriterDashboard() {
   const fetchDeletedApplications = async () => {
     try {
       setLoading(true)
-      const { data } = await api.get('/loans/deleted')
+      const { data } = await api.get('/loans/underwriter/deleted')
       if (data.success) {
         setDeletedApplications(data.applications)
       } else {
@@ -99,7 +99,7 @@ export default function UnderwriterDashboard() {
 
   const fetchPendingRestorationRequests = async () => {
     try {
-      const { data } = await api.get('/loans/my-restoration-requests')
+      const { data } = await api.get('/loans/underwriter/my-restoration-requests')
       if (data.success) {
         // Create a set of application IDs that have pending requests
         const pendingIds = new Set<string>(
@@ -126,7 +126,7 @@ export default function UnderwriterDashboard() {
 
   const refreshApplications = async () => {
     try {
-      const { data } = await api.get('/loans/all')
+      const { data } = await api.get('/loans/underwriter/all')
       if (data.success) {
         setApplications(data.applications)
       }
@@ -264,7 +264,7 @@ export default function UnderwriterDashboard() {
     }
 
     try {
-      const { data } = await api.post(`/loans/request-restoration/${applicationToRequest}`, {
+      const { data } = await api.post(`/loans/underwriter/request-restoration/${applicationToRequest}`, {
         reason: restorationReason
       })
       

@@ -66,7 +66,7 @@ export default function SystemAdminDashboard() {
   const fetchRestorationRequests = async () => {
     try {
       setLoading(true)
-      const { data } = await api.get('/loans/restoration-requests', {
+      const { data } = await api.get('/loans/admin/restoration-requests', {
         params: { status: filters.status !== 'all' ? filters.status : undefined }
       })
       if (data.success) {
@@ -114,15 +114,15 @@ export default function SystemAdminDashboard() {
 
     try {
       if (actionType === 'approve') {
-        await api.post(`/loans/restoration-requests/${selectedRequest._id}/approve`, {
+        await api.post(`/loans/admin/restoration-requests/${selectedRequest._id}/approve`, {
           notes: reviewNotes
         })
       } else if (actionType === 'reject') {
-        await api.post(`/loans/restoration-requests/${selectedRequest._id}/reject`, {
+        await api.post(`/loans/admin/restoration-requests/${selectedRequest._id}/reject`, {
           notes: reviewNotes
         })
       } else if (actionType === 'delete') {
-        await api.delete(`/loans/permanent-delete/${selectedRequest.applicationId._id}`)
+        await api.delete(`/loans/admin/permanent-delete/${selectedRequest.applicationId._id}`)
       }
 
       await fetchRestorationRequests()

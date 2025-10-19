@@ -198,7 +198,7 @@ router.delete(
 );
 
 // Mount sub-routers without changing urls to keep structure flatter
-router.use('/', underwriterRoutes);
-router.use('/', adminRoutes);
+router.use('/underwriter', underwriterRoutes);
+router.use('/admin', adminRoutes);
 
 export default router;
