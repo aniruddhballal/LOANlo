@@ -192,10 +192,12 @@
 | 139 | **Request for Additional Documents** | Auditing backend support and UX for additional document requests, ensuring `UploadDocuments.tsx` renders "additional documents" only after underwriter request, improving frontend headings/subheadings to distinguish required vs additional documents, and verifying Indian mandatory vs additional document requirements |
 | 147 | **System Admin Database Overview Dashboard** | Create comprehensive system admin dashboard to display all database tables (Users, LoanApplications, Documents, etc.), implement data grid views with filtering and sorting for each table, add statistics and analytics widgets showing total records, active/deleted counts, and recent activity including logs of logging in (flagging of suspicious activities), and provide navigation between different database collections with read-only access to all fields |
 | 149 | **User Profile Restoration System** | Implementing user profile restoration workflow within System Admin Dashboard. Adding view for deleted user profiles with restoration request functionality that applicants can initiate for their own accounts. System admin reviews submitted requests and approves/rejects based on evaluation. Follows similar pattern to existing loan application restoration system with role-based access control (applicant self-request, system_admin review). |
-| 152 | **New email notifications** | send email notification to applicant, underwriter, system_admin on soft-deletion/restoration/permanent deletion of loan application as well as user profiles. |
+| 152 | **New Email Notifications** | Sending email notifications to applicant, underwriter, and system_admin on soft-deletion, restoration, or permanent deletion of loan applications and user profiles |
+| 154 | **Loans Route: Modularize Code** | Refactoring `loans.ts` into smaller, modular route and controller files to improve readability, maintainability, and scalability |
+| 155 | **Database Transaction Session** | Implement MongoDB transaction sessions to ensure atomic operations and maintain database consistency across related updates |
 
 ---
 
-**Document Version:** 119
+**Document Version:** 122
 **Last Updated:** 19th October 2025
 **Maintained By:** Aniruddh Ballal
