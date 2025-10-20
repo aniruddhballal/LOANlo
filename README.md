@@ -6,8 +6,8 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) <span style="background:#eee;padding:2px 6px;border-radius:4px;">43</span>
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) <span style="background:#eee;padding:2px 6px;border-radius:4px;">120</span>
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (43)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (120)
 
 ---
 
