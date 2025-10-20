@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (43)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (120)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (121)
 
 ---
 
@@ -74,7 +74,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (104)
+### ✅ Completed Initiatives (105)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -182,6 +182,7 @@
 | 158 | **Loan Application: Track User Deletions** | Updated `DELETE /:applicationId` route to record soft deletions in `statusHistory` with comment `'Application deleted by user'`. This preserves the deletion context for auditing and prevents restoring applications deleted intentionally by users. |
 | 159 | **System Admin Restoration Management & Cascading User Deletion** | Redesigned `SystemAdminDashboard.tsx` into navigation hub linking to two new pages: `DeletedLoanApplications.tsx` (restoration request CRUD with approve/reject/permanent-delete) and `DeletedUsers.tsx` (soft-deleted user management with restore/permanent-delete). Added 3 admin endpoints to `profile.ts`: `GET /admin/deleted-users`, `GET /admin/all-users`, `DELETE /admin/permanent-delete/:userId`. Implemented CASCADE logic: `DELETE /me` soft-deletes user's loan applications with statusHistory tracking; `POST /restore/:userId` restores only cascade-deleted applications. Added system_admin RoleProtectedRoute entries to `App.tsx`. |
 | 160 | **Deleted Loan Applications: Filter by Active Users** | Updated `GET /deleted` route to only return soft-deleted loan applications whose associated users are still active. This prevents showing applications of users who themselves have been deleted. |
+| 164 | **Auth Route: Modularized** | Refactored monolithic `auth.ts` (500ish lines) into modular architecture: `routes/auth.ts` (route definitions only), `controllers/authController.ts` (request/response handlers), `services/authService.ts` (auth business logic), `services/captchaService.ts` (captcha logic), `middleware/rateLimiters.ts` (rate limiting configs), `middleware/captchaRateLimiter.ts` (captcha rate limiting), and `utils/captchaStore.ts` (in-memory captcha tracking). Separated concerns following single responsibility principle, improving maintainability, testability, and code reusability. |
 
 ### ⚡ In Progress (16)
 
@@ -206,6 +207,6 @@
 
 ---
 
-**Document Version:** 134
+**Document Version:** 135
 **Last Updated:** 20th October 2025
 **Maintained By:** Aniruddh Ballal
