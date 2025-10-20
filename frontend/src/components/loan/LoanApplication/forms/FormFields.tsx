@@ -25,6 +25,7 @@ interface CurrencyFieldProps extends BaseFieldProps {
   value: string
   min?: string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
 }
 
 export const SelectField: React.FC<SelectFieldProps> = ({
@@ -116,7 +117,8 @@ export const CurrencyField: React.FC<CurrencyFieldProps> = ({
   focusedField,
   onFocus,
   onBlur,
-  onChange
+  onChange,
+  onKeyDown
 }) => (
   <div className="relative group">
     <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
@@ -136,6 +138,7 @@ export const CurrencyField: React.FC<CurrencyFieldProps> = ({
           onChange={onChange}
           onFocus={() => onFocus(name)}
           onBlur={onBlur}
+          onKeyDown={onKeyDown}       // <--- forward the prop here
           className="flex-1 px-4 py-3 bg-transparent font-medium text-gray-800 placeholder-gray-400 focus:outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
           required={required}
           min={min}

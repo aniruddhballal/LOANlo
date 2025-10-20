@@ -76,6 +76,19 @@ export const LoanForm: React.FC<LoanFormProps> = ({
           onFocus={onFocus}
           onBlur={onBlur}
           onChange={onChange}
+          onKeyDown={(e) => {
+            // Allow digits, backspace, delete, arrows, tab
+            if (
+              !/[0-9]/.test(e.key) &&
+              e.key !== 'Backspace' &&
+              e.key !== 'Delete' &&
+              e.key !== 'ArrowLeft' &&
+              e.key !== 'ArrowRight' &&
+              e.key !== 'Tab'
+            ) {
+              e.preventDefault()
+            }
+          }}
         />
         
         <SelectField

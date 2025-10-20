@@ -55,6 +55,7 @@
 | 131 | **Application Status: Document Upload Animation on Redirect** | Added `highlightedAppId` and `animatingDocs` state in `ApplicationStatus.tsx`. `useEffect` detects `location.state.updatedApplicationId`, triggers `docStatusChange` keyframe on badge and `highlightCard` keyframe on card. Auto-scrolls via `scrollIntoView`, clears after timeout. Fixed `DocumentUpload.tsx` navigation syntax to pass state object with `updatedApplicationId`. |
 | 132 | **Loan Application: Split Loading States** | In `LoanApplication.tsx`, separated `checkingPersonalDetails` and `loading` conditions. Added submission-specific loading state with "Submitting Application" title and email confirmation message. |
 | 140 | **Reference Number Display Fix** | Fixing display of loan reference numbers on underwriter dashboard and applicant `ApplicationStatus` to show full 24-character ID instead of only last 8 characters |
+| 161 | **CurrencyField Digit-Only Input** | Updated `CurrencyField` in `formfields.tsx` to support `onKeyDown` for handling key-level input restrictions. In `loanform.tsx`, added an `onKeyDown` handler to allow only digits, backspace, delete, arrow keys, and tab, preventing invalid characters from being typed into the loan amount field. |
 
 ### ⚡ In Progress
 
@@ -203,6 +204,6 @@
 
 ---
 
-**Document Version:** 129
+**Document Version:** 130
 **Last Updated:** 20th October 2025
 **Maintained By:** Aniruddh Ballal
