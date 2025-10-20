@@ -167,6 +167,7 @@
 | 154 | **Loans Route: Modularized** | Refactored monolithic `loans.ts` (900ish lines) into role-based modules: `loans.ts` (applicant routes), `loans/underwriter.ts`, `loans/admin.ts`, and `loans/shared.ts`. Implemented `requireRole()` middleware for router-level authorization, eliminating redundant per-route checks. |
 | 156 | **Profile Routes: Role-Based Separation** | Refactored `Profile.tsx` into `ApplicantProfile.tsx` (full details) and `StaffProfile.tsx` (minimal info). Updated routes in `App.tsx` and dynamic routing in `DashboardHeader.tsx` based on user role. |
 | 157 | **User Model: Soft-Delete Query Flexibility** | Updated `User.ts` pre-find middleware to exclude soft-deleted users by default **only when `isDeleted` isn’t explicitly queried**. This allows fetching deleted users when needed (e.g., for restoration) without affecting normal queries. |
+| 158 | **Loan Application: Track User Deletions** | Updated `DELETE /:applicationId` route to record soft deletions in `statusHistory` with comment `'Application deleted by user'`. This preserves the deletion context for auditing and prevents restoring applications deleted intentionally by users. |
 
 ### ⚡ In Progress
 
@@ -200,6 +201,6 @@
 
 ---
 
-**Document Version:** 123
+**Document Version:** 124
 **Last Updated:** 20th October 2025
 **Maintained By:** Aniruddh Ballal

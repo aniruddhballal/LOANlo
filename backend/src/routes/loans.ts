@@ -188,6 +188,14 @@ router.delete(
       // Soft delete the application
       application.isDeleted = true;
       application.deletedAt = new Date();
+
+      // Add deletion to status history
+      application.statusHistory.push({
+        status: application.status, // Keep current status
+        timestamp: new Date(),
+        comment: 'Application deleted by user'
+      });
+
       await application.save();
       
       res.json({ success: true, message: 'Application deleted successfully' });
