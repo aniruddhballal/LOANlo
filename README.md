@@ -168,6 +168,7 @@
 | 156 | **Profile Routes: Role-Based Separation** | Refactored `Profile.tsx` into `ApplicantProfile.tsx` (full details) and `StaffProfile.tsx` (minimal info). Updated routes in `App.tsx` and dynamic routing in `DashboardHeader.tsx` based on user role. |
 | 157 | **User Model: Soft-Delete Query Flexibility** | Updated `User.ts` pre-find middleware to exclude soft-deleted users by default **only when `isDeleted` isn’t explicitly queried**. This allows fetching deleted users when needed (e.g., for restoration) without affecting normal queries. |
 | 158 | **Loan Application: Track User Deletions** | Updated `DELETE /:applicationId` route to record soft deletions in `statusHistory` with comment `'Application deleted by user'`. This preserves the deletion context for auditing and prevents restoring applications deleted intentionally by users. |
+| 159 | **System Admin Restoration Management & Cascading User Deletion** | Redesigned `SystemAdminDashboard.tsx` into navigation hub linking to two new pages: `DeletedLoanApplications.tsx` (restoration request CRUD with approve/reject/permanent-delete) and `DeletedUsers.tsx` (soft-deleted user management with restore/permanent-delete). Added 3 admin endpoints to `profile.ts`: `GET /admin/deleted-users`, `GET /admin/all-users`, `DELETE /admin/permanent-delete/:userId`. Implemented CASCADE logic: `DELETE /me` soft-deletes user's loan applications with statusHistory tracking; `POST /restore/:userId` restores only cascade-deleted applications. Added system_admin RoleProtectedRoute entries to `App.tsx`. |
 
 ### ⚡ In Progress
 
@@ -201,6 +202,6 @@
 
 ---
 
-**Document Version:** 124
+**Document Version:** 125
 **Last Updated:** 20th October 2025
 **Maintained By:** Aniruddh Ballal

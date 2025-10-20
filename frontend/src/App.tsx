@@ -4,6 +4,8 @@ import Register from './components/auth/Register'
 import ApplicantDashboard from './components/dashboards/ApplicantDashboard'
 import UnderwriterDashboard from './components/dashboards/UnderwriterDashboard'
 import SystemAdminDashboard from './components/dashboards/SystemAdminDashboard'
+import DeletedLoanApplications from './components/loan/DeletedLoanApplications'
+import DeletedUsers from './components/auth/DeletedUsers'
 import LoanApplication from './components/loan/LoanApplication/LoanApplication'
 import DocumentUpload from './components/loan/DocumentUpload'
 import ApplicationStatus from './components/loan/ApplicationStatus'
@@ -120,6 +122,19 @@ function AppContent() {
         <Route path="/dashboard/system_admin" element={
           <RoleProtectedRoute allowedRoles={['system_admin']}>
             <SystemAdminDashboard />
+          </RoleProtectedRoute>
+        } />
+
+        {/* System Admin Management Routes */}
+        <Route path="/admin/deleted-applications" element={
+          <RoleProtectedRoute allowedRoles={['system_admin']}>
+            <DeletedLoanApplications />
+          </RoleProtectedRoute>
+        } />
+
+        <Route path="/admin/deleted-users" element={
+          <RoleProtectedRoute allowedRoles={['system_admin']}>
+            <DeletedUsers />
           </RoleProtectedRoute>
         } />
 

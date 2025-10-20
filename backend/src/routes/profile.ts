@@ -5,6 +5,7 @@ import { authenticateToken } from '../middleware/auth';
 import validator from 'validator';
 import { isProfileComplete, UserProfile } from '../shared/validation';
 import { logProfileChange, getProfileHistory } from '../middleware/profileAudit';
+import LoanApplication from '../models/LoanApplication';
 
 const router = Router();
 
@@ -432,17 +433,15 @@ router.get('/:userId', profileFetchLimiter, authenticateToken, async (req: AuthR
   }
 });
 
-// Soft delete user account
+// Soft delete user account WITH cascading delete to loan applications
 router.delete('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
-
     if (!userId) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
     const user = await User.findById(userId);
-
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -458,17 +457,42 @@ router.delete('/me', authenticateToken, async (req: AuthRequest, res: Response) 
       });
     }
 
-    // Perform soft delete
+    // Perform soft delete on user
     user.isDeleted = true;
     user.deletedAt = new Date();
     await user.save();
 
-    // Optional: Log the deletion for audit purposes
+    // CASCADE: Soft delete all loan applications by this user
+    // Find all non-deleted loan applications
+    const userLoanApplications = await LoanApplication.find({ 
+      userId: userId,
+      isDeleted: { $ne: true }
+    });
+
+    // Soft delete each application and add to status history
+    for (const application of userLoanApplications) {
+      application.isDeleted = true;
+      application.deletedAt = new Date();
+      
+      // Add to status history
+      application.statusHistory.push({
+        status: application.status, // Keep current status
+        timestamp: new Date(),
+        comment: 'Application deleted because user account was deleted',
+        updatedBy: userId.toString()
+      });
+      
+      await application.save();
+    }
+
+    // Log the deletion for audit purposes
     console.log(`User ${userId} (${user.email}) soft deleted at ${user.deletedAt}`);
+    console.log(`Cascaded soft delete to ${userLoanApplications.length} loan applications`);
 
     res.json({
       success: true,
-      message: 'Account deleted successfully'
+      message: 'Account deleted successfully',
+      cascadedApplications: userLoanApplications.length
     });
   } catch (err: any) {
     console.error('Error deleting account:', err);
@@ -480,7 +504,7 @@ router.delete('/me', authenticateToken, async (req: AuthRequest, res: Response) 
   }
 });
 
-// Optional: Add an endpoint to restore deleted accounts (admin only)
+// Restore deleted user account WITH cascading restore to loan applications
 router.post('/restore/:userId', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     // Check if user is admin
@@ -494,8 +518,7 @@ router.post('/restore/:userId', authenticateToken, async (req: AuthRequest, res:
     const { userId } = req.params;
 
     // Find user including soft-deleted ones
-    const user = await User.findOne({ _id: userId }).exec();
-
+    const user = await User.findOne({ _id: userId, isDeleted: true }).exec();
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -510,21 +533,184 @@ router.post('/restore/:userId', authenticateToken, async (req: AuthRequest, res:
       });
     }
 
-    // Restore the account
+    // Restore the user account
     user.isDeleted = false;
     user.deletedAt = undefined;
     await user.save();
 
+    // CASCADE: Restore loan applications that were deleted BECAUSE the user was deleted
+    // Find deleted applications where the last status history comment indicates user deletion
+    const deletedApplications = await LoanApplication.find({ 
+      userId: userId,
+      isDeleted: true
+    });
+
+    let restoredCount = 0;
+
+    for (const application of deletedApplications) {
+      // Check if the most recent status history entry is about user deletion
+      const lastHistoryEntry = application.statusHistory[application.statusHistory.length - 1];
+      
+      // Only restore if it was deleted due to user account deletion
+      if (lastHistoryEntry?.comment === 'Application deleted because user account was deleted') {
+        application.isDeleted = false;
+        application.deletedAt = undefined;
+        
+        // Add restoration to status history
+        application.statusHistory.push({
+          status: application.status, // Keep the status before deletion
+          timestamp: new Date(),
+          comment: 'Application restored because user account was restored',
+          updatedBy: req.user?.userId?.toString() || 'system'
+        });
+        
+        await application.save();
+        restoredCount++;
+      }
+      // If the comment is "Application deleted by user", we DON'T restore it
+    }
+
+    console.log(`User ${userId} restored. Cascaded restore to ${restoredCount} loan applications`);
+
     res.json({
       success: true,
       message: 'Account restored successfully',
-      user
+      user,
+      restoredApplications: restoredCount
     });
   } catch (err: any) {
     console.error('Error restoring account:', err);
     res.status(500).json({
       success: false,
       message: 'Failed to restore account',
+      error: err.message
+    });
+  }
+});
+
+// Add these two endpoints to: backend/src/routes/profile.ts
+// Place them near your existing restore and soft delete endpoints
+
+// Get all deleted users (admin only)
+router.get('/admin/deleted-users', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    // Check if user is admin
+    if (req.user?.role !== 'system_admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized. Admin access required.'
+      });
+    }
+
+    // Find ONLY soft-deleted users (isDeleted: true)
+    const deletedUsers = await User.find({ isDeleted: true })
+      .select('firstName lastName email phone role isDeleted deletedAt createdAt employmentType companyName monthlyIncome city state designation')
+      .sort({ deletedAt: -1 }) // Most recently deleted first
+      .exec();
+
+    res.json({
+      success: true,
+      users: deletedUsers,
+      count: deletedUsers.length
+    });
+  } catch (err: any) {
+    console.error('Error fetching deleted users:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch deleted users',
+      error: err.message
+    });
+  }
+});
+
+// Get all users (both active and deleted) - admin only
+router.get('/admin/all-users', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    // Check if user is admin
+    if (req.user?.role !== 'system_admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized. Admin access required.'
+      });
+    }
+
+    // Find ALL users (including soft-deleted ones)
+    const allUsers = await User.find({})
+      .select('firstName lastName email phone role isDeleted deletedAt createdAt employmentType companyName monthlyIncome city state designation')
+      .sort({ createdAt: -1 }) // Most recently created first
+      .exec();
+
+    res.json({
+      success: true,
+      users: allUsers,
+      count: allUsers.length
+    });
+  } catch (err: any) {
+    console.error('Error fetching all users:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch all users',
+      error: err.message
+    });
+  }
+});
+
+// Permanently delete a user (admin only)
+router.delete('/admin/permanent-delete/:userId', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    // Check if user is admin
+    if (req.user?.role !== 'system_admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized. Admin access required.'
+      });
+    }
+
+    const { userId } = req.params;
+
+    // Find the user
+    const user = await User.findById(userId).exec();
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Check if user is soft-deleted
+    if (!user.isDeleted) {
+      return res.status(400).json({
+        success: false,
+        message: 'User account is not deleted. Cannot permanently delete an active account.'
+      });
+    }
+
+    // Optional: Delete all associated loan applications
+    // Uncomment if you want to delete user's applications too
+    // const LoanApplication = require('../models/LoanApplication'); // Add import if needed
+    // await LoanApplication.deleteMany({ userId: userId });
+
+    // Permanently delete the user from the database
+    await User.findByIdAndDelete(userId);
+
+    // Log the permanent deletion for audit purposes
+    console.log(`User ${userId} (${user.email}) permanently deleted by admin ${req.user?.userId}`);
+
+    res.json({
+      success: true,
+      message: 'User permanently deleted from the system',
+      deletedUser: {
+        id: user._id,
+        email: user.email,
+        name: `${user.firstName} ${user.lastName}`
+      }
+    });
+  } catch (err: any) {
+    console.error('Error permanently deleting user:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to permanently delete user',
       error: err.message
     });
   }
