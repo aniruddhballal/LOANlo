@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import LoanApplication from '../../models/LoanApplication';
 import { AuthenticatedRequest, authenticateToken, requireRole } from '../../middleware/auth';
 import RestorationRequest from '../../models/RestorationRequest';
+import User from '../../models/User';
 
 import {
   sendLoanStatusUpdateEmail,
@@ -199,11 +200,18 @@ router.get(
   '/deleted',
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-
-      const deletedApps = await LoanApplication.find({ isDeleted: true })
+      // First, get all non-deleted user IDs
+      const activeUsers = await User.find({ isDeleted: { $ne: true } }).select('_id');
+      const activeUserIds = activeUsers.map(user => user._id);
+      
+      // Then query for deleted loan applications with active users only
+      const deletedApps = await LoanApplication.find({ 
+        isDeleted: true,
+        userId: { $in: activeUserIds }
+      })
         .populate('userId', 'firstName lastName email phone role')
         .sort({ deletedAt: -1 });
-
+      
       res.json({
         success: true,
         applications: deletedApps
