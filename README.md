@@ -166,6 +166,7 @@
 | 153 | **Restoration Request: Enhance Application Restore Logic** | Updated `/restoration-requests/:requestId/approve` route to explicitly query only deleted applications, prevent restoring already approved applications, add audit trail entry in `statusHistory`, and include detailed response data with `applicationId` and current status |
 | 154 | **Loans Route: Modularized** | Refactored monolithic `loans.ts` (900ish lines) into role-based modules: `loans.ts` (applicant routes), `loans/underwriter.ts`, `loans/admin.ts`, and `loans/shared.ts`. Implemented `requireRole()` middleware for router-level authorization, eliminating redundant per-route checks. |
 | 156 | **Profile Routes: Role-Based Separation** | Refactored `Profile.tsx` into `ApplicantProfile.tsx` (full details) and `StaffProfile.tsx` (minimal info). Updated routes in `App.tsx` and dynamic routing in `DashboardHeader.tsx` based on user role. |
+| 157 | **User Model: Soft-Delete Query Flexibility** | Updated `User.ts` pre-find middleware to exclude soft-deleted users by default **only when `isDeleted` isn’t explicitly queried**. This allows fetching deleted users when needed (e.g., for restoration) without affecting normal queries. |
 
 ### ⚡ In Progress
 
@@ -199,6 +200,6 @@
 
 ---
 
-**Document Version:** 122
-**Last Updated:** 19th October 2025
+**Document Version:** 123
+**Last Updated:** 20th October 2025
 **Maintained By:** Aniruddh Ballal

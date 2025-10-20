@@ -95,10 +95,20 @@ userSchema.methods.calculateProfileCompletion = function (): number {
   return score;
 };
 
-// Add query middleware to exclude soft-deleted users by default
+// UPDATED: Add query middleware to exclude soft-deleted users by default
+// BUT allow bypassing when explicitly querying for deleted users
 userSchema.pre(/^find/, function(next) {
-  // @ts-ignore
-  this.find({ isDeleted: { $ne: true } });
+  // Check if the query explicitly includes isDeleted
+  // @ts-ignore - accessing mongoose query internals
+  const query = this.getQuery();
+  
+  // If isDeleted is not explicitly set in the query, add the filter
+  if (!('isDeleted' in query)) {
+    // @ts-ignore
+    this.find({ isDeleted: { $ne: true } });
+  }
+  // If isDeleted IS in the query, don't add the filter (let it through)
+  
   next();
 });
 
