@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives
+### ✅ Completed Initiatives (37)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -57,7 +57,7 @@
 | 140 | **Reference Number Display Fix** | Fixing display of loan reference numbers on underwriter dashboard and applicant `ApplicationStatus` to show full 24-character ID instead of only last 8 characters |
 | 161 | **CurrencyField Digit-Only Input** | Updated `CurrencyField` in `formfields.tsx` to support `onKeyDown` for handling key-level input restrictions. In `loanform.tsx`, added an `onKeyDown` handler to allow only digits, backspace, delete, arrow keys, and tab, preventing invalid characters from being typed into the loan amount field. |
 
-### ⚡ In Progress
+### ⚡ In Progress (6)
 
 | ID | Initiative | Status |
 |----|-----------|--------|
@@ -74,7 +74,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives
+### ✅ Completed Initiatives (104)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -183,7 +183,7 @@
 | 159 | **System Admin Restoration Management & Cascading User Deletion** | Redesigned `SystemAdminDashboard.tsx` into navigation hub linking to two new pages: `DeletedLoanApplications.tsx` (restoration request CRUD with approve/reject/permanent-delete) and `DeletedUsers.tsx` (soft-deleted user management with restore/permanent-delete). Added 3 admin endpoints to `profile.ts`: `GET /admin/deleted-users`, `GET /admin/all-users`, `DELETE /admin/permanent-delete/:userId`. Implemented CASCADE logic: `DELETE /me` soft-deletes user's loan applications with statusHistory tracking; `POST /restore/:userId` restores only cascade-deleted applications. Added system_admin RoleProtectedRoute entries to `App.tsx`. |
 | 160 | **Deleted Loan Applications: Filter by Active Users** | Updated `GET /deleted` route to only return soft-deleted loan applications whose associated users are still active. This prevents showing applications of users who themselves have been deleted. |
 
-### ⚡ In Progress
+### ⚡ In Progress (16)
 
 | ID | Initiative | Status |
 |----|-----------|--------|
@@ -204,9 +204,8 @@
 | 155 | **Database Transaction Session** | Implement MongoDB transaction sessions to ensure atomic operations and maintain database consistency across related updates |
 | 163 | **State Machine & Additional Document Flow** | Combined state machine design for loan status transitions with integrated support for additional document requests. Status flows handle: pending ↔ under_review → approved/rejected/request_documents → pending, including underwriter-triggered requests for re-upload of particular/all documents. Frontend `UploadDocuments.tsx` now renders "additional documents" only after underwriter request, with improved headings/subheadings to distinguish required vs additional documents, ensuring proper handling of Indian mandatory vs additional document requirements. |
 
-
 ---
 
-**Document Version:** 133
+**Document Version:** 134
 **Last Updated:** 20th October 2025
 **Maintained By:** Aniruddh Ballal
