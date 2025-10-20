@@ -40,6 +40,7 @@ router.get(
 // Update loan application status (for underwriters only)
 router.put(
   '/update-status/:applicationId',
+  authenticateToken,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { applicationId } = req.params as { applicationId: string };
@@ -80,7 +81,7 @@ router.put(
         status,
         timestamp: new Date(),
         comment,
-        updatedBy: `${req.user?.firstName ?? 'Unknown'} ${req.user?.lastName ?? ''}`
+        updatedBy: req.user?.userId.toString() ?? 'Unknown'
       };
 
       if (status === 'approved' && approvalDetails) {

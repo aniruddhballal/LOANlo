@@ -32,12 +32,6 @@ export default function LoanReviewModal({
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('details')
   const [comment, setComment] = useState('')
-  const [approvalData, setApprovalData] = useState<ApprovalData>({
-    approvedAmount: 0,
-    interestRate: 0,
-    tenure: 0,
-    emi: 0
-  })
   const [actionLoading, setActionLoading] = useState('')
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
@@ -64,12 +58,6 @@ export default function LoanReviewModal({
         }
         
         setApplication(data.application)
-        setApprovalData({
-          approvedAmount: data.application.amount,
-          interestRate: 12,
-          tenure: data.application.tenure,
-          emi: 0
-        })
       } else {
         setError(data.message)
       }
@@ -80,20 +68,23 @@ export default function LoanReviewModal({
     }
   }
 
-  const handleStatusUpdate = async (status: 'approved' | 'rejected' | 'under_review') => {
+  // In your parent component, update the function signature to make parameters optional:
+  const handleStatusUpdate = async (
+    status: 'approved' | 'rejected' | 'under_review',
+    comment?: string,
+    approvalData?: ApprovalData
+  ) => {
     setActionLoading(status)
     try {
       const payload = {
         status,
-        comment,
-        ...(status === 'approved' && { approvalDetails: approvalData }),
-        ...(status === 'rejected' && { rejectionReason: comment })
+        comment: comment || '',  // Provide default empty string
+        ...(status === 'approved' && approvalData && { approvalDetails: approvalData }),
+        ...(status === 'rejected' && { rejectionReason: comment || '' })
       }
-
       const { data } = await api.put(`/loans/underwriter/update-status/${applicationId}`, payload)
       if (data.success) {
         await fetchApplicationDetails()
-        setComment('')
         onApplicationUpdated()
         if (status !== 'under_review') {
           // Switch to details tab before closing modal

@@ -305,6 +305,7 @@ router.post(
                 status: 'under_review',
                 timestamp: new Date(),
                 comment: 'All required documents uploaded, application under review',
+                updatedBy: req.user?.userId.toString() ?? 'Unknown'
               });
               application.updatedAt = new Date();
               await application.save();

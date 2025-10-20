@@ -43,7 +43,12 @@ router.post(
         tenure,
         userId: req.user?.userId,
         statusHistory: [
-          { status: 'pending', timestamp: new Date(), comment: 'Application submitted' },
+          { 
+            status: 'pending', 
+            timestamp: new Date(), 
+            comment: 'Application submitted',
+            updatedBy: req.user?.userId.toString() ?? 'Unknown'
+          },
         ],
       });
 

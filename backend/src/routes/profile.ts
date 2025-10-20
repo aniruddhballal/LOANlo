@@ -557,7 +557,7 @@ router.post('/restore/:userId', authenticateToken, async (req: AuthRequest, res:
           status: application.status, // Keep the status before deletion
           timestamp: new Date(),
           comment: 'Application restored because user account was restored',
-          updatedBy: req.user?.userId?.toString() || 'system'
+          updatedBy: req.user?.userId?.toString() || 'Unknown'
         });
         
         await application.save();

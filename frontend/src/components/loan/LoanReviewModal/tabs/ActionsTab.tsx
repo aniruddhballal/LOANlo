@@ -5,7 +5,7 @@ import { getDocumentProgress, getProgressBarColor } from '../../../utils'
 
 interface ActionsTabProps {
   application: LoanApplication
-  onStatusUpdate: (status: 'approved' | 'rejected' | 'under_review') => Promise<void>
+  onStatusUpdate: (status: 'approved' | 'rejected' | 'under_review', comment?: string, approvalData?: ApprovalData) => Promise<void>
   onRequestAdditionalDocuments: () => void;
   error?: string | null
   actionLoading: string
@@ -44,7 +44,7 @@ export default function ActionsTab({ application, onStatusUpdate, onRequestAddit
   }, [approvalData.approvedAmount, approvalData.interestRate, approvalData.tenure])
 
   const handleStatusUpdate = async (status: 'approved' | 'rejected' | 'under_review') => {
-    await onStatusUpdate(status)
+    await onStatusUpdate(status, comment, approvalData)
     if (status !== 'under_review') {
       setComment('')
     }

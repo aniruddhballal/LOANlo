@@ -131,6 +131,7 @@
 | 86 | **Storage Migration** | Migrated document storage from Render's ephemeral filesystem to persistent GridFS solution to ensure data durability across redeployments |
 | 87 | **Workflow Automation** | Implemented automatic loan status transition from "pending" to "under_review" upon completion of required document uploads |
 | 88 | **Data Protection** | Implemented frontend and backend safeguards preventing deletion of approved loan applications |
+| 90 | **Attribution Bug Fix** | Resolved "Updated by: Unknown" display issue by adding `updatedBy` and `comment` fields to status history for all loan application status updates across all user actions |
 | 98 | **Document Protection** | Implemented frontend and backend safeguards preventing deletion of documents associated with approved loan applications |
 | 99 | **Data Archival Strategy** | ~~Designing and implementing redundant data archival strategy for deleted documents, loan applications, and user profiles~~ *(Deprecated: (ONLY LOANS AND PROFILES) Document Deletion should not be archived/soft. Profile deletions are soft already, implemented in Task - 80, only pending function is the soft delete the loan applications themselves)* |
 | 104 | **Email Verification Gate for ApplicantDashboard** | Added email verification check to ApplicantDashboard - introduced isEmailVerified state, updated API call to fetch verification status, added red-themed email verification banner prompting users to check inbox, and modified logic to only display "Personal Details Required" section and "Complete Profile" button after email is verified, ensuring users must verify email before accessing profile completion |
@@ -185,7 +186,6 @@
 | 77 | **Rate-Limiting Audit** | Auditing rate-limiting implementation to ensure IP-based restrictions don't inadvertently affect legitimate users |
 | 83 | **Permissions Framework** | Finalizing decision framework for user profile deletion permissions and implementation approach |
 | 89 | **Audit Trail System** | Implementing comprehensive audit trail system ensuring all deletion operations are logged rather than permanently removed from database |
-| 90 | **Attribution Bug Fix** | Resolving "Updated by: Unknown" display issue occurring when loan applications receive approval status |
 | 91 | **Conflict Resolution** | Implementing conflict resolution mechanism for concurrent document deletion by Applicant during Underwriter approval process |
 | 100 | **Security Evaluation** | Evaluating security requirements for personal data storage, including potential implementation of salting and hashing mechanisms |
 | 101 | **Performance Optimization** | Optimizing Underwriter dashboard performance by implementing on-demand data fetching with search/filter/sort parameters |
@@ -203,6 +203,6 @@
 
 ---
 
-**Document Version:** 128
+**Document Version:** 129
 **Last Updated:** 20th October 2025
 **Maintained By:** Aniruddh Ballal
