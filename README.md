@@ -66,6 +66,7 @@
 | 81 | **Interactive Feedback Standardization** | Standardizing button styles and improving interactive feedback across all components, using "Save & Continue" button as design reference |
 | 150 | **Underwriter Dashboard Skeleton UI Alignment** | Adjusting `UnderwriterTableSkeleton` component column widths to match actual table column dimensions in `UnderwriterDashboard.tsx` for consistent loading state presentation. Ensuring skeleton placeholders for Reference, Applicant, Contact, Amount, Status, Submitted, and Actions columns align with rendered table structure. |
 | 151 | **System Admin Review Modal for Restoration Requests** | Implementing dedicated review modal for System Admin Dashboard restoration requests. Creating modal similar to `LoanReviewModal` that displays comprehensive loan applicant profile details and underwriter profile information before action execution. Consolidating three action buttons (Approve/Reject/Delete) from cluttered table "Actions" column into single "Review" button that opens modal. Modal contains tabbed or sectioned view showing applicant details, underwriter details, restoration reason, and action buttons with appropriate validation (rejection reason required, DELETE confirmation for permanent deletion). Improves UX by reducing table width and providing contextual information before decision-making. |
+| 162 | **Unified "Back to Dashboard" Buttons** | Standardized placement and styling of all "Back to Dashboard" buttons across the app to ensure consistent UX and make it easy for users to locate navigation options. |
 
 ---
 
@@ -204,6 +205,6 @@
 
 ---
 
-**Document Version:** 130
+**Document Version:** 131
 **Last Updated:** 20th October 2025
 **Maintained By:** Aniruddh Ballal
