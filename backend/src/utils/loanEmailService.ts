@@ -49,7 +49,6 @@ export const sendLoanApplicationSubmittedEmail = async (
     };
 
     await sgMail.send(msg);
-    console.log(`✅ Application submitted email sent to ${email}`);
   } catch (error) {
     console.error('❌ Error sending application submitted email:', error);
     // Don't throw - we don't want email failures to break the application flow
@@ -102,7 +101,6 @@ export const sendLoanStatusUpdateEmail = async (
     };
 
     await sgMail.send(msg);
-    console.log(`✅ Status update email sent to ${email} (Status: ${status})`);
   } catch (error) {
     console.error('❌ Error sending status update email:', error);
   }
@@ -161,7 +159,6 @@ export const sendNewApplicationNotificationToUnderwriters = async (
     });
 
     await Promise.all(emailPromises);
-    console.log(`✅ New application notifications sent to ${underwriterEmails.length} underwriters`);
   } catch (error) {
     console.error('❌ Error sending underwriter notification emails:', error);
   }
@@ -198,7 +195,6 @@ export const sendDocumentsRequestedEmail = async (
     };
 
     await sgMail.send(msg);
-    console.log(`✅ Documents requested email sent to ${email}`);
   } catch (error) {
     console.error('❌ Error sending documents requested email:', error);
   }

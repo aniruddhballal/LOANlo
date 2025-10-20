@@ -485,10 +485,6 @@ router.delete('/me', authenticateToken, async (req: AuthRequest, res: Response) 
       await application.save();
     }
 
-    // Log the deletion for audit purposes
-    console.log(`User ${userId} (${user.email}) soft deleted at ${user.deletedAt}`);
-    console.log(`Cascaded soft delete to ${userLoanApplications.length} loan applications`);
-
     res.json({
       success: true,
       message: 'Account deleted successfully',
@@ -569,8 +565,6 @@ router.post('/restore/:userId', authenticateToken, async (req: AuthRequest, res:
       }
       // If the comment is "Application deleted by user", we DON'T restore it
     }
-
-    console.log(`User ${userId} restored. Cascaded restore to ${restoredCount} loan applications`);
 
     res.json({
       success: true,
@@ -695,8 +689,6 @@ router.delete('/admin/permanent-delete/:userId', authenticateToken, async (req: 
     await User.findByIdAndDelete(userId);
 
     // Log the permanent deletion for audit purposes
-    console.log(`User ${userId} (${user.email}) permanently deleted by admin ${req.user?.userId}`);
-
     res.json({
       success: true,
       message: 'User permanently deleted from the system',
