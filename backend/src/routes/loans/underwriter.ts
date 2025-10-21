@@ -2,9 +2,10 @@ import { Router, Response } from 'express';
 import LoanApplication from '../../models/LoanApplication';
 import { AuthenticatedRequest, authenticateToken, requireRole } from '../../middleware/auth';
 import RestorationRequest from '../../models/RestorationRequest';
-import User from '../../models/User';
-
-import {
+import User, { IUser }from '../../models/User';
+import { 
+  sendUnderwriterRestorationRequestConfirmation,
+  sendUnderwriterRestorationRequestToAdmin,
   sendLoanStatusUpdateEmail,
   sendDocumentsRequestedEmail,
 } from '../../utils/loanEmailService';
@@ -228,11 +229,11 @@ router.get(
 );
 
 // 1. Request restoration (underwriters only)
+// Updated route with email notifications
 router.post(
   '/request-restoration/:applicationId',
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-
       // Type guard - TypeScript now knows req.user exists below this point
       if (!req.user) {
         return res.status(401).json({
@@ -251,11 +252,11 @@ router.post(
         });
       }
 
-      // Find deleted application
+      // Find deleted application with populated user data
       const application = await LoanApplication.findOne({
         _id: applicationId,
         isDeleted: true
-      });
+      }).populate('userId', 'firstName lastName email');
 
       if (!application) {
         return res.status(404).json({
@@ -277,6 +278,15 @@ router.post(
         });
       }
 
+      // Get underwriter details
+      const underwriter = await User.findById(req.user.userId);
+      if (!underwriter) {
+        return res.status(404).json({
+          success: false,
+          message: 'Underwriter not found'
+        });
+      }
+
       // Create restoration request
       const restorationRequest = new RestorationRequest({
         applicationId,
@@ -286,12 +296,69 @@ router.post(
 
       await restorationRequest.save();
 
+      // Prepare data for emails
+      const underwriterName = `${underwriter.firstName} ${underwriter.lastName}`;
+      const underwriterEmail = underwriter.email;
+      
+      // Handle populated userId
+      const applicant = application.userId as any;
+      const applicantName = applicant && applicant.firstName && applicant.lastName
+        ? `${applicant.firstName} ${applicant.lastName}`
+        : 'Unknown Applicant';
+
+      // Use MongoDB _id directly as the application ID
+      const applicationIdStr = application._id.toString();
+
+      // Get deletedAt date, fallback to current date if not set
+      const deletedDate = application.deletedAt || new Date();
+
+      // Send confirmation email to underwriter
+      try {
+        await sendUnderwriterRestorationRequestConfirmation(
+          underwriterEmail,
+          underwriterName,
+          applicantName,
+          applicationIdStr,
+          application.loanType,
+          application.amount,
+          deletedDate,
+          reason.trim()
+        );
+      } catch (emailError) {
+        console.error('Failed to send confirmation email to underwriter:', emailError);
+        // Continue execution - email failure shouldn't block the request
+      }
+
+      // Send notification to system admin
+      try {
+        await sendUnderwriterRestorationRequestToAdmin(
+          underwriterName,
+          underwriterEmail,
+          applicantName,
+          applicationIdStr,
+          application.loanType,
+          application.amount,
+          deletedDate,
+          reason.trim()
+        );
+      } catch (emailError) {
+        console.error('Failed to send notification email to admin:', emailError);
+        // Continue execution - email failure shouldn't block the request
+      }
+
       res.json({
         success: true,
-        message: 'Restoration request submitted successfully',
-        request: restorationRequest
+        message: 'Restoration request submitted successfully. You will be notified once the admin reviews your request.',
+        request: {
+          id: restorationRequest._id,
+          applicationId: applicationIdStr,
+          status: restorationRequest.status,
+          reason: restorationRequest.reason,
+          createdAt: restorationRequest.createdAt
+        }
       });
     } catch (error: any) {
+      console.error('Error in restoration request:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',

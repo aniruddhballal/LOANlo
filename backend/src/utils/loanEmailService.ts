@@ -1,6 +1,3 @@
-// src/services/loanEmailService.ts
-// Create this as a NEW file for loan-related email functions
-
 import sgMail from '@sendgrid/mail';
 import { loanApplicationSubmittedTemplate, LoanApplicationSubmittedData } from './LoanApplicationSubmittedData';
 import { loanStatusUpdateTemplate, LoanStatusUpdateData } from './loanStatusUpdateTemplate';
@@ -12,6 +9,12 @@ import {
   applicationDeletedUnderwriterTemplate,
   ApplicationDeletedUnderwriterData
 } from './applicationDeletedTemplate';
+import { 
+  underwriterRestorationRequestConfirmationTemplate, 
+  UnderwriterRestorationRequestConfirmationData,
+  underwriterRestorationRequestAdminTemplate,
+  UnderwriterRestorationRequestAdminData
+} from './underwriterRestorationRequestTemplate';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
@@ -307,6 +310,111 @@ export const sendApplicationDeletedNotificationToUnderwriters = async (
   }
 };
 
+/**
+ * Send confirmation email to underwriter when they request restoration of a deleted application
+ */
+export const sendUnderwriterRestorationRequestConfirmation = async (
+  underwriterEmail: string,
+  underwriterName: string,
+  applicantName: string,
+  applicationId: string,
+  loanType: string,
+  amount: number,
+  deletedAt: Date,
+  restorationReason: string
+) => {
+  try {
+    const frontendUrl = getFrontendUrl();
+    const underwriterDashboardLink = `${frontendUrl}/dashboard/underwriter`;
+
+    const emailData: UnderwriterRestorationRequestConfirmationData = {
+      underwriterName,
+      underwriterEmail,
+      applicantName,
+      applicationId,
+      loanType,
+      amount,
+      deletedAt: deletedAt.toISOString(),
+      restorationReason,
+      requestedAt: new Date().toISOString(),
+      underwriterDashboardLink,
+    };
+
+    const msg = {
+      to: underwriterEmail,
+      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
+      subject: `Restoration Request Submitted - ${applicationId}`,
+      html: underwriterRestorationRequestConfirmationTemplate(emailData),
+      text: `Dear ${underwriterName},\n\nYour request to restore the deleted loan application (ID: ${applicationId}) has been submitted successfully.\n\nApplicant: ${applicantName}\nDeleted on: ${deletedAt.toLocaleString()}\n\nReason: ${restorationReason}\n\nThe system administrator will review your request and get back to you shortly.\n\nView dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`,
+    };
+
+    await sgMail.send(msg);
+  } catch (error) {
+    console.error('❌ Error sending underwriter restoration request confirmation email:', error);
+    // Don't throw - we don't want email failures to break the application flow
+  }
+};
+
+/**
+ * Send notification to system admin when underwriter requests restoration
+ */
+export const sendUnderwriterRestorationRequestToAdmin = async (
+  underwriterName: string,
+  underwriterEmail: string,
+  applicantName: string,
+  applicationId: string,
+  loanType: string,
+  amount: number,
+  deletedAt: Date,
+  restorationReason: string
+) => {
+  try {
+    // Get system admin email from environment variable
+    const adminEmail = process.env.SYSTEM_ADMIN_EMAIL;
+
+    if (!adminEmail) {
+      console.warn('⚠️ No system admin email configured in SYSTEM_ADMIN_EMAIL');
+      return;
+    }
+
+    const frontendUrl = getFrontendUrl();
+    const adminDashboardLink = `${frontendUrl}/dashboard/admin`;
+
+    // Extract admin name from email (basic implementation)
+    const adminName = (adminEmail.split('@')[0] || 'Admin')
+      .split('.')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+
+    const emailData: UnderwriterRestorationRequestAdminData = {
+      adminName,
+      underwriterName,
+      underwriterEmail,
+      applicantName,
+      applicationId,
+      loanType,
+      amount,
+      deletedAt: deletedAt.toISOString(),
+      restorationReason,
+      requestedAt: new Date().toISOString(),
+      adminDashboardLink,
+    };
+
+    const msg = {
+      to: adminEmail,
+      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
+      subject: `⚠️ Action Required: Application Restoration Request - ${applicationId}`,
+      html: underwriterRestorationRequestAdminTemplate(emailData),
+      text: `Dear ${adminName},\n\nACTION REQUIRED: An underwriter has requested restoration of a deleted loan application.\n\nRequested by: ${underwriterName} (${underwriterEmail})\nApplicant: ${applicantName}\nApplication ID: ${applicationId}\nLoan Type: ${loanType}\nDeleted on: ${deletedAt.toLocaleString()}\n\nRestoration Reason:\n${restorationReason}\n\nPlease review and approve/reject this request from your admin dashboard: ${adminDashboardLink}\n\nLOANLO Team`,
+    };
+
+    await sgMail.send(msg);
+  } catch (error) {
+    console.error('❌ Error sending restoration request notification to admin:', error);
+  }
+};
+
+// Add these to the default export at the bottom of the file
 export default {
   sendLoanApplicationSubmittedEmail,
   sendLoanStatusUpdateEmail,
@@ -314,5 +422,6 @@ export default {
   sendDocumentsRequestedEmail,
   sendApplicationDeletedEmail,
   sendApplicationDeletedNotificationToUnderwriters,
+  sendUnderwriterRestorationRequestConfirmation,
+  sendUnderwriterRestorationRequestToAdmin,
 };
-
