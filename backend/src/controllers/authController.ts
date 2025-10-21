@@ -7,6 +7,8 @@ import {
   resendVerification,
   getUserById,
 } from '../services/authService';
+import { getClientIP, normalizeIP } from '../middleware/ipWhitelist';
+import User from '../models/User';
 
 // Define interface for authenticated request
 interface AuthenticatedRequest extends Request {
@@ -115,7 +117,6 @@ export const loginController = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    // Input validation
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
@@ -129,6 +130,30 @@ export const loginController = async (req: Request, res: Response) => {
         message: result.message,
         user: result.user,
       });
+    }
+
+    const user = await User.findById(result.user.id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Enforce IP restriction for system_admin
+    if (user.role === 'system_admin' && user.allowIpRestriction) {
+      const clientIP = normalizeIP(getClientIP(req));
+      const isAllowed = user.ipWhitelist.some(
+        (item: any) => normalizeIP(item.ip) === clientIP
+      );
+
+      if (!isAllowed) {
+        console.warn(`IP whitelist violation: User ${user.email} attempted login from ${clientIP}`);
+        return res.status(401).json({
+          success: false,
+          message: 'Access denied: Your IP address is not whitelisted',
+          currentIp: clientIP,
+          code: 'IP_NOT_WHITELISTED',
+        });
+      }
     }
 
     res.json({
