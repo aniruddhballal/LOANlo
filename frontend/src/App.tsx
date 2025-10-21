@@ -139,15 +139,7 @@ function AppContent() {
           </RoleProtectedRoute>
         } />
 
-<Route path="/settings/ip-whitelist" element={<IpWhitelistSettings />} />
-
-
-        {/* ADD THIS NEW ROUTE */}
-        {/* <Route path="/settings/ip-whitelist" element={
-          <RoleProtectedRoute allowedRoles={['system_admin']}>
-            <IpWhitelistSettings />
-          </RoleProtectedRoute>
-        } /> */}
+        <Route path="/settings/ip-whitelist" element={<IpWhitelistSettings />} />
 
         <Route path="/access-denied" element={
           <AccessDenied />
