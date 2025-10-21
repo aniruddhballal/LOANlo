@@ -345,3 +345,167 @@ export const ApplicationStatusSkeleton = () => (
     </div>
   </div>
 );
+
+// IP Whitelist Settings Skeleton
+export const IpWhitelistSkeleton = () => (
+  <div className="min-h-screen bg-gray-50 p-6">
+    <div className="max-w-6xl mx-auto">
+      <SkeletonBase>
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <SkeletonBox className="w-10 h-10 rounded-lg" />
+            <SkeletonText className="w-64 h-8" />
+          </div>
+          <SkeletonText className="w-96 h-4 ml-13" />
+        </div>
+
+        {/* Current IP Section */}
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+            <div className="flex items-center gap-2 mb-2">
+              <SkeletonBox className="w-5 h-5" />
+              <SkeletonText className="w-48 h-6" />
+            </div>
+            <SkeletonText className="w-80 h-4" />
+          </div>
+          
+          <div className="p-8">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-4">
+              <SkeletonText className="w-48 h-9 mb-4" />
+              <div className="flex flex-col sm:flex-row gap-3">
+                <SkeletonBox className="flex-1 h-11 rounded-lg" />
+                <SkeletonBox className="w-40 h-11 rounded-lg" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* IP Restriction Toggle Section */}
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+            <div className="flex items-center gap-2 mb-2">
+              <SkeletonBox className="w-5 h-5" />
+              <SkeletonText className="w-40 h-6" />
+            </div>
+            <SkeletonText className="w-96 h-4" />
+          </div>
+          
+          <div className="p-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+              <div className="flex-1">
+                <SkeletonText className="w-80 h-6 mb-2" />
+                <SkeletonText className="w-64 h-4" />
+              </div>
+              <SkeletonBox className="w-44 h-11 rounded-lg" />
+            </div>
+          </div>
+        </section>
+
+        {/* Whitelist Table Section */}
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+            <div className="flex justify-between items-center">
+              <div>
+                <SkeletonText className="w-64 h-7 mb-1" />
+                <SkeletonText className="w-80 h-4" />
+              </div>
+              <SkeletonText className="w-24 h-5" />
+            </div>
+          </header>
+
+          <div className="p-8">
+            {/* Desktop Table View */}
+            <div className="hidden lg:block">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50/50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        IP Address
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Description
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Added
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {[1, 2, 3].map((i) => (
+                      <tr key={i} className="hover:bg-gray-50/50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <SkeletonBox className="w-32 h-7 rounded" />
+                        </td>
+                        <td className="px-6 py-4">
+                          <SkeletonText className="w-40 h-5" />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <SkeletonText className="w-24 h-4 mb-1" />
+                          <SkeletonText className="w-16 h-3" />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <SkeletonBox className="w-20 h-7 rounded-lg" />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="lg:hidden space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="border border-gray-200 rounded-xl p-6"
+                >
+                  <div className="space-y-3 mb-4">
+                    <div className="flex justify-between items-start">
+                      <SkeletonText className="w-20 h-3" />
+                      <SkeletonBox className="w-32 h-6 rounded" />
+                    </div>
+                    <div className="flex justify-between">
+                      <SkeletonText className="w-20 h-3" />
+                      <SkeletonText className="w-32 h-4" />
+                    </div>
+                    <div className="flex justify-between">
+                      <SkeletonText className="w-16 h-3" />
+                      <div className="text-right">
+                        <SkeletonText className="w-24 h-4 mb-1" />
+                        <SkeletonText className="w-16 h-3" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <SkeletonBox className="w-full h-10 rounded-lg" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Notice */}
+        <section className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+          <div className="flex items-start gap-3">
+            <SkeletonBox className="w-6 h-6 flex-shrink-0 mt-1" />
+            <div className="flex-1">
+              <SkeletonText className="w-56 h-6 mb-3" />
+              <div className="space-y-2">
+                <SkeletonText className="w-full h-4" />
+                <SkeletonText className="w-full h-4" />
+                <SkeletonText className="w-4/5 h-4" />
+                <SkeletonText className="w-full h-4" />
+              </div>
+            </div>
+          </div>
+        </section>
+      </SkeletonBase>
+    </div>
+  </div>
+);
