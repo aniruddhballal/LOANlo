@@ -10,7 +10,6 @@ import loanRoutes from './routes/loans';
 import documentRoutes from './routes/documents';
 import profileRoutes from './routes/profile';
 import profileHistoryRoutes from './routes/profileHistory';
-
 import ipWhitelistRoutes from './routes/ipWhitelist';
 import { checkIpWhitelist } from './middleware/ipWhitelist';
 
@@ -21,22 +20,27 @@ app.set('trust proxy', 1);
 
 const PORT: number = Number(config.PORT) || 5000;
 
-// Allowed origins from .env (comma-separated)
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",");
+// Allowed origins from .env (comma-separated), trimmed
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
+  .split(',')
+  .map((o) => o.trim());
 
 // Middleware
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      const normalizedOrigin = origin?.replace(/\/$/, '').trim() || '';
+      if (!origin || allowedOrigins.includes(normalizedOrigin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 app.options('*', cors()); // ensure OPTIONS requests always succeed
 
@@ -52,16 +56,14 @@ if (!fs.existsSync('uploads')) {
 app.use('/api/auth', authRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/documents', documentRoutes);
-app.use('/api/profile', profileRoutes); // mount under /api/profile
+app.use('/api/profile', profileRoutes);
 app.use('/api/profile-history', profileHistoryRoutes);
 
-// Add IP whitelist routes
+// IP whitelist routes
 app.use('/api/ip-whitelist', ipWhitelistRoutes);
 
-// Add IP whitelist check middleware AFTER authenticateToken is applied globally
-// OR apply it per-route basis in your routes
-// Option 1: Global (after auth routes but before protected routes)
-app.use('/api', checkIpWhitelist); // This will check all /api/* routes
+// Apply IP whitelist check to protected /api routes
+app.use('/api', checkIpWhitelist);
 
 // Connect to MongoDB and start server
 connectDB()
