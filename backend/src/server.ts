@@ -26,21 +26,19 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
   .map((o) => o.trim());
 
 // Middleware
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      const normalizedOrigin = origin?.replace(/\/$/, '').trim() || '';
-      if (!origin || allowedOrigins.includes(normalizedOrigin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
+app.use(cors({
+  origin: (origin, callback) => {
+    const normalizedOrigin = origin?.replace(/\/$/, '').trim() || '';
+    if (!origin || allowedOrigins.includes(normalizedOrigin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'], // add PATCH
+  allowedHeaders: ['Content-Type','Authorization']
+}));
 
 app.options('*', cors()); // ensure OPTIONS requests always succeed
 
