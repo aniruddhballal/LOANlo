@@ -50,18 +50,17 @@ if (!fs.existsSync('uploads')) {
   fs.mkdirSync('uploads');
 }
 
-// Routes
+// Public routes
 app.use('/api/auth', authRoutes);
-app.use('/api/loans', loanRoutes);
-app.use('/api/documents', documentRoutes);
-app.use('/api/profile', profileRoutes);
-app.use('/api/profile-history', profileHistoryRoutes);
 
-// IP whitelist routes
+// Protected routes with IP whitelist check
+app.use('/api/loans', checkIpWhitelist, loanRoutes);
+app.use('/api/documents', checkIpWhitelist, documentRoutes);
+app.use('/api/profile', checkIpWhitelist, profileRoutes);
+app.use('/api/profile-history', checkIpWhitelist, profileHistoryRoutes);
+
+// IP whitelist management routes (allow access without restriction)
 app.use('/api/ip-whitelist', ipWhitelistRoutes);
-
-// Apply IP whitelist check to protected /api routes
-app.use('/api', checkIpWhitelist);
 
 // Connect to MongoDB and start server
 connectDB()
