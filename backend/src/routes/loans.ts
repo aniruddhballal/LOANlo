@@ -11,6 +11,8 @@ import {
   sendLoanApplicationSubmittedEmail,
 } from '../utils/loanEmailService';
 
+import { sendApplicationDeletedEmail, sendApplicationDeletedNotificationToUnderwriters } from '../utils/loanEmailService';
+
 const router = Router();
 
 router.post(
@@ -162,47 +164,80 @@ router.get(
   }
 );
 
-// Soft delete a loan application
+// Updated soft delete route with email notifications
 router.delete(
   '/:applicationId',
   authenticateToken,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { applicationId } = req.params as { applicationId: string };
-      
-      // Find the application (bypassing the soft delete filter)
+     
+      // Find the application (bypassing the soft delete filter) and populate user data
       const application = await LoanApplication.findOne({
         _id: applicationId,
         userId: req.user?.userId,
         isDeleted: { $ne: true } // Explicitly check it's not already deleted
-      });
-      
+      }).populate('userId'); // Populate user data for email notifications
+     
       if (!application) {
         return res.status(404).json({
           message: 'Application not found or not authorized'
         });
       }
-      
+     
       // Prevent deletion of approved applications
       if (application.status === 'approved') {
         return res.status(400).json({
           message: 'Cannot delete approved applications'
         });
       }
+     
+      // Get user data for email notifications
+      const user = application.userId as any; // Populated user object (IUser)
+      const applicantEmail = user.email;
+      const applicantFirstName = user.firstName;
+      const applicantFullName = `${user.firstName} ${user.lastName}`;
       
+      // Store data before deletion for email notifications
+      const loanType = application.loanType;
+      const amount = application.amount;
+      const previousStatus = application.status;
+      const deletionTime = new Date();
+     
       // Soft delete the application
       application.isDeleted = true;
-      application.deletedAt = new Date();
-
+      application.deletedAt = deletionTime;
       // Add deletion to status history
       application.statusHistory.push({
         status: application.status, // Keep current status
-        timestamp: new Date(),
+        timestamp: deletionTime,
         comment: 'Application deleted by user'
       });
-
       await application.save();
-      
+     
+      // Send email notifications (async, don't block response)
+      // 1. Send confirmation email to applicant
+      sendApplicationDeletedEmail(
+        applicantEmail,
+        applicantFirstName,
+        applicationId,
+        loanType,
+        amount,
+        deletionTime
+      ).catch(err => console.error('Failed to send deletion email to applicant:', err));
+     
+      // 2. Send notification to underwriters (only if application was in review)
+      if (['pending', 'under_review', 'documents_requested'].includes(previousStatus)) {
+        sendApplicationDeletedNotificationToUnderwriters(
+          applicantFullName,
+          applicationId,
+          loanType,
+          amount,
+          previousStatus,
+          deletionTime
+        ).catch(err => console.error('Failed to send deletion notification to underwriters:', err));
+      }
+     
       res.json({ success: true, message: 'Application deleted successfully' });
     } catch (error: any) {
       res.status(500).json({ success: false, message: 'Server error', error: error.message });

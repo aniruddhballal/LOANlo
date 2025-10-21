@@ -210,10 +210,10 @@
 | 155 | **Database Transaction Session** | Implement MongoDB transaction sessions to ensure atomic operations and maintain database consistency across related updates |
 | 163 | **State Machine & Additional Document Flow** | Combined state machine design for loan status transitions with integrated support for additional document requests. Status flows handle: pending ↔ under_review → approved/rejected/request_documents → pending, including underwriter-triggered requests for re-upload of particular/all documents. Frontend `UploadDocuments.tsx` now renders "additional documents" only after underwriter request, with improved headings/subheadings to distinguish required vs additional documents, ensuring proper handling of Indian mandatory vs additional document requirements. |
 | 167 | **IP Whitelist Implementation Review** | Audit all IP whitelist-related pages and code added in tasks 165 and 166 to verify what's actually needed and being used. Check which pages are restricted by IP whitelist and which aren't. Identify any unused components, services, or routes that can be removed or consolidated for cleaner implementation. |
-| 168 | **Global Support Contact Link** | Add a "Contact Support" link on every page of the website for consistent user access to help and assistance. |
+| 168 | **Global Support Contact Link** | Add a "Contact Support" link on every page of the website and every mail that gets sent to all the users of the application for consistent user access to help and assistance. |
 
 ---
 
-**Document Version:** 143
+**Document Version:** 144
 **Last Updated:** 21st October 2025
 **Maintained By:** Aniruddh Ballal
