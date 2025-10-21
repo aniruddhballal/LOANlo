@@ -74,8 +74,7 @@ const Login = () => {
       if (axios.isAxiosError(err)) {
         // ADD THIS: Check for IP whitelist error
         if (err.response?.data?.code === 'IP_NOT_WHITELISTED') {
-          const currentIp = err.response.data.currentIp
-          errorMsg = `Access denied: Your IP address (${currentIp}) is not whitelisted. Please contact support or whitelist this IP in your settings.`
+          errorMsg = 'Access denied: You are not authorized to login from this network. Please contact support.'
         } else {
           errorMsg = err.response?.data?.message || err.message
         }

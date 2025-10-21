@@ -23,7 +23,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status;
-    if (status === 401) {
+    const code = error.response?.data?.code;
+    if (status === 401 && code !== 'IP_NOT_WHITELISTED') {
       localStorage.removeItem("token");
       localStorage.removeItem("pendingUser");
       window.location.href = "/login";

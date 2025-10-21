@@ -83,9 +83,9 @@ export const checkIpWhitelist = async (
         // Log the failed attempt
         console.warn(`IP whitelist violation: User ${user.email} attempted access from ${clientIP}`);
 
-        res.status(403).json({
+        res.status(401).json({
           success: false,
-          message: 'Access denied: Your IP address is not whitelisted',
+          message: 'Access denied: You are not authorized to login from this network',
           currentIp: clientIP,
           code: 'IP_NOT_WHITELISTED',
         });
