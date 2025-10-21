@@ -1,5 +1,6 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/auth';
+import { checkIpWhitelist } from '../middleware/ipWhitelist';
 import {
   authLimiter,
   registerLimiter,
@@ -28,6 +29,6 @@ router.post('/register', registerLimiter, registerController);
 router.post('/login', authLimiter, loginController);
 router.get('/verify-email', verifyEmailController);
 router.post('/resend-verification', resendVerificationLimiter, resendVerificationController);
-router.get('/verify', verifyLimiter, authenticateToken, verifyTokenController);
+router.get('/verify', verifyLimiter, authenticateToken, checkIpWhitelist, verifyTokenController); // <-- ADDED checkIpWhitelist HERE
 
 export default router;

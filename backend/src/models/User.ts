@@ -36,9 +36,17 @@ export interface IUser extends Document {
   // Soft delete fields
   isDeleted: boolean;
   deletedAt?: Date | undefined; // Changed to explicitly allow undefined
+
+  // New fields
+  ipWhitelist: {
+    ip: string;
+    description?: string;
+    addedAt: Date;
+    addedBy?: mongoose.Types.ObjectId;
+  }[];
+  allowIpRestriction: boolean;
 }
 
-// Schema definition
 const userSchema: Schema<IUser> = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
@@ -77,6 +85,15 @@ const userSchema: Schema<IUser> = new Schema({
   // Soft delete fields
   isDeleted: { type: Boolean, default: false },
   deletedAt: { type: Date },
+
+  // New IP restriction fields
+  ipWhitelist: [{
+    ip: { type: String, required: true },
+    description: String,
+    addedAt: { type: Date, default: Date.now },
+    addedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  }],
+  allowIpRestriction: { type: Boolean, default: false },
 });
 
 // Add method to calculate profile completion

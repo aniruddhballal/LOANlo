@@ -45,24 +45,23 @@ const Login = () => {
   const handleCaptchaSuccess = async () => {
     setCaptchaVerified(true)
     setShowCaptcha(false)
-    
+  
     if (!pendingFormData) return
-    
+  
     setLoading(true)
-
     try {
       // CHANGED: Capture the login response
       const loginResponse = await login(pendingFormData.email, pendingFormData.password)
-      
+    
       // CHANGED: Capture email verification status from login response
       setIsEmailVerified(loginResponse?.isEmailVerified || false)
-      
+    
       // Show success animation
       setLoginSuccess(true)
-      
+    
       setTimeout(() => {
         completeLogin()
-        
+      
         // Redirect based on role
         if (user?.role) {
           navigate(`/dashboard/${user.role}`)
@@ -72,18 +71,22 @@ const Login = () => {
       }, 1000)
     } catch (err: unknown) {
       let errorMsg = "Login failed"
-
       if (axios.isAxiosError(err)) {
-        errorMsg = err.response?.data?.message || err.message
+        // ADD THIS: Check for IP whitelist error
+        if (err.response?.data?.code === 'IP_NOT_WHITELISTED') {
+          const currentIp = err.response.data.currentIp
+          errorMsg = `Access denied: Your IP address (${currentIp}) is not whitelisted. Please contact support or whitelist this IP in your settings.`
+        } else {
+          errorMsg = err.response?.data?.message || err.message
+        }
       } else if (err instanceof Error) {
         errorMsg = err.message
       }
-
       setError(errorMsg)
       setLoading(false)
       setLoginSuccess(false)
     }
-    
+  
     setPendingFormData(null)
   }
 

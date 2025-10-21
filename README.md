@@ -204,9 +204,10 @@
 | 152 | **New Email Notifications** | Sending email notifications to applicant, underwriter, and system_admin on soft-deletion, restoration, or permanent deletion of loan applications and user profiles |
 | 155 | **Database Transaction Session** | Implement MongoDB transaction sessions to ensure atomic operations and maintain database consistency across related updates |
 | 163 | **State Machine & Additional Document Flow** | Combined state machine design for loan status transitions with integrated support for additional document requests. Status flows handle: pending ↔ under_review → approved/rejected/request_documents → pending, including underwriter-triggered requests for re-upload of particular/all documents. Frontend `UploadDocuments.tsx` now renders "additional documents" only after underwriter request, with improved headings/subheadings to distinguish required vs additional documents, ensuring proper handling of Indian mandatory vs additional document requirements. |
+| 165 | **IP WHitelisting System Admin Logins** | Trying Version-0 of IP Address whitelisting for System Admin logins. Might remove this feature if it makes the whole app haywired/trash. |
 
 ---
 
-**Document Version:** 135
-**Last Updated:** 20th October 2025
+**Document Version:** 136
+**Last Updated:** 21st October 2025
 **Maintained By:** Aniruddh Ballal

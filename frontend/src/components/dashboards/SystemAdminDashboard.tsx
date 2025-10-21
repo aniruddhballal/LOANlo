@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
-import { Trash2, Users } from 'lucide-react'
+import { Trash2, Users, Shield } from 'lucide-react'  // ADD Shield import
 import { DashboardLayout } from './shared/DashboardLayout'
 
 export default function SystemAdminDashboard() {
   return (
-    <DashboardLayout 
+    <DashboardLayout
       title="System Admin Dashboard"
       welcomeTitle="Welcome, Administrator!"
       welcomeSubtitle="Manage system operations and restoration requests"
@@ -16,8 +16,8 @@ export default function SystemAdminDashboard() {
           <div className="w-16 h-0.5 bg-gradient-to-r from-gray-900 to-gray-600"></div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Link 
-            to="/admin/deleted-applications" 
+          <Link
+            to="/admin/deleted-applications"
             className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
           >
             <div className="flex items-start space-x-4">
@@ -34,9 +34,9 @@ export default function SystemAdminDashboard() {
               </div>
             </div>
           </Link>
-          
-          <Link 
-            to="/admin/deleted-users" 
+         
+          <Link
+            to="/admin/deleted-users"
             className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
           >
             <div className="flex items-start space-x-4">
@@ -49,6 +49,26 @@ export default function SystemAdminDashboard() {
                 </h3>
                 <p className="text-gray-600 text-sm font-light leading-relaxed">
                   Manage soft-deleted user accounts. View account details, restore accounts, or permanently delete user data from the system.
+                </p>
+              </div>
+            </div>
+          </Link>
+
+          {/* ADD THIS NEW LINK */}
+          <Link
+            to="/settings/ip-whitelist"
+            className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
+          >
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                <Shield className="w-6 h-6 text-gray-700" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
+                  IP Whitelist Settings
+                </h3>
+                <p className="text-gray-600 text-sm font-light leading-relaxed">
+                  Manage IP address whitelist for enhanced security. Add or remove trusted IP addresses and control access restrictions.
                 </p>
               </div>
             </div>

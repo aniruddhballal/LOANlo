@@ -11,6 +11,9 @@ import documentRoutes from './routes/documents';
 import profileRoutes from './routes/profile';
 import profileHistoryRoutes from './routes/profileHistory';
 
+import ipWhitelistRoutes from './routes/ipWhitelist';
+import { checkIpWhitelist } from './middleware/ipWhitelist';
+
 const app: Application = express();
 
 // Trust Render / Vercel proxy headers
@@ -51,6 +54,14 @@ app.use('/api/loans', loanRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/profile', profileRoutes); // mount under /api/profile
 app.use('/api/profile-history', profileHistoryRoutes);
+
+// Add IP whitelist routes
+app.use('/api/ip-whitelist', ipWhitelistRoutes);
+
+// Add IP whitelist check middleware AFTER authenticateToken is applied globally
+// OR apply it per-route basis in your routes
+// Option 1: Global (after auth routes but before protected routes)
+app.use('/api', checkIpWhitelist); // This will check all /api/* routes
 
 // Connect to MongoDB and start server
 connectDB()

@@ -18,6 +18,7 @@ import EmailVerification from './components/auth/EmailVerification'
 import ApplicantProfile from './components/auth/ApplicantProfile'
 import StaffProfile from './components/auth/StaffProfile'
 import ProfileHistory from './components/auth/ProfileHistory'
+import IpWhitelistSettings from './components/IpWhitelistSettings';
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -137,6 +138,16 @@ function AppContent() {
             <DeletedUsers />
           </RoleProtectedRoute>
         } />
+
+<Route path="/settings/ip-whitelist" element={<IpWhitelistSettings />} />
+
+
+        {/* ADD THIS NEW ROUTE */}
+        {/* <Route path="/settings/ip-whitelist" element={
+          <RoleProtectedRoute allowedRoles={['system_admin']}>
+            <IpWhitelistSettings />
+          </RoleProtectedRoute>
+        } /> */}
 
         <Route path="/access-denied" element={
           <AccessDenied />
