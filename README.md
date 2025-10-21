@@ -6,8 +6,8 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (43)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (121)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (47)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (124)
 
 ---
 
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (37)
+### ✅ Completed Initiatives (38)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -58,7 +58,7 @@
 | 161 | **CurrencyField Digit-Only Input** | Updated `CurrencyField` in `formfields.tsx` to support `onKeyDown` for handling key-level input restrictions. In `loanform.tsx`, added an `onKeyDown` handler to allow only digits, backspace, delete, arrow keys, and tab, preventing invalid characters from being typed into the loan amount field. |
 | 166 | **IP Whitelisting System** | Built frontend interface for system admins to manage IP whitelisting. **API Service (`frontend/src/services/ipWhitelistService.ts`):** Created TypeScript functions with JWT authentication: `getCurrentIp`, `getIpWhitelist`, `addIpToWhitelist`, `removeIpFromWhitelist`, `toggleIpRestriction`. Provides type-safe communication with backend API. **Management Interface (`frontend/src/components/IpWhitelistSettings.tsx`):** Developed full-featured component displaying current IP, restriction toggle (disabled when no IPs exist), whitelist table (desktop)/cards (mobile), add/remove IP operations with confirmations, formatted timestamps, empty states, and warning badges. Uses centralized `IpWhitelistSkeleton` for loading states. Handles success/error alerts for all operations. **Login Security (`frontend/src/components/auth/Login.tsx`):** Added error handling for `IP_NOT_WHITELISTED` response code, displaying "Access denied: You are not authorized to login from this network. Please contact support." when users attempt login from non-whitelisted IPs. **Dashboard Access (`frontend/src/components/SystemAdminDashboard.tsx`):** Added "IP Whitelist Settings" card with Shield icon linking to `/settings/ip-whitelist`, giving system admins direct access to whitelist management. **Routing (`App.tsx`):** Added `/settings/ip-whitelist` route pointing to `IpWhitelistSettings` component, integrating whitelist management into app navigation. This frontend implementation allows system admins to view their current IP, add it to the whitelist, toggle restrictions on/off, and manage trusted IPs through an intuitive interface. When restrictions are enabled, login attempts from non-whitelisted IPs are blocked with clear error messages. |
 
-### ⚡ In Progress (6)
+### ⚡ In Progress (9)
 
 | ID | Initiative | Status |
 |----|-----------|--------|
@@ -67,7 +67,10 @@
 | 81 | **Interactive Feedback Standardization** | Standardizing button styles and improving interactive feedback across all components, using "Save & Continue" button as design reference |
 | 150 | **Underwriter Dashboard Skeleton UI Alignment** | Adjusting `UnderwriterTableSkeleton` component column widths to match actual table column dimensions in `UnderwriterDashboard.tsx` for consistent loading state presentation. Ensuring skeleton placeholders for Reference, Applicant, Contact, Amount, Status, Submitted, and Actions columns align with rendered table structure. |
 | 151 | **System Admin Review Modal for Restoration Requests** | Implementing dedicated review modal for System Admin Dashboard restoration requests. Creating modal similar to `LoanReviewModal` that displays comprehensive loan applicant profile details and underwriter profile information before action execution. Consolidating three action buttons (Approve/Reject/Delete) from cluttered table "Actions" column into single "Review" button that opens modal. Modal contains tabbed or sectioned view showing applicant details, underwriter details, restoration reason, and action buttons with appropriate validation (rejection reason required, DELETE confirmation for permanent deletion). Improves UX by reducing table width and providing contextual information before decision-making. |
-| 162 | **Unified "Back to Dashboard" Buttons** | Standardized placement and styling of all "Back to Dashboard" buttons across the app to ensure consistent UX and make it easy for users to locate navigation options. |
+| 162 | **Unify "Back to Dashboard" Buttons** | Standardize the placement and styling of all "Back to Dashboard" buttons across the app to ensure consistent UX and make it easy for users to locate navigation options. |
+| 169 | **Restoration Page Alert Styling** | Replace default browser alert on restoration request page with custom-styled confirmation modal matching the application's design system. |
+| 170 | **Button Styling** | Standardize and style all buttons on restoration pages for both underwriter and system admin interfaces to match application design patterns. |
+| 171 | **Universal Skeleton Loading Components** | Create centralized, reusable skeleton loading components and replace all custom loading indicators throughout the app with standardized skeletons, similar to the button styling approach. |
 
 ---
 
@@ -75,7 +78,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (105)
+### ✅ Completed Initiatives (106)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -186,7 +189,7 @@
 | 164 | **Auth Route: Modularized** | Refactored monolithic `auth.ts` (500ish lines) into modular architecture: `routes/auth.ts` (route definitions only), `controllers/authController.ts` (request/response handlers), `services/authService.ts` (auth business logic), `services/captchaService.ts` (captcha logic), `middleware/rateLimiters.ts` (rate limiting configs), `middleware/captchaRateLimiter.ts` (captcha rate limiting), and `utils/captchaStore.ts` (in-memory captcha tracking). Separated concerns following single responsibility principle, improving maintainability, testability, and code reusability. |
 | 165 | **IP Whitelisting System** | Implemented backend IP whitelisting for system admin login security. **User Model (`backend/src/models/User.ts`):** Added `ipWhitelist` array (stores `ip`, `description`, `addedAt`, `addedBy`) and `allowIpRestriction` boolean to enable/disable IP checks per user. **Service Layer (`backend/src/services/ipWhitelistService.ts`):** Created functions to add/remove IPs with duplicate prevention, fetch user whitelists, toggle restrictions (requires minimum one IP), and validate IP formats. Enforces `system_admin` role for all operations. **Controller (`backend/src/controllers/ipWhitelistController.ts`):** Handles requests for getting current client IP, managing whitelist CRUD operations, and toggling restrictions. Returns appropriate HTTP status codes (400/403/500) and normalizes IPv4-mapped IPv6 addresses. **Middleware (`backend/src/middleware/ipWhitelist.ts`):** Created `checkIpWhitelist` to block unauthorized IPs when `allowIpRestriction` is enabled. Includes `getClientIP` (extracts real IP from proxies/headers) and `normalizeIP` (standardizes IPv6-mapped IPv4). Logs all access attempts and returns 403 for blocked IPs. **Routes (`backend/src/routes/ipWhitelist.ts`):** Established `/api/ip-whitelist` endpoints: GET `/current-ip`, GET `/` (whitelist), POST `/add`, DELETE `/:ipId`, PATCH `/toggle`. All require authentication via `authenticateToken`. **Server Integration (`backend/src/server.ts`):** Applied `checkIpWhitelist` middleware to protect all `/api/*` routes (loans, documents, profiles, profile-history) while keeping auth routes public. Updated CORS to support PATCH requests. Modified auth verify route (`backend/src/routes/auth.ts`) to include IP whitelist checks, ensuring token verification respects IP restrictions. This architecture allows system admins to control which IPs can access protected endpoints when restrictions are enabled, with automatic enforcement across all sensitive API routes. |
 
-### ⚡ In Progress (16)
+### ⚡ In Progress (18)
 
 | ID | Initiative | Status |
 |----|-----------|--------|
@@ -206,9 +209,11 @@
 | 152 | **New Email Notifications** | Sending email notifications to applicant, underwriter, and system_admin on soft-deletion, restoration, or permanent deletion of loan applications and user profiles |
 | 155 | **Database Transaction Session** | Implement MongoDB transaction sessions to ensure atomic operations and maintain database consistency across related updates |
 | 163 | **State Machine & Additional Document Flow** | Combined state machine design for loan status transitions with integrated support for additional document requests. Status flows handle: pending ↔ under_review → approved/rejected/request_documents → pending, including underwriter-triggered requests for re-upload of particular/all documents. Frontend `UploadDocuments.tsx` now renders "additional documents" only after underwriter request, with improved headings/subheadings to distinguish required vs additional documents, ensuring proper handling of Indian mandatory vs additional document requirements. |
+| 167 | **IP Whitelist Implementation Review** | Audit all IP whitelist-related pages and code added in tasks 165 and 166 to verify what's actually needed and being used. Check which pages are restricted by IP whitelist and which aren't. Identify any unused components, services, or routes that can be removed or consolidated for cleaner implementation. |
+| 168 | **Global Support Contact Link** | Add a "Contact Support" link on every page of the website for consistent user access to help and assistance. |
 
 ---
 
-**Document Version:** 142
+**Document Version:** 143
 **Last Updated:** 21st October 2025
 **Maintained By:** Aniruddh Ballal
