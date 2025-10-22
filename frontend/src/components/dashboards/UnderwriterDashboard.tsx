@@ -1,31 +1,15 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Search, SlidersHorizontal, X, ChevronDown, ChevronUp, ArrowUpDown, Clock } from 'lucide-react'
 import { DashboardLayout } from './shared/DashboardLayout'
 import { UnderwriterTableSkeleton } from '../ui/SkeletonComponents'
 import { ErrorAlert } from './shared/ErrorAlert'
 import { EmptyState } from './shared/EmptyState'
-import { StatusBadge } from './shared/StatusBadge'
-import { formatCurrency, formatDate, formatTime, formatApplicationId } from './utils/formatters'
 import LoanReviewModal from '../loan/LoanReviewModal'
+import { SearchFilterBar } from './SearchFilterBar'
+import { ApplicationsTable } from './ApplicationsTable'
+import { RestorationRequestModal } from './RestorationRequestModal'
+import type { LoanApplication, FilterState, SortConfig} from './types'
+import { applyFiltersAndSort } from './searchFilterUtils'
 import api from '../../api'
-
-interface LoanApplication {
-  _id: string
-  amount: number
-  status: string
-  createdAt: string
-  userId: {
-    firstName: string
-    lastName: string
-    email: string
-    phone: string
-    role: string
-  }
-  restorationRequest?: {
-    _id: string
-    status: 'pending' | 'approved' | 'rejected'
-  }
-}
 
 export default function UnderwriterDashboard() {
   const [applications, setApplications] = useState<LoanApplication[]>([])
@@ -39,17 +23,16 @@ export default function UnderwriterDashboard() {
 
   const [requestModalOpen, setRequestModalOpen] = useState(false)
   const [applicationToRequest, setApplicationToRequest] = useState<string | null>(null)
-  const [restorationReason, setRestorationReason] = useState('')
   const [pendingRestorationRequests, setPendingRestorationRequests] = useState<Set<string>>(new Set())
 
   // Search and Filter States
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
-  const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: 'asc' | 'desc' }>({ 
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ 
     key: null, 
     direction: 'asc' 
   })
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FilterState>({
     status: 'all',
     amountMin: '',
     amountMax: '',
@@ -101,7 +84,6 @@ export default function UnderwriterDashboard() {
     try {
       const { data } = await api.get('/loans/underwriter/my-restoration-requests')
       if (data.success) {
-        // Create a set of application IDs that have pending requests
         const pendingIds = new Set<string>(
           data.requests
             .filter((req: any) => req.status === 'pending')
@@ -135,87 +117,13 @@ export default function UnderwriterDashboard() {
     }
   }
 
-  // Global search function
-  const searchInApplication = (app: LoanApplication, query: string) => {
-    const searchLower = query.toLowerCase()
-    return (
-      formatApplicationId(app._id).toLowerCase().includes(searchLower) ||
-      `${app.userId?.firstName} ${app.userId?.lastName}`.toLowerCase().includes(searchLower) ||
-      app.userId?.email?.toLowerCase().includes(searchLower) ||
-      app.userId?.phone?.toLowerCase().includes(searchLower) ||
-      app.status?.toLowerCase().includes(searchLower) ||
-      formatCurrency(app.amount).toLowerCase().includes(searchLower) ||
-      formatDate(app.createdAt).toLowerCase().includes(searchLower)
-    )
-  }
-
-  // Filter and sort logic
   const filteredAndSortedApplications = useMemo(() => {
-    let result = [...(showDeleted ? deletedApplications : applications)]
-
-    // Apply global search
-    if (searchQuery) {
-      result = result.filter(app => searchInApplication(app, searchQuery))
-    }
-
-    // Apply filters
-    if (filters.status !== 'all') {
-      result = result.filter(app => app.status === filters.status)
-    }
-
-    if (filters.amountMin) {
-      result = result.filter(app => app.amount >= Number(filters.amountMin))
-    }
-
-    if (filters.amountMax) {
-      result = result.filter(app => app.amount <= Number(filters.amountMax))
-    }
-
-    if (filters.dateFrom) {
-      result = result.filter(app => new Date(app.createdAt) >= new Date(filters.dateFrom))
-    }
-
-    if (filters.dateTo) {
-      result = result.filter(app => new Date(app.createdAt) <= new Date(filters.dateTo))
-    }
-
-    // Apply sorting
-    if (sortConfig.key) {
-      result.sort((a, b) => {
-        let aVal: any, bVal: any
-
-        switch (sortConfig.key) {
-          case 'reference':
-            aVal = a._id
-            bVal = b._id
-            break
-          case 'applicant':
-            aVal = `${a.userId?.firstName} ${a.userId?.lastName}`.toLowerCase()
-            bVal = `${b.userId?.firstName} ${b.userId?.lastName}`.toLowerCase()
-            break
-          case 'amount':
-            aVal = a.amount
-            bVal = b.amount
-            break
-          case 'status':
-            aVal = a.status
-            bVal = b.status
-            break
-          case 'submitted':
-            aVal = new Date(a.createdAt).getTime()
-            bVal = new Date(b.createdAt).getTime()
-            break
-          default:
-            return 0
-        }
-
-        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1
-        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1
-        return 0
-      })
-    }
-
-    return result
+    return applyFiltersAndSort(
+      showDeleted ? deletedApplications : applications,
+      searchQuery,
+      filters,
+      sortConfig
+    )
   }, [applications, deletedApplications, showDeleted, searchQuery, filters, sortConfig])
 
   const handleSort = (key: string) => {
@@ -243,52 +151,32 @@ export default function UnderwriterDashboard() {
 
   const activeFilterCount = Object.values(filters).filter(v => v && v !== 'all').length + (searchQuery ? 1 : 0)
 
-  const SortIcon = ({ columnKey }: { columnKey: string }) => {
-    if (sortConfig.key !== columnKey) {
-      return <ArrowUpDown className="w-4 h-4 text-gray-400" />
-    }
-    return sortConfig.direction === 'asc' 
-      ? <ChevronUp className="w-4 h-4 text-gray-900" />
-      : <ChevronDown className="w-4 h-4 text-gray-900" />
-  }
-
   const handleRequestRestoration = (applicationId: string) => {
     setApplicationToRequest(applicationId)
     setRequestModalOpen(true)
   }
 
-  const handleSubmitRequest = async () => {
-    if (restorationReason.trim().length < 10) {
-      setError('Restoration reason must be at least 10 characters')
-      return
-    }
-
+  const handleSubmitRestorationRequest = async (reason: string) => {
     try {
       const { data } = await api.post(`/loans/underwriter/request-restoration/${applicationToRequest}`, {
-        reason: restorationReason
+        reason
       })
       
       if (data.success) {
-        // Add to pending requests
         setPendingRestorationRequests(prev => new Set([...prev, applicationToRequest!]))
-        
-        // Close modal and reset
         setRequestModalOpen(false)
         setApplicationToRequest(null)
-        setRestorationReason('')
-        
-        // Show success message
         alert('Restoration request submitted successfully! System admin will review it.')
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to submit restoration request')
+      throw err
     }
   }
 
   const handleCancelRequest = () => {
     setRequestModalOpen(false)
     setApplicationToRequest(null)
-    setRestorationReason('')
   }
 
   return (
@@ -331,361 +219,51 @@ export default function UnderwriterDashboard() {
               </div>
             </div>
 
-            {/* Search and Filter Bar */}
-            <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-3">
-                {/* Global Search */}
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search by reference, name, email, phone, status, or amount..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Filter Toggle */}
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors relative text-gray-900"                
-                >
-                  <SlidersHorizontal className="w-5 h-5 text-gray-900" />
-                  <span className="font-medium">Filters</span>
-                  {activeFilterCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-gray-900 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {activeFilterCount}
-                    </span>
-                  )}
-                </button>
-
-                {activeFilterCount > 0 && (
-                  <button
-                    onClick={clearFilters}
-                    className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900"
-                  >
-                    Clear All
-                  </button>
-                )}
-              </div>
-
-              {/* Filter Panel */}
-              {showFilters && (
-                <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {/* Status Filter */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                      <select
-                        value={filters.status}
-                        onChange={(e) => handleFilterChange('status', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900"
-                      >
-                        <option value="all">All Statuses</option>
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                        <option value="under_review">Under Review</option>
-                      </select>
-                    </div>
-
-                    {/* Amount Range */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Min Amount</label>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="₹0"
-                        value={filters.amountMin}
-                        onChange={(e) => handleFilterChange('amountMin', e.target.value)}
-                        onInput={(e) => {
-                          e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Max Amount</label>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="₹10,00,000"
-                        value={filters.amountMax}
-                        onChange={(e) => handleFilterChange('amountMax', e.target.value)}
-                        onInput={(e) => {
-                          e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900"
-                      />
-                    </div>
-
-                    {/* Date Range */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">From Date</label>
-                      <input
-                        type="date"
-                        value={filters.dateFrom}
-                        onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">To Date</label>
-                      <input
-                        type="date"
-                        value={filters.dateTo}
-                        onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <SearchFilterBar
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              showFilters={showFilters}
+              setShowFilters={setShowFilters}
+              activeFilterCount={activeFilterCount}
+              clearFilters={clearFilters}
+              filters={filters}
+              handleFilterChange={handleFilterChange}
+            />
           </header>
           
           <div className="p-8">
-          {loading ? (
-            <UnderwriterTableSkeleton rows={5} />
-          ) : (
-            <>
-            
-            {error && <ErrorAlert message={error} />}
+            {loading ? (
+              <UnderwriterTableSkeleton rows={5} />
+            ) : (
+              <>
+                {error && <ErrorAlert message={error} />}
 
-            {!loading && filteredAndSortedApplications.length === 0 && !searchQuery && activeFilterCount === 0 && (
-              <EmptyState 
-                title="No Applications Found"
-                description="There are currently no loan applications to review."
-              />
-            )}
+                {!loading && filteredAndSortedApplications.length === 0 && !searchQuery && activeFilterCount === 0 && (
+                  <EmptyState 
+                    title="No Applications Found"
+                    description="There are currently no loan applications to review."
+                  />
+                )}
 
-            {!loading && filteredAndSortedApplications.length === 0 && (searchQuery || activeFilterCount > 0) && (
-              <div className="text-center py-12">
-                <p className="text-gray-500 text-lg mb-2">No applications found</p>
-                <p className="text-gray-400 text-sm">Try adjusting your search or filters</p>
-              </div>
-            )}
-
-            {!loading && filteredAndSortedApplications.length > 0 && (
-              <div className="overflow-hidden">
-                {/* Desktop Table View */}
-                <div className="hidden lg:block">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-gray-50/50 border-b border-gray-200">
-                        <tr>
-                          <th 
-                            onClick={() => handleSort('reference')}
-                            className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                          >
-                            <div className="flex items-center gap-2">
-                              Reference
-                              <SortIcon columnKey="reference" />
-                            </div>
-                          </th>
-                          <th 
-                            onClick={() => handleSort('applicant')}
-                            className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                          >
-                            <div className="flex items-center gap-2">
-                              Applicant
-                              <SortIcon columnKey="applicant" />
-                            </div>
-                          </th>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Contact
-                          </th>
-                          <th 
-                            onClick={() => handleSort('amount')}
-                            className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                          >
-                            <div className="flex items-center gap-2">
-                              Amount
-                              <SortIcon columnKey="amount" />
-                            </div>
-                          </th>
-                          <th 
-                            onClick={() => handleSort('status')}
-                            className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                          >
-                            <div className="flex items-center gap-2">
-                              Status
-                              <SortIcon columnKey="status" />
-                            </div>
-                          </th>
-                          <th 
-                            onClick={() => handleSort('submitted')}
-                            className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                          >
-                            <div className="flex items-center gap-2">
-                              Submitted
-                              <SortIcon columnKey="submitted" />
-                            </div>
-                          </th>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            {showDeleted ? 'Restoration Status' : 'Actions'}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {filteredAndSortedApplications.map((app) => (
-                          <tr key={app._id} className="hover:bg-gray-50/50 transition-colors duration-150">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="font-mono bg-gray-900 text-white px-2 py-1 rounded text-xs font-medium">
-                                {formatApplicationId(app._id)}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-12 h-8 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                                  {app.userId?.firstName?.charAt(0)}{app.userId?.lastName?.charAt(0)}
-                                </div>
-                                <div>
-                                  <div className="font-semibold text-gray-900">
-                                    {app.userId?.firstName} {app.userId?.lastName}
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="text-sm">
-                                <div className="text-gray-900 font-medium">{app.userId?.email}</div>
-                                <div className="text-gray-600 font-light">{app.userId?.phone}</div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="font-semibold text-gray-900 text-lg">
-                                {formatCurrency(app.amount)}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <StatusBadge status={app.status} />
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                              <div>{formatDate(app.createdAt)}</div>
-                              <div className="text-xs text-gray-500 font-light">
-                                {formatTime(app.createdAt)}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {showDeleted ? (
-                                pendingRestorationRequests.has(app._id) ? (
-                                  <div className="flex items-center gap-2">
-                                    <Clock className="w-4 h-4 text-yellow-600" />
-                                    <span className="text-xs font-medium text-yellow-700">
-                                      Awaiting Admin Review
-                                    </span>
-                                  </div>
-                                ) : (
-                                  <button
-                                    onClick={() => handleRequestRestoration(app._id)}
-                                    className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
-                                  >
-                                    Request Admin
-                                  </button>
-                                )
-                              ) : (
-                                <button
-                                  onClick={() => handleReviewClick(app._id)}
-                                  className="px-3 py-1.5 text-xs font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200 shadow-sm hover:shadow-md"
-                                >
-                                  Review
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                {!loading && filteredAndSortedApplications.length === 0 && (searchQuery || activeFilterCount > 0) && (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500 text-lg mb-2">No applications found</p>
+                    <p className="text-gray-400 text-sm">Try adjusting your search or filters</p>
                   </div>
-                </div>
+                )}
 
-                {/* Mobile Card View */}
-                <div className="lg:hidden space-y-4">
-                  {filteredAndSortedApplications.map((app) => (
-                    <div 
-                      key={app._id} 
-                      className="border border-gray-200 rounded-xl p-6 hover:bg-gray-50/50 hover:border-gray-300 transition-all duration-200 group"
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                            {app.userId?.firstName?.charAt(0)}{app.userId?.lastName?.charAt(0)}
-                          </div>
-                          <div>
-                            <div className="font-semibold text-gray-900">
-                              {app.userId?.firstName} {app.userId?.lastName}
-                            </div>
-                            <span className="font-mono bg-gray-900 text-white px-2 py-1 rounded text-xs font-medium">
-                              {formatApplicationId(app._id)}
-                            </span>
-                          </div>
-                        </div>
-                        <StatusBadge status={app.status} />
-                      </div>
-
-                      <div className="space-y-3 mb-4">
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600 font-light">Amount</span>
-                          <span className="font-semibold text-gray-900">{formatCurrency(app.amount)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600 font-light">Email</span>
-                          <span className="text-sm text-gray-900">{app.userId?.email}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600 font-light">Phone</span>
-                          <span className="text-sm text-gray-900">{app.userId?.phone}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600 font-light">Submitted</span>
-                          <span className="text-sm text-gray-900">{formatDate(app.createdAt)}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-2 pt-4 border-t border-gray-100">
-                        {showDeleted ? (
-                          pendingRestorationRequests.has(app._id) ? (
-                            <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
-                              <Clock className="w-4 h-4 text-yellow-600" />
-                              <span className="text-sm font-medium text-yellow-700">
-                                Awaiting Admin Review
-                              </span>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => handleRequestRestoration(app._id)}
-                              className="flex-1 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200"
-                            >
-                              Request Admin
-                            </button>
-                          )
-                        ) : (
-                          <button
-                            onClick={() => handleReviewClick(app._id)}
-                            className="flex-1 px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition-all duration-200"
-                          >
-                            Review
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              )}
-            </>
+                {!loading && filteredAndSortedApplications.length > 0 && (
+                  <ApplicationsTable
+                    applications={filteredAndSortedApplications}
+                    showDeleted={showDeleted}
+                    pendingRestorationRequests={pendingRestorationRequests}
+                    sortConfig={sortConfig}
+                    handleSort={handleSort}
+                    handleReviewClick={handleReviewClick}
+                    handleRequestRestoration={handleRequestRestoration}
+                  />
+                )}
+              </>
             )}
           </div>
         </section>
@@ -700,60 +278,12 @@ export default function UnderwriterDashboard() {
         />
       )}
 
-      {/* Request Restoration Modal */}
-      {requestModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
-              Request Restoration
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Submit a restoration request for this deleted loan application. A system administrator will review and approve or reject your request.
-            </p>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Reason for Restoration <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                value={restorationReason}
-                onChange={(e) => setRestorationReason(e.target.value)}
-                placeholder="Explain why this application should be restored (minimum 10 characters)..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-gray-900 resize-none"
-                rows={4}
-                autoFocus
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                {restorationReason.length}/500 characters
-              </p>
-            </div>
-            {error && restorationReason.length > 0 && restorationReason.length < 10 && (
-              <p className="text-sm text-red-600 mb-4">
-                Reason must be at least 10 characters long
-              </p>
-            )}
-            <div className="flex gap-3">
-              <button
-                onClick={handleCancelRequest}
-                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmitRequest}
-                disabled={restorationReason.trim().length < 10}
-                className={`flex-1 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${
-                  restorationReason.trim().length >= 10
-                    ? 'bg-blue-600 hover:bg-blue-700'
-                    : 'bg-gray-300 cursor-not-allowed'
-                }`}
-              >
-                Submit Request
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+      <RestorationRequestModal
+        isOpen={requestModalOpen}
+        onClose={handleCancelRequest}
+        onSubmit={handleSubmitRestorationRequest}
+        error={error}
+      />
     </>
   )
 }
