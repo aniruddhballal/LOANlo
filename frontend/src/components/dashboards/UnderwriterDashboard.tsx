@@ -162,12 +162,8 @@ export default function UnderwriterDashboard() {
         reason
       })
       
-      if (data.success) {
+      if (data.success)
         setPendingRestorationRequests(prev => new Set([...prev, applicationToRequest!]))
-        setRequestModalOpen(false)
-        setApplicationToRequest(null)
-        alert('Restoration request submitted successfully! System admin will review it.')
-      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to submit restoration request')
       throw err
