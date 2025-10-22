@@ -38,7 +38,7 @@ const Profile = () => {
     try {
       await api.delete('/profile/me')
       localStorage.removeItem('token')
-      navigate('/')
+      navigate('/account-deleted') // Navigate to the dedicated page instead of '/'
     } catch (err) {
       console.error('Failed to delete account:', err)
       alert('Failed to delete account. Please try again.')
@@ -47,7 +47,6 @@ const Profile = () => {
       setShowDeleteModal(false)
     }
   }
-
   const handleViewHistory = () => {
     // Navigate to profile history page
     const targetUserId = userId || user?.id // Use URL userId or current user's id

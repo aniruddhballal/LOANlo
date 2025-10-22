@@ -19,6 +19,7 @@ import ApplicantProfile from './components/auth/ApplicantProfile'
 import StaffProfile from './components/auth/StaffProfile'
 import ProfileHistory from './components/auth/ProfileHistory'
 import IpWhitelistSettings from './components/IpWhitelistSettings';
+import AccountDeleted from './components/AccountDeleted';
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -140,7 +141,8 @@ function AppContent() {
         } />
 
         <Route path="/settings/ip-whitelist" element={<IpWhitelistSettings />} />
-
+        <Route path="/account-deleted" element={<AccountDeleted />} />
+        
         <Route path="/access-denied" element={
           <AccessDenied />
         } />

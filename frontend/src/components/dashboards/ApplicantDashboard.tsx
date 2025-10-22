@@ -37,7 +37,7 @@ const ApplicantDashboard = () => {
     <DashboardLayout 
       title="Applicant Dashboard"
       welcomeTitle="Welcome Back!"
-      welcomeSubtitle="Successfully authenticated to LoanLo Platform"
+      welcomeSubtitle="Successfully authenticated to LOANlo Platform"
     >
       {/* Email Verification Section */}
       {isEmailVerified === null ? (
