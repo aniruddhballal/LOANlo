@@ -15,6 +15,12 @@ import {
   underwriterRestorationRequestAdminTemplate,
   UnderwriterRestorationRequestAdminData
 } from './underwriterRestorationRequestTemplate';
+import { 
+  restorationApprovedTemplate, 
+  RestorationApprovedData,
+  restorationRejectedTemplate,
+  RestorationRejectedData
+} from './restorationResponseTemplates';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
@@ -414,7 +420,95 @@ export const sendUnderwriterRestorationRequestToAdmin = async (
   }
 };
 
-// Add these to the default export at the bottom of the file
+/**
+ * Send email to underwriter when their restoration request is APPROVED
+ */
+export const sendRestorationApprovedEmail = async (
+  underwriterEmail: string,
+  underwriterName: string,
+  applicantName: string,
+  applicationId: string,
+  loanType: string,
+  amount: number,
+  restorationReason: string,
+  adminNotes?: string
+) => {
+  try {
+    const frontendUrl = getFrontendUrl();
+    const underwriterDashboardLink = `${frontendUrl}/dashboard/underwriter`;
+
+    const emailData: RestorationApprovedData = {
+      underwriterName,
+      applicationId,
+      applicantName,
+      loanType,
+      amount,
+      restorationReason,
+      ...(adminNotes && { adminNotes }), // Only include if it exists
+      approvedAt: new Date().toISOString(),
+      underwriterDashboardLink,
+    };
+
+    const msg = {
+      to: underwriterEmail,
+      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
+      subject: `✓ Restoration Request Approved - ${applicationId}`,
+      html: restorationApprovedTemplate(emailData),
+      text: `Dear ${underwriterName},\n\nGood news! Your restoration request has been approved.\n\nApplication ID: ${applicationId}\nApplicant: ${applicantName}\n\nThe application has been successfully restored and is now available in your dashboard.\n\n${adminNotes ? `Admin Notes: ${adminNotes}\n\n` : ''}View dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`,
+    };
+
+    await sgMail.send(msg);
+  } catch (error) {
+    console.error('❌ Error sending restoration approved email:', error);
+    // Don't throw - we don't want email failures to break the application flow
+  }
+};
+
+/**
+ * Send email to underwriter when their restoration request is REJECTED
+ */
+export const sendRestorationRejectedEmail = async (
+  underwriterEmail: string,
+  underwriterName: string,
+  applicantName: string,
+  applicationId: string,
+  loanType: string,
+  amount: number,
+  restorationReason: string,
+  rejectionNotes: string
+) => {
+  try {
+    const frontendUrl = getFrontendUrl();
+    const underwriterDashboardLink = `${frontendUrl}/dashboard/underwriter`;
+
+    const emailData: RestorationRejectedData = {
+      underwriterName,
+      applicationId,
+      applicantName,
+      loanType,
+      amount,
+      restorationReason,
+      rejectionNotes,
+      rejectedAt: new Date().toISOString(),
+      underwriterDashboardLink,
+    };
+
+    const msg = {
+      to: underwriterEmail,
+      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
+      subject: `Restoration Request Rejected - ${applicationId}`,
+      html: restorationRejectedTemplate(emailData),
+      text: `Dear ${underwriterName},\n\nYour restoration request has been rejected by the system administrator.\n\nApplication ID: ${applicationId}\nApplicant: ${applicantName}\n\nRejection Reason:\n${rejectionNotes}\n\nIf you believe this decision requires further review, please contact the system administrator.\n\nView dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`,
+    };
+
+    await sgMail.send(msg);
+  } catch (error) {
+    console.error('❌ Error sending restoration rejected email:', error);
+    // Don't throw - we don't want email failures to break the application flow
+  }
+};
+
+// Update the default export at the bottom of emailService.ts to include:
 export default {
   sendLoanApplicationSubmittedEmail,
   sendLoanStatusUpdateEmail,
@@ -424,4 +518,6 @@ export default {
   sendApplicationDeletedNotificationToUnderwriters,
   sendUnderwriterRestorationRequestConfirmation,
   sendUnderwriterRestorationRequestToAdmin,
+  sendRestorationApprovedEmail,
+  sendRestorationRejectedEmail,
 };

@@ -4,6 +4,11 @@ import { AuthenticatedRequest, authenticateToken, requireRole} from '../../middl
 import DocumentModel from '../../models/Document';
 import RestorationRequest from '../../models/RestorationRequest';
 import mongoose from 'mongoose';
+import { 
+  sendRestorationApprovedEmail,
+  sendRestorationRejectedEmail
+} from '../../utils/loanEmailService';
+import User from '../../models/User';
 
 const router = Router();
 // Apply middleware to ALL routes
@@ -65,7 +70,6 @@ router.post(
   '/restoration-requests/:requestId/approve',
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-
       // Type guard - TypeScript now knows req.user exists below this point
       if (!req.user) {
         return res.status(401).json({
@@ -77,7 +81,9 @@ router.post(
       const { requestId } = req.params;
       const { notes } = req.body;
 
-      const request = await RestorationRequest.findById(requestId);
+      // Populate the restoration request with underwriter details
+      const request = await RestorationRequest.findById(requestId)
+        .populate('requestedBy', 'firstName lastName email');
 
       if (!request) {
         return res.status(404).json({
@@ -96,15 +102,21 @@ router.post(
       // CRITICAL FIX: Explicitly query for deleted applications
       const application = await LoanApplication.findOne({
         _id: request.applicationId,
-        isDeleted: true  // Only find if actually deleted
+        isDeleted: true
       });
-     
+
       if (!application) {
         return res.status(404).json({
           success: false,
           message: 'Deleted application not found or already restored'
         });
       }
+
+      // Fetch user separately with error handling
+      const applicant = await User.findById(application.userId).select('firstName lastName email');
+      const applicantName = applicant?.firstName && applicant?.lastName
+        ? `${applicant.firstName} ${applicant.lastName}`
+        : 'Unknown Applicant';
 
       // Business rule validation (customize as needed)
       if (application.status === 'approved') {
@@ -138,6 +150,34 @@ router.post(
       
       await request.save();
 
+      // Prepare data for email
+      const underwriter = request.requestedBy as any;
+      const underwriterName = underwriter && underwriter.firstName && underwriter.lastName
+        ? `${underwriter.firstName} ${underwriter.lastName}`
+        : 'Underwriter';
+      const underwriterEmail = underwriter?.email || '';
+
+      const applicationIdStr = application._id.toString();
+
+      // Send approval email to underwriter
+      if (underwriterEmail) {
+        try {
+          await sendRestorationApprovedEmail(
+            underwriterEmail,
+            underwriterName,
+            applicantName,
+            applicationIdStr,
+            application.loanType,
+            application.amount,
+            request.reason,
+            notes?.trim()
+          );
+        } catch (emailError) {
+          console.error('Failed to send restoration approved email:', emailError);
+          // Continue execution - email failure shouldn't block the approval
+        }
+      }
+
       res.json({
         success: true,
         message: 'Application restored successfully',
@@ -147,6 +187,7 @@ router.post(
         }
       });
     } catch (error: any) {
+      console.error('Error in restoration approval:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',
@@ -161,7 +202,6 @@ router.post(
   '/restoration-requests/:requestId/reject',
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-
       // Type guard - TypeScript now knows req.user exists below this point
       if (!req.user) {
         return res.status(401).json({
@@ -169,33 +209,35 @@ router.post(
           message: 'Authentication required'
         });
       }
-
       const { requestId } = req.params;
       const { notes } = req.body;
-
       if (!notes || notes.trim().length === 0) {
         return res.status(400).json({
           success: false,
           message: 'Rejection reason is required'
         });
       }
-
-      const request = await RestorationRequest.findById(requestId);
-
+      // Populate the restoration request with underwriter details
+      const request = await RestorationRequest.findById(requestId)
+        .populate('requestedBy', 'firstName lastName email');
       if (!request) {
         return res.status(404).json({
           success: false,
           message: 'Restoration request not found'
         });
       }
-
       if (request.status !== 'pending') {
         return res.status(400).json({
           success: false,
           message: 'This request has already been reviewed'
         });
       }
-
+      // Get application details for email
+      const application = await LoanApplication.findOne({
+        _id: request.applicationId,
+        isDeleted: true
+      });
+      
       // Update request status
       request.status = 'rejected';
       if (mongoose.Types.ObjectId.isValid(req.user.userId)) {
@@ -204,12 +246,42 @@ router.post(
       request.reviewedAt = new Date();
       request.reviewNotes = notes.trim();
       await request.save();
-
+      // Prepare data for email
+      const underwriter = request.requestedBy as any;
+      const underwriterName = underwriter && underwriter.firstName && underwriter.lastName
+        ? `${underwriter.firstName} ${underwriter.lastName}`
+        : 'Underwriter';
+      const underwriterEmail = underwriter?.email || '';
+      if (application && underwriterEmail) {
+        // Fetch user separately with error handling
+        const applicant = await User.findById(application.userId).select('firstName lastName email');
+        const applicantName = applicant?.firstName && applicant?.lastName
+          ? `${applicant.firstName} ${applicant.lastName}`
+          : 'Unknown Applicant';
+        const applicationIdStr = application._id.toString();
+        // Send rejection email to underwriter
+        try {
+          await sendRestorationRejectedEmail(
+            underwriterEmail,
+            underwriterName,
+            applicantName,
+            applicationIdStr,
+            application.loanType,
+            application.amount,
+            request.reason,
+            notes.trim()
+          );
+        } catch (emailError) {
+          console.error('Failed to send restoration rejected email:', emailError);
+          // Continue execution - email failure shouldn't block the rejection
+        }
+      }
       res.json({
         success: true,
         message: 'Restoration request rejected'
       });
     } catch (error: any) {
+      console.error('Error in restoration rejection:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',
@@ -224,7 +296,6 @@ router.delete(
   '/permanent-delete/:applicationId',
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-
       const { applicationId } = req.params as { applicationId: string };
 
       // Find deleted application
@@ -254,6 +325,7 @@ router.delete(
         message: 'Application permanently deleted'
       });
     } catch (error: any) {
+      console.error('Error in permanent deletion:', error);
       res.status(500).json({
         success: false,
         message: 'Server error',
