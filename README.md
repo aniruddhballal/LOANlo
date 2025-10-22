@@ -6,8 +6,8 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (48)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (124)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (50)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (125)
 
 ---
 
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (39)
+### ✅ Completed Initiatives (47)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -37,9 +37,12 @@
 | 50 | **Modal Viewport Fix** | Resolved UI obstruction issue affecting the bottom viewport area in Underwriter's LoanReviewModal |
 | 54 | **Container Optimization** | Fixed dimensional resize glitches occurring in individual document upload submission containers |
 | 55 | **Performance Enhancement** | Optimized document deletion functionality to prevent unnecessary full-page reloads on ApplicationStatus page |
+| 56 | **Button Style Refinement** | Refining "Begin Application Process" button styles to ensure consistency with application-wide design system |
 | 61 | **Modal Consistency** | Standardized styling for delete confirmation modals across loan applications and documents, ensuring design consistency for dynamically created components |
+| 62 | **Error Display Enhancement** | Enhancing styling and animation quality for individual field error displays on Personal Details page |
 | 78 | **Interactive Feedback** | Enhanced "Save & Continue" button with custom cursor hover state for improved user feedback |
 | 79 | **Button State Fix** | Resolved persistent active state styling issue on "Previous" button that incorrectly carried over to subsequent pages after navigation |
+| 81 | **Interactive Feedback Standardization** | Standardizing button styles and improving interactive feedback across all components, using "Save & Continue" button as design reference |
 | 92 | **Advanced Data Operations** | Implemented advanced search, sort, and filter capabilities for Underwriters to view specific loan applications with matching results display |
 | 93 | **Layout Optimization** | Optimized Dashboard layout by expanding table width to eliminate unused whitespace and improve content density |
 | 94 | **UI Consolidation** | Redesigned loan application display on ApplicationStatus page to match the styling pattern used for recent applications on Applicant Dashboard, subsequently removing redundant recent applications section from Dashboard |
@@ -55,32 +58,30 @@
 | 131 | **Application Status: Document Upload Animation on Redirect** | Added `highlightedAppId` and `animatingDocs` state in `ApplicationStatus.tsx`. `useEffect` detects `location.state.updatedApplicationId`, triggers `docStatusChange` keyframe on badge and `highlightCard` keyframe on card. Auto-scrolls via `scrollIntoView`, clears after timeout. Fixed `DocumentUpload.tsx` navigation syntax to pass state object with `updatedApplicationId`. |
 | 132 | **Loan Application: Split Loading States** | In `LoanApplication.tsx`, separated `checkingPersonalDetails` and `loading` conditions. Added submission-specific loading state with "Submitting Application" title and email confirmation message. |
 | 140 | **Reference Number Display Fix** | Fixing display of loan reference numbers on underwriter dashboard and applicant `ApplicationStatus` to show full 24-character ID instead of only last 8 characters |
+| 150 | **Underwriter Dashboard Skeleton UI Alignment** | Adjusting `UnderwriterTableSkeleton` component column widths to match actual table column dimensions in `UnderwriterDashboard.tsx` for consistent loading state presentation. Ensuring skeleton placeholders for Reference, Applicant, Contact, Amount, Status, Submitted, and Actions columns align with rendered table structure. |
 | 161 | **CurrencyField Digit-Only Input** | Updated `CurrencyField` in `formfields.tsx` to support `onKeyDown` for handling key-level input restrictions. In `loanform.tsx`, added an `onKeyDown` handler to allow only digits, backspace, delete, arrow keys, and tab, preventing invalid characters from being typed into the loan amount field. |
 | 166 | **IP Whitelisting System** | Built frontend interface for system admins to manage IP whitelisting. **API Service (`frontend/src/services/ipWhitelistService.ts`):** Created TypeScript functions with JWT authentication: `getCurrentIp`, `getIpWhitelist`, `addIpToWhitelist`, `removeIpFromWhitelist`, `toggleIpRestriction`. Provides type-safe communication with backend API. **Management Interface (`frontend/src/components/IpWhitelistSettings.tsx`):** Developed full-featured component displaying current IP, restriction toggle (disabled when no IPs exist), whitelist table (desktop)/cards (mobile), add/remove IP operations with confirmations, formatted timestamps, empty states, and warning badges. Uses centralized `IpWhitelistSkeleton` for loading states. Handles success/error alerts for all operations. **Login Security (`frontend/src/components/auth/Login.tsx`):** Added error handling for `IP_NOT_WHITELISTED` response code, displaying "Access denied: You are not authorized to login from this network. Please contact support." when users attempt login from non-whitelisted IPs. **Dashboard Access (`frontend/src/components/SystemAdminDashboard.tsx`):** Added "IP Whitelist Settings" card with Shield icon linking to `/settings/ip-whitelist`, giving system admins direct access to whitelist management. **Routing (`App.tsx`):** Added `/settings/ip-whitelist` route pointing to `IpWhitelistSettings` component, integrating whitelist management into app navigation. This frontend implementation allows system admins to view their current IP, add it to the whitelist, toggle restrictions on/off, and manage trusted IPs through an intuitive interface. When restrictions are enabled, login attempts from non-whitelisted IPs are blocked with clear error messages. |
-| 172 | **Account Deletion Confirmation Page & Clean Session Redirect** | Created `AccountDeleted.tsx` component as dedicated post-deletion landing page with farewell message, data removal summary, recovery contact option (mailto link to admin), and dual CTAs (Back to Login/Create New Account). Modified account deletion handler in profile management component to navigate to `/account-deleted` instead of `/`. Replaced `<Link>` components with `<a href>` tags in `AccountDeleted.tsx` to force full page reload, clearing React state/auth context and preventing stale token issues that caused brief "email verification required" flash before login redirect. Added `/account-deleted` route to `App.tsx` as public (non-protected) route. |
-| 173 | **Profile History Collapsible Cards & IP Normalization** | Refactored `ProfileHistory.tsx` to support collapsible history entries with default open for the latest entry using `openCards` state and `toggleCard` handler. Added `normalizeIp` helper to display IPv4-mapped and IPv6 localhost addresses correctly (`::ffff:127.0.0.1` → `127.0.0.1`, `::1` → `127.0.0.1`). Updated history entry headers to be clickable, showing/hiding changed fields and profile snapshots, with arrow icon rotating to indicate expansion. Minor UI tweaks for smoother transitions and cleaner layout of entry headers and collapsible content. |
-
-### ⚡ In Progress (9)
-
-| ID | Initiative | Status |
-|----|-----------|--------|
-| 56 | **Button Style Refinement** | Refining "Begin Application Process" button styles to ensure consistency with application-wide design system |
-| 62 | **Error Display Enhancement** | Enhancing styling and animation quality for individual field error displays on Personal Details page |
-| 81 | **Interactive Feedback Standardization** | Standardizing button styles and improving interactive feedback across all components, using "Save & Continue" button as design reference |
-| 150 | **Underwriter Dashboard Skeleton UI Alignment** | Adjusting `UnderwriterTableSkeleton` component column widths to match actual table column dimensions in `UnderwriterDashboard.tsx` for consistent loading state presentation. Ensuring skeleton placeholders for Reference, Applicant, Contact, Amount, Status, Submitted, and Actions columns align with rendered table structure. |
-| 151 | **System Admin Review Modal for Restoration Requests** | Implementing dedicated review modal for System Admin Dashboard restoration requests. Creating modal similar to `LoanReviewModal` that displays comprehensive loan applicant profile details and underwriter profile information before action execution. Consolidating three action buttons (Approve/Reject/Delete) from cluttered table "Actions" column into single "Review" button that opens modal. Modal contains tabbed or sectioned view showing applicant details, underwriter details, restoration reason, and action buttons with appropriate validation (rejection reason required, DELETE confirmation for permanent deletion). Improves UX by reducing table width and providing contextual information before decision-making. |
-| 162 | **Unify "Back to Dashboard" Buttons** | Standardize the placement and styling of all "Back to Dashboard" buttons across the app to ensure consistent UX and make it easy for users to locate navigation options. |
 | 169 | **Restoration Page Alert Styling** | Replace default browser alert on restoration request page with custom-styled confirmation modal matching the application's design system. |
 | 170 | **Button Styling** | Standardize and style all buttons on restoration pages for both underwriter and system admin interfaces to match application design patterns. |
 | 171 | **Universal Skeleton Loading Components** | Create centralized, reusable skeleton loading components and replace all custom loading indicators throughout the app with standardized skeletons, similar to the button styling approach. |
+| 172 | **Account Deletion Confirmation Page & Clean Session Redirect** | Created `AccountDeleted.tsx` component as dedicated post-deletion landing page with farewell message, data removal summary, recovery contact option (mailto link to admin), and dual CTAs (Back to Login/Create New Account). Modified account deletion handler in profile management component to navigate to `/account-deleted` instead of `/`. Replaced `<Link>` components with `<a href>` tags in `AccountDeleted.tsx` to force full page reload, clearing React state/auth context and preventing stale token issues that caused brief "email verification required" flash before login redirect. Added `/account-deleted` route to `App.tsx` as public (non-protected) route. |
+| 173 | **Profile History Collapsible Cards & IP Normalization** | Refactored `ProfileHistory.tsx` to support collapsible history entries with default open for the latest entry using `openCards` state and `toggleCard` handler. Added `normalizeIp` helper to display IPv4-mapped and IPv6 localhost addresses correctly (`::ffff:127.0.0.1` → `127.0.0.1`, `::1` → `127.0.0.1`). Updated history entry headers to be clickable, showing/hiding changed fields and profile snapshots, with arrow icon rotating to indicate expansion. Minor UI tweaks for smoother transitions and cleaner layout of entry headers and collapsible content. |
 
+### ⚡ In Progress (3)
+
+| ID | Initiative | Status |
+|----|-----------|--------|
+
+| 151 | **System Admin Review Modal for Restoration Requests** | Implementing dedicated review modal for System Admin Dashboard restoration requests. Creating modal similar to `LoanReviewModal` that displays comprehensive loan applicant profile details and underwriter profile information before action execution. Consolidating three action buttons (Approve/Reject/Delete) from cluttered table "Actions" column into single "Review" button that opens modal. Modal contains tabbed or sectioned view showing applicant details, underwriter details, restoration reason, and action buttons with appropriate validation (rejection reason required, DELETE confirmation for permanent deletion). Improves UX by reducing table width and providing contextual information before decision-making. |
+| 162 | **Unifying "Back to Dashboard" Buttons** | Standardizing the placement and styling of all "Back to Dashboard" buttons across the app to ensure consistent UX and make it easy for users to locate navigation options. |
+| 175 | **Revamping the UI** | Making the whole website, all the pages in the website more micor-interactive, and stylish yet giving a classy corporate look - make use of shimmers, and other hover animations. |
 ---
 
 ## Backend Development, Security & Architecture
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (107)
+### ✅ Completed Initiatives (108)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -217,6 +218,6 @@
 
 ---
 
-**Document Version:** 149
+**Document Version:** 150
 **Last Updated:** 22nd October 2025
 **Maintained By:** Aniruddh Ballal
