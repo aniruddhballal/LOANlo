@@ -75,6 +75,7 @@
 | 151 | **System Admin Review Modal for Restoration Requests** | Implementing dedicated review modal for System Admin Dashboard restoration requests. Creating modal similar to `LoanReviewModal` that displays comprehensive loan applicant profile details and underwriter profile information before action execution. Consolidating three action buttons (Approve/Reject/Delete) from cluttered table "Actions" column into single "Review" button that opens modal. Modal contains tabbed or sectioned view showing applicant details, underwriter details, restoration reason, and action buttons with appropriate validation (rejection reason required, DELETE confirmation for permanent deletion). Improves UX by reducing table width and providing contextual information before decision-making. |
 | 162 | **Unifying "Back to Dashboard" Buttons** | Standardizing the placement and styling of all "Back to Dashboard" buttons across the app to ensure consistent UX and make it easy for users to locate navigation options. |
 | 175 | **Revamping the UI** | Making the whole website, all the pages in the website more micor-interactive, and stylish yet giving a classy corporate look - make use of shimmers, and other hover animations. |
+
 ---
 
 ## Backend Development, Security & Architecture
@@ -218,6 +219,6 @@
 
 ---
 
-**Document Version:** 150
+**Document Version:** 151
 **Last Updated:** 22nd October 2025
 **Maintained By:** Aniruddh Ballal
