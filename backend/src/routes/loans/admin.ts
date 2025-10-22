@@ -6,7 +6,8 @@ import RestorationRequest from '../../models/RestorationRequest';
 import mongoose from 'mongoose';
 import { 
   sendRestorationApprovedEmail,
-  sendRestorationRejectedEmail
+  sendRestorationRejectedEmail,
+  sendApplicationRestoredEmail,
 } from '../../utils/loanEmailService';
 import User from '../../models/User';
 
@@ -174,6 +175,24 @@ router.post(
           );
         } catch (emailError) {
           console.error('Failed to send restoration approved email:', emailError);
+          // Continue execution - email failure shouldn't block the approval
+        }
+      }
+
+      // Send notification email to applicant about restoration
+      if (applicant?.email) {
+        try {
+          await sendApplicationRestoredEmail(
+            applicant.email,
+            applicantName,
+            applicationIdStr,
+            application.loanType,
+            application.amount,
+            request.reason,
+            underwriterName
+          );
+        } catch (emailError) {
+          console.error('Failed to send application restored email to applicant:', emailError);
           // Continue execution - email failure shouldn't block the approval
         }
       }

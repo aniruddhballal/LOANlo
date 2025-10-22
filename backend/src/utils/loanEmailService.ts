@@ -21,6 +21,10 @@ import {
   restorationRejectedTemplate,
   RestorationRejectedData
 } from './restorationResponseTemplates';
+import { 
+  applicationRestoredTemplate, 
+  ApplicationRestoredData 
+} from './applicationRestoredTemplate';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
@@ -508,6 +512,48 @@ export const sendRestorationRejectedEmail = async (
   }
 };
 
+/**
+ * Send email to applicant when their deleted application is restored
+ */
+export const sendApplicationRestoredEmail = async (
+  applicantEmail: string,
+  applicantName: string,
+  applicationId: string,
+  loanType: string,
+  amount: number,
+  restorationReason: string,
+  underwriterName: string
+) => {
+  try {
+    const frontendUrl = getFrontendUrl();
+    const applicationStatusLink = `${frontendUrl}/application-status`;
+
+    const emailData: ApplicationRestoredData = {
+      applicantName,
+      applicationId,
+      loanType,
+      amount,
+      restoredAt: new Date().toISOString(),
+      restorationReason,
+      underwriterName,
+      applicationStatusLink,
+    };
+
+    const msg = {
+      to: applicantEmail,
+      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
+      subject: `Application Restored - ${applicationId}`,
+      html: applicationRestoredTemplate(emailData),
+      text: `Dear ${applicantName},\n\nYour previously deleted loan application (ID: ${applicationId}) has been restored by the system administrator on request of ${underwriterName}.\n\nReason: ${restorationReason}\n\nYou can now view and track your application in your dashboard: ${applicationStatusLink}\n\nLOANLO Team`,
+    };
+
+    await sgMail.send(msg);
+  } catch (error) {
+    console.error('❌ Error sending application restored email to applicant:', error);
+    // Don't throw - we don't want email failures to break the application flow
+  }
+};
+
 // Update the default export at the bottom of emailService.ts to include:
 export default {
   sendLoanApplicationSubmittedEmail,
@@ -520,4 +566,5 @@ export default {
   sendUnderwriterRestorationRequestToAdmin,
   sendRestorationApprovedEmail,
   sendRestorationRejectedEmail,
+  sendApplicationRestoredEmail,
 };
