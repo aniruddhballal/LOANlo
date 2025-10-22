@@ -29,18 +29,24 @@ const ProfileHistory = () => {
   const [history, setHistory] = useState<ProfileHistoryEntry[]>([])
   const [error, setError] = useState<string | null>(null)
   const { userId } = useParams<{ userId: string }>()
+  const [openCards, setOpenCards] = useState<Set<string>>(new Set())
   const navigate = useNavigate()
 
   useEffect(() => {
     fetchHistory()
   }, [userId])
 
-  const fetchHistory = async () => {
+    const fetchHistory = async () => {
     try {
       setLoading(true)
       const endpoint = `/profile-history/${userId}`
       const { data } = await api.get(endpoint)
-      setHistory(data.history || [])
+      const historyData = data.history || []
+      setHistory(historyData)
+      // Open the first (latest) card by default
+      if (historyData.length > 0) {
+        setOpenCards(new Set([historyData[0]._id]))
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch profile history')
       console.error('Failed to fetch history:', err)
@@ -94,6 +100,25 @@ const ProfileHistory = () => {
 
   const getChangeTypeLabel = (type: string) => {
     return type === 'profile_creation' ? 'Profile Created' : 'Profile Updated'
+  }
+
+  const normalizeIp = (ip: string = "") => {
+    if (!ip) return "Unknown";
+    if (ip.startsWith("::ffff:")) return ip.replace("::ffff:", ""); // IPv6-mapped IPv4
+    if (ip === "::1") return "127.0.0.1"; // IPv6 localhost
+    return ip;
+  };
+
+  const toggleCard = (id: string) => {
+    setOpenCards(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(id)) {
+        newSet.delete(id)
+      } else {
+        newSet.add(id)
+      }
+      return newSet
+    })
   }
 
   if (loading) {
@@ -165,63 +190,86 @@ const ProfileHistory = () => {
           ) : (
             <div className="space-y-4">
               {history.map((entry, index) => (
-                <div key={entry._id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                  {/* Entry Header */}
-                  <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-semibold text-gray-700">#{history.length - index}</span>
+                <div key={entry._id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-200">
+                  {/* Clickable Header */}
+                  <div 
+                    className="p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                    onClick={() => toggleCard(entry._id)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                          <span className="text-sm font-semibold text-gray-700">#{history.length - index}</span>
+                        </div>
+                        <div>
+                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium border ${getChangeTypeColor(entry.changeType)}`}>
+                            {getChangeTypeLabel(entry.changeType)}
+                          </span>
+                          <p className="text-sm text-gray-600 mt-1">{formatTimestamp(entry.timestamp)}</p>
+                        </div>
                       </div>
-                      <div>
-                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium border ${getChangeTypeColor(entry.changeType)}`}>
-                          {getChangeTypeLabel(entry.changeType)}
-                        </span>
-                        <p className="text-sm text-gray-600 mt-1">{formatTimestamp(entry.timestamp)}</p>
+                      <div className="flex items-center space-x-4">
+                        {entry.ipAddress && (
+                          <div className="text-right">
+                            <p className="text-xs text-gray-500">
+                              IP: {normalizeIp(entry.ipAddress)}
+                            </p>
+                          </div>
+                        )}
+                        <svg 
+                          width="20" 
+                          height="20" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          className={`text-gray-400 transition-transform duration-200 ${openCards.has(entry._id) ? 'rotate-180' : ''}`}
+                        >
+                          <path d="M19 9l-7 7-7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
                       </div>
                     </div>
-                    {entry.ipAddress && (
-                      <div className="text-right">
-                        <p className="text-xs text-gray-500">IP: {entry.ipAddress}</p>
-                      </div>
-                    )}
                   </div>
 
-                  {/* Changed Fields */}
-                  {Object.keys(entry.changedFields).length > 0 && (
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Changes Made:</h4>
-                      {Object.entries(entry.changedFields).map(([field, change]) => (
-                        <div key={field} className="bg-gray-50 rounded-lg p-4">
-                          <p className="text-sm font-medium text-gray-900 mb-2">{formatFieldName(field)}</p>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                              <p className="text-xs text-red-600 font-medium mb-1">Previous Value</p>
-                              <p className="text-sm text-gray-900 font-mono">{formatValue(change.oldValue)}</p>
+                  {/* Collapsible Content */}
+                  {openCards.has(entry._id) && (
+                    <div className="px-6 pb-6 pt-4 border-t border-gray-100">
+                      {/* Changed Fields */}
+                      {Object.keys(entry.changedFields).length > 0 && (
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Changes Made:</h4>
+                          {Object.entries(entry.changedFields).map(([field, change]) => (
+                            <div key={field} className="bg-gray-50 rounded-lg p-4">
+                              <p className="text-sm font-medium text-gray-900 mb-2">{formatFieldName(field)}</p>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                                  <p className="text-xs text-red-600 font-medium mb-1">Previous Value</p>
+                                  <p className="text-sm text-gray-900 font-mono">{formatValue(change.oldValue)}</p>
+                                </div>
+                                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                                  <p className="text-xs text-green-600 font-medium mb-1">New Value</p>
+                                  <p className="text-sm text-gray-900 font-mono">{formatValue(change.newValue)}</p>
+                                </div>
+                              </div>
                             </div>
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                              <p className="text-xs text-green-600 font-medium mb-1">New Value</p>
-                              <p className="text-sm text-gray-900 font-mono">{formatValue(change.newValue)}</p>
-                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Profile Snapshot */}
+                      {entry.profileSnapshot && Object.keys(entry.profileSnapshot).length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Critical Fields Snapshot:</h4>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {Object.entries(entry.profileSnapshot).map(([key, value]) => (
+                              value && (
+                                <div key={key} className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                  <p className="text-xs text-blue-600 font-medium mb-1">{formatFieldName(key)}</p>
+                                  <p className="text-sm text-gray-900 font-mono">{formatValue(value)}</p>
+                                </div>
+                              )
+                            ))}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Profile Snapshot */}
-                  {entry.profileSnapshot && Object.keys(entry.profileSnapshot).length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Critical Fields Snapshot:</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        {Object.entries(entry.profileSnapshot).map(([key, value]) => (
-                          value && (
-                            <div key={key} className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                              <p className="text-xs text-blue-600 font-medium mb-1">{formatFieldName(key)}</p>
-                              <p className="text-sm text-gray-900 font-mono">{formatValue(value)}</p>
-                            </div>
-                          )
-                        ))}
-                      </div>
+                      )}
                     </div>
                   )}
                 </div>
