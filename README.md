@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (50)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (125)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (127)
 
 ---
 
@@ -195,7 +195,7 @@
 | 165 | **IP Whitelisting System** | Implemented backend IP whitelisting for system admin login security. **User Model (`backend/src/models/User.ts`):** Added `ipWhitelist` array (stores `ip`, `description`, `addedAt`, `addedBy`) and `allowIpRestriction` boolean to enable/disable IP checks per user. **Service Layer (`backend/src/services/ipWhitelistService.ts`):** Created functions to add/remove IPs with duplicate prevention, fetch user whitelists, toggle restrictions (requires minimum one IP), and validate IP formats. Enforces `system_admin` role for all operations. **Controller (`backend/src/controllers/ipWhitelistController.ts`):** Handles requests for getting current client IP, managing whitelist CRUD operations, and toggling restrictions. Returns appropriate HTTP status codes (400/403/500) and normalizes IPv4-mapped IPv6 addresses. **Middleware (`backend/src/middleware/ipWhitelist.ts`):** Created `checkIpWhitelist` to block unauthorized IPs when `allowIpRestriction` is enabled. Includes `getClientIP` (extracts real IP from proxies/headers) and `normalizeIP` (standardizes IPv6-mapped IPv4). Logs all access attempts and returns 403 for blocked IPs. **Routes (`backend/src/routes/ipWhitelist.ts`):** Established `/api/ip-whitelist` endpoints: GET `/current-ip`, GET `/` (whitelist), POST `/add`, DELETE `/:ipId`, PATCH `/toggle`. All require authentication via `authenticateToken`. **Server Integration (`backend/src/server.ts`):** Applied `checkIpWhitelist` middleware to protect all `/api/*` routes (loans, documents, profiles, profile-history) while keeping auth routes public. Updated CORS to support PATCH requests. Modified auth verify route (`backend/src/routes/auth.ts`) to include IP whitelist checks, ensuring token verification respects IP restrictions. This architecture allows system admins to control which IPs can access protected endpoints when restrictions are enabled, with automatic enforcement across all sensitive API routes. |
 | 174 | **Underwriter Dashboard: Modularized** | Refactored monolithic `UnderwriterDashboard.tsx` (760+ lines) into focused modules: `types.ts` (interfaces), `searchFilterUtils.ts` (filter/sort logic), `SearchFilterBar.tsx` (search UI), `ApplicationsTable.tsx` (table/card views), `RestorationRequestModal.tsx` (modal component), and streamlined main `UnderwriterDashboard.tsx` (~290 lines). Improved maintainability, testability, and separation of concerns reduction in main component size. |
 
-### ⚡ In Progress (17)
+### ⚡ In Progress (19)
 
 | ID | Initiative | Status |
 |----|-----------|--------|
@@ -217,9 +217,10 @@
 | 167 | **IP Whitelist Implementation Review** | Audit all IP whitelist-related pages and code added in tasks 165 and 166 to verify what's actually needed and being used. Check which pages are restricted by IP whitelist and which aren't. Identify any unused components, services, or routes that can be removed or consolidated for cleaner implementation. |
 | 168 | **Global Support Contact Link** | Add a "Contact Support" link on every page of the website and every mail that gets sent to all the users of the application for consistent user access to help and assistance. |
 | 176 | **Loan Email Service: Refactor & Modularization** | Refactoring the large `loanEmailService.ts` (~830 lines) into smaller, modular hooks/functions grouped by feature (application emails, restoration emails, profile emails, underwriter/admin notifications) to improve readability, maintainability, and testability. |
+| 177 | **Profile Restoration: Admin Reason & History Tracking** | Implemented system admin prompt for restoration reason when restoring a user profile, similar to loan application restoration. Added `ProfileHistory` model to track deletion timestamps, user-provided deletion reasons, and admin-provided restoration reasons for audit and record-keeping. |
 
 ---
 
-**Document Version:** 152
+**Document Version:** 153
 **Last Updated:** 22nd October 2025
 **Maintained By:** Aniruddh Ballal
