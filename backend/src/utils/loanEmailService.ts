@@ -25,6 +25,20 @@ import {
   applicationRestoredTemplate, 
   ApplicationRestoredData 
 } from './applicationRestoredTemplate';
+import { 
+  profileDeletedApplicantTemplate, 
+  ProfileDeletedApplicantData,
+  profileDeletedUnderwriterTemplate,
+  ProfileDeletedUnderwriterData,
+  profileDeletedAdminTemplate,
+  ProfileDeletedAdminData
+} from './profileDeletedTemplate';
+import { 
+  profileRestoredApplicantTemplate, 
+  ProfileRestoredApplicantData,
+  profileRestoredUnderwriterTemplate,
+  ProfileRestoredUnderwriterData
+} from './profileRestoredTemplate';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
@@ -554,7 +568,250 @@ export const sendApplicationRestoredEmail = async (
   }
 };
 
-// Update the default export at the bottom of emailService.ts to include:
+/**
+ * Send email to applicant when they delete their profile
+ */
+export const sendProfileDeletedEmail = async (
+  email: string,
+  firstName: string,
+  applicationsCount: number,
+  deletedAt: Date
+) => {
+  try {
+    const supportEmail = process.env.SYSTEM_ADMIN_EMAIL || 'support@loanlo.com';
+
+    const emailData: ProfileDeletedApplicantData = {
+      firstName,
+      email,
+      deletedAt: deletedAt.toISOString(),
+      applicationsCount,
+      supportEmail,
+    };
+
+    const msg = {
+      to: email,
+      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
+      subject: `Profile Deleted - LOANLO`,
+      html: profileDeletedApplicantTemplate(emailData),
+      text: `Dear ${firstName},\n\nYour LOANLO account has been successfully deleted.\n\nDeleted on: ${deletedAt.toLocaleString()}\nApplications removed: ${applicationsCount}\n\nIf you need to restore your account, contact us at ${supportEmail}\n\nLOANLO Team`,
+    };
+
+    await sgMail.send(msg);
+  } catch (error) {
+    console.error('❌ Error sending profile deleted email:', error);
+    // Don't throw - we don't want email failures to break the application flow
+  }
+};
+
+/**
+ * Send email to underwriters when an applicant deletes their profile
+ */
+export const sendProfileDeletedNotificationToUnderwriters = async (
+  applicantName: string,
+  applicantEmail: string,
+  applicationsCount: number,
+  deletedAt: Date
+) => {
+  try {
+    // Get all underwriter emails from environment variable
+    const underwriterEmails = (process.env.UNDERWRITER_EMAILS || '')
+      .split(',')
+      .map(email => email.trim())
+      .filter(email => email.length > 0);
+
+    if (underwriterEmails.length === 0) {
+      console.warn('⚠️ No underwriter emails configured in UNDERWRITER_EMAILS');
+      return;
+    }
+
+    const frontendUrl = getFrontendUrl();
+    const underwriterDashboardLink = `${frontendUrl}/dashboard/underwriter`;
+
+    // Send to all underwriters
+    const emailPromises = underwriterEmails.map(async (underwriterEmail) => {
+      // Extract first name from email (basic implementation)
+      const underwriterName = (underwriterEmail.split('@')[0] || 'Underwriter')
+        .split('.')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+
+      const emailData: ProfileDeletedUnderwriterData = {
+        underwriterName,
+        applicantName,
+        applicantEmail,
+        deletedAt: deletedAt.toISOString(),
+        applicationsCount,
+        underwriterDashboardLink,
+      };
+
+      const msg = {
+        to: underwriterEmail,
+        from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
+        subject: `Applicant Profile Deleted - ${applicantName}`,
+        html: profileDeletedUnderwriterTemplate(emailData),
+        text: `Dear ${underwriterName},\n\nAn applicant has deleted their profile.\n\nApplicant: ${applicantName} (${applicantEmail})\nApplications removed: ${applicationsCount}\nDeleted on: ${deletedAt.toLocaleString()}\n\nNo action required. View dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`,
+      };
+
+      return sgMail.send(msg);
+    });
+
+    await Promise.all(emailPromises);
+  } catch (error) {
+    console.error('❌ Error sending profile deleted notification to underwriters:', error);
+  }
+};
+
+/**
+ * Send email to system admin when an applicant deletes their profile
+ */
+export const sendProfileDeletedNotificationToAdmin = async (
+  applicantName: string,
+  applicantEmail: string,
+  applicationsCount: number,
+  deletedAt: Date
+) => {
+  try {
+    // Get system admin email from environment variable
+    const adminEmail = process.env.SYSTEM_ADMIN_EMAIL;
+
+    if (!adminEmail) {
+      console.warn('⚠️ No system admin email configured in SYSTEM_ADMIN_EMAIL');
+      return;
+    }
+
+    const frontendUrl = getFrontendUrl();
+    const adminDashboardLink = `${frontendUrl}/dashboard/admin`;
+
+    // Extract admin name from email (basic implementation)
+    const adminName = (adminEmail.split('@')[0] || 'Admin')
+      .split('.')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+
+    const emailData: ProfileDeletedAdminData = {
+      adminName,
+      applicantName,
+      applicantEmail,
+      deletedAt: deletedAt.toISOString(),
+      applicationsCount,
+      adminDashboardLink,
+    };
+
+    const msg = {
+      to: adminEmail,
+      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
+      subject: `🔔 Applicant Profile Deleted - ${applicantName}`,
+      html: profileDeletedAdminTemplate(emailData),
+      text: `Dear ${adminName},\n\nAn applicant has deleted their profile. This profile can be restored if needed.\n\nApplicant: ${applicantName} (${applicantEmail})\nApplications affected: ${applicationsCount}\nDeleted on: ${deletedAt.toLocaleString()}\n\nYou can restore this profile from your admin dashboard if the applicant requests it.\n\nView dashboard: ${adminDashboardLink}\n\nLOANLO Team`,
+    };
+
+    await sgMail.send(msg);
+  } catch (error) {
+    console.error('❌ Error sending profile deleted notification to admin:', error);
+  }
+};
+
+/**
+ * Send email to applicant when their profile is restored
+ */
+export const sendProfileRestoredEmail = async (
+  applicantEmail: string,
+  applicantName: string,
+  applicationsCount: number,
+  restorationReason: string,
+  restoredAt: Date
+) => {
+  try {
+    const frontendUrl = getFrontendUrl();
+    const applicationStatusLink = `${frontendUrl}/application-status`;
+
+    // Extract first name from full name
+    const firstName = applicantName.split(' ')[0] ?? '';
+
+    const emailData: ProfileRestoredApplicantData = {
+      firstName,
+      email: applicantEmail,
+      restoredAt: restoredAt.toISOString(),
+      applicationsCount,
+      restorationReason,
+      applicationStatusLink,
+    };
+
+    const msg = {
+      to: applicantEmail,
+      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
+      subject: `✓ Profile Restored - Welcome Back to LOANLO`,
+      html: profileRestoredApplicantTemplate(emailData),
+      text: `Dear ${firstName},\n\nGreat news! Your LOANLO account has been successfully restored.\n\nRestored on: ${restoredAt.toLocaleString()}\nApplications restored: ${applicationsCount}\n\nReason: ${restorationReason}\n\nYou can now access your applications: ${applicationStatusLink}\n\nLOANLO Team`,
+    };
+
+    await sgMail.send(msg);
+  } catch (error) {
+    console.error('❌ Error sending profile restored email to applicant:', error);
+    // Don't throw - we don't want email failures to break the application flow
+  }
+};
+
+/**
+ * Send email to underwriters when an applicant profile is restored
+ */
+export const sendProfileRestoredNotificationToUnderwriters = async (
+  applicantName: string,
+  applicantEmail: string,
+  applicationsCount: number,
+  restorationReason: string,
+  restoredAt: Date
+) => {
+  try {
+    // Get all underwriter emails from environment variable
+    const underwriterEmails = (process.env.UNDERWRITER_EMAILS || '')
+      .split(',')
+      .map(email => email.trim())
+      .filter(email => email.length > 0);
+
+    if (underwriterEmails.length === 0) {
+      console.warn('⚠️ No underwriter emails configured in UNDERWRITER_EMAILS');
+      return;
+    }
+
+    const frontendUrl = getFrontendUrl();
+    const underwriterDashboardLink = `${frontendUrl}/dashboard/underwriter`;
+
+    // Send to all underwriters
+    const emailPromises = underwriterEmails.map(async (underwriterEmail) => {
+      // Extract first name from email (basic implementation)
+      const underwriterName = (underwriterEmail.split('@')[0] || 'Underwriter')
+        .split('.')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+
+      const emailData: ProfileRestoredUnderwriterData = {
+        underwriterName,
+        applicantName,
+        applicantEmail,
+        restoredAt: restoredAt.toISOString(),
+        applicationsCount,
+        restorationReason,
+        underwriterDashboardLink,
+      };
+
+      const msg = {
+        to: underwriterEmail,
+        from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
+        subject: `Applicant Profile Restored - ${applicantName}`,
+        html: profileRestoredUnderwriterTemplate(emailData),
+        text: `Dear ${underwriterName},\n\nAn applicant profile has been restored.\n\nApplicant: ${applicantName} (${applicantEmail})\nApplications restored: ${applicationsCount}\nRestored on: ${restoredAt.toLocaleString()}\n\nReason: ${restorationReason}\n\nView dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`,
+      };
+
+      return sgMail.send(msg);
+    });
+
+    await Promise.all(emailPromises);
+  } catch (error) {
+    console.error('❌ Error sending profile restored notification to underwriters:', error);
+  }
+};
+
 export default {
   sendLoanApplicationSubmittedEmail,
   sendLoanStatusUpdateEmail,
@@ -567,4 +824,9 @@ export default {
   sendRestorationApprovedEmail,
   sendRestorationRejectedEmail,
   sendApplicationRestoredEmail,
+  sendProfileDeletedEmail,
+  sendProfileDeletedNotificationToUnderwriters,
+  sendProfileDeletedNotificationToAdmin,
+  sendProfileRestoredEmail,
+  sendProfileRestoredNotificationToUnderwriters,
 };

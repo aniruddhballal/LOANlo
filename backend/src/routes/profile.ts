@@ -6,6 +6,7 @@ import validator from 'validator';
 import { isProfileComplete, UserProfile } from '../shared/validation';
 import { logProfileChange, getProfileHistory } from '../middleware/profileAudit';
 import LoanApplication from '../models/LoanApplication';
+import { sendProfileDeletedEmail, sendProfileDeletedNotificationToUnderwriters, sendProfileDeletedNotificationToAdmin, sendProfileRestoredEmail, sendProfileRestoredNotificationToUnderwriters } from '../utils/loanEmailService';
 
 const router = Router();
 
@@ -462,6 +463,10 @@ router.delete('/me', authenticateToken, async (req: AuthRequest, res: Response) 
     user.deletedAt = new Date();
     await user.save();
 
+    // Get user details for email notifications
+    const applicantName = `${user.firstName} ${user.lastName}`;
+    const deletedAt = user.deletedAt!;
+
     // CASCADE: Soft delete all loan applications by this user
     // Find all non-deleted loan applications
     const userLoanApplications = await LoanApplication.find({ 
@@ -484,6 +489,28 @@ router.delete('/me', authenticateToken, async (req: AuthRequest, res: Response) 
       
       await application.save();
     }
+
+    // Send email notifications (don't await - let them send in background)
+    Promise.all([
+      sendProfileDeletedEmail(
+        user.email,
+        user.firstName,
+        userLoanApplications.length,
+        deletedAt
+      ),
+      sendProfileDeletedNotificationToUnderwriters(
+        applicantName,
+        user.email,
+        userLoanApplications.length,
+        deletedAt
+      ),
+      sendProfileDeletedNotificationToAdmin(
+        applicantName,
+        user.email,
+        userLoanApplications.length,
+        deletedAt
+      )
+    ]).catch(err => console.error('Error sending profile deletion emails:', err));
 
     res.json({
       success: true,
@@ -566,6 +593,29 @@ router.post('/restore/:userId', authenticateToken, async (req: AuthRequest, res:
       // If the comment is "Application deleted by user", we DON'T restore it
     }
 
+    // Get restoration details
+    const applicantName = `${user.firstName} ${user.lastName}`;
+    const restoredAt = new Date();
+    const restorationReason = 'Profile restored by system administrator';
+
+    // Send email notifications (don't await - let them send in background)
+    Promise.all([
+      sendProfileRestoredEmail(
+        user.email,
+        applicantName,
+        restoredCount,
+        restorationReason,
+        restoredAt
+      ),
+      sendProfileRestoredNotificationToUnderwriters(
+        applicantName,
+        user.email,
+        restoredCount,
+        restorationReason,
+        restoredAt
+      )
+    ]).catch(err => console.error('Error sending profile restoration emails:', err));
+
     res.json({
       success: true,
       message: 'Account restored successfully',
@@ -581,9 +631,6 @@ router.post('/restore/:userId', authenticateToken, async (req: AuthRequest, res:
     });
   }
 });
-
-// Add these two endpoints to: backend/src/routes/profile.ts
-// Place them near your existing restore and soft delete endpoints
 
 // Get all deleted users (admin only)
 router.get('/admin/deleted-users', authenticateToken, async (req: AuthRequest, res: Response) => {
