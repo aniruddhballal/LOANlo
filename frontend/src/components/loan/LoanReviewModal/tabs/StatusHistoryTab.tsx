@@ -8,8 +8,8 @@ interface StatusHistoryTabProps {
 export default function StatusHistoryTab({ application }: StatusHistoryTabProps) {
   return (
     <div className="space-y-6">
-      {/* Header with gradient underline */}
-      <div className="relative pb-3">
+      {/* Header with gradient underline - Now with slide up animation */}
+      <div className="relative pb-3" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
         <h3 className="font-semibold text-gray-900 text-xl tracking-tight">Status Timeline</h3>
         <div className="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-blue-600 to-blue-400"></div>
       </div>
@@ -17,21 +17,21 @@ export default function StatusHistoryTab({ application }: StatusHistoryTabProps)
       {/* Timeline Container */}
       <div className="space-y-6">
         {application.statusHistory.map((entry, index) => (
-          <div 
-            key={index} 
+          <div
+            key={index}
             className="group"
-            style={{ 
-              animation: `fadeInUp 0.5s ease-out ${index * 0.1}s both`
+            style={{
+              animation: `fadeInUp 0.5s ease-out ${(index + 1) * 0.1}s both`
             }}
           >
             {/* Content card */}
             <div className="relative bg-white rounded-xl border border-gray-200 p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5 overflow-hidden">
               {/* Subtle gradient overlay on hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              
+             
               {/* Top shimmer line */}
               <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              
+             
               <div className="relative z-10">
                 {/* Header row */}
                 <div className="flex items-center justify-between mb-3">
@@ -40,12 +40,10 @@ export default function StatusHistoryTab({ application }: StatusHistoryTabProps)
                   </span>
                   <span className="text-sm text-gray-600 font-medium tracking-wide">{formatDate(entry.timestamp)}</span>
                 </div>
-
                 {/* Comment */}
                 {entry.comment && (
                   <p className="text-gray-700 mt-3 leading-relaxed text-sm border-l-2 border-gray-200 pl-3 italic">{entry.comment}</p>
                 )}
-
                 {/* Updated by */}
                 {entry.updatedBy && (
                   <div className="flex items-center mt-3 text-xs text-gray-500">

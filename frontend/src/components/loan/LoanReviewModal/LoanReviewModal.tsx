@@ -3,9 +3,9 @@ import { X, FileText, Clock, MessageSquare, File, AlertCircle, CheckCircle } fro
 import api from '../../../api'
 import type { LoanApplication, ApprovalData } from './types'
 import { getRequiredDocuments } from '../../utils'
-import ApplicationDetailsTab from './tabs/ApplicationDetailsTab'
+import ApplicationDetailsTab from './tabs/ApplicationDetailsTab'    // done
 import DocumentsTab from './tabs/DocumentsTab'
-import StatusHistoryTab from './tabs/StatusHistoryTab'
+import StatusHistoryTab from './tabs/StatusHistoryTab'              // done
 import ActionsTab from './tabs/ActionsTab'
 
 import { useAuth } from '../../../context/AuthContext'
