@@ -162,7 +162,9 @@ export function SearchFilterBar({
           {activeFilterCount > 0 && (
             <button
               onClick={clearFilters}
-              className="shimmer-button px-5 py-3 text-sm font-semibold text-gray-700 hover:text-white bg-white hover:bg-gradient-to-r hover:from-gray-900 hover:to-gray-800 border-2 border-gray-300 hover:border-gray-900 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
+              className="shimmer-button px-5 py-3 text-sm font-semibold text-gray-700 hover:text-gray-900 bg-white 
+              hover:bg-gradient-to-r hover:from-gray-200 hover:to-gray-300 border-2 border-gray-300 
+              hover:border-gray-500 rounded-xl transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
             >
               Clear All
             </button>
