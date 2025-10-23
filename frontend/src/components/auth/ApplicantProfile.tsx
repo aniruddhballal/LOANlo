@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { ProfileSkeleton } from '../ui/SkeletonComponents'
@@ -6,18 +6,91 @@ import api from '../../api'
 import { getGreeting } from '../utils'
 import { formatDate, formatCurrency } from '../utils'
 
+const DeleteConfirmationModal = ({ 
+  show, 
+  onClose, 
+  onConfirm, 
+  loading 
+}: { 
+  show: boolean
+  onClose: () => void
+  onConfirm: () => void
+  loading: boolean
+}) => (
+  <>
+    <div
+      className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] transition-all duration-300 ${
+        show ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}
+      style={{ position: 'fixed' }}
+      onClick={onClose}
+    />
+    <div 
+      className={`fixed inset-0 z-[9999] overflow-y-auto transition-opacity duration-300 ${
+        show ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}
+    >
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div
+          className={`bg-white rounded-xl shadow-2xl max-w-md w-full p-6 transition-transform duration-300 ${
+            show ? 'scale-100' : 'scale-95'
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#DC2626" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
+            Delete Account?
+          </h3>
+          <p className="text-sm text-gray-600 text-center mb-6">
+            This action cannot be undone. All your data, including loan applications and personal information, will be permanently deleted.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              disabled={loading}
+              className="group relative flex-1 px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className="relative z-10">Cancel</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-100 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={loading}
+              className="group relative flex-1 px-4 py-3 text-sm font-medium text-white bg-red-600 border border-red-700 rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className="relative z-10">{loading ? 'Deleting...' : 'Delete Account'}</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </>
+)
+
 const Profile = () => {
   const { userId } = useParams<{ userId: string }>()
   const [loading, setLoading] = useState(true)
   const [userData, setUserData] = useState<any>(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const hasAnimated = useRef(false) // Track if initial animations have played
   const navigate = useNavigate()
   const { user, logout } = useAuth()
 
   useEffect(() => {
     fetchUserData()
   }, [userId])
+
+  useEffect(() => {
+    if (!loading && userData) {
+      hasAnimated.current = true
+    }
+  }, [loading, userData])
 
   const fetchUserData = async () => {
     try {
@@ -55,8 +128,8 @@ const Profile = () => {
 
   const InfoSection = ({ title, children, delay = 0 }: { title: string; children: React.ReactNode; delay?: number }) => (
     <div 
-      className="group bg-white rounded-xl border border-gray-200 p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5 overflow-hidden mb-6"
-      style={{ animation: `fadeInUp 0.5s ease-out ${delay}s both` }}
+      className={`group bg-white rounded-xl border border-gray-200 p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5 overflow-hidden mb-6 ${!hasAnimated.current ? 'animate-fade-in-up' : ''}`}
+      style={!hasAnimated.current ? { animationDelay: `${delay}s` } : {}}
     >
       {/* Subtle gradient overlay on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -80,51 +153,6 @@ const Profile = () => {
     <div className="group/field">
       <p className="text-sm font-medium text-gray-500 mb-1.5 tracking-wide">{label}</p>
       <p className="text-base text-gray-900 font-medium transition-colors duration-200 group-hover/field:text-gray-700">{value || 'N/A'}</p>
-    </div>
-  )
-
-  const DeleteConfirmationModal = () => (
-    <div 
-      className="fixed inset-0 backdrop-blur-sm z-[9999] overflow-y-auto"
-      style={{ position: 'fixed' }}
-      onClick={() => setShowDeleteModal(false)}
-    >
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div 
-          className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#DC2626" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-            Delete Account?
-          </h3>
-          <p className="text-sm text-gray-600 text-center mb-6">
-            This action cannot be undone. All your data, including loan applications and personal information, will be permanently deleted.
-          </p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setShowDeleteModal(false)}
-              disabled={deleteLoading}
-              className="group relative flex-1 px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="relative z-10">Cancel</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-100 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-            </button>
-            <button
-              onClick={handleDeleteAccount}
-              disabled={deleteLoading}
-              className="group relative flex-1 px-4 py-3 text-sm font-medium text-white bg-red-600 border border-red-700 rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="relative z-10">{deleteLoading ? 'Deleting...' : 'Delete Account'}</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   )
 
@@ -394,7 +422,12 @@ const Profile = () => {
       </div>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteModal && <DeleteConfirmationModal />}
+      <DeleteConfirmationModal 
+        show={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteAccount}
+        loading={deleteLoading}
+      />
 
       <style>{`
         @keyframes fadeInUp {
@@ -417,6 +450,14 @@ const Profile = () => {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+
+        .animate-fade-in-up {
+          animation: fadeInUp 0.5s ease-out both;
+        }
+
+        .animate-fade-in-down {
+          animation: fadeInDown 0.5s ease-out;
         }
       `}</style>
     </div>
