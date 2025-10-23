@@ -107,8 +107,14 @@ const Login = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-6 relative overflow-hidden">
         {/* Success Animation Overlay */}
         {loginSuccess && (
-          <div className="fixed inset-0 bg-green-500/20 backdrop-blur-sm z-50 flex items-center justify-center animate-in fade-in duration-500">
-            <div className="bg-white rounded-3xl p-8 shadow-2xl border border-green-200 animate-in zoom-in duration-500 delay-300">
+          <div 
+            className="fixed inset-0 bg-green-500/20 backdrop-blur-sm z-50 flex items-center justify-center"
+            style={{ animation: 'fadeIn 0.5s ease-out' }}
+          >
+            <div 
+              className="bg-white rounded-3xl p-8 shadow-2xl border border-green-200"
+              style={{ animation: 'scaleIn 0.5s ease-out 0.3s both' }}
+            >
               <div className="text-center">
                 <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center animate-bounce">
                   <CheckCircle className="w-8 h-8 text-green-600" />
@@ -126,7 +132,10 @@ const Login = () => {
         )}
         <div className="w-full max-w-lg relative z-10">
           {/* Corporate Header */}
-          <div className={`text-center mb-12 transition-all duration-700 ${loginSuccess ? 'opacity-50 scale-95' : ''}`}>
+          <div 
+            className={`text-center mb-12 transition-all duration-700 ${loginSuccess ? 'opacity-50 scale-95' : ''}`}
+            style={{ animation: 'fadeInDown 0.5s ease-out' }}
+          >
             <div className="inline-flex items-center justify-center w-16 h-16 bg-black rounded-xl mb-6 shadow-lg">
               <Shield className="w-8 h-8 text-white" />
             </div>
@@ -140,9 +149,12 @@ const Login = () => {
           </div>
          
           {/* Main Authentication Card */}
-          <div className={`bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden transition-all duration-700 ${
-            loginSuccess ? 'opacity-50 scale-95 border-green-300 shadow-green-100' : ''
-          }`}>
+          <div 
+            className={`bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden transition-all duration-700 ${
+              loginSuccess ? 'opacity-50 scale-95 border-green-300 shadow-green-100' : ''
+            }`}
+            style={{ animation: 'fadeInUp 0.5s ease-out 0.1s both' }}
+          >
             {/* Card Header */}
             <div className="bg-gradient-to-r from-gray-50 to-white px-10 py-8 border-b border-gray-100">
               <h2 className="text-2xl font-light text-gray-900 text-center tracking-wide">
@@ -163,7 +175,10 @@ const Login = () => {
             <div className="px-10 py-8">
               {/* Error Alert */}
               {error && (
-                <div className="mb-6 p-4 rounded-2xl border border-red-200 bg-red-50 flex items-start space-x-3 transition-all duration-300">
+                <div 
+                  className="mb-6 p-4 rounded-2xl border border-red-200 bg-red-50 flex items-start space-x-3 transition-all duration-300"
+                  style={{ animation: 'fadeInUp 0.3s ease-out' }}
+                >
                   <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
                   <div className="text-red-700 text-sm font-medium">{error}</div>
                 </div>
@@ -332,7 +347,10 @@ const Login = () => {
           </div>
 
           {/* Footer Badge */}
-          <div className={`text-center mt-8 opacity-60 transition-all duration-700 ${loginSuccess ? 'opacity-30' : ''}`}>
+          <div 
+            className={`text-center mt-8 opacity-60 transition-all duration-700 ${loginSuccess ? 'opacity-30' : ''}`}
+            style={{ animation: 'fadeInUp 0.5s ease-out 0.3s both' }}
+          >
             <p className="text-xs text-gray-400 tracking-widest font-light">
               ENTERPRISE GRADE SECURITY
             </p>
@@ -349,6 +367,50 @@ const Login = () => {
         title="Security Verification"
         description="Please solve this simple math problem to verify you're human"
       />
+
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes fadeInDown {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </>
   )
 }
