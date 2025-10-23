@@ -44,8 +44,8 @@ export const PersonalDetailsSkeleton = () => (
   </SkeletonBase>
 );
 
-// Staff Profile Skeleton - matches the actual StaffProfile layout
-export const StaffProfileSkeleton = () => (
+// Profile Skeleton - matches the actual Profile layout
+export const ProfileSkeleton = () => (
   <SkeletonBase>
     <div className="space-y-6">
       {/* Account Status Card Skeleton */}

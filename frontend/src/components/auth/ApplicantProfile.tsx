@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { PersonalDetailsSkeleton } from '../ui/SkeletonComponents'
+import { ProfileSkeleton } from '../ui/SkeletonComponents'
 import api from '../../api'
 import { getGreeting } from '../utils'
 import { formatDate, formatCurrency } from '../utils'
@@ -239,7 +239,7 @@ const Profile = () => {
         {/* Main Content */}
         <main className="max-w-[1600px] mx-auto px-6 lg:px-8 py-8">
           {loading ? (
-            <PersonalDetailsSkeleton />
+            <ProfileSkeleton />
           ) : userData ? (
             <>
               {/* Account Status */}

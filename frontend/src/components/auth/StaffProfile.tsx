@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { StaffProfileSkeleton } from '../ui/SkeletonComponents'
+import { ProfileSkeleton } from '../ui/SkeletonComponents'
 import api from '../../api'
 import { getGreeting } from '../utils'
 import { formatDate } from '../utils'
@@ -129,7 +129,7 @@ const StaffProfile = () => {
         {/* Main Content */}
         <main className="max-w-[1600px] mx-auto px-6 lg:px-8 py-8">
           {loading ? (
-            <StaffProfileSkeleton />
+            <ProfileSkeleton />
           ) : userData ? (
             <div className="space-y-6">
               {/* Account Status */}
