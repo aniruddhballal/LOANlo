@@ -44,6 +44,54 @@ export const PersonalDetailsSkeleton = () => (
   </SkeletonBase>
 );
 
+// Staff Profile Skeleton - matches the actual StaffProfile layout
+export const StaffProfileSkeleton = () => (
+  <SkeletonBase>
+    <div className="space-y-6">
+      {/* Account Status Card Skeleton */}
+      <div className="rounded-xl p-6 shadow-sm border bg-white border-gray-200">
+        <div className="flex items-center space-x-5">
+          <SkeletonBox className="w-12 h-12 rounded-xl" />
+          <div className="flex-1">
+            <SkeletonText className="w-64 mb-2" />
+            <SkeletonText className="w-48 h-3" />
+          </div>
+        </div>
+      </div>
+
+      {/* Basic Information Section Skeleton */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="relative pb-3 mb-4">
+          <SkeletonText className="w-40 h-5" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i}>
+              <SkeletonText className="w-24 h-3 mb-2" />
+              <SkeletonText className="w-32 h-4" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Account Information Section Skeleton */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="relative pb-3 mb-4">
+          <SkeletonText className="w-48 h-5" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i}>
+              <SkeletonText className="w-28 h-3 mb-2" />
+              <SkeletonText className="w-40 h-4" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </SkeletonBase>
+);
+
 // Service Actions Skeleton (for ApplicantDashboard)
 export const ServiceActionsSkeleton = () => (
   <SkeletonBase>

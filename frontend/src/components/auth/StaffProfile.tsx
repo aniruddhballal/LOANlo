@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { PersonalDetailsSkeleton } from '../ui/SkeletonComponents'
+import { StaffProfileSkeleton } from '../ui/SkeletonComponents'
 import api from '../../api'
 import { getGreeting } from '../utils'
 import { formatDate } from '../utils'
@@ -102,7 +102,7 @@ const StaffProfile = () => {
                         <span className="font-semibold text-gray-900 ml-1">
                           {user?.firstName} {user?.lastName}
                         </span>
-                        <span className="ml-2 text-gray-500">• View your staff information</span>
+                        <span className="ml-2 text-gray-500">• View your information</span>
                       </>
                     )}
                   </p>
@@ -129,7 +129,7 @@ const StaffProfile = () => {
         {/* Main Content */}
         <main className="max-w-[1600px] mx-auto px-6 lg:px-8 py-8">
           {loading ? (
-            <PersonalDetailsSkeleton />
+            <StaffProfileSkeleton />
           ) : userData ? (
             <div className="space-y-6">
               {/* Account Status */}
