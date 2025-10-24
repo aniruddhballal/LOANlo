@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (51)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (52)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (127)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (48)
+### ✅ Completed Initiatives (49)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -67,6 +67,7 @@
 | 172 | **Account Deletion Confirmation Page & Clean Session Redirect** | Created `AccountDeleted.tsx` component as dedicated post-deletion landing page with farewell message, data removal summary, recovery contact option (mailto link to admin), and dual CTAs (Back to Login/Create New Account). Modified account deletion handler in profile management component to navigate to `/account-deleted` instead of `/`. Replaced `<Link>` components with `<a href>` tags in `AccountDeleted.tsx` to force full page reload, clearing React state/auth context and preventing stale token issues that caused brief "email verification required" flash before login redirect. Added `/account-deleted` route to `App.tsx` as public (non-protected) route. |
 | 173 | **Profile History Collapsible Cards & IP Normalization** | Refactored `ProfileHistory.tsx` to support collapsible history entries with default open for the latest entry using `openCards` state and `toggleCard` handler. Added `normalizeIp` helper to display IPv4-mapped and IPv6 localhost addresses correctly (`::ffff:127.0.0.1` → `127.0.0.1`, `::1` → `127.0.0.1`). Updated history entry headers to be clickable, showing/hiding changed fields and profile snapshots, with arrow icon rotating to indicate expansion. Minor UI tweaks for smoother transitions and cleaner layout of entry headers and collapsible content. |
 | 178 | **ProfilePage Modal Refactor & Re-render Optimization** | Extracted modal state and handlers from `ApplicantProfile`, creating `ProfilePage.tsx` wrapper to manage `showDeleteModal` and `deleteLoading` independently. Wrapped `ApplicantProfile` in `React.memo` and used `useCallback` for `onDeleteAccount` to prevent unnecessary re-renders. Rendered `DeleteAccountConfirmationModal` via `ReactDOM.createPortal` to isolate its mount/unmount from `ApplicantProfile`, ensuring stable UI behavior and eliminating repeated animations or click issues. Updated routes to load `ProfilePage` instead of `ApplicantProfile`. |
+| 179 | **DeletedUsers Component Refactor & Modularization** | Refactored `DeletedUsers.tsx` from 650ish lines into 9 focused modules: `UserTableHeader`, `RoleBadge`, `UserTableRow`, `UserMobileCard`, `DeletedUsersStyles`, `DeletedUsersHeader`, `NoResultsState`, `UsersList`, and `useDeletedUsers`. Main component now 100ish lines, preserving all functionality, improving readability, maintainability, and separation of concerns. |
 
 ### ⚡ In Progress (3)
 
@@ -222,6 +223,6 @@
 
 ---
 
-**Document Version:** 154
-**Last Updated:** 24nd October 2025
+**Document Version:** 155
+**Last Updated:** 25th October 2025
 **Maintained By:** Aniruddh Ballal
