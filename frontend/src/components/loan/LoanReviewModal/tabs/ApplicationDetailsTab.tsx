@@ -107,9 +107,29 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
       )}
 
       {/* Header with gradient underline */}
-      <div className="relative pb-3" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
-        <h3 className="font-semibold text-gray-900 text-xl tracking-tight">Application Details</h3>
-        <div className="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-blue-600 to-blue-400"></div>
+      <div
+        className="relative pb-3 flex items-center justify-between"
+        style={{ animation: 'fadeInUp 0.5s ease-out' }}
+      >
+        <div>
+          <h3 className="font-semibold text-gray-900 text-xl tracking-tight">
+            Application Details
+          </h3>
+          <div 
+            className="absolute bottom-0 left-0 w-41 h-0.5 bg-gradient-to-r from-blue-600 to-blue-400"
+            style={{ animation: 'expandWidth 0.3s ease-out' }}
+          ></div>
+        </div>
+
+        {onDelete && user && user.role === 'applicant' && isOwner && application.status !== 'approved' && (
+          <button
+            onClick={handleDeleteClick}
+            className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 hover:text-red-800 bg-white hover:bg-red-50 rounded-lg transition-all duration-200 border border-gray-300 hover:border-red-300 shadow-sm hover:shadow group/btn"
+          >
+            <Trash2 className="w-4 h-4 mr-2 transition-transform duration-200 group-hover/btn:scale-110" />
+            Delete
+          </button>
+        )}
       </div>
 
       {/* Applicant Info Card */}
@@ -147,16 +167,7 @@ export default function ApplicationDetailsTab({ application, onDelete }: Applica
                   Visit Profile
                 </button>
               )}
-              
-              {onDelete && user && user.role === 'applicant' && isOwner && application.status !== 'approved' && (
-                <button
-                  onClick={handleDeleteClick}
-                  className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 hover:text-red-800 bg-white hover:bg-red-50 rounded-lg transition-all duration-200 border border-gray-300 hover:border-red-300 shadow-sm hover:shadow group/btn"
-                >
-                  <Trash2 className="w-4 h-4 mr-2 transition-transform duration-200 group-hover/btn:scale-110" />
-                  Delete
-                </button>
-              )}
+
             </div>
           </div>
           
