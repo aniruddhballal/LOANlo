@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Search, SlidersHorizontal, X, ChevronDown, ChevronUp, ArrowUpDown, Mail, Phone, Briefcase } from 'lucide-react'
+import { ChevronDown, ChevronUp, ArrowUpDown, Mail, Phone, Briefcase } from 'lucide-react'
 import { DashboardLayout } from '../dashboards/shared/DashboardLayout'
 import { UnderwriterTableSkeleton } from '../ui/SkeletonComponents'
 import { ErrorAlert } from '../dashboards/shared/ErrorAlert'
 import { EmptyState } from '../dashboards/shared/EmptyState'
 import { formatDate, formatTime } from '../dashboards/utils/formatters'
 import api from '../../api'
+import { SearchFilterBar } from '../dashboards/SearchFilterBar'
 
 interface User {
   _id: string
@@ -377,98 +378,28 @@ export default function DeletedUsers() {
             </div>
 
             {/* Search and Filter Bar */}
-            <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-3">
-                {/* Global Search */}
-                <div className="flex-1 relative group">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 transition-colors group-focus-within:text-gray-600" />
-                  <input
-                    type="text"
-                    placeholder="Search by name, email, phone, role, or location..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-10 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300 font-medium"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Filter Toggle */}
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="shimmer-button flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 hover:shadow-lg relative text-gray-900 font-bold"                
-                >
-                  <SlidersHorizontal className="w-5 h-5 text-gray-900" />
-                  <span>Filters</span>
-                  {activeFilterCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-gradient-to-r from-gray-900 to-gray-800 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg">
-                      {activeFilterCount}
-                    </span>
-                  )}
-                </button>
-
-                {activeFilterCount > 0 && (
-                  <button
-                    onClick={clearFilters}
-                    className="shimmer-button px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-800 text-white font-bold rounded-xl hover:from-gray-800 hover:to-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-100"
-                  >
-                    Clear All
-                  </button>
-                )}
-              </div>
-
-              {/* Filter Panel */}
-              {showFilters && (
-                <div 
-                  className="p-6 bg-gradient-to-br from-gray-50 via-white to-gray-50/50 rounded-xl border-2 border-gray-200 space-y-4 shadow-lg"
-                  style={{ animation: 'fadeInUp 0.3s ease-out' }}
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Role Filter */}
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Role</label>
-                      <select
-                        value={filters.role}
-                        onChange={(e) => handleFilterChange('role', e.target.value)}
-                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300 font-medium"
-                      >
-                        <option value="all">All Roles</option>
-                        <option value="applicant">Applicant</option>
-                        <option value="underwriter">Underwriter</option>
-                        <option value="system_admin">System Admin</option>
-                      </select>
-                    </div>
-
-                    {/* Date Range */}
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Deleted From</label>
-                      <input
-                        type="date"
-                        value={filters.dateFrom}
-                        onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300 font-medium"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Deleted To</label>
-                      <input
-                        type="date"
-                        value={filters.dateTo}
-                        onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300 font-medium"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <SearchFilterBar
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              showFilters={showFilters}
+              setShowFilters={setShowFilters}
+              activeFilterCount={activeFilterCount}
+              clearFilters={clearFilters}
+              filters={{
+                status: filters.role,
+                amountMin: '',
+                amountMax: '',
+                dateFrom: filters.dateFrom,
+                dateTo: filters.dateTo
+              }}
+              handleFilterChange={(key, value) => {
+                if (key === 'status') {
+                  handleFilterChange('role', value)
+                } else {
+                  handleFilterChange(key, value)
+                }
+              }}
+            />
           </header>
           
           <div className="content-section p-8">
