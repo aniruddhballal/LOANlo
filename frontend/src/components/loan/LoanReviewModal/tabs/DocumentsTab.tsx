@@ -230,7 +230,11 @@ export default function DocumentsTab({ application, onDocumentUpdate, isApplican
       <div className="relative pb-3" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-gray-900 text-xl tracking-tight">Document Requirements</h3>
+            <h3 className="font-semibold text-gray-900 text-xl tracking-tight">Document Upload Status</h3>
+            <div 
+              className="absolute bottom-0 left-0 w-55 h-0.5 bg-gradient-to-r from-blue-600 to-blue-400"
+              style={{ animation: 'expandWidth 0.3s ease-out' }}
+            ></div>
           </div>
           <div className="flex items-center space-x-3">
             {/* Upload Button */}
@@ -262,7 +266,6 @@ export default function DocumentsTab({ application, onDocumentUpdate, isApplican
             </div>
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-blue-600 to-blue-400"></div>
       </div>
 
       {/* Document Progress Summary */}
@@ -352,15 +355,17 @@ export default function DocumentsTab({ application, onDocumentUpdate, isApplican
               <div className="flex items-start space-x-4 flex-1 min-w-0">
                 <div className="mt-1">
                   {doc.uploaded ? (
-                    <div className="w-10 h-10 bg-gradient-to-br from-green-50 to-green-100 rounded-full flex items-center justify-center ring-4 ring-green-50 transition-all duration-300 group-hover:scale-105 group-hover:ring-green-100">
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-50 to-green-100 rounded-full flex items-center justify-center ring-4 ring-green-50 transition-all duration-300">
                       <CheckCircle className="w-5 h-5 text-green-600" />
                     </div>
                   ) : (
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ring-4 transition-all duration-300 group-hover:scale-105 ${
-                      doc.required 
-                        ? 'bg-gradient-to-br from-red-50 to-red-100 ring-red-50 group-hover:ring-red-100' 
-                        : 'bg-gradient-to-br from-gray-50 to-gray-100 ring-gray-50 group-hover:ring-gray-100'
-                    }`}>
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center ring-4 transition-all duration-300 ${
+                        doc.required
+                          ? 'bg-gradient-to-br from-red-50 to-red-100 ring-red-50'
+                          : 'bg-gradient-to-br from-gray-50 to-gray-100 ring-gray-50'
+                      }`}
+                    >
                       <XCircle className={`w-5 h-5 ${doc.required ? 'text-red-600' : 'text-gray-400'}`} />
                     </div>
                   )}
