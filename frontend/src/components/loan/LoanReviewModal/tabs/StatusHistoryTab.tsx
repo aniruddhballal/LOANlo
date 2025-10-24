@@ -10,8 +10,11 @@ export default function StatusHistoryTab({ application }: StatusHistoryTabProps)
     <div className="space-y-6">
       {/* Header with gradient underline - Now with slide up animation */}
       <div className="relative pb-3" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
-        <h3 className="font-semibold text-gray-900 text-xl tracking-tight">Status Timeline</h3>
-        <div className="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-blue-600 to-blue-400"></div>
+        <h3 className="font-semibold text-gray-900 text-xl tracking-tight">Status History</h3>
+        <div 
+          className="absolute bottom-0 left-0 w-31 h-0.5 bg-gradient-to-r from-blue-600 to-blue-400"
+          style={{ animation: 'expandWidth 0.3s ease-out' }}
+        ></div>
       </div>
 
       {/* Timeline Container */}
