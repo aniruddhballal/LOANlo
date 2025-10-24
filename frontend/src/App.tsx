@@ -15,7 +15,7 @@ import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 import AccessDenied from './components/auth/AccessDenied'
 import { LoadingState } from './components/ui/StatusMessages'
 import EmailVerification from './components/auth/EmailVerification'
-import ApplicantProfile from './components/auth/ApplicantProfile'
+import ProfilePage from './components/auth/ProfilePage'
 import StaffProfile from './components/auth/StaffProfile'
 import ProfileHistory from './components/auth/ProfileHistory'
 import IpWhitelistSettings from './components/IpWhitelistSettings';
@@ -80,12 +80,12 @@ function AppContent() {
         {/* Applicant Profile Routes */}
         <Route path="/applicant-profile" element={
           <RoleProtectedRoute allowedRoles={['applicant']}>
-            <ApplicantProfile />
+            <ProfilePage />
           </RoleProtectedRoute>
         } />
         <Route path="/applicant-profile/:userId" element={
           <RoleProtectedRoute allowedRoles={['underwriter', 'system_admin']}>
-            <ApplicantProfile />
+            <ProfilePage />
           </RoleProtectedRoute>
         } />
         

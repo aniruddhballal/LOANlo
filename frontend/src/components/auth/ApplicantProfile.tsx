@@ -1,31 +1,32 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { ProfileSkeleton } from '../ui/SkeletonComponents'
 import api from '../../api'
 import { getGreeting } from '../utils'
 import { formatDate, formatCurrency } from '../utils'
-import DeleteAccountConfirmationModal from '../DeleteAccountConfirmationModal'
 
-const Profile = () => {
+interface ApplicantProfileProps {
+  onDeleteAccount: () => void
+}
+
+const ApplicantProfile = memo(({ onDeleteAccount }: ApplicantProfileProps) => {
   const { userId } = useParams<{ userId: string }>()
   const [loading, setLoading] = useState(true)
   const [userData, setUserData] = useState<any>(null)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [deleteLoading, setDeleteLoading] = useState(false)
   const hasAnimated = useRef(false) // Track if initial animations have played
   const navigate = useNavigate()
   const { user, logout } = useAuth()
 
+  // Optional: Store userData in ref to isolate from unrelated state changes
+  const userDataRef = useRef(userData)
+  useEffect(() => {
+    userDataRef.current = userData
+  }, [userData])
+
   useEffect(() => {
     fetchUserData()
   }, [userId])
-
-  useEffect(() => {
-    if (!loading && userData) {
-      hasAnimated.current = true
-    }
-  }, [loading, userData])
 
   const fetchUserData = async () => {
     try {
@@ -36,21 +37,6 @@ const Profile = () => {
       console.error('Failed to fetch user data:', err)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleDeleteAccount = async () => {
-    setDeleteLoading(true)
-    try {
-      await api.delete('/profile/me')
-      localStorage.removeItem('token')
-      navigate('/account-deleted')
-    } catch (err) {
-      console.error('Failed to delete account:', err)
-      alert('Failed to delete account. Please try again.')
-    } finally {
-      setDeleteLoading(false)
-      setShowDeleteModal(false)
     }
   }
 
@@ -317,7 +303,7 @@ const Profile = () => {
                           </p>
                         </div>
                         <button
-                          onClick={() => setShowDeleteModal(true)}
+                          onClick={onDeleteAccount}
                           className="group/delete relative px-5 py-2.5 text-sm font-medium text-white bg-red-600 border border-red-700 rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-red-700 hover:-translate-y-0.5"
                         >
                           <span className="relative z-10">Delete Account</span>
@@ -356,14 +342,6 @@ const Profile = () => {
         </main>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      <DeleteAccountConfirmationModal 
-        show={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={handleDeleteAccount}
-        loading={deleteLoading}
-      />
-
       <style>{`
         @keyframes fadeInUp {
           from {
@@ -397,6 +375,9 @@ const Profile = () => {
       `}</style>
     </div>
   )
-}
+})
 
-export default Profile
+// Display name for React DevTools
+ApplicantProfile.displayName = 'ApplicantProfile'
+
+export default ApplicantProfile
