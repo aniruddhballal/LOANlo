@@ -214,7 +214,7 @@ export default function DeletedUsers() {
     }[role] || 'bg-gray-100 text-gray-800 border-gray-200'
 
     return (
-      <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm transition-all duration-300 hover:scale-105 ${styles}`}>
+      <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold border shadow-sm transition-all duration-300 hover:scale-105 ${styles}`}>
         {role === 'system_admin' ? 'System Admin' : role.charAt(0).toUpperCase() + role.slice(1)}
       </span>
     )
@@ -222,41 +222,162 @@ export default function DeletedUsers() {
 
   return (
     <>
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        .dashboard-container {
+          animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .header-title {
+          animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .header-actions {
+          animation: slideInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .shimmer-button {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .shimmer-button::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent
+          );
+          transform: translateX(-100%);
+        }
+
+        .shimmer-button:hover::before {
+          animation: shimmer 0.7s ease-in-out;
+        }
+
+        .card-hover {
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card-hover:hover {
+          box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+          transform: translateY(-2px);
+        }
+
+        .gradient-border {
+          position: relative;
+        }
+
+        .gradient-border::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          padding: 2px;
+          background: linear-gradient(135deg, #f9f9f9, #ffffff, #f9f9f9);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .gradient-border:hover::before {
+          opacity: 1;
+        }
+
+        .content-section {
+          animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;
+        }
+      `}</style>
+
       <DashboardLayout 
         title="Deleted User Accounts"
         welcomeTitle="User Account Management"
         welcomeSubtitle="Manage soft-deleted user accounts and restore or permanently delete them"
       >
-        <section 
-          className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
-          style={{ animation: 'fadeInUp 0.5s ease-out' }}
-        >
-          <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-            <div className="flex justify-between items-center mb-6">
-              <div style={{ animation: 'fadeInUp 0.5s ease-out 0.1s both' }}>
-                <div className="relative pb-3 mb-1">
-                  <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">
-                    Deleted Users
-                  </h2>
-                  <div className="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-gray-600 to-gray-400"></div>
-                </div>
-                <p className="text-sm text-gray-600 leading-relaxed">
+        <section className="dashboard-container bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden card-hover gradient-border">
+          <header className="px-8 py-8 border-b-2 border-gray-100 bg-gradient-to-br from-gray-50 via-white to-gray-50/50">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+              <div className="header-title">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent mb-2">
+                  Deleted Users
+                </h2>
+                <p className="text-sm text-gray-600 font-medium tracking-wide">
                   View and manage soft-deleted user accounts
                 </p>
               </div>
 
-              <div 
-                className="text-sm font-medium text-gray-700"
-                style={{ animation: 'fadeInUp 0.5s ease-out 0.2s both' }}
-              >
-                {loading 
-                  ? <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
-                  : `${filteredAndSortedUsers.length} of ${users.length} ${users.length === 1 ? "User" : "Users"}`}
+              <div className="header-actions text-sm font-medium text-gray-700">
+                {loading ? (
+                  <div className="w-26 h-12 rounded bg-gray-200 animate-pulse"></div>
+                ) : (
+                  <div className="text-center">
+                    <div className="text-2xl font-semibold text-gray-900">
+                      {filteredAndSortedUsers.length}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      of {users.length} {users.length === 1 ? "User" : "Users"}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Search and Filter Bar */}
-            <div className="space-y-4" style={{ animation: 'fadeInUp 0.5s ease-out 0.3s both' }}>
+            <div className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-3">
                 {/* Global Search */}
                 <div className="flex-1 relative group">
@@ -266,14 +387,14 @@ export default function DeletedUsers() {
                     placeholder="Search by name, email, phone, role, or location..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300"
+                    className="w-full pl-10 pr-10 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300 font-medium"
                   />
                   {searchQuery && (
                     <button
                       onClick={() => setSearchQuery('')}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-5 h-5" />
                     </button>
                   )}
                 </div>
@@ -281,12 +402,12 @@ export default function DeletedUsers() {
                 {/* Filter Toggle */}
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 hover:shadow-sm relative text-gray-900"                
+                  className="shimmer-button flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 hover:shadow-lg relative text-gray-900 font-bold"                
                 >
                   <SlidersHorizontal className="w-5 h-5 text-gray-900" />
-                  <span className="font-medium">Filters</span>
+                  <span>Filters</span>
                   {activeFilterCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-gray-900 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
+                    <span className="absolute -top-2 -right-2 bg-gradient-to-r from-gray-900 to-gray-800 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg">
                       {activeFilterCount}
                     </span>
                   )}
@@ -295,7 +416,7 @@ export default function DeletedUsers() {
                 {activeFilterCount > 0 && (
                   <button
                     onClick={clearFilters}
-                    className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                    className="shimmer-button px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-800 text-white font-bold rounded-xl hover:from-gray-800 hover:to-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-100"
                   >
                     Clear All
                   </button>
@@ -305,17 +426,17 @@ export default function DeletedUsers() {
               {/* Filter Panel */}
               {showFilters && (
                 <div 
-                  className="p-6 bg-gray-50 rounded-lg border border-gray-200 space-y-4 shadow-sm"
+                  className="p-6 bg-gradient-to-br from-gray-50 via-white to-gray-50/50 rounded-xl border-2 border-gray-200 space-y-4 shadow-lg"
                   style={{ animation: 'fadeInUp 0.3s ease-out' }}
                 >
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Role Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">Role</label>
                       <select
                         value={filters.role}
                         onChange={(e) => handleFilterChange('role', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300"
+                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300 font-medium"
                       >
                         <option value="all">All Roles</option>
                         <option value="applicant">Applicant</option>
@@ -326,22 +447,22 @@ export default function DeletedUsers() {
 
                     {/* Date Range */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Deleted From</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">Deleted From</label>
                       <input
                         type="date"
                         value={filters.dateFrom}
                         onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300"
+                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300 font-medium"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Deleted To</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">Deleted To</label>
                       <input
                         type="date"
                         value={filters.dateTo}
                         onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300"
+                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300 font-medium"
                       />
                     </div>
                   </div>
@@ -350,7 +471,7 @@ export default function DeletedUsers() {
             </div>
           </header>
           
-          <div className="p-8">
+          <div className="content-section p-8">
             {loading ? (
               <UnderwriterTableSkeleton rows={5} />
             ) : (
@@ -358,16 +479,31 @@ export default function DeletedUsers() {
                 {error && <ErrorAlert message={error} />}
 
                 {!loading && filteredAndSortedUsers.length === 0 && !searchQuery && activeFilterCount === 0 && (
-                  <EmptyState 
-                    title="No Deleted Users"
-                    description="There are currently no deleted user accounts."
-                  />
+                  <div className="py-20">
+                    <EmptyState 
+                      title="No Deleted Users"
+                      description="There are currently no deleted user accounts."
+                    />
+                  </div>
                 )}
 
                 {!loading && filteredAndSortedUsers.length === 0 && (searchQuery || activeFilterCount > 0) && (
-                  <div className="text-center py-12">
-                    <p className="text-gray-500 text-lg mb-2">No users found</p>
-                    <p className="text-gray-400 text-sm">Try adjusting your search or filters</p>
+                  <div className="text-center py-20 px-4">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full mb-6 shadow-lg">
+                      <svg className="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">No users found</h3>
+                    <p className="text-gray-500 text-base mb-6 max-w-md mx-auto">
+                      Try adjusting your search criteria or filters to find what you're looking for
+                    </p>
+                    <button
+                      onClick={clearFilters}
+                      className="shimmer-button px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-800 text-white font-bold rounded-xl hover:from-gray-800 hover:to-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-100"
+                    >
+                      Clear All Filters
+                    </button>
                   </div>
                 )}
 
@@ -377,11 +513,11 @@ export default function DeletedUsers() {
                     <div className="hidden lg:block">
                       <div className="overflow-x-auto">
                         <table className="w-full">
-                          <thead className="bg-gray-50/50 border-b border-gray-200">
+                          <thead className="bg-gradient-to-r from-gray-50 via-white to-gray-50 border-b-2 border-gray-200">
                             <tr>
                               <th 
                                 onClick={() => handleSort('name')}
-                                className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                                className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                               >
                                 <div className="flex items-center gap-2">
                                   User
@@ -390,7 +526,7 @@ export default function DeletedUsers() {
                               </th>
                               <th 
                                 onClick={() => handleSort('email')}
-                                className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                                className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                               >
                                 <div className="flex items-center gap-2">
                                   Contact
@@ -399,26 +535,26 @@ export default function DeletedUsers() {
                               </th>
                               <th 
                                 onClick={() => handleSort('role')}
-                                className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                                className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                               >
                                 <div className="flex items-center gap-2">
                                   Role
                                   <SortIcon columnKey="role" />
                                 </div>
                               </th>
-                              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                              <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                                 Additional Info
                               </th>
                               <th 
                                 onClick={() => handleSort('deletedAt')}
-                                className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                                className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                               >
                                 <div className="flex items-center gap-2">
                                   Deleted At
                                   <SortIcon columnKey="deletedAt" />
                                 </div>
                               </th>
-                              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                              <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                                 Actions
                               </th>
                             </tr>
@@ -430,77 +566,77 @@ export default function DeletedUsers() {
                                 className="group hover:bg-gray-50/50 transition-all duration-300"
                                 style={{ animation: `fadeInUp 0.5s ease-out ${(index + 1) * 0.05}s both` }}
                               >
-                                <td className="px-6 py-4">
+                                <td className="px-6 py-5">
                                   <div className="flex items-center space-x-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-sm transition-transform duration-300 group-hover:scale-110">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg transition-transform duration-300 group-hover:scale-110">
                                       {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
                                     </div>
                                     <div>
-                                      <div className="font-semibold text-gray-900">
+                                      <div className="font-bold text-gray-900">
                                         {user.firstName} {user.lastName}
                                       </div>
-                                      <div className="text-xs text-gray-500">ID: {user._id.slice(-8)}</div>
+                                      <div className="text-xs text-gray-500 font-medium">ID: {user._id.slice(-8)}</div>
                                     </div>
                                   </div>
                                 </td>
-                                <td className="px-6 py-4">
-                                  <div className="space-y-1">
-                                    <div className="flex items-center gap-2 text-sm text-gray-900">
+                                <td className="px-6 py-5">
+                                  <div className="space-y-1.5">
+                                    <div className="flex items-center gap-2 text-sm text-gray-900 font-medium">
                                       <Mail className="w-4 h-4 text-gray-400" />
                                       {user.email}
                                     </div>
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
                                       <Phone className="w-4 h-4 text-gray-400" />
                                       {user.phone || 'N/A'}
                                     </div>
                                   </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                <td className="px-6 py-5 whitespace-nowrap">
                                   <RoleBadge role={user.role} />
                                 </td>
-                                <td className="px-6 py-4">
-                                  <div className="space-y-1 text-sm">
+                                <td className="px-6 py-5">
+                                  <div className="space-y-1.5 text-sm">
                                     {user.companyName && (
-                                      <div className="flex items-center gap-2 text-gray-700">
+                                      <div className="flex items-center gap-2 text-gray-700 font-medium">
                                         <Briefcase className="w-4 h-4 text-gray-400" />
                                         {user.companyName}
                                       </div>
                                     )}
                                     {user.city && user.state && (
-                                      <div className="text-gray-600">
+                                      <div className="text-gray-600 font-medium">
                                         {user.city}, {user.state}
                                       </div>
                                     )}
                                     {user.monthlyIncome && (
-                                      <div className="text-gray-600">
+                                      <div className="text-gray-600 font-medium">
                                         ₹{user.monthlyIncome.toLocaleString()}/mo
                                       </div>
                                     )}
                                   </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-600">
                                   {user.deletedAt ? (
                                     <>
-                                      <div>{formatDate(user.deletedAt)}</div>
-                                      <div className="text-xs text-gray-500 font-light">
+                                      <div className="font-bold text-gray-900">{formatDate(user.deletedAt)}</div>
+                                      <div className="text-xs text-gray-500 font-medium">
                                         {formatTime(user.deletedAt)}
                                       </div>
                                     </>
                                   ) : (
-                                    <span className="text-gray-400 italic">Unknown</span>
+                                    <span className="text-gray-400 italic font-medium">Unknown</span>
                                   )}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                <td className="px-6 py-5 whitespace-nowrap">
                                   <div className="flex gap-2">
                                     <button
                                       onClick={() => handleActionClick(user, 'restore')}
-                                      className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                                      className="shimmer-button px-4 py-2 text-xs font-bold bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 active:scale-100"
                                     >
                                       Restore
                                     </button>
                                     <button
                                       onClick={() => handleActionClick(user, 'delete')}
-                                      className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                                      className="shimmer-button px-4 py-2 text-xs font-bold bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 active:scale-100"
                                     >
                                       Delete
                                     </button>
@@ -518,67 +654,61 @@ export default function DeletedUsers() {
                       {filteredAndSortedUsers.map((user, index) => (
                         <div 
                           key={user._id} 
-                          className="group relative bg-white border border-gray-200 rounded-xl p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5 overflow-hidden"
+                          className="group relative bg-white border-2 border-gray-200 rounded-xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-gray-300 hover:-translate-y-1 overflow-hidden card-hover"
                           style={{ animation: `fadeInUp 0.5s ease-out ${(index + 1) * 0.1}s both` }}
                         >
-                          {/* Hover gradient overlay */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                          
-                          {/* Top shimmer line */}
-                          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-gray-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                          
                           <div className="relative z-10">
-                            <div className="flex items-center gap-3 mb-4">
-                              <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-semibold shadow-sm">
+                            <div className="flex items-center gap-4 mb-4">
+                              <div className="w-14 h-14 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
                                 {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
                               </div>
                               <div className="flex-1">
-                                <div className="font-semibold text-gray-900 text-lg">
+                                <div className="font-bold text-gray-900 text-lg">
                                   {user.firstName} {user.lastName}
                                 </div>
                                 <RoleBadge role={user.role} />
                               </div>
                             </div>
 
-                            <div className="space-y-3 mb-4">
+                            <div className="space-y-3 mb-5">
                               <div>
-                                <span className="text-sm text-gray-600 font-medium">Email</span>
-                                <div className="text-sm text-gray-900">{user.email}</div>
+                                <span className="text-sm text-gray-600 font-bold">Email</span>
+                                <div className="text-sm text-gray-900 font-medium">{user.email}</div>
                               </div>
                               <div>
-                                <span className="text-sm text-gray-600 font-medium">Phone</span>
-                                <div className="text-sm text-gray-900">{user.phone || 'N/A'}</div>
+                                <span className="text-sm text-gray-600 font-bold">Phone</span>
+                                <div className="text-sm text-gray-900 font-medium">{user.phone || 'N/A'}</div>
                               </div>
                               {user.companyName && (
                                 <div>
-                                  <span className="text-sm text-gray-600 font-medium">Company</span>
-                                  <div className="text-sm text-gray-900">{user.companyName}</div>
+                                  <span className="text-sm text-gray-600 font-bold">Company</span>
+                                  <div className="text-sm text-gray-900 font-medium">{user.companyName}</div>
                                 </div>
                               )}
                               {user.city && user.state && (
                                 <div>
-                                  <span className="text-sm text-gray-600 font-medium">Location</span>
-                                  <div className="text-sm text-gray-900">{user.city}, {user.state}</div>
+                                  <span className="text-sm text-gray-600 font-bold">Location</span>
+                                  <div className="text-sm text-gray-900 font-medium">{user.city}, {user.state}</div>
                                 </div>
                               )}
                               <div>
-                                <span className="text-sm text-gray-600 font-medium">Deleted At</span>
-                                <div className="text-sm text-gray-900">
+                                <span className="text-sm text-gray-600 font-bold">Deleted At</span>
+                                <div className="text-sm text-gray-900 font-medium">
                                   {user.deletedAt ? formatDate(user.deletedAt) : 'Unknown'}
                                 </div>
                               </div>
                             </div>
 
-                            <div className="flex flex-col gap-2 pt-4 border-t border-gray-100">
+                            <div className="flex flex-col gap-3 pt-4 border-t-2 border-gray-100">
                               <button
                                 onClick={() => handleActionClick(user, 'restore')}
-                                className="w-full px-4 py-2 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 shadow-sm hover:shadow-md"
+                                className="shimmer-button w-full px-5 py-3 text-sm font-bold bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-100"
                               >
                                 Restore Account
                               </button>
                               <button
                                 onClick={() => handleActionClick(user, 'delete')}
-                                className="w-full px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 shadow-sm hover:shadow-md"
+                                className="shimmer-button w-full px-5 py-3 text-sm font-bold bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-100"
                               >
                                 Permanently Delete
                               </button>
@@ -602,28 +732,25 @@ export default function DeletedUsers() {
           style={{ animation: 'fadeIn 0.2s ease-out' }}
         >
           <div 
-            className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto border-2 border-gray-200"
             style={{ animation: 'fadeInUp 0.3s ease-out' }}
           >
-            <div className="relative pb-3 mb-4">
-              <h3 className="text-xl font-semibold text-gray-900 tracking-tight">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
                 {actionType === 'restore' && 'Restore User Account'}
                 {actionType === 'delete' && 'Permanently Delete User'}
               </h3>
-              <div className="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-gray-600 to-gray-400"></div>
             </div>
 
             {/* User Details */}
-            <div className="relative bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200 overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-100/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              
+            <div className="relative bg-gradient-to-br from-gray-50 via-white to-gray-50/50 rounded-xl p-6 mb-6 border-2 border-gray-200 overflow-hidden group shadow-sm">
               <div className="relative z-10">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-semibold text-xl shadow-sm">
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="w-16 h-16 bg-gradient-to-br from-gray-900 to-black rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
                     {selectedUser.firstName?.charAt(0)}{selectedUser.lastName?.charAt(0)}
                   </div>
                   <div>
-                    <div className="text-lg font-semibold text-gray-900">
+                    <div className="text-xl font-bold text-gray-900">
                       {selectedUser.firstName} {selectedUser.lastName}
                     </div>
                     <RoleBadge role={selectedUser.role} />
@@ -632,32 +759,32 @@ export default function DeletedUsers() {
                 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-600 font-medium">Email:</span>
-                    <div className="text-gray-900">{selectedUser.email}</div>
+                    <span className="text-gray-600 font-bold">Email:</span>
+                    <div className="text-gray-900 font-medium">{selectedUser.email}</div>
                   </div>
                   <div>
-                    <span className="text-gray-600 font-medium">Phone:</span>
-                    <div className="text-gray-900">{selectedUser.phone || 'N/A'}</div>
+                    <span className="text-gray-600 font-bold">Phone:</span>
+                    <div className="text-gray-900 font-medium">{selectedUser.phone || 'N/A'}</div>
                   </div>
                   {selectedUser.companyName && (
                     <div>
-                      <span className="text-gray-600 font-medium">Company:</span>
-                      <div className="text-gray-900">{selectedUser.companyName}</div>
+                      <span className="text-gray-600 font-bold">Company:</span>
+                      <div className="text-gray-900 font-medium">{selectedUser.companyName}</div>
                     </div>
                   )}
                   {selectedUser.city && selectedUser.state && (
                     <div>
-                      <span className="text-gray-600 font-medium">Location:</span>
-                      <div className="text-gray-900">{selectedUser.city}, {selectedUser.state}</div>
+                      <span className="text-gray-600 font-bold">Location:</span>
+                      <div className="text-gray-900 font-medium">{selectedUser.city}, {selectedUser.state}</div>
                     </div>
                   )}
                   <div>
-                    <span className="text-gray-600 font-medium">Account Created:</span>
-                    <div className="text-gray-900">{formatDate(selectedUser.createdAt)}</div>
+                    <span className="text-gray-600 font-bold">Account Created:</span>
+                    <div className="text-gray-900 font-medium">{formatDate(selectedUser.createdAt)}</div>
                   </div>
                   <div>
-                    <span className="text-gray-600 font-medium">Deleted On:</span>
-                    <div className="text-gray-900">
+                    <span className="text-gray-600 font-bold">Deleted On:</span>
+                    <div className="text-gray-900 font-medium">
                       {selectedUser.deletedAt ? formatDate(selectedUser.deletedAt) : 'Unknown'}
                     </div>
                   </div>
@@ -667,17 +794,15 @@ export default function DeletedUsers() {
 
             {/* Action-specific content */}
             {actionType === 'restore' && (
-              <div className="relative bg-white border border-green-200 rounded-lg p-4 mb-4 shadow-sm overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative bg-gradient-to-br from-green-50 via-white to-green-50/50 border-2 border-green-200 rounded-xl p-5 mb-6 shadow-sm overflow-hidden group">
                 <div className="relative z-10">
-                  <p className="text-green-800 font-semibold mb-2 flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <p className="text-green-800 font-bold mb-2 flex items-center gap-2 text-lg">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Restore Account
                   </p>
-                  <p className="text-green-700 text-sm leading-relaxed">
+                  <p className="text-green-700 text-sm leading-relaxed font-medium">
                     This will restore the user account and allow the user to log in again. 
                     All their data will be accessible once more.
                   </p>
@@ -687,52 +812,50 @@ export default function DeletedUsers() {
 
             {actionType === 'delete' && (
               <>
-                <div className="relative bg-white border border-red-200 rounded-lg p-4 mb-4 shadow-sm overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-red-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative bg-gradient-to-br from-red-50 via-white to-red-50/50 border-2 border-red-200 rounded-xl p-5 mb-6 shadow-sm overflow-hidden group">
                   <div className="relative z-10">
-                    <p className="text-red-800 font-semibold mb-2 flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <p className="text-red-800 font-bold mb-3 flex items-center gap-2 text-lg">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
                       Warning: This action is irreversible!
                     </p>
-                    <p className="text-red-700 text-sm mb-2 leading-relaxed">
+                    <p className="text-red-700 text-sm mb-3 leading-relaxed font-medium">
                       This will permanently delete the user account and ALL associated data including:
                     </p>
-                    <ul className="text-red-700 text-sm space-y-1 ml-4">
+                    <ul className="text-red-700 text-sm space-y-2 ml-4">
                       <li className="flex items-start gap-2">
-                        <span className="text-red-500 mt-0.5">•</span>
-                        <span>Personal information and profile data</span>
+                        <span className="text-red-500 mt-0.5 font-bold">•</span>
+                        <span className="font-medium">Personal information and profile data</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-red-500 mt-0.5">•</span>
-                        <span>All loan applications</span>
+                        <span className="text-red-500 mt-0.5 font-bold">•</span>
+                        <span className="font-medium">All loan applications</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-red-500 mt-0.5">•</span>
-                        <span>Document uploads and verification records</span>
+                        <span className="text-red-500 mt-0.5 font-bold">•</span>
+                        <span className="font-medium">Document uploads and verification records</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-red-500 mt-0.5">•</span>
-                        <span>Communication history</span>
+                        <span className="text-red-500 mt-0.5 font-bold">•</span>
+                        <span className="font-medium">Communication history</span>
                       </li>
                     </ul>
-                    <p className="text-red-700 text-sm mt-2 font-semibold">
+                    <p className="text-red-700 text-sm mt-3 font-bold">
                       This action cannot be undone.
                     </p>
                   </div>
                 </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Type <span className="font-mono bg-gray-100 px-2 py-1 rounded text-red-600 font-semibold">DELETE</span> to confirm:
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Type <span className="font-mono bg-red-100 px-3 py-1 rounded-lg text-red-600 font-bold border border-red-200">DELETE</span> to confirm:
                   </label>
                   <input
                     type="text"
                     value={confirmText}
                     onChange={(e) => setConfirmText(e.target.value)}
                     placeholder="Type DELETE"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 transition-all duration-300 font-medium"
                     autoFocus
                   />
                 </div>
@@ -740,26 +863,26 @@ export default function DeletedUsers() {
             )}
 
             {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-800 text-sm">{error}</p>
+              <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl">
+                <p className="text-red-800 text-sm font-bold">{error}</p>
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               <button
                 onClick={handleCloseModal}
-                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 hover:border-gray-400 transition-all duration-300 hover:shadow-sm"
+                className="flex-1 px-6 py-3 text-sm font-bold text-gray-700 bg-gray-100 border-2 border-gray-300 rounded-xl hover:bg-gray-200 hover:border-gray-400 transition-all duration-300 hover:shadow-lg"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmAction}
                 disabled={actionType === 'delete' && confirmText !== 'DELETE'}
-                className={`flex-1 px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-300 shadow-sm hover:shadow-md ${
+                className={`shimmer-button flex-1 px-6 py-3 text-sm font-bold text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-100 ${
                   actionType === 'restore'
-                    ? 'bg-green-600 hover:bg-green-700'
+                    ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
                     : confirmText === 'DELETE'
-                    ? 'bg-red-600 hover:bg-red-700'
+                    ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
                     : 'bg-gray-300 cursor-not-allowed'
                 }`}
               >
@@ -770,28 +893,6 @@ export default function DeletedUsers() {
           </div>
         </div>
       )}
-
-      {/* Animation styles */}
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-      `}</style>
     </>
   )
 }
