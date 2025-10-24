@@ -28,21 +28,18 @@ const ApplicationStatus = () => {
   const [highlightedAppId, setHighlightedAppId] = useState<string | null>(null)
   const [animatingDocs, setAnimatingDocs] = useState<string | null>(null)
   const location = useLocation()
-  const docStatusChangeAnimation = "animate-[docStatusChange_0.5s_ease-out]"
 
   useEffect(() => {
     fetchApplications()
   }, [])
 
   useEffect(() => {
-    // Check if we were redirected with an updated application ID
     const state = location.state as { updatedApplicationId?: string } | null
     
     if (state?.updatedApplicationId && applications.length > 0) {
       setHighlightedAppId(state.updatedApplicationId)
       setAnimatingDocs(state.updatedApplicationId)
       
-      // Scroll to the highlighted application
       setTimeout(() => {
         const element = document.getElementById(`app-${state.updatedApplicationId}`)
         if (element) {
@@ -50,13 +47,11 @@ const ApplicationStatus = () => {
         }
       }, 100)
       
-      // Remove highlight after animation completes
       setTimeout(() => {
         setHighlightedAppId(null)
         setAnimatingDocs(null)
       }, 2500)
       
-      // Clear the location state so refresh doesn't re-trigger
       window.history.replaceState({}, document.title)
     }
   }, [location.state, applications])
@@ -85,73 +80,25 @@ const ApplicationStatus = () => {
     fetchApplications()
   }
 
-  const getStatusIcon = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'approved': return (
-        <svg className="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-        </svg>
-      )
-      case 'rejected': return (
-        <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-        </svg>
-      )
-      case 'under_review': return (
-        <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-          <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-        </svg>
-      )
-      default: return (
-        <svg className="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-        </svg>
-      )
+      case 'approved':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      case 'rejected':
+        return 'bg-red-50 text-red-700 border-red-200'
+      case 'under_review':
+        return 'bg-blue-50 text-blue-700 border-blue-200'
+      default:
+        return 'bg-amber-50 text-amber-700 border-amber-200'
     }
   }
 
-  const getStatusBadge = (status: string) => {
-    const baseClasses = "inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold border"
-    
+  const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'approved':
-        return (
-          <span className={`${baseClasses} bg-emerald-50 text-emerald-700 border-emerald-200`}>
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            <span>Approved</span>
-          </span>
-        )
-      case 'rejected':
-        return (
-          <span className={`${baseClasses} bg-red-50 text-red-700 border-red-200`}>
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-            <span>Rejected</span>
-          </span>
-        )
-      case 'under_review':
-        return (
-          <span className={`${baseClasses} bg-blue-50 text-blue-700 border-blue-200`}>
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-              <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-            </svg>
-            <span>Under Review</span>
-          </span>
-        )
-      default:
-        return (
-          <span className={`${baseClasses} bg-amber-50 text-amber-700 border-amber-200`}>
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-            </svg>
-            <span>Pending</span>
-          </span>
-        )
+      case 'approved': return 'APPROVED'
+      case 'rejected': return 'REJECTED'
+      case 'under_review': return 'UNDER REVIEW'
+      default: return 'PENDING'
     }
   }
 
@@ -159,57 +106,84 @@ const ApplicationStatus = () => {
     return <ApplicationStatusSkeleton />
   }
 
-  // Add this inside your component, right before the return statement:
   const styles = `
-    @keyframes colorTransition {
-      0% {
-        background-color: rgb(249 250 251 / 0.5);
-        border-color: rgb(229 231 235);
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
       }
-      50% {
-        background-color: rgb(236 253 245 / 0.6);
-        border-color: rgb(167 243 208);
-      }
-      100% {
-        background-color: rgb(236 253 245 / 0.3);
-        border-color: rgb(52 211 153);
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
-    
-    @keyframes docStatusChange {
+
+    @keyframes shimmer {
       0% {
-        opacity: 0.5;
-        transform: scale(0.95);
-      }
-      50% {
-        opacity: 0.7;
-        transform: scale(1.02);
+        transform: translateX(-100%);
       }
       100% {
+        transform: translateX(100%);
+      }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes docPulse {
+      0%, 100% {
         opacity: 1;
         transform: scale(1);
       }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+      }
     }
-    
+
+    .shimmer-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+      transform: translateX(-100%);
+    }
+
+    .group:hover .shimmer-line {
+      animation: shimmer 1.5s ease-in-out;
+    }
+
     .highlight-card {
-      animation: colorTransition 1.5s ease-out;
+      animation: pulseGlow 1.5s ease-out;
+      background: linear-gradient(135deg, rgba(236, 253, 245, 0.4) 0%, rgba(209, 250, 229, 0.3) 100%);
+      border-color: rgb(52, 211, 153);
+    }
+
+    .doc-pulse {
+      animation: docPulse 0.5s ease-out;
     }
   `
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-        <style>{styles}</style>
-      {/* Subtle geometric background */}
-      <div className="absolute inset-0 overflow-hidden opacity-30">
-        <div className="absolute top-0 left-0 w-full h-full" style={{
-          backgroundImage: `linear-gradient(30deg, transparent 40%, rgba(0,0,0,0.02) 40%, rgba(0,0,0,0.02) 60%, transparent 60%),
-                           linear-gradient(150deg, transparent 40%, rgba(0,0,0,0.01) 40%, rgba(0,0,0,0.01) 60%, transparent 60%)`
-        }}></div>
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <style>{styles}</style>
+      
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
         {/* Executive Header */}
-        <div className="mb-12">
+        <div 
+          className="mb-12"
+          style={{ animation: 'fadeInUp 0.5s ease-out 0s both' }}
+        >
           <div className="border-l-4 border-gray-900 pl-6">
             <h1 className="text-4xl font-extralight text-gray-900 mb-3 tracking-tight">
               Loan Application 
@@ -223,13 +197,18 @@ const ApplicationStatus = () => {
         
         {/* Error State */}
         {error && (
-          <div className="mb-8 border-l-4 border-red-400 bg-red-50 p-6 rounded-r-lg shadow-sm">
+          <div 
+            className="mb-8 bg-white border border-red-200 rounded-xl p-5 shadow-sm"
+            style={{ animation: 'fadeInUp 0.5s ease-out 0.1s both' }}
+          >
             <div className="flex items-center">
-              <svg className="w-5 h-5 text-red-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-              <div>
-                <h3 className="text-red-800 font-medium">System Alert</h3>
+              <div className="flex-shrink-0 w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-red-800 font-semibold">Error</h3>
                 <p className="text-red-700 text-sm mt-1">{error}</p>
               </div>
             </div>
@@ -238,22 +217,25 @@ const ApplicationStatus = () => {
 
         {/* Empty State */}
         {applications.length === 0 ? (
-          <div className="text-center py-24">
+          <div 
+            className="text-center py-24"
+            style={{ animation: 'fadeInUp 0.5s ease-out 0.2s both' }}
+          >
             <div className="max-w-md mx-auto">
-              <div className="w-24 h-24 mx-auto mb-8 rounded-full bg-gray-100 flex items-center justify-center">
+              <div className="w-24 h-24 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center border border-gray-200 shadow-sm">
                 <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-light text-gray-900 mb-4">No Applications Found</h3>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-4">No Applications Yet</h3>
               <p className="text-gray-600 mb-8 leading-relaxed">
-                You haven't submitted any loan applications yet. Start your financial journey by applying for a loan that meets your needs.
+                Start your journey by submitting your first loan application
               </p>
               <Link 
                 to="/loan-application" 
-                className="inline-flex items-center px-8 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md"
+                className="inline-flex items-center px-8 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
               >
-                Begin Application Process
+                New Application
                 <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -261,9 +243,12 @@ const ApplicationStatus = () => {
             </div>
           </div>
         ) : (
-          <div>
-            {/* Applications Section with Card Layout */}
-            <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div>
+        {/* Applications Section with Card Layout */}
+            <section 
+              className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8"
+              style={{ animation: 'fadeInUp 0.5s ease-out 0.1s both' }}
+            >
               <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
                 <div className="flex justify-between items-center">
                   <div>
@@ -282,114 +267,114 @@ const ApplicationStatus = () => {
 
               <div className="p-8">
                 <div className="space-y-4">
-                  {applications.map((app) => (
-                    <div 
-                      key={app._id}
-                      id={`app-${app._id}`}
-                      className={`border rounded-xl p-6 transition-all duration-200 group ${
-                        highlightedAppId === app._id
-                          ? 'highlight-card border-emerald-400 bg-emerald-50/30'
-                          : 'border-gray-200 hover:bg-gray-50/50 hover:border-gray-300'
-                      }`}
-                    >
-                      {/* Main Content Row */}
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center space-x-6 flex-1 min-w-0">
-                          <div className="flex-shrink-0">
-                            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                              {getStatusIcon(app.status)}
+                  {applications.map((app, index) => (
+                <div
+                  key={app._id}
+                  id={`app-${app._id}`}
+                  className={`group relative bg-white rounded-xl border shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5 overflow-hidden ${
+                    highlightedAppId === app._id
+                      ? 'highlight-card'
+                      : 'border-gray-200'
+                  }`}
+                  style={{
+                    animation: `fadeInUp 0.5s ease-out ${(index + 1) * 0.1}s both`
+                  }}
+                >
+                  {/* Shimmer effect on hover */}
+                  <div className="shimmer-line"></div>
+                  
+                  {/* Gradient overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                  <div className="relative z-10 p-6">
+                    {/* Header Row */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <h3 className="font-semibold text-gray-900 text-xl tracking-tight">{app.loanType}</h3>
+                          <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm transition-all duration-300 hover:scale-105 ${getStatusColor(app.status)}`}>
+                            {getStatusLabel(app.status)}
+                          </span>
+                        </div>
+                        
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="space-y-1">
+                            <span className="text-gray-500 text-xs">Amount</span>
+                            <div className="font-semibold text-gray-900 text-lg">{formatCurrency(app.amount)}</div>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-gray-500 text-xs">Tenure</span>
+                            <div className="font-medium text-gray-700">{app.tenure} months</div>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-gray-500 text-xs">Reference ID</span>
+                            <div className="font-mono text-xs text-gray-800">
+                                {formatApplicationId(app._id)}
                             </div>
                           </div>
-                          
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center space-x-4 mb-3">
-                              <h3 className="font-semibold text-gray-900 text-lg">{app.loanType}</h3>
-                              {getStatusBadge(app.status)}
-                            </div>
-                            
-                            <div className="flex items-center space-x-6 text-sm text-gray-600">
-                              <div className="flex items-center space-x-2">
-                                <span className="font-light">Amount:</span>
-                                <span className="font-semibold text-gray-900 text-lg">{formatCurrency(app.amount)}</span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <span className="font-light">Tenure:</span>
-                                <span className="font-medium">{app.tenure} months</span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <span className="font-light">Reference:</span>
-                                <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs font-medium">
-                                  {formatApplicationId(app._id)}
-                                </span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <span className="font-light">Submitted:</span>
-                                <span className="font-medium">{formatDate(app.createdAt)}</span>
-                              </div>
-                            </div>
+                          <div className="space-y-1">
+                            <span className="text-gray-500 text-xs">Submitted</span>
+                            <div className="font-medium text-gray-700">{formatDate(app.createdAt)}</div>
                           </div>
-                        </div>
-                      </div>
-
-                      {/* Action Buttons Row */}
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <div className={animatingDocs === app._id ? docStatusChangeAnimation : ''}>
-                          {app.documentsUploaded ? (
-                            <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-white text-emerald-700 border-2 border-emerald-200 shadow-sm">
-                              <div className="w-4 h-4 mr-2 bg-emerald-100 rounded-full flex items-center justify-center">
-                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"/>
-                                </svg>
-                              </div>
-                              Documentation Complete
-                            </div>
-                          ) : (
-                            <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-white text-amber-700 border-2 border-amber-200 shadow-sm">
-                              <div className="w-4 h-4 mr-2 bg-amber-100 rounded-full flex items-center justify-center">
-                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
-                              </div>
-                              Documents Pending
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex items-center space-x-3">
-                          <button 
-                            onClick={() => setSelectedApplication(app)}
-                            className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-medium bg-white text-gray-700 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 shadow-sm"
-                          >
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                            Review Details
-                          </button>
-
-                          {!app.documentsUploaded && (
-                            <Link
-                              to="/upload-documents"
-                              state={{ applicationId: app._id }}
-                              className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold bg-white text-amber-700 border-2 border-amber-200 hover:border-amber-300 hover:bg-amber-50 transition-all duration-200 shadow-sm hover:shadow-md group"
-                            >
-                              <div className="w-4 h-4 mr-2 bg-amber-100 rounded-full flex items-center justify-center group-hover:bg-amber-200">
-                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                </svg>
-                              </div>
-                              Upload Documents
-                              <svg width="12" height="12" className="ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                              </svg>
-                            </Link>
-                          )}
                         </div>
                       </div>
                     </div>
-                  ))}
+
+                    {/* Divider */}
+                    <div className="border-t border-gray-100 my-4"></div>
+
+                    {/* Actions Row */}
+                    <div className="flex items-center justify-between">
+                      <div className={animatingDocs === app._id ? 'doc-pulse' : ''}>
+                        {app.documentsUploaded ? (
+                          <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Documentation Complete
+                          </div>
+                        ) : (
+                          <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            Documents Pending
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <button 
+                          onClick={() => setSelectedApplication(app)}
+                          className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-medium bg-white text-gray-700 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-0.5"
+                        >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          Review
+                        </button>
+
+                        {!app.documentsUploaded && (
+                          <Link
+                            to="/upload-documents"
+                            state={{ applicationId: app._id }}
+                            className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold bg-amber-600 text-white hover:bg-amber-700 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                          >
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                            Upload Documents
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
+            </div>
+            </div>
             </section>
 
             <LoanReviewModal
@@ -401,29 +386,30 @@ const ApplicationStatus = () => {
           </div>
         )}
 
-        {/* Navigation */}
-        <div className="mt-12 flex justify-between items-center">
+        {/* Navigation - Animated */}
+        <div 
+          className="mt-12 flex justify-between items-center"
+          style={{ animation: 'fadeInUp 0.5s ease-out 0.3s both' }}
+        >
           <Link 
             to={dashboardPath}
-            className="inline-flex items-center px-8 py-3 border-2 border-gray-300 text-gray-700 font-medium rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            className="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-0.5"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Return to Dashboard
+            Back to Dashboard
           </Link>
 
-          <div className="flex items-center space-x-4">
-            <Link 
-              to="/loan-application" 
-              className="inline-flex items-center px-8 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-            >
-              Submit New Application
-              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-              </svg>
-            </Link>
-          </div>
+          <Link 
+            to="/loan-application" 
+            className="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+          >
+            New Application
+            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            </svg>
+          </Link>
         </div>
       </div>
     </div>
