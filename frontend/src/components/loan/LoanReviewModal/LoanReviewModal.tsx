@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, FileText, Clock, MessageSquare, File, AlertCircle, CheckCircle } from 'lucide-react'
+import { X, FileText, Clock, MessageSquare, FileUp, AlertCircle, CheckCircle } from 'lucide-react'
 import api from '../../../api'
 import type { LoanApplication, ApprovalData } from './types'
 import { getRequiredDocuments } from '../../utils'
@@ -185,9 +185,9 @@ export default function LoanReviewModal({
             </div>
             <button
               onClick={onClose}
-              className="relative z-10 p-2 hover:bg-gray-200/80 rounded-lg transition-all duration-200 group"
+              className="relative z-10 p-2 rounded-full transition-all duration-300 transform hover:rotate-90 hover:scale-110 hover:bg-gray-200/80 group"
             >
-              <X className="w-5 h-5 text-gray-500 group-hover:text-gray-700 transition-colors" />
+              <X className="w-5 h-5 text-gray-500 group-hover:text-gray-700 transition-colors duration-300" />
             </button>
           </div>
 
@@ -263,7 +263,7 @@ export default function LoanReviewModal({
                 <div className="flex border-b border-gray-200 bg-gradient-to-b from-white to-gray-50/50 backdrop-blur-sm">
                   {[
                     { id: 'details', label: 'Application Details', icon: FileText },
-                    { id: 'documents', label: 'Document Status', icon: File },
+                    { id: 'documents', label: 'Document Upload Status', icon: FileUp },
                     { id: 'history', label: 'Status History', icon: Clock },
                     ...(canShowActionsTab ? [{ id: 'actions', label: 'Actions', icon: MessageSquare }] : [])
                   ].map((tab) => {
@@ -272,31 +272,36 @@ export default function LoanReviewModal({
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`group relative flex items-center space-x-2 px-6 py-4 font-medium text-sm transition-all duration-300 ${
+                        className={`group relative flex items-center px-6 py-4 font-medium text-sm transition-all duration-300 ${
                           activeTab === tab.id
-                            ? 'text-gray-900'
-                            : 'text-gray-600 hover:text-gray-900'
+                            ? 'text-gray-900 justify-center'
+                            : 'text-gray-600 hover:text-gray-900 space-x-2'
                         }`}
                       >
                         {/* Active indicator - gradient underline */}
                         {activeTab === tab.id && (
-                          <div 
+                          <div
                             className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600"
-                            style={{ animation: 'expandWidth 0.3s ease-out' }}
                           />
                         )}
-                        
+                    
                         {/* Hover background */}
                         <div className={`absolute inset-0 transition-opacity duration-300 ${
-                          activeTab === tab.id 
-                            ? 'bg-gradient-to-br from-gray-100/80 to-transparent opacity-100' 
+                          activeTab === tab.id
+                            ? 'bg-gradient-to-br from-gray-100/80 to-transparent opacity-100'
                             : 'bg-gradient-to-br from-gray-50 to-transparent opacity-0 group-hover:opacity-100'
                         }`} />
-                        
-                        <Icon className={`w-4 h-4 relative z-10 transition-transform duration-300 ${
-                          activeTab === tab.id ? 'scale-110' : 'group-hover:scale-105'
+                    
+                        <Icon className={`w-4 h-4 relative z-10 transition-all duration-300 ${
+                          activeTab === tab.id 
+                            ? 'scale-110' 
+                            : 'group-hover:scale-105 group-hover:rotate-12'
                         }`} />
-                        <span className="relative z-10">{tab.label}</span>
+                        {activeTab !== tab.id && (
+                          <span className="relative z-10 transition-all duration-300 group-hover:tracking-wide">
+                            {tab.label}
+                          </span>
+                        )}
                       </button>
                     )
                   })}
