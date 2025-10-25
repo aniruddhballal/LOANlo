@@ -49,7 +49,7 @@ export function RequestsTable({ requests, sortConfig, handleSort, handleReviewCl
               className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
             >
               <div className="flex items-center gap-2">
-                Reference
+                Loan Application ID
                 <SortIcon columnKey="reference" sortConfig={sortConfig} />
               </div>
             </th>
@@ -72,7 +72,7 @@ export function RequestsTable({ requests, sortConfig, handleSort, handleReviewCl
               </div>
             </th>
             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-              Reason
+              Restoration Request Reason
             </th>
             <th 
               onClick={() => handleSort('status')}
@@ -88,7 +88,7 @@ export function RequestsTable({ requests, sortConfig, handleSort, handleReviewCl
               className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
             >
               <div className="flex items-center gap-2">
-                Requested
+                Requested On
                 <SortIcon columnKey="requested" sortConfig={sortConfig} />
               </div>
             </th>
