@@ -1,4 +1,4 @@
-import type { DocumentRequirement } from './loan/LoanReviewModal/types'
+import type { DocumentRequirement } from './ui/LoanReviewModal/types'
 
 export const getRequiredDocuments = (): DocumentRequirement[] => {
   return [

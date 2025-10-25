@@ -3,7 +3,7 @@ import { DashboardLayout } from '../dashboards/shared/DashboardLayout'
 import { UnderwriterTableSkeleton } from '../ui/SkeletonComponents'
 import { ErrorAlert } from '../dashboards/shared/ErrorAlert'
 import { EmptyState } from '../dashboards/shared/EmptyState'
-import LoanReviewModal from '../loan/LoanReviewModal'                   // done
+import LoanReviewModal from '../ui/LoanReviewModal'                   // done
 import { SearchFilterBar } from '../ui/searchfilterbar/SearchFilterBar' // done
 import { ApplicationsTable } from './ApplicationsTable'                 // done
 import { RestorationRequestModal } from './RestorationRequestModal'     // done
