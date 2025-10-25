@@ -1,6 +1,6 @@
 import { Mail, Phone, Briefcase } from 'lucide-react'
 import { RoleBadge } from './RoleBadge.tsx'
-import { formatDate, formatTime } from '../dashboards/utils/formatters'
+import { formatDate, formatTime } from '../dashboards/utils/formatters.ts'
 
 interface User {
   _id: string
