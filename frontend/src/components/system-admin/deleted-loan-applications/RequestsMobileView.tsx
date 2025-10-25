@@ -1,4 +1,4 @@
-import { formatApplicationId, formatDate } from '../utils'
+import { formatApplicationId, formatDate } from '../../utils'
 import { StatusBadge } from './StatusBadge'
 
 interface User {

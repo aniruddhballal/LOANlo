@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (52)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (53)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (127)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (49)
+### ✅ Completed Initiatives (50)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -68,6 +68,7 @@
 | 173 | **Profile History Collapsible Cards & IP Normalization** | Refactored `ProfileHistory.tsx` to support collapsible history entries with default open for the latest entry using `openCards` state and `toggleCard` handler. Added `normalizeIp` helper to display IPv4-mapped and IPv6 localhost addresses correctly (`::ffff:127.0.0.1` → `127.0.0.1`, `::1` → `127.0.0.1`). Updated history entry headers to be clickable, showing/hiding changed fields and profile snapshots, with arrow icon rotating to indicate expansion. Minor UI tweaks for smoother transitions and cleaner layout of entry headers and collapsible content. |
 | 178 | **ProfilePage Modal Refactor & Re-render Optimization** | Extracted modal state and handlers from `ApplicantProfile`, creating `ProfilePage.tsx` wrapper to manage `showDeleteModal` and `deleteLoading` independently. Wrapped `ApplicantProfile` in `React.memo` and used `useCallback` for `onDeleteAccount` to prevent unnecessary re-renders. Rendered `DeleteAccountConfirmationModal` via `ReactDOM.createPortal` to isolate its mount/unmount from `ApplicantProfile`, ensuring stable UI behavior and eliminating repeated animations or click issues. Updated routes to load `ProfilePage` instead of `ApplicantProfile`. |
 | 179 | **DeletedUsers Component Refactor & Modularization** | Refactored `DeletedUsers.tsx` from 650ish lines into 9 focused modules: `UserTableHeader`, `RoleBadge`, `UserTableRow`, `UserMobileCard`, `DeletedUsersStyles`, `DeletedUsersHeader`, `NoResultsState`, `UsersList`, and `useDeletedUsers`. Main component now 100ish lines, preserving all functionality, improving readability, maintainability, and separation of concerns. |
+| 180 | **DeletedLoanApplications Component Refactor & Modularization** | Refactored `DeletedLoanApplications.tsx` from 700ish lines into 6 focused modules: `StatusBadge`, `SortIcon`, `SearchFilterBar`, `RequestsTable`, `RequestsMobileView`, and `ReviewModal`. Main component now 300ish lines, preserving all functionality including search, filters, sorting, table/mobile views, and restoration request management. Improved code organization, reusability, and maintainability. |
 
 ### ⚡ In Progress (3)
 

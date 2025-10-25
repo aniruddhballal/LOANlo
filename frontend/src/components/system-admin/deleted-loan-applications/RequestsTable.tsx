@@ -1,4 +1,4 @@
-import { formatApplicationId, formatDate, formatTime } from '../utils'
+import { formatApplicationId, formatDate, formatTime } from '../../utils'
 import { StatusBadge } from './StatusBadge'
 import { SortIcon } from './SortIcon'
 

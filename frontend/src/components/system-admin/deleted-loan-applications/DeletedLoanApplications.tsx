@@ -1,14 +1,14 @@
 import { useEffect, useState, useMemo } from 'react'
-import { DashboardLayout } from '../dashboards/shared/DashboardLayout'
-import { UnderwriterTableSkeleton } from '../ui/SkeletonComponents'
-import { ErrorAlert } from '../dashboards/shared/ErrorAlert'
-import { EmptyState } from '../dashboards/shared/EmptyState'
-import { formatApplicationId } from '../utils'
+import { DashboardLayout } from '../../dashboards/shared/DashboardLayout'
+import { UnderwriterTableSkeleton } from '../../ui/SkeletonComponents'
+import { ErrorAlert } from '../../dashboards/shared/ErrorAlert'
+import { EmptyState } from '../../dashboards/shared/EmptyState'
+import { formatApplicationId } from '../../utils'
 import { SearchFilterBar } from './SearchFilterBar'
 import { RequestsTable } from './RequestsTable'
 import { RequestsMobileView } from './RequestsMobileView'
 import { ReviewModal } from './ReviewModal'
-import api from '../../api'
+import api from '../../../api'
 
 interface User {
   firstName: string
