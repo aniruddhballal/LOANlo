@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
+import { IUser } from './User';
 
 export interface IStatusHistory {
   status: string;
@@ -15,7 +16,7 @@ export interface IApprovalDetails {
 }
 
 export interface ILoanApplication extends Document {
-  userId: Types.ObjectId;
+  userId: Types.ObjectId | IUser | null; // allow populated user or null
 
   loanType: 'personal' | 'home' | 'vehicle' | 'business' | 'education';
   amount: number;

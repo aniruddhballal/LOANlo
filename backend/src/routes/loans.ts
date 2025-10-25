@@ -126,7 +126,7 @@ router.get(
       if (req.user?.role === 'underwriter') {
         // underwriters can access any
       } else if (req.user?.role === 'applicant') {
-        if (application.userId._id.toString() !== req.user.userId?.toString()) {
+        if (!application.userId || application.userId._id.toString() !== req.user.userId?.toString()) {
           return res.status(403).json({
             success: false,
             message: 'Access denied. You can only view your own applications.'

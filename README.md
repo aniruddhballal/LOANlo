@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (57)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (126)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (127)
 
 ---
 
@@ -89,7 +89,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (108)
+### ✅ Completed Initiatives (109)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -201,6 +201,7 @@
 | 160 | **Deleted Loan Applications: Filter by Active Users** | Updated `GET /deleted` route to only return soft-deleted loan applications whose associated users are still active. This prevents showing applications of users who themselves have been deleted. |
 | 164 | **Auth Route: Modularized** | Refactored monolithic `auth.ts` (500ish lines) into modular architecture: `routes/auth.ts` (route definitions only), `controllers/authController.ts` (request/response handlers), `services/authService.ts` (auth business logic), `services/captchaService.ts` (captcha logic), `middleware/rateLimiters.ts` (rate limiting configs), `middleware/captchaRateLimiter.ts` (captcha rate limiting), and `utils/captchaStore.ts` (in-memory captcha tracking). Separated concerns following single responsibility principle, improving maintainability, testability, and code reusability. |
 | 165 | **IP Whitelisting System** | Implemented backend IP whitelisting for system admin login security. **User Model (`backend/src/models/User.ts`):** Added `ipWhitelist` array (stores `ip`, `description`, `addedAt`, `addedBy`) and `allowIpRestriction` boolean to enable/disable IP checks per user. **Service Layer (`backend/src/services/ipWhitelistService.ts`):** Created functions to add/remove IPs with duplicate prevention, fetch user whitelists, toggle restrictions (requires minimum one IP), and validate IP formats. Enforces `system_admin` role for all operations. **Controller (`backend/src/controllers/ipWhitelistController.ts`):** Handles requests for getting current client IP, managing whitelist CRUD operations, and toggling restrictions. Returns appropriate HTTP status codes (400/403/500) and normalizes IPv4-mapped IPv6 addresses. **Middleware (`backend/src/middleware/ipWhitelist.ts`):** Created `checkIpWhitelist` to block unauthorized IPs when `allowIpRestriction` is enabled. Includes `getClientIP` (extracts real IP from proxies/headers) and `normalizeIP` (standardizes IPv6-mapped IPv4). Logs all access attempts and returns 403 for blocked IPs. **Routes (`backend/src/routes/ipWhitelist.ts`):** Established `/api/ip-whitelist` endpoints: GET `/current-ip`, GET `/` (whitelist), POST `/add`, DELETE `/:ipId`, PATCH `/toggle`. All require authentication via `authenticateToken`. **Server Integration (`backend/src/server.ts`):** Applied `checkIpWhitelist` middleware to protect all `/api/*` routes (loans, documents, profiles, profile-history) while keeping auth routes public. Updated CORS to support PATCH requests. Modified auth verify route (`backend/src/routes/auth.ts`) to include IP whitelist checks, ensuring token verification respects IP restrictions. This architecture allows system admins to control which IPs can access protected endpoints when restrictions are enabled, with automatic enforcement across all sensitive API routes. |
+| 184 | **Soft-Delete Handling & Restoration Requests Update** | Updated `LoanApplication` model to allow `userId` as `Types.ObjectId | IUser | null` for proper population handling. Fixed `/details/:applicationId` route in `loans.ts` to safely check `application.userId` before access validation. Refactored `/restoration-requests` route in `admin.ts` to exclude soft-deleted applications and users, ensuring only active applications and non-deleted users are returned, with proper null filtering and population logic. |
 
 ### ⚡ In Progress (18)
 
@@ -227,6 +228,6 @@
 
 ---
 
-**Document Version:** 162
+**Document Version:** 163
 **Last Updated:** 25th October 2025
 **Maintained By:** Aniruddh Ballal

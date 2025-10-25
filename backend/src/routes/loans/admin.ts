@@ -27,34 +27,45 @@ router.get(
       if (status && status !== 'all') {
         filter.status = status;
       }
-      // First, get restoration requests with basic population
-      const requests = await RestorationRequest.find(filter)
-        .populate('requestedBy', 'firstName lastName email role')
-        .populate('reviewedBy', 'firstName lastName email role')
-        .sort({ createdAt: -1 })
-        .lean(); // Use lean() for better performance
 
-      // Manually populate applicationId including soft-deleted ones
-      const populatedRequests = await Promise.all(
+      const requests = await RestorationRequest.find(filter)
+        .populate({
+          path: 'requestedBy',
+          select: 'firstName lastName email role',
+          match: { isDeleted: { $ne: true } }
+        })
+        .populate({
+          path: 'reviewedBy',
+          select: 'firstName lastName email role',
+          match: { isDeleted: { $ne: true } }
+        })
+        .sort({ createdAt: -1 })
+        .lean();
+
+      const populatedRequests = (await Promise.all(
         requests.map(async (request) => {
-          // Find the application WITHOUT the soft-delete filter by explicitly querying with isDeleted
           const application = await LoanApplication.findOne({
             _id: request.applicationId,
-            isDeleted: { $in: [true, false] } // This forces the query to include both deleted and non-deleted
+            isDeleted: false // Only include non-deleted applications
           })
-          .populate('userId', 'firstName lastName email phone')
-          .lean();
+            .populate({
+              path: 'userId',
+              select: 'firstName lastName email phone isDeleted',
+              match: { isDeleted: { $ne: true } } // Exclude soft-deleted users
+            })
+            .lean();
 
-          return {
-            ...request,
-            applicationId: application
-          };
+          if (!application || !application.userId) return null; // skip if deleted
+
+          return { ...request, applicationId: application };
         })
-      );
-      
+      )) as any[];
+
+      const filteredRequests = populatedRequests.filter(r => r !== null);
+
       res.json({
         success: true,
-        requests: populatedRequests
+        requests: filteredRequests
       });
     } catch (error: any) {
       res.status(500).json({
@@ -65,6 +76,7 @@ router.get(
     }
   }
 );
+
 
 // 3. Approve restoration request (system_admin only)
 router.post(
