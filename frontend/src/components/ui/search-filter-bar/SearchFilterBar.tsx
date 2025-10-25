@@ -1,5 +1,12 @@
 import { Search, SlidersHorizontal, X } from 'lucide-react'
-import type { FilterState } from '../../dashboards/types'
+
+interface FilterState {
+  status: string
+  amountMin: string
+  amountMax: string
+  dateFrom: string
+  dateTo: string
+}
 
 interface SearchFilterBarProps {
   searchQuery: string
@@ -10,6 +17,7 @@ interface SearchFilterBarProps {
   clearFilters: () => void
   filters: FilterState
   handleFilterChange: (key: string, value: string) => void
+  searchPlaceholder?: string  // custom placeholder
 }
 
 export function SearchFilterBar({
@@ -20,7 +28,8 @@ export function SearchFilterBar({
   activeFilterCount,
   clearFilters,
   filters,
-  handleFilterChange
+  handleFilterChange,
+  searchPlaceholder = "Search by reference, name, email, phone, status, or amount..."  // Default for UnderwriterDashboard
 }: SearchFilterBarProps) {
   return (
     <>
@@ -124,7 +133,7 @@ export function SearchFilterBar({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-gray-600 transition-colors duration-200" />
             <input
               type="text"
-              placeholder="Search by reference, name, email, phone, status, or amount..."
+              placeholder={searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-900 search-focus hover:border-gray-400 transition-all duration-200"

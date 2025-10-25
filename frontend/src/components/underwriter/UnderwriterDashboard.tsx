@@ -3,12 +3,12 @@ import { DashboardLayout } from '../dashboards/shared/DashboardLayout'
 import { UnderwriterTableSkeleton } from '../ui/SkeletonComponents'
 import { ErrorAlert } from '../dashboards/shared/ErrorAlert'
 import { EmptyState } from '../dashboards/shared/EmptyState'
-import LoanReviewModal from '../ui/loan-review-modal'                   // done
+import LoanReviewModal from '../ui/loan-review-modal'                     // done
 import { SearchFilterBar } from '../ui/search-filter-bar/SearchFilterBar' // done
-import { ApplicationsTable } from './ApplicationsTable'                 // done
-import { RestorationRequestModal } from './RestorationRequestModal'     // done
+import { ApplicationsTable } from './ApplicationsTable'                   // done
+import { RestorationRequestModal } from './RestorationRequestModal'       // done
 import type { LoanApplication, FilterState, SortConfig} from '../dashboards/types'
-import { applyFiltersAndSort } from '../ui/search-filter-bar/searchFilterUtils'
+import { applyFiltersAndSort } from '../ui/search-filter-bar/searchFilterUtilsUnderwriter'
 import api from '../../api'
 
 export default function UnderwriterDashboard() {
@@ -406,6 +406,7 @@ export default function UnderwriterDashboard() {
               clearFilters={clearFilters}
               filters={filters}
               handleFilterChange={handleFilterChange}
+              searchPlaceholder="Search by reference, name, email, phone, status, or amount..."
             />
           </header>
           

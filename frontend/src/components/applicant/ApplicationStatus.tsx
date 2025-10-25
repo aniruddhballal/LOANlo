@@ -6,8 +6,8 @@ import api from '../../api'
 import LoanReviewModal from '../ui/loan-review-modal'
 import { useAuth } from '../../context/AuthContext'
 import { ApplicationStatusSkeleton } from '../ui/SkeletonComponents'
-import { applyFilters } from './searchFilterUtils'
-import { SearchFilterBar } from './SearchFilterBar'
+import { applyFilters } from '../ui/search-filter-bar/searchFilterUtilsApplicant'
+import { SearchFilterBar } from '../ui/search-filter-bar/SearchFilterBar'
 
 import { formatCurrency, formatDate, formatApplicationId } from '../utils'
 
@@ -299,135 +299,198 @@ const ApplicationStatus = () => {
                   handleFilterChange={handleFilterChange}
                   activeFilterCount={Object.values(filters).filter(v => v && v !== 'all').length}
                   clearFilters={clearFilters}
+                  searchPlaceholder="Search by loan type, reference ID, status, or amount..."  // ADD THIS LINE
                 />
+                
               </header>
 
               <div className="p-8">
                 {filteredApplications.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gray-100 flex items-center justify-center">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <div className="text-center py-20 px-4">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full mb-6 shadow-lg mx-auto">
+                      <svg
+                        className="w-10 h-10 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No Applications Found</h3>
-                    <p className="text-gray-600 mb-4">Try adjusting your search or filters</p>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">No Applications Found</h3>
+                    <p className="text-gray-500 text-base mb-6 max-w-md mx-auto">
+                      Try adjusting your search criteria or filters to find what you're looking for
+                    </p>
                     <button
                       onClick={clearFilters}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                      className="shimmer-button px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-800 text-white font-bold rounded-xl hover:from-gray-800 hover:to-gray-900 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-100"
                     >
-                      Clear Filters
+                      Clear All Filters
                     </button>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {filteredApplications.map((app, index) => (
-                  <div
-                    key={app._id}
-                    id={`app-${app._id}`}
-                    className={`group relative bg-white rounded-xl border shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5 overflow-hidden ${
-                      highlightedAppId === app._id
-                        ? 'highlight-card'
-                        : 'border-gray-200'
-                    }`}
-                    style={{
-                      animation: `fadeInUp 0.5s ease-out ${(index + 1) * 0.1}s both`
-                    }}
-                  >
-                    {/* Shimmer effect on hover */}
-                    <div className="shimmer-line"></div>
-                    
-                    {/* Gradient overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div
+                        key={app._id}
+                        id={`app-${app._id}`}
+                        className={`group relative bg-white rounded-xl border shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5 overflow-hidden ${
+                          highlightedAppId === app._id ? 'highlight-card' : 'border-gray-200'
+                        }`}
+                        style={{
+                          animation: `fadeInUp 0.5s ease-out ${(index + 1) * 0.1}s both`,
+                        }}
+                      >
+                        {/* Shimmer effect on hover */}
+                        <div className="shimmer-line"></div>
 
-                    <div className="relative z-10 p-6">
-                      {/* Header Row */}
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-3">
-                            <h3 className="font-semibold text-gray-900 text-xl tracking-tight">{app.loanType}</h3>
-                            <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm transition-all duration-300 hover:scale-105 ${getStatusColor(app.status)}`}>
-                              {getStatusLabel(app.status)}
-                            </span>
-                          </div>
-                          
-                          {/* Details Grid */}
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="space-y-1">
-                              <span className="text-gray-500 text-xs">Amount</span>
-                              <div className="font-semibold text-gray-900 text-lg">{formatCurrency(app.amount)}</div>
-                            </div>
-                            <div className="space-y-1">
-                              <span className="text-gray-500 text-xs">Tenure</span>
-                              <div className="font-medium text-gray-700">{app.tenure} months</div>
-                            </div>
-                            <div className="space-y-1">
-                              <span className="text-gray-500 text-xs">Reference ID</span>
-                              <div className="font-mono text-xs text-gray-800">
-                                  {formatApplicationId(app._id)}
+                        {/* Gradient overlay on hover */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                        <div className="relative z-10 p-6">
+                          {/* Header Row */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-3">
+                                <h3 className="font-semibold text-gray-900 text-xl tracking-tight">
+                                  {app.loanType}
+                                </h3>
+                                <span
+                                  className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm transition-all duration-300 hover:scale-105 ${getStatusColor(app.status)}`}
+                                >
+                                  {getStatusLabel(app.status)}
+                                </span>
+                              </div>
+
+                              {/* Details Grid */}
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div className="space-y-1">
+                                  <span className="text-gray-500 text-xs">Amount</span>
+                                  <div className="font-semibold text-gray-900 text-lg">
+                                    {formatCurrency(app.amount)}
+                                  </div>
+                                </div>
+                                <div className="space-y-1">
+                                  <span className="text-gray-500 text-xs">Tenure</span>
+                                  <div className="font-medium text-gray-700">{app.tenure} months</div>
+                                </div>
+                                <div className="space-y-1">
+                                  <span className="text-gray-500 text-xs">Reference ID</span>
+                                  <div className="font-mono text-xs text-gray-800">
+                                    {formatApplicationId(app._id)}
+                                  </div>
+                                </div>
+                                <div className="space-y-1">
+                                  <span className="text-gray-500 text-xs">Submitted</span>
+                                  <div className="font-medium text-gray-700">{formatDate(app.createdAt)}</div>
+                                </div>
                               </div>
                             </div>
-                            <div className="space-y-1">
-                              <span className="text-gray-500 text-xs">Submitted</span>
-                              <div className="font-medium text-gray-700">{formatDate(app.createdAt)}</div>
+                          </div>
+
+                          {/* Divider */}
+                          <div className="border-t border-gray-100 my-4"></div>
+
+                          {/* Actions Row */}
+                          <div className="flex items-center justify-between">
+                            <div className={animatingDocs === app._id ? 'doc-pulse' : ''}>
+                              {app.documentsUploaded ? (
+                                <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
+                                  <svg
+                                    className="w-4 h-4 mr-2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M5 13l4 4L19 7"
+                                    />
+                                  </svg>
+                                  Documentation Complete
+                                </div>
+                              ) : (
+                                <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
+                                  <svg
+                                    className="w-4 h-4 mr-2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                    />
+                                  </svg>
+                                  Documents Pending
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              <button
+                                onClick={() => setSelectedApplication(app)}
+                                className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-medium bg-white text-gray-700 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-0.5"
+                              >
+                                <svg
+                                  className="w-4 h-4 mr-2"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                  />
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                  />
+                                </svg>
+                                Review
+                              </button>
+
+                              {!app.documentsUploaded && (
+                                <Link
+                                  to="/upload-documents"
+                                  state={{ applicationId: app._id }}
+                                  className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold bg-amber-600 text-white hover:bg-amber-700 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                                >
+                                  <svg
+                                    className="w-4 h-4 mr-2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                    />
+                                  </svg>
+                                  Upload Documents
+                                </Link>
+                              )}
                             </div>
                           </div>
                         </div>
                       </div>
-
-                      {/* Divider */}
-                      <div className="border-t border-gray-100 my-4"></div>
-
-                      {/* Actions Row */}
-                      <div className="flex items-center justify-between">
-                        <div className={animatingDocs === app._id ? 'doc-pulse' : ''}>
-                          {app.documentsUploaded ? (
-                            <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
-                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
-                              </svg>
-                              Documentation Complete
-                            </div>
-                          ) : (
-                            <div className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
-                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                              </svg>
-                              Documents Pending
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                          <button 
-                            onClick={() => setSelectedApplication(app)}
-                            className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-medium bg-white text-gray-700 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-0.5"
-                          >
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                            Review
-                          </button>
-
-                          {!app.documentsUploaded && (
-                            <Link
-                              to="/upload-documents"
-                              state={{ applicationId: app._id }}
-                              className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold bg-amber-600 text-white hover:bg-amber-700 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
-                            >
-                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                              </svg>
-                              Upload Documents
-                            </Link>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
                 )}
               </div>
             </section>
