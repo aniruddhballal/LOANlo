@@ -4,10 +4,10 @@ import { ErrorAlert } from '../dashboards/shared/ErrorAlert.tsx'
 import { EmptyState } from '../dashboards/shared/EmptyState.tsx'
 import { UserActionModal } from '../auth/UserActionModal.tsx'
 import { DeletedUsersStyles } from './DeletedUsersStyles.tsx'
-import { DeletedUsersHeader } from './DeletedUsersHeader'
-import { NoResultsState } from './NoResultsState'
-import { UsersList } from './UsersList'
-import { useDeletedUsers } from './useDeletedUsers'
+import { DeletedUsersHeader } from './DeletedUsersHeader.tsx'
+import { NoResultsState } from './NoResultsState.tsx'
+import { UsersList } from './UsersList.tsx'
+import { useDeletedUsers } from './useDeletedUsers.ts'
 
 export default function DeletedUsers() {
   const {

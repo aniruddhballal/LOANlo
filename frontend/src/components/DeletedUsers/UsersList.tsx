@@ -1,6 +1,6 @@
 import { UserTableHeader } from './UserTableHeader.tsx'
-import { UserTableRow } from './UserTableRow'
-import { UserMobileCard } from './UserMobileCard'
+import { UserTableRow } from './UserTableRow.tsx'
+import { UserMobileCard } from './UserMobileCard.tsx'
 
 interface User {
   _id: string
