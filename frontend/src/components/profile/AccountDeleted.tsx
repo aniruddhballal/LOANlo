@@ -128,7 +128,7 @@ const AccountDeleted = () => {
               style={{ animation: 'fadeInUp 0.6s ease-out 0.6s both' }}
             >
               <p className="text-sm text-gray-500 tracking-wide">
-                Thank you for using LoanLo. We hope to serve you again in the future.
+                Thank you for using LOANlo. We hope to serve you again in the future.
               </p>
             </div>
           </div>
