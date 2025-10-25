@@ -3,14 +3,14 @@ import Login from './components/auth/Login'
 import Register from './components/auth/Register'
 import ApplicantDashboard from './components/applicant/ApplicantDashboard'
 import UnderwriterDashboard from './components/underwriter/UnderwriterDashboard'
-import SystemAdminDashboard from './components/systemadmin/SystemAdminDashboard'
-import DeletedLoanApplications from './components/systemadmin/DeletedLoanApplications'
-import DeletedUsers from './components/systemadmin/deletedusers/DeletedUsers'
-import LoanApplication from './components/applicant/LoanApplication/LoanApplication'
+import SystemAdminDashboard from './components/system-admin/SystemAdminDashboard'
+import DeletedLoanApplications from './components/system-admin/DeletedLoanApplications'
+import DeletedUsers from './components/system-admin/deleted-users/DeletedUsers'
+import LoanApplication from './components/applicant/loan-application/LoanApplication'
 import DocumentUpload from './components/applicant/DocumentUpload'
 import ApplicationStatus from './components/applicant/ApplicationStatus'
 import { AuthProvider, useAuth } from './context/AuthContext'
-import PersonalDetails from './components/applicant/PersonalDetails/PersonalDetails'
+import PersonalDetails from './components/applicant/personal-details/PersonalDetails'
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 import AccessDenied from './components/auth/AccessDenied'
 import { LoadingState } from './components/ui/StatusMessages'
@@ -18,7 +18,7 @@ import EmailVerification from './components/auth/EmailVerification'
 import ProfilePage from './components/profile/ProfilePage'
 import StaffProfile from './components/profile/StaffProfile'
 import ProfileHistory from './components/profile/ProfileHistory'
-import IpWhitelistSettings from './components/systemadmin/IpWhitelistSettings';
+import IpWhitelistSettings from './components/system-admin/IpWhitelistSettings';
 import AccountDeleted from './components/profile/AccountDeleted';
 
 // Public Route Component (redirect if already logged in)

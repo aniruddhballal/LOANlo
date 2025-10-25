@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
 
 import api from '../../api'
-import LoanReviewModal from '../ui/LoanReviewModal'
+import LoanReviewModal from '../ui/loan-review-modal'
 import { useAuth } from '../../context/AuthContext'
 import { ApplicationStatusSkeleton } from '../ui/SkeletonComponents'
 
