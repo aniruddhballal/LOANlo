@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Trash2, Users, Shield } from 'lucide-react'  // ADD Shield import
+import { Trash2, Users, Shield } from 'lucide-react'
 import { DashboardLayout } from '../dashboards/shared/DashboardLayout'
 
 export default function SystemAdminDashboard() {
