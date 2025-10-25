@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (53)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (54)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (127)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (50)
+### ✅ Completed Initiatives (51)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -69,6 +69,7 @@
 | 178 | **ProfilePage Modal Refactor & Re-render Optimization** | Extracted modal state and handlers from `ApplicantProfile`, creating `ProfilePage.tsx` wrapper to manage `showDeleteModal` and `deleteLoading` independently. Wrapped `ApplicantProfile` in `React.memo` and used `useCallback` for `onDeleteAccount` to prevent unnecessary re-renders. Rendered `DeleteAccountConfirmationModal` via `ReactDOM.createPortal` to isolate its mount/unmount from `ApplicantProfile`, ensuring stable UI behavior and eliminating repeated animations or click issues. Updated routes to load `ProfilePage` instead of `ApplicantProfile`. |
 | 179 | **DeletedUsers Component Refactor & Modularization** | Refactored `DeletedUsers.tsx` from 650ish lines into 9 focused modules: `UserTableHeader`, `RoleBadge`, `UserTableRow`, `UserMobileCard`, `DeletedUsersStyles`, `DeletedUsersHeader`, `NoResultsState`, `UsersList`, and `useDeletedUsers`. Main component now 100ish lines, preserving all functionality, improving readability, maintainability, and separation of concerns. |
 | 180 | **DeletedLoanApplications Component Refactor & Modularization** | Refactored `DeletedLoanApplications.tsx` from 700ish lines into 6 focused modules: `StatusBadge`, `SortIcon`, `SearchFilterBar`, `RequestsTable`, `RequestsMobileView`, and `ReviewModal`. Main component now 300ish lines, preserving all functionality including search, filters, sorting, table/mobile views, and restoration request management. Improved code organization, reusability, and maintainability. |
+| 181 | **ApplicationStatus Search & Filter Integration** | Added search and filter functionality to `ApplicationStatus.tsx` by creating `SearchFilterBar` component and `searchFilterUtils.ts`. Implemented real-time search across loan type, reference ID, status, and amount fields. Added filter panel supporting status dropdown, amount range (min/max), and date range (from/to) filtering. Integrated `applyFilters()` utility to handle multi-criteria filtering with active filter count badge, "Clear All" button, and empty state showing "X of Y Applications" count. Customized search logic for ApplicationStatus-specific fields, excluding user details present in underwriter dashboard. |
 
 ### ⚡ In Progress (3)
 
@@ -224,6 +225,6 @@
 
 ---
 
-**Document Version:** 158
+**Document Version:** 159
 **Last Updated:** 25th October 2025
 **Maintained By:** Aniruddh Ballal
