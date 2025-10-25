@@ -5,7 +5,7 @@ import {
   applyDeletedUsersFilters,
   getActiveDeletedUsersFilterCount,
   getDefaultDeletedUsersFilters
-} from '../../ui/search-filter-bar/searchFilterUtilsDeletedUsers'
+} from '../../ui/search-filter-bar/utils/searchFilterUtilsDeletedUsers'
 
 interface User {
   _id: string

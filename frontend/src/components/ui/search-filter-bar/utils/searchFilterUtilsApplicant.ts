@@ -1,4 +1,4 @@
-import { formatApplicationId, formatCurrency } from '../../utils'
+import { formatApplicationId, formatCurrency } from '../../../utils'
 
 interface LoanApplication {
   _id: string

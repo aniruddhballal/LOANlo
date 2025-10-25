@@ -6,7 +6,7 @@ import api from '../../api'
 import LoanReviewModal from '../ui/loan-review-modal'
 import { useAuth } from '../../context/AuthContext'
 import { ApplicationStatusSkeleton } from '../ui/SkeletonComponents'
-import { applyFilters } from '../ui/search-filter-bar/searchFilterUtilsApplicant'
+import { applyFilters } from '../ui/search-filter-bar/utils/searchFilterUtilsApplicant'
 import { SearchFilterBar } from '../ui/search-filter-bar/SearchFilterBar'
 
 import { formatCurrency, formatDate, formatApplicationId } from '../utils'

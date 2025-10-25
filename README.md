@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (57)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (58)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (127)
 
 ---
@@ -73,6 +73,7 @@
 | 181 | **ApplicationStatus Search & Filter Integration** | Added search and filter functionality to `ApplicationStatus.tsx` by creating `SearchFilterBar` component and `searchFilterUtils.ts`. Implemented real-time search across loan type, reference ID, status, and amount fields. Added filter panel supporting status dropdown, amount range (min/max), and date range (from/to) filtering. Integrated `applyFilters()` utility to handle multi-criteria filtering with active filter count badge, "Clear All" button, and empty state showing "X of Y Applications" count. Customized search logic for ApplicationStatus-specific fields, excluding user details present in underwriter dashboard. |
 | 182 | **Unified Search & Filter Bar Integration (Underwriter & Applicant Dashboards)** | Merged and standardized `SearchFilterBar` across both `UnderwriterDashboard.tsx` and `ApplicationStatus.tsx`. Created separate utility files — `searchFilterUtilsUnderwriter.ts` and `searchFilterUtilsApplicant.ts` — to handle dataset-specific search and filtering logic. Preserved independent search criteria for each (underwriter: applicant details, status, loan type; applicant: loan type, reference ID, status, amount). Ensured consistent UI/UX styling for empty states, gradient buttons, and filter panels while maintaining distinct backend logic for each dashboard. |
 | 183 | **Search & Filter Bar Extension for Deleted Users (System Admin Dashboard)** | Extended `SearchFilterBar` component with optional customization props (`showAmountFilters`, `statusLabel`, `statusOptions`) to support role-based filtering without amount fields. Created `searchFilterUtilsDeletedUsers.ts` utility file with dedicated functions for searching across user fields (name, email, phone, role, company, city) and filtering by role and deletion date range. Updated `useDeletedUsers.ts` hook to integrate utility functions for cleaner state management. Modified `DeletedUsersHeader.tsx` to pass custom props: disabled amount filters, changed label from "Status" to "Role", and provided role-specific dropdown options (All Roles, Applicant, Underwriter, System Admin). Ensured backward compatibility with existing Underwriter and Applicant dashboards while adding flexible third use case for system administrators. |
+| 185 | **Search & Filter Bar Integration for Deleted Loan Applications** | Refactored `DeletedLoanApplications.tsx` to use centralized `SearchFilterBar` component. Created `searchFilterUtilsRestoration.ts` with search/filter functions for restoration requests (applicant, underwriter, reference, reason, amount, status, dates). Updated `FilterState` to include `amountMin/amountMax` fields. Configured SearchFilterBar with custom props: enabled amount filters, "Request Status" label, and restoration-specific status options (Pending, Approved, Rejected). Removed legacy SearchFilterBar implementation while preserving all existing functionality. |
 
 ### ⚡ In Progress (3)
 
@@ -228,6 +229,6 @@
 
 ---
 
-**Document Version:** 163
+**Document Version:** 164
 **Last Updated:** 25th October 2025
 **Maintained By:** Aniruddh Ballal

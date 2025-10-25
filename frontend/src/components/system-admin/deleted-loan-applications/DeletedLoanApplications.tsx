@@ -3,41 +3,20 @@ import { DashboardLayout } from '../../dashboards/shared/DashboardLayout'
 import { UnderwriterTableSkeleton } from '../../ui/SkeletonComponents'
 import { ErrorAlert } from '../../dashboards/shared/ErrorAlert'
 import { EmptyState } from '../../dashboards/shared/EmptyState'
-import { formatApplicationId } from '../../utils'
-import { SearchFilterBar } from './SearchFilterBar'
+import { SearchFilterBar } from '../../ui/search-filter-bar/SearchFilterBar'
 import { RequestsTable } from './RequestsTable'
 import { RequestsMobileView } from './RequestsMobileView'
 import { ReviewModal } from './ReviewModal'
 import api from '../../../api'
+import {
+  applyFilters,
+  countActiveFilters
+} from '../../ui/search-filter-bar/utils/searchFilterUtilsRestoration'
+import type {
+  RestorationRequest,
+  FilterState
+  } from '../../ui/search-filter-bar/utils/searchFilterUtilsRestoration'
 
-interface User {
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  role: string
-}
-
-interface LoanApplication {
-  _id: string
-  amount: number
-  status: string
-  createdAt: string
-  deletedAt?: string
-  userId: User
-}
-
-interface RestorationRequest {
-  _id: string
-  applicationId: LoanApplication
-  requestedBy: User
-  reason: string
-  status: 'pending' | 'approved' | 'rejected'
-  reviewedBy?: User
-  reviewedAt?: string
-  reviewNotes?: string
-  createdAt: string
-}
 
 export default function DeletedLoanApplications() {
   const [requests, setRequests] = useState<RestorationRequest[]>([])
@@ -56,8 +35,10 @@ export default function DeletedLoanApplications() {
     key: null, 
     direction: 'asc' 
   })
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FilterState>({
     status: 'all',
+    amountMin: '',
+    amountMax: '',
     dateFrom: '',
     dateTo: ''
   })
@@ -135,39 +116,10 @@ export default function DeletedLoanApplications() {
     }
   }
 
-  // Global search function
-  const searchInRequest = (req: RestorationRequest, query: string) => {
-    const searchLower = query.toLowerCase()
-    return (
-      (req.applicationId ? formatApplicationId(req.applicationId._id).toLowerCase().includes(searchLower) : false) ||
-      `${req.requestedBy?.firstName} ${req.requestedBy?.lastName}`.toLowerCase().includes(searchLower) ||
-      `${req.applicationId?.userId?.firstName || ''} ${req.applicationId?.userId?.lastName || ''}`.toLowerCase().includes(searchLower) ||
-      req.reason?.toLowerCase().includes(searchLower) ||
-      req.status?.toLowerCase().includes(searchLower)
-    )
-  }
-
-  // Filter and sort logic
+  // Filter and sort logic using the utility functions
   const filteredAndSortedRequests = useMemo(() => {
-    let result = [...requests]
-
-    // Apply global search
-    if (searchQuery) {
-      result = result.filter(req => searchInRequest(req, searchQuery))
-    }
-
-    // Apply filters
-    if (filters.status !== 'all') {
-      result = result.filter(req => req.status === filters.status)
-    }
-
-    if (filters.dateFrom) {
-      result = result.filter(req => new Date(req.createdAt) >= new Date(filters.dateFrom))
-    }
-
-    if (filters.dateTo) {
-      result = result.filter(req => new Date(req.createdAt) <= new Date(filters.dateTo))
-    }
+    // Apply filters using the utility function
+    let result = applyFilters(requests, searchQuery, filters)
 
     // Apply sorting
     if (sortConfig.key) {
@@ -222,6 +174,8 @@ export default function DeletedLoanApplications() {
   const clearFilters = () => {
     setFilters({
       status: 'all',
+      amountMin: '',
+      amountMax: '',
       dateFrom: '',
       dateTo: ''
     })
@@ -229,7 +183,7 @@ export default function DeletedLoanApplications() {
     setSortConfig({ key: null, direction: 'asc' })
   }
 
-  const activeFilterCount = Object.values(filters).filter(v => v && v !== 'all').length + (searchQuery ? 1 : 0)
+  const activeFilterCount = countActiveFilters(filters, searchQuery)
   const pendingCount = requests.filter(r => r.status === 'pending').length
 
   return (
@@ -274,6 +228,15 @@ export default function DeletedLoanApplications() {
               clearFilters={clearFilters}
               filters={filters}
               handleFilterChange={handleFilterChange}
+              searchPlaceholder="Search by reference, applicant, underwriter, reason, or amount..."
+              showAmountFilters={true}
+              statusLabel="Request Status"
+              statusOptions={[
+                { value: 'all', label: 'All Statuses' },
+                { value: 'pending', label: 'Pending' },
+                { value: 'approved', label: 'Approved' },
+                { value: 'rejected', label: 'Rejected' }
+              ]}
             />
           </header>
           

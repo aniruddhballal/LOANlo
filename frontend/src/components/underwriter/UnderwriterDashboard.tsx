@@ -8,7 +8,7 @@ import { SearchFilterBar } from '../ui/search-filter-bar/SearchFilterBar' // don
 import { ApplicationsTable } from './ApplicationsTable'                   // done
 import { RestorationRequestModal } from './RestorationRequestModal'       // done
 import type { LoanApplication, FilterState, SortConfig} from '../dashboards/types'
-import { applyFiltersAndSort } from '../ui/search-filter-bar/searchFilterUtilsUnderwriter'
+import { applyFiltersAndSort } from '../ui/search-filter-bar/utils/searchFilterUtilsUnderwriter'
 import api from '../../api'
 
 export default function UnderwriterDashboard() {
