@@ -27,42 +27,47 @@ router.get(
       if (status && status !== 'all') {
         filter.status = status;
       }
-
+      
+      // Get all non-deleted user IDs
+      const activeUsers = await User.find({ isDeleted: { $ne: true } })
+        .select('_id')
+        .lean();
+      
+      const activeUserIds = activeUsers.map(user => user._id);
+      
+      // Filter to only get requests from active users (requestedBy)
+      filter.requestedBy = { $in: activeUserIds };
+      
+      // Get restoration requests with populated fields
       const requests = await RestorationRequest.find(filter)
-        .populate({
-          path: 'requestedBy',
-          select: 'firstName lastName email role',
-          match: { isDeleted: { $ne: true } }
-        })
-        .populate({
-          path: 'reviewedBy',
-          select: 'firstName lastName email role',
-          match: { isDeleted: { $ne: true } }
-        })
+        .populate('requestedBy', 'firstName lastName email role')
+        .populate('reviewedBy', 'firstName lastName email role')
         .sort({ createdAt: -1 })
         .lean();
-
-      const populatedRequests = (await Promise.all(
+      
+      // Manually populate applicationId including soft-deleted ones
+      const populatedRequests = await Promise.all(
         requests.map(async (request) => {
           const application = await LoanApplication.findOne({
             _id: request.applicationId,
-            isDeleted: false // Only include non-deleted applications
+            isDeleted: { $in: [true, false] }
           })
-            .populate({
-              path: 'userId',
-              select: 'firstName lastName email phone isDeleted',
-              match: { isDeleted: { $ne: true } } // Exclude soft-deleted users
-            })
-            .lean();
-
-          if (!application || !application.userId) return null; // skip if deleted
-
-          return { ...request, applicationId: application };
+          .populate('userId', 'firstName lastName email phone')
+          .lean();
+          
+          return {
+            ...request,
+            applicationId: application
+          };
         })
-      )) as any[];
-
-      const filteredRequests = populatedRequests.filter(r => r !== null);
-
+      );
+      
+      // Filter out requests where the applicant user is soft-deleted
+      // Keep requests where: application doesn't exist OR applicant is not soft-deleted
+      const filteredRequests = populatedRequests.filter(req => 
+        !req.applicationId || req.applicationId.userId !== null
+      );
+     
       res.json({
         success: true,
         requests: filteredRequests
@@ -76,7 +81,6 @@ router.get(
     }
   }
 );
-
 
 // 3. Approve restoration request (system_admin only)
 router.post(
