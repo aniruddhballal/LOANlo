@@ -135,6 +135,10 @@ export default function DeletedLoanApplications() {
             aVal = `${a.applicationId?.userId?.firstName || ''} ${a.applicationId?.userId?.lastName || ''}`.toLowerCase()
             bVal = `${b.applicationId?.userId?.firstName || ''} ${b.applicationId?.userId?.lastName || ''}`.toLowerCase()
             break
+          case 'amount':
+            aVal = a.applicationId?.amount || 0
+            bVal = b.applicationId?.amount || 0
+            break
           case 'requestedBy':
             aVal = `${a.requestedBy?.firstName} ${a.requestedBy?.lastName}`.toLowerCase()
             bVal = `${b.requestedBy?.firstName} ${b.requestedBy?.lastName}`.toLowerCase()

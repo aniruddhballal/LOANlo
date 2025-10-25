@@ -63,6 +63,15 @@ export function RequestsTable({ requests, sortConfig, handleSort, handleReviewCl
               </div>
             </th>
             <th 
+              onClick={() => handleSort('amount')}
+              className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                Loan Amount
+                <SortIcon columnKey="amount" sortConfig={sortConfig} />
+              </div>
+            </th>
+            <th 
               onClick={() => handleSort('requestedBy')}
               className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
             >
@@ -120,6 +129,15 @@ export function RequestsTable({ requests, sortConfig, handleSort, handleReviewCl
                         {req.applicationId.userId.firstName} {req.applicationId.userId.lastName}
                       </div>
                     </div>
+                  </div>
+                ) : (
+                  <span className="text-gray-400 text-sm italic">N/A</span>
+                )}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {req.applicationId?.amount ? (
+                  <div className="text-sm font-semibold text-gray-900">
+                    ₹{req.applicationId.amount.toLocaleString('en-IN')}
                   </div>
                 ) : (
                   <span className="text-gray-400 text-sm italic">N/A</span>

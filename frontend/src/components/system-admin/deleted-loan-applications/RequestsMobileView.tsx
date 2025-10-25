@@ -63,6 +63,16 @@ export function RequestsMobileView({ requests, handleReviewClick }: RequestsMobi
               </div>
             </div>
             <div>
+              <span className="text-sm text-gray-600 font-light">Loan Amount</span>
+              <div className="font-semibold text-gray-900">
+                {req.applicationId?.amount ? (
+                  `₹${req.applicationId.amount.toLocaleString('en-IN')}`
+                ) : (
+                  <span className="text-gray-400 italic">N/A</span>
+                )}
+              </div>
+            </div>
+            <div>
               <span className="text-sm text-gray-600 font-light">Requested By</span>
               <div className="font-semibold text-gray-900">
                 {req.requestedBy?.firstName} {req.requestedBy?.lastName}
