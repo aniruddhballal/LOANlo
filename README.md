@@ -6,8 +6,8 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (56)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (127)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (57)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (126)
 
 ---
 
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (53)
+### ✅ Completed Initiatives (54)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -66,6 +66,7 @@
 | 171 | **Universal Skeleton Loading Components** | Create centralized, reusable skeleton loading components and replace all custom loading indicators throughout the app with standardized skeletons, similar to the button styling approach. |
 | 172 | **Account Deletion Confirmation Page & Clean Session Redirect** | Created `AccountDeleted.tsx` component as dedicated post-deletion landing page with farewell message, data removal summary, recovery contact option (mailto link to admin), and dual CTAs (Back to Login/Create New Account). Modified account deletion handler in profile management component to navigate to `/account-deleted` instead of `/`. Replaced `<Link>` components with `<a href>` tags in `AccountDeleted.tsx` to force full page reload, clearing React state/auth context and preventing stale token issues that caused brief "email verification required" flash before login redirect. Added `/account-deleted` route to `App.tsx` as public (non-protected) route. |
 | 173 | **Profile History Collapsible Cards & IP Normalization** | Refactored `ProfileHistory.tsx` to support collapsible history entries with default open for the latest entry using `openCards` state and `toggleCard` handler. Added `normalizeIp` helper to display IPv4-mapped and IPv6 localhost addresses correctly (`::ffff:127.0.0.1` → `127.0.0.1`, `::1` → `127.0.0.1`). Updated history entry headers to be clickable, showing/hiding changed fields and profile snapshots, with arrow icon rotating to indicate expansion. Minor UI tweaks for smoother transitions and cleaner layout of entry headers and collapsible content. |
+| 174 | **Underwriter Dashboard: Modularized** | Refactored monolithic `UnderwriterDashboard.tsx` (760+ lines) into focused modules: `types.ts` (interfaces), `searchFilterUtils.ts` (filter/sort logic), `SearchFilterBar.tsx` (search UI), `ApplicationsTable.tsx` (table/card views), `RestorationRequestModal.tsx` (modal component), and streamlined main `UnderwriterDashboard.tsx` (~290 lines). Improved maintainability, testability, and separation of concerns reduction in main component size. |
 | 178 | **ProfilePage Modal Refactor & Re-render Optimization** | Extracted modal state and handlers from `ApplicantProfile`, creating `ProfilePage.tsx` wrapper to manage `showDeleteModal` and `deleteLoading` independently. Wrapped `ApplicantProfile` in `React.memo` and used `useCallback` for `onDeleteAccount` to prevent unnecessary re-renders. Rendered `DeleteAccountConfirmationModal` via `ReactDOM.createPortal` to isolate its mount/unmount from `ApplicantProfile`, ensuring stable UI behavior and eliminating repeated animations or click issues. Updated routes to load `ProfilePage` instead of `ApplicantProfile`. |
 | 179 | **DeletedUsers Component Refactor & Modularization** | Refactored `DeletedUsers.tsx` from 650ish lines into 9 focused modules: `UserTableHeader`, `RoleBadge`, `UserTableRow`, `UserMobileCard`, `DeletedUsersStyles`, `DeletedUsersHeader`, `NoResultsState`, `UsersList`, and `useDeletedUsers`. Main component now 100ish lines, preserving all functionality, improving readability, maintainability, and separation of concerns. |
 | 180 | **DeletedLoanApplications Component Refactor & Modularization** | Refactored `DeletedLoanApplications.tsx` from 700ish lines into 6 focused modules: `StatusBadge`, `SortIcon`, `SearchFilterBar`, `RequestsTable`, `RequestsMobileView`, and `ReviewModal`. Main component now 300ish lines, preserving all functionality including search, filters, sorting, table/mobile views, and restoration request management. Improved code organization, reusability, and maintainability. |
@@ -88,7 +89,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (109)
+### ✅ Completed Initiatives (108)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -200,7 +201,6 @@
 | 160 | **Deleted Loan Applications: Filter by Active Users** | Updated `GET /deleted` route to only return soft-deleted loan applications whose associated users are still active. This prevents showing applications of users who themselves have been deleted. |
 | 164 | **Auth Route: Modularized** | Refactored monolithic `auth.ts` (500ish lines) into modular architecture: `routes/auth.ts` (route definitions only), `controllers/authController.ts` (request/response handlers), `services/authService.ts` (auth business logic), `services/captchaService.ts` (captcha logic), `middleware/rateLimiters.ts` (rate limiting configs), `middleware/captchaRateLimiter.ts` (captcha rate limiting), and `utils/captchaStore.ts` (in-memory captcha tracking). Separated concerns following single responsibility principle, improving maintainability, testability, and code reusability. |
 | 165 | **IP Whitelisting System** | Implemented backend IP whitelisting for system admin login security. **User Model (`backend/src/models/User.ts`):** Added `ipWhitelist` array (stores `ip`, `description`, `addedAt`, `addedBy`) and `allowIpRestriction` boolean to enable/disable IP checks per user. **Service Layer (`backend/src/services/ipWhitelistService.ts`):** Created functions to add/remove IPs with duplicate prevention, fetch user whitelists, toggle restrictions (requires minimum one IP), and validate IP formats. Enforces `system_admin` role for all operations. **Controller (`backend/src/controllers/ipWhitelistController.ts`):** Handles requests for getting current client IP, managing whitelist CRUD operations, and toggling restrictions. Returns appropriate HTTP status codes (400/403/500) and normalizes IPv4-mapped IPv6 addresses. **Middleware (`backend/src/middleware/ipWhitelist.ts`):** Created `checkIpWhitelist` to block unauthorized IPs when `allowIpRestriction` is enabled. Includes `getClientIP` (extracts real IP from proxies/headers) and `normalizeIP` (standardizes IPv6-mapped IPv4). Logs all access attempts and returns 403 for blocked IPs. **Routes (`backend/src/routes/ipWhitelist.ts`):** Established `/api/ip-whitelist` endpoints: GET `/current-ip`, GET `/` (whitelist), POST `/add`, DELETE `/:ipId`, PATCH `/toggle`. All require authentication via `authenticateToken`. **Server Integration (`backend/src/server.ts`):** Applied `checkIpWhitelist` middleware to protect all `/api/*` routes (loans, documents, profiles, profile-history) while keeping auth routes public. Updated CORS to support PATCH requests. Modified auth verify route (`backend/src/routes/auth.ts`) to include IP whitelist checks, ensuring token verification respects IP restrictions. This architecture allows system admins to control which IPs can access protected endpoints when restrictions are enabled, with automatic enforcement across all sensitive API routes. |
-| 174 | **Underwriter Dashboard: Modularized** | Refactored monolithic `UnderwriterDashboard.tsx` (760+ lines) into focused modules: `types.ts` (interfaces), `searchFilterUtils.ts` (filter/sort logic), `SearchFilterBar.tsx` (search UI), `ApplicationsTable.tsx` (table/card views), `RestorationRequestModal.tsx` (modal component), and streamlined main `UnderwriterDashboard.tsx` (~290 lines). Improved maintainability, testability, and separation of concerns reduction in main component size. |
 
 ### ⚡ In Progress (18)
 
@@ -227,6 +227,6 @@
 
 ---
 
-**Document Version:** 161
+**Document Version:** 162
 **Last Updated:** 25th October 2025
 **Maintained By:** Aniruddh Ballal
