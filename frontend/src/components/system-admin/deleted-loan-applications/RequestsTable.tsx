@@ -152,7 +152,7 @@ export function RequestsTable({ requests, sortConfig, handleSort, handleReviewCl
                 </div>
               </td>
               <td className="px-6 py-4">
-                <div className="text-sm text-gray-900 max-w-xs truncate" title={req.reason}>
+                <div className="text-sm text-gray-900 w-35 break-words" title={req.reason}>
                   {req.reason}
                 </div>
               </td>
