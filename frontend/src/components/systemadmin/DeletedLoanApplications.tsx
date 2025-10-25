@@ -4,7 +4,7 @@ import { DashboardLayout } from '../dashboards/shared/DashboardLayout'
 import { UnderwriterTableSkeleton } from '../ui/SkeletonComponents'
 import { ErrorAlert } from '../dashboards/shared/ErrorAlert'
 import { EmptyState } from '../dashboards/shared/EmptyState'
-import { formatCurrency, formatDate, formatTime, formatApplicationId } from '../dashboards/utils/formatters'
+import { formatCurrency, formatDate, formatTime, formatApplicationId } from '../utils'
 import api from '../../api'
 
 interface User {

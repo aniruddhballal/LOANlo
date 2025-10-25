@@ -1,5 +1,5 @@
-import type { LoanApplication, FilterState, SortConfig } from './types'
-import { formatApplicationId, formatCurrency, formatDate } from './utils/formatters'
+import type { LoanApplication, FilterState, SortConfig } from '../../dashboards/types'
+import { formatApplicationId, formatCurrency, formatDate } from '../../utils'
 
 export const searchInApplication = (app: LoanApplication, query: string): boolean => {
   const searchLower = query.toLowerCase()

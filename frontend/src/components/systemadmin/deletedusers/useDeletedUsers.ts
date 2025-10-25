@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import api from '../../api'
+import api from '../../../api'
 
 interface User {
   _id: string

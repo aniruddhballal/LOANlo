@@ -1,7 +1,7 @@
 import { ArrowUpDown, ChevronDown, ChevronUp, Clock } from 'lucide-react'
-import type { LoanApplication, SortConfig } from './types'
-import { StatusBadge } from './shared/StatusBadge'
-import { formatCurrency, formatDate, formatTime, formatApplicationId } from './utils/formatters'
+import type { LoanApplication, SortConfig } from '../dashboards/types'
+import { StatusBadge } from '../dashboards/shared/StatusBadge'
+import { formatCurrency, formatDate, formatTime, formatApplicationId } from '../utils'
 
 interface ApplicationsTableProps {
   applications: LoanApplication[]

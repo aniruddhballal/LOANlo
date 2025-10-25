@@ -1,14 +1,14 @@
 import { useEffect, useState, useMemo } from 'react'
-import { DashboardLayout } from './shared/DashboardLayout'
+import { DashboardLayout } from '../dashboards/shared/DashboardLayout'
 import { UnderwriterTableSkeleton } from '../ui/SkeletonComponents'
-import { ErrorAlert } from './shared/ErrorAlert'
-import { EmptyState } from './shared/EmptyState'
+import { ErrorAlert } from '../dashboards/shared/ErrorAlert'
+import { EmptyState } from '../dashboards/shared/EmptyState'
 import LoanReviewModal from '../loan/LoanReviewModal'                   // done
-import { SearchFilterBar } from './SearchFilterBar'                     // done
+import { SearchFilterBar } from '../ui/searchfilterbar/SearchFilterBar'                     // done
 import { ApplicationsTable } from './ApplicationsTable'                 // done
 import { RestorationRequestModal } from './RestorationRequestModal'     // done
-import type { LoanApplication, FilterState, SortConfig} from './types'
-import { applyFiltersAndSort } from './searchFilterUtils'
+import type { LoanApplication, FilterState, SortConfig} from '../dashboards/types'
+import { applyFiltersAndSort } from '../ui/searchfilterbar/searchFilterUtils'
 import api from '../../api'
 
 export default function UnderwriterDashboard() {

@@ -86,6 +86,15 @@ export const formatDate = (dateString: string) => {
   })
 }
 
+export const formatTime = (dateString: string) => {
+  return new Date(dateString).toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+export const formatApplicationId = (id: string) => `#${id.toUpperCase()}`
+
 export const getStatusColor = (status: string) => {
   switch (status) {
     case 'approved': return 'text-green-800 bg-green-100 border-green-400'

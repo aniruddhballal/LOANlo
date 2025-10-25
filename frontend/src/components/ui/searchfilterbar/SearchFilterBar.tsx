@@ -1,5 +1,5 @@
 import { Search, SlidersHorizontal, X } from 'lucide-react'
-import type { FilterState } from './types'
+import type { FilterState } from '../../dashboards/types'
 
 interface SearchFilterBarProps {
   searchQuery: string

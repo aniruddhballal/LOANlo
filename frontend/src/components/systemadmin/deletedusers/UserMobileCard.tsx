@@ -1,5 +1,5 @@
 import { RoleBadge } from './RoleBadge'
-import { formatDate } from '../dashboards/utils/formatters'
+import { formatDate } from '../../utils'
 
 interface User {
   _id: string

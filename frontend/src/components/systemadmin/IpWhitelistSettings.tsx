@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, Plus, Trash2, AlertTriangle, CheckCircle, Globe, Lock, Unlock } from 'lucide-react';
-import { IpWhitelistSkeleton } from '../components/ui/SkeletonComponents';
+import { IpWhitelistSkeleton } from '../ui/SkeletonComponents';
 import {
   getCurrentIp,
   getIpWhitelist,
   addIpToWhitelist,
   removeIpFromWhitelist,
   toggleIpRestriction,
-} from '../services/ipWhitelistService';
+} from '../../services/ipWhitelistService';
 
 interface IpWhitelistItem {
   _id: string;

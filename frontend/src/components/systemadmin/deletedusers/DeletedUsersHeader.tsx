@@ -1,4 +1,4 @@
-import { SearchFilterBar } from '../dashboards/SearchFilterBar'
+import { SearchFilterBar } from '../../ui/searchfilterbar/SearchFilterBar'
 
 interface DeletedUsersHeaderProps {
   loading: boolean

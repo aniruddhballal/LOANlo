@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import ApplicantProfile from './ApplicantProfile'
-import DeleteAccountConfirmationModal from '../DeleteAccountConfirmationModal'
+import DeleteAccountConfirmationModal from './DeleteAccountConfirmationModal'
 import api from '../../api'
 
 const ProfilePage = () => {

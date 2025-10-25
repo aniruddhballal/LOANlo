@@ -1,16 +1,16 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './components/auth/Login'
 import Register from './components/auth/Register'
-import ApplicantDashboard from './components/dashboards/ApplicantDashboard'
-import UnderwriterDashboard from './components/dashboards/UnderwriterDashboard'
-import SystemAdminDashboard from './components/dashboards/SystemAdminDashboard'
-import DeletedLoanApplications from './components/loan/DeletedLoanApplications'
-import DeletedUsers from './components/deletedusers/DeletedUsers'
+import ApplicantDashboard from './components/applicant/ApplicantDashboard'
+import UnderwriterDashboard from './components/underwriter/UnderwriterDashboard'
+import SystemAdminDashboard from './components/systemadmin/SystemAdminDashboard'
+import DeletedLoanApplications from './components/systemadmin/DeletedLoanApplications'
+import DeletedUsers from './components/systemadmin/deletedusers/DeletedUsers'
 import LoanApplication from './components/loan/LoanApplication/LoanApplication'
-import DocumentUpload from './components/loan/DocumentUpload'
-import ApplicationStatus from './components/loan/ApplicationStatus'
+import DocumentUpload from './components/applicant/DocumentUpload'
+import ApplicationStatus from './components/applicant/ApplicationStatus'
 import { AuthProvider, useAuth } from './context/AuthContext'
-import PersonalDetails from './components/loan/PersonalDetails/PersonalDetails'
+import PersonalDetails from './components/applicant/PersonalDetails/PersonalDetails'
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 import AccessDenied from './components/auth/AccessDenied'
 import { LoadingState } from './components/ui/StatusMessages'
@@ -18,8 +18,8 @@ import EmailVerification from './components/auth/EmailVerification'
 import ProfilePage from './components/profile/ProfilePage'
 import StaffProfile from './components/profile/StaffProfile'
 import ProfileHistory from './components/profile/ProfileHistory'
-import IpWhitelistSettings from './components/IpWhitelistSettings';
-import AccountDeleted from './components/AccountDeleted';
+import IpWhitelistSettings from './components/systemadmin/IpWhitelistSettings';
+import AccountDeleted from './components/profile/AccountDeleted';
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {

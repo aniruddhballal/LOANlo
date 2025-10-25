@@ -7,7 +7,7 @@ import LoanReviewModal from './LoanReviewModal'
 import { useAuth } from '../../context/AuthContext'
 import { ApplicationStatusSkeleton } from '../ui/SkeletonComponents'
 
-import { formatCurrency, formatDate, formatApplicationId } from '../dashboards/utils/formatters'
+import { formatCurrency, formatDate, formatApplicationId } from '../utils'
 
 interface LoanApplication {
   _id: string
