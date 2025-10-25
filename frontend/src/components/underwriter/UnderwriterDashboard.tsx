@@ -271,6 +271,7 @@ export default function UnderwriterDashboard() {
             transparent
           );
           transform: translateX(-100%);
+          pointer-events: none;
         }
 
         .shimmer-button:hover::before {
@@ -314,6 +315,7 @@ export default function UnderwriterDashboard() {
           mask-composite: exclude;
           opacity: 0;
           transition: opacity 0.3s ease;
+          pointer-events: none;
         }
 
         .gradient-border:hover::before {
