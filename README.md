@@ -85,7 +85,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (108)
+### ✅ Completed Initiatives (109)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -138,6 +138,7 @@
 | 73 | **User Guidance Enhancement** | Enhanced user experience in Personal Details form by adding input format specifications to labels/placeholders for Aadhaar, PAN, and DOB fields |
 | 74 | **Production Deployment** | Deployed application infrastructure with Render for backend services and Vercel for frontend hosting |
 | 76 | **Rate-Limiting Refinement** | Resolved critical issue combining rate-limiting on profile completion/update with validation errors by implementing step-specific partial data persistence through dedicated save route |
+| 77 | **Rate-Limiting Audit** | Auditing rate-limiting implementation to ensure IP-based restrictions don't inadvertently affect legitimate users |
 | 80 | **Soft-Delete User Accounts** | Added backend endpoints for soft-deleting (`DELETE /profile/me`) and restoring (`POST /profile/restore/:userId`) users, updated frontend `Profile.tsx` to show delete modal, handle deletion with API call, and prevent login post-deletion |
 | 82 | **Profile Management Feature** | Added "View History" button to `Profile.tsx` with conditional rendering (underwriters + self-access) using `handleViewHistory()` handler. Created `ProfileHistory.tsx` with `useParams`, fetching from `/profile-history/${userId}`, displaying chronological changes with old/new value comparison, change type badges, timestamps, IP addresses, and field snapshots. Implemented `profileHistory.ts` backend: `GET /api/profile-history/:userId` with dual authorization (underwriters + self), ObjectId validation, rate limiting (30/min), sorted descending, limit 1-100 (default 50); bonus `/stats` endpoint for analytics. Added protected route `/profile/history/:userId` in `App.tsx` with `RoleProtectedRoute` for underwriters and applicants. Registered `/api/profile-history` in server. Security via role-based access at frontend (conditional UI) and backend (auth middleware) |
 | 83 | **Permissions Framework** | Finalizing decision framework for user profile deletion permissions and implementation approach |
@@ -198,7 +199,7 @@
 | 165 | **IP Whitelisting System** | Implemented backend IP whitelisting for system admin login security. **User Model (`backend/src/models/User.ts`):** Added `ipWhitelist` array (stores `ip`, `description`, `addedAt`, `addedBy`) and `allowIpRestriction` boolean to enable/disable IP checks per user. **Service Layer (`backend/src/services/ipWhitelistService.ts`):** Created functions to add/remove IPs with duplicate prevention, fetch user whitelists, toggle restrictions (requires minimum one IP), and validate IP formats. Enforces `system_admin` role for all operations. **Controller (`backend/src/controllers/ipWhitelistController.ts`):** Handles requests for getting current client IP, managing whitelist CRUD operations, and toggling restrictions. Returns appropriate HTTP status codes (400/403/500) and normalizes IPv4-mapped IPv6 addresses. **Middleware (`backend/src/middleware/ipWhitelist.ts`):** Created `checkIpWhitelist` to block unauthorized IPs when `allowIpRestriction` is enabled. Includes `getClientIP` (extracts real IP from proxies/headers) and `normalizeIP` (standardizes IPv6-mapped IPv4). Logs all access attempts and returns 403 for blocked IPs. **Routes (`backend/src/routes/ipWhitelist.ts`):** Established `/api/ip-whitelist` endpoints: GET `/current-ip`, GET `/` (whitelist), POST `/add`, DELETE `/:ipId`, PATCH `/toggle`. All require authentication via `authenticateToken`. **Server Integration (`backend/src/server.ts`):** Applied `checkIpWhitelist` middleware to protect all `/api/*` routes (loans, documents, profiles, profile-history) while keeping auth routes public. Updated CORS to support PATCH requests. Modified auth verify route (`backend/src/routes/auth.ts`) to include IP whitelist checks, ensuring token verification respects IP restrictions. This architecture allows system admins to control which IPs can access protected endpoints when restrictions are enabled, with automatic enforcement across all sensitive API routes. |
 | 174 | **Underwriter Dashboard: Modularized** | Refactored monolithic `UnderwriterDashboard.tsx` (760+ lines) into focused modules: `types.ts` (interfaces), `searchFilterUtils.ts` (filter/sort logic), `SearchFilterBar.tsx` (search UI), `ApplicationsTable.tsx` (table/card views), `RestorationRequestModal.tsx` (modal component), and streamlined main `UnderwriterDashboard.tsx` (~290 lines). Improved maintainability, testability, and separation of concerns reduction in main component size. |
 
-### ⚡ In Progress (19)
+### ⚡ In Progress (18)
 
 | ID | Initiative | Status |
 |----|-----------|--------|
@@ -208,7 +209,6 @@
 | 63 | **Location Services** | Implementing Google Maps location pinpointing functionality, modernizing pincode loading animations, and evaluating component modularization opportunities |
 | 72 | **Middleware Restructuring** | Evaluating middleware restructuring including potential renaming of auth.ts to middleware.ts and refactoring of routes/auth.ts |
 | 75 | **AI Integration** | Integrating XGBoost-based AI risk prediction and credit assessment model from standalone Streamlit application into MERN stack architecture |
-| 77 | **Rate-Limiting Audit** | Auditing rate-limiting implementation to ensure IP-based restrictions don't inadvertently affect legitimate users |
 | 91 | **Conflict Resolution** | Implementing conflict resolution mechanism for concurrent document deletion by Applicant during Underwriter approval process |
 | 100 | **Security Evaluation** | Evaluating security requirements for personal data storage, including potential implementation of salting and hashing mechanisms |
 | 102 | **Session Management** | Implementing automatic session timeout and logout functionality after defined period of user inactivity |
@@ -224,6 +224,6 @@
 
 ---
 
-**Document Version:** 157
+**Document Version:** 158
 **Last Updated:** 25th October 2025
 **Maintained By:** Aniruddh Ballal
