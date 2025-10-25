@@ -15,9 +15,9 @@ import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 import AccessDenied from './components/auth/AccessDenied'
 import { LoadingState } from './components/ui/StatusMessages'
 import EmailVerification from './components/auth/EmailVerification'
-import ProfilePage from './components/auth/ProfilePage'
-import StaffProfile from './components/auth/StaffProfile'
-import ProfileHistory from './components/auth/ProfileHistory'
+import ProfilePage from './components/profile/ProfilePage'
+import StaffProfile from './components/profile/StaffProfile'
+import ProfileHistory from './components/profile/ProfileHistory'
 import IpWhitelistSettings from './components/IpWhitelistSettings';
 import AccountDeleted from './components/AccountDeleted';
 
