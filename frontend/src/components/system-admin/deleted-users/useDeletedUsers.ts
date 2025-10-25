@@ -1,5 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
 import api from '../../../api'
+import {
+  searchInDeletedUser,
+  applyDeletedUsersFilters,
+  getActiveDeletedUsersFilterCount,
+  getDefaultDeletedUsersFilters
+} from '../../ui/search-filter-bar/searchFilterUtilsDeletedUsers'
 
 interface User {
   _id: string
@@ -32,11 +38,7 @@ export function useDeletedUsers() {
     key: null, 
     direction: 'asc' 
   })
-  const [filters, setFilters] = useState({
-    role: 'all',
-    dateFrom: '',
-    dateTo: ''
-  })
+  const [filters, setFilters] = useState(getDefaultDeletedUsersFilters())
 
   useEffect(() => {
     fetchDeletedUsers()
@@ -89,37 +91,16 @@ export function useDeletedUsers() {
     }
   }
 
-  const searchInUser = (user: User, query: string) => {
-    const searchLower = query.toLowerCase()
-    return (
-      `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchLower) ||
-      user.email?.toLowerCase().includes(searchLower) ||
-      user.phone?.toLowerCase().includes(searchLower) ||
-      user.role?.toLowerCase().includes(searchLower) ||
-      user.companyName?.toLowerCase().includes(searchLower) ||
-      user.city?.toLowerCase().includes(searchLower)
-    )
-  }
-
   const filteredAndSortedUsers = useMemo(() => {
-    let result = [...users]
+    // Apply search
+    let result = searchQuery 
+      ? users.filter(user => searchInDeletedUser(user, searchQuery))
+      : [...users]
 
-    if (searchQuery) {
-      result = result.filter(user => searchInUser(user, searchQuery))
-    }
+    // Apply filters
+    result = applyDeletedUsersFilters(result, filters)
 
-    if (filters.role !== 'all') {
-      result = result.filter(user => user.role === filters.role)
-    }
-
-    if (filters.dateFrom) {
-      result = result.filter(user => new Date(user.deletedAt || '') >= new Date(filters.dateFrom))
-    }
-
-    if (filters.dateTo) {
-      result = result.filter(user => new Date(user.deletedAt || '') <= new Date(filters.dateTo))
-    }
-
+    // Apply sorting
     if (sortConfig.key) {
       result.sort((a, b) => {
         let aVal: any, bVal: any
@@ -166,16 +147,12 @@ export function useDeletedUsers() {
   }
 
   const clearFilters = () => {
-    setFilters({
-      role: 'all',
-      dateFrom: '',
-      dateTo: ''
-    })
+    setFilters(getDefaultDeletedUsersFilters())
     setSearchQuery('')
     setSortConfig({ key: null, direction: 'asc' })
   }
 
-  const activeFilterCount = Object.values(filters).filter(v => v && v !== 'all').length + (searchQuery ? 1 : 0)
+  const activeFilterCount = getActiveDeletedUsersFilterCount(filters, searchQuery)
 
   return {
     users,

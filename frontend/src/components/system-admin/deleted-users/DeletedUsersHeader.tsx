@@ -31,6 +31,13 @@ export function DeletedUsersHeader({
   filters,
   handleFilterChange
 }: DeletedUsersHeaderProps) {
+  const roleOptions = [
+    { value: 'all', label: 'All Roles' },
+    { value: 'applicant', label: 'Applicant' },
+    { value: 'underwriter', label: 'Underwriter' },
+    { value: 'system_admin', label: 'System Admin' }
+  ]
+
   return (
     <header className="px-8 py-8 border-b-2 border-gray-100 bg-gradient-to-br from-gray-50 via-white to-gray-50/50">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
@@ -42,7 +49,6 @@ export function DeletedUsersHeader({
             View and manage soft-deleted user accounts
           </p>
         </div>
-
         <div className="header-actions text-sm font-medium text-gray-700">
           {loading ? (
             <div className="w-26 h-12 rounded bg-gray-200 animate-pulse"></div>
@@ -58,7 +64,7 @@ export function DeletedUsersHeader({
           )}
         </div>
       </div>
-
+      
       <SearchFilterBar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -80,6 +86,10 @@ export function DeletedUsersHeader({
             handleFilterChange(key, value)
           }
         }}
+        searchPlaceholder="Search by name, email, phone, role, company, or city..."
+        showAmountFilters={false}
+        statusLabel="Role"
+        statusOptions={roleOptions}
       />
     </header>
   )

@@ -17,7 +17,11 @@ interface SearchFilterBarProps {
   clearFilters: () => void
   filters: FilterState
   handleFilterChange: (key: string, value: string) => void
-  searchPlaceholder?: string  // custom placeholder
+  searchPlaceholder?: string
+  // New optional props for customization
+  showAmountFilters?: boolean
+  statusLabel?: string
+  statusOptions?: Array<{ value: string; label: string }>
 }
 
 export function SearchFilterBar({
@@ -29,7 +33,16 @@ export function SearchFilterBar({
   clearFilters,
   filters,
   handleFilterChange,
-  searchPlaceholder = "Search by reference, name, email, phone, status, or amount..."  // Default for UnderwriterDashboard
+  searchPlaceholder = "Search by reference, name, email, phone, status, or amount...",
+  showAmountFilters = true,
+  statusLabel = "Status",
+  statusOptions = [
+    { value: 'all', label: 'All Statuses' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'rejected', label: 'Rejected' },
+    { value: 'under_review', label: 'Under Review' }
+  ]
 }: SearchFilterBarProps) {
   return (
     <>
@@ -183,59 +196,63 @@ export function SearchFilterBar({
         {/* Filter Panel */}
         {showFilters && (
           <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl border-2 border-gray-200 shadow-lg filter-panel-animate">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Status Filter */}
+            <div className={`grid grid-cols-1 md:grid-cols-2 ${showAmountFilters ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
+              {/* Status/Role Filter */}
               <div className="group">
                 <label className="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-gray-900 transition-colors">
-                  Status
+                  {statusLabel}
                 </label>
                 <select
                   value={filters.status}
                   onChange={(e) => handleFilterChange('status', e.target.value)}
                   className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none text-gray-900 font-medium bg-white hover:border-gray-400 transition-all duration-200 filter-input cursor-pointer"
                 >
-                  <option value="all">All Statuses</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="under_review">Under Review</option>
+                  {statusOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
-              {/* Amount Range */}
-              <div className="group">
-                <label className="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-gray-900 transition-colors">
-                  Min Amount
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="₹0"
-                  value={filters.amountMin}
-                  onChange={(e) => handleFilterChange('amountMin', e.target.value)}
-                  onInput={(e) => {
-                    e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')
-                  }}
-                  className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none text-gray-900 font-medium bg-white hover:border-gray-400 transition-all duration-200 filter-input"
-                />
-              </div>
+              {/* Amount Range - Only show if enabled */}
+              {showAmountFilters && (
+                <>
+                  <div className="group">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-gray-900 transition-colors">
+                      Min Amount
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="₹0"
+                      value={filters.amountMin}
+                      onChange={(e) => handleFilterChange('amountMin', e.target.value)}
+                      onInput={(e) => {
+                        e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')
+                      }}
+                      className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none text-gray-900 font-medium bg-white hover:border-gray-400 transition-all duration-200 filter-input"
+                    />
+                  </div>
 
-              <div className="group">
-                <label className="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-gray-900 transition-colors">
-                  Max Amount
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="₹10,00,000"
-                  value={filters.amountMax}
-                  onChange={(e) => handleFilterChange('amountMax', e.target.value)}
-                  onInput={(e) => {
-                    e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')
-                  }}
-                  className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none text-gray-900 font-medium bg-white hover:border-gray-400 transition-all duration-200 filter-input"
-                />
-              </div>
+                  <div className="group">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-gray-900 transition-colors">
+                      Max Amount
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="₹10,00,000"
+                      value={filters.amountMax}
+                      onChange={(e) => handleFilterChange('amountMax', e.target.value)}
+                      onInput={(e) => {
+                        e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')
+                      }}
+                      className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none text-gray-900 font-medium bg-white hover:border-gray-400 transition-all duration-200 filter-input"
+                    />
+                  </div>
+                </>
+              )}
 
               {/* Date Range */}
               <div className="group">
