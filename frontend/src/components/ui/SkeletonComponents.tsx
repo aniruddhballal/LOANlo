@@ -118,32 +118,6 @@ export const ServiceActionsSkeleton = () => (
   </SkeletonBase>
 );
 
-// Application Card Skeleton (for ApplicantDashboard)
-export const ApplicationCardSkeleton = () => (
-  <div className="border border-gray-200 rounded-xl p-6">
-    <div className="flex items-center justify-between">
-      <div className="flex items-center space-x-6 flex-1 min-w-0">
-        <SkeletonCircle className="w-10 h-10" />
-        
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center space-x-4 mb-3">
-            <SkeletonText className="w-32 h-5" />
-            <SkeletonBox className="w-20 h-6 rounded-full" />
-          </div>
-          
-          <div className="flex items-center space-x-6">
-            <SkeletonText className="w-24 h-4" />
-            <SkeletonText className="w-28 h-4" />
-            <SkeletonText className="w-32 h-4" />
-          </div>
-        </div>
-      </div>
-      
-      <SkeletonBox className="w-48 h-12 rounded-xl" />
-    </div>
-  </div>
-);
-
 // Table Row Skeleton (for UnderwriterDashboard desktop table)
 export const TableRowSkeleton = () => (
   <tr className="hover:bg-gray-50/50">
@@ -297,19 +271,10 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   );
 };
 
-// Compact Loading Spinner
-export const CompactLoadingSpinner = ({ text = "Loading..." }) => (
-  <div className="flex items-center justify-center py-12">
-    <div className="flex items-center space-x-3">
-      <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
-      <span className="text-gray-600 font-light">{text}</span>
-    </div>
-  </div>
-);
-
+// Application Status Page Skeleton
 // Application Status Page Skeleton
 export const ApplicationStatusSkeleton = () => (
-  <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+  <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
     {/* Subtle geometric background */}
     <div className="absolute inset-0 overflow-hidden opacity-30">
       <div className="absolute top-0 left-0 w-full h-full" style={{
@@ -317,7 +282,7 @@ export const ApplicationStatusSkeleton = () => (
                          linear-gradient(150deg, transparent 40%, rgba(0,0,0,0.01) 40%, rgba(0,0,0,0.01) 60%, transparent 60%)`
       }}></div>
     </div>
-
+    
     <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
       <SkeletonBase>
         {/* Header Skeleton */}
@@ -329,15 +294,23 @@ export const ApplicationStatusSkeleton = () => (
         </div>
 
         {/* Applications Section Skeleton */}
-        <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
           {/* Header */}
           <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-6">
               <div>
                 <SkeletonText className="w-48 h-7 mb-2" />
                 <SkeletonText className="w-72 h-4" />
               </div>
-              <SkeletonBox className="w-32 h-10 rounded-lg" />
+              <SkeletonBox className="w-40 h-10 rounded-lg" />
+            </div>
+
+            {/* Search Bar Skeleton */}
+            <div className="space-y-3">
+              <div className="flex gap-3">
+                <SkeletonBox className="flex-1 h-11 rounded-lg" />
+                <SkeletonBox className="w-32 h-11 rounded-lg" />
+              </div>
             </div>
           </header>
 
@@ -345,37 +318,53 @@ export const ApplicationStatusSkeleton = () => (
           <div className="p-8">
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div 
+                <div
                   key={i}
-                  className="border border-gray-200 rounded-xl p-6"
+                  className="border border-gray-200 rounded-xl p-6 bg-white"
                 >
-                  {/* Main Content Row */}
+                  {/* Header Row - Title and Status */}
                   <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-6 flex-1 min-w-0">
-                      <SkeletonCircle className="w-10 h-10" />
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-4 mb-3">
-                          <SkeletonText className="w-40 h-6" />
-                          <SkeletonBox className="w-24 h-6 rounded-full" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <SkeletonText className="w-40 h-6" />
+                        <SkeletonBox className="w-28 h-7 rounded-full" />
+                      </div>
+
+                      {/* Details Grid - 2 columns */}
+                      <div className="grid grid-cols-2 gap-4">
+                        {/* Amount */}
+                        <div className="space-y-1">
+                          <SkeletonText className="w-16 h-3" />
+                          <SkeletonText className="w-32 h-6" />
                         </div>
-                        
-                        <div className="flex items-center space-x-6">
-                          <SkeletonText className="w-32 h-5" />
+                        {/* Tenure */}
+                        <div className="space-y-1">
+                          <SkeletonText className="w-16 h-3" />
+                          <SkeletonText className="w-24 h-5" />
+                        </div>
+                        {/* Reference ID */}
+                        <div className="space-y-1">
+                          <SkeletonText className="w-24 h-3" />
+                          <SkeletonText className="w-36 h-4" />
+                        </div>
+                        {/* Submitted Date */}
+                        <div className="space-y-1">
+                          <SkeletonText className="w-20 h-3" />
                           <SkeletonText className="w-28 h-5" />
-                          <SkeletonText className="w-36 h-5" />
-                          <SkeletonText className="w-32 h-5" />
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Action Buttons Row */}
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <SkeletonBox className="w-48 h-10 rounded-lg" />
-                    <div className="flex items-center space-x-3">
-                      <SkeletonBox className="w-32 h-10 rounded-lg" />
-                      <SkeletonBox className="w-36 h-10 rounded-lg" />
+                  {/* Divider */}
+                  <div className="border-t border-gray-100 my-4"></div>
+
+                  {/* Actions Row */}
+                  <div className="flex items-center justify-between">
+                    <SkeletonBox className="w-52 h-9 rounded-lg" />
+                    <div className="flex items-center gap-3">
+                      <SkeletonBox className="w-28 h-10 rounded-lg" />
+                      <SkeletonBox className="w-44 h-10 rounded-lg" />
                     </div>
                   </div>
                 </div>
@@ -386,13 +375,13 @@ export const ApplicationStatusSkeleton = () => (
 
         {/* Navigation Skeleton */}
         <div className="mt-12 flex justify-between items-center">
+          <SkeletonBox className="w-52 h-12 rounded-lg" />
           <SkeletonBox className="w-48 h-12 rounded-lg" />
-          <SkeletonBox className="w-56 h-12 rounded-lg" />
         </div>
       </SkeletonBase>
     </div>
   </div>
-);
+)
 
 // IP Whitelist Settings Skeleton
 export const IpWhitelistSkeleton = () => (

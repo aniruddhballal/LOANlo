@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom'
 import api from '../../api'
 import LoanReviewModal from '../ui/loan-review-modal'
 import { useAuth } from '../../context/AuthContext'
-import { ApplicationStatusSkeleton } from '../ui/SkeletonComponents'
+import { ApplicationStatusSkeleton } from '../ui/SkeletonComponents'                      // the skeleton doesnt match
 import { applyFilters } from '../ui/search-filter-bar/utils/searchFilterUtilsApplicant'
 import { SearchFilterBar } from '../ui/search-filter-bar/SearchFilterBar'
 
