@@ -52,19 +52,6 @@ export function SearchFilterBar({
           100% { transform: translateX(100%); }
         }
         
-        @keyframes slideDown {
-          from { 
-            opacity: 0;
-            transform: translateY(-10px);
-            max-height: 0;
-          }
-          to { 
-            opacity: 1;
-            transform: translateY(0);
-            max-height: 500px;
-          }
-        }
-        
         @keyframes badge-pop {
           0% { transform: scale(0); }
           50% { transform: scale(1.2); }
@@ -108,11 +95,7 @@ export function SearchFilterBar({
         .shimmer-button:hover::before {
           animation: shimmer 0.7s ease-in-out;
         }
-        
-        .filter-panel-animate {
-          animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        
+      
         .badge-animate {
           animation: badge-pop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -194,8 +177,12 @@ export function SearchFilterBar({
         </div>
 
         {/* Filter Panel */}
-        {showFilters && (
-          <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl border-2 border-gray-200 shadow-lg filter-panel-animate">
+        <div 
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            showFilters ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl border-2 border-gray-200 shadow-lg">
             <div className={`grid grid-cols-1 md:grid-cols-2 ${showAmountFilters ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
               {/* Status/Role Filter */}
               <div className="group">
@@ -280,7 +267,7 @@ export function SearchFilterBar({
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </>
   )
