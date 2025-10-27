@@ -7,7 +7,7 @@ import SystemAdminDashboard from './components/system-admin/SystemAdminDashboard
 import DeletedLoanApplications from './components/system-admin/deleted-loan-applications/DeletedLoanApplications'
 import DeletedUsers from './components/system-admin/deleted-users/DeletedUsers'
 import LoanApplication from './components/applicant/loan-application/LoanApplication'
-import DocumentUpload from './components/applicant/DocumentUpload'
+import DocumentUpload from './components/applicant/loan-application/DocumentUpload'
 import ApplicationStatus from './components/applicant/ApplicationStatus'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import PersonalDetails from './components/applicant/personal-details/PersonalDetails'

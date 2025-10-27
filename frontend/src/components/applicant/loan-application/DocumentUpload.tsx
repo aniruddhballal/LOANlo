@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
-import api from '../../api'
+import { useAuth } from '../../../context/AuthContext'
+import api from '../../../api'
 
 // Refined, minimal icons for professional appearance
 const CheckCircleIcon = () => (
