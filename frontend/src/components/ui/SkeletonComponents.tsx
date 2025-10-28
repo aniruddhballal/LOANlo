@@ -271,9 +271,8 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   );
 };
 
-// Application Status Page Skeleton
-// Application Status Page Skeleton
-export const ApplicationStatusSkeleton = () => (
+// My Loans Page Skeleton
+export const MyLoansSkeleton = () => (
   <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
     {/* Subtle geometric background */}
     <div className="absolute inset-0 overflow-hidden opacity-30">

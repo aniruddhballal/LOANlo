@@ -6,7 +6,7 @@ import { User, Home, Briefcase, Car, Book } from 'lucide-react'
 import api from '../../api'
 import LoanReviewModal from '../ui/loan-review-modal'
 import { useAuth } from '../../context/AuthContext'
-import { ApplicationStatusSkeleton } from '../ui/SkeletonComponents'
+import { MyLoansSkeleton } from '../ui/SkeletonComponents'
 import { applyFilters } from '../ui/search-filter-bar/utils/searchFilterUtilsApplicant'
 import { SearchFilterBar } from '../ui/search-filter-bar/SearchFilterBar'
 
@@ -22,7 +22,7 @@ interface LoanApplication {
   documentsUploaded: boolean
 }
 
-const ApplicationStatus = () => {
+const MyLoans = () => {
   const [applications, setApplications] = useState<LoanApplication[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -150,7 +150,7 @@ const ApplicationStatus = () => {
   }
 
   if (loading) {
-    return <ApplicationStatusSkeleton />
+    return <MyLoansSkeleton />
   }
 
   const styles = `
@@ -566,4 +566,4 @@ const ApplicationStatus = () => {
   )
 }
 
-export default ApplicationStatus
+export default MyLoans

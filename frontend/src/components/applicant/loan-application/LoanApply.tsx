@@ -34,7 +34,7 @@ interface PersonalDetailsData {
   monthlyIncome: string
 }
 
-const LoanApplication = () => {
+const LoanApply = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [focusedField, setFocusedField] = useState<string>('')
@@ -272,4 +272,4 @@ const LoanApplication = () => {
   )
 }
 
-export default LoanApplication
+export default LoanApply

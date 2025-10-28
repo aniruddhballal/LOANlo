@@ -6,9 +6,9 @@ import UnderwriterDashboard from './components/underwriter/UnderwriterDashboard'
 import SystemAdminDashboard from './components/system-admin/SystemAdminDashboard'
 import DeletedLoanApplications from './components/system-admin/deleted-loan-applications/DeletedLoanApplications'
 import DeletedUsers from './components/system-admin/deleted-users/DeletedUsers'
-import LoanApplication from './components/applicant/loan-application/LoanApply'
+import LoanApply from './components/applicant/loan-application/LoanApply'
 import DocumentUpload from './components/applicant/loan-application/DocumentUpload'
-import ApplicationStatus from './components/applicant/MyLoans'
+import MyLoans from './components/applicant/MyLoans'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import PersonalDetails from './components/applicant/personal-details/PersonalDetails'
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
@@ -150,7 +150,7 @@ function AppContent() {
         {/* Loan Application Routes */}
         <Route path="/apply-loan" element={
           <RoleProtectedRoute allowedRoles={['applicant']}>
-            <LoanApplication />
+            <LoanApply />
           </RoleProtectedRoute>
         } />
         <Route path="/personal-details" element={
@@ -165,7 +165,7 @@ function AppContent() {
         } />
         <Route path="/my-loans" element={
           <RoleProtectedRoute allowedRoles={['applicant']}>
-            <ApplicationStatus />
+            <MyLoans />
           </RoleProtectedRoute>
         } />
       </Routes>
