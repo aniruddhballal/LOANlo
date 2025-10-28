@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
+import { User, Home, Briefcase, Car, Book } from 'lucide-react'
 
 import api from '../../api'
 import LoanReviewModal from '../ui/loan-review-modal'
@@ -105,6 +106,15 @@ const ApplicationStatus = () => {
   // Apply filters to get filtered applications
   const filteredApplications = applyFilters(applications, searchQuery, filters)
 
+  const getStatusBg = (status: string) => {
+    switch (status) {
+      case 'approved': return 'bg-[rgba(16,185,129,0.02)]'   // emerald
+      case 'rejected': return 'bg-[rgba(244,63,94,0.02)]'    // rose
+      case 'under_review': return 'bg-[rgba(59,130,246,0.02)]' // blue
+      default: return 'bg-[rgba(251,191,36,0.02)]'           // amber
+    }
+  }
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
@@ -124,6 +134,18 @@ const ApplicationStatus = () => {
       case 'rejected': return 'REJECTED'
       case 'under_review': return 'UNDER REVIEW'
       default: return 'PENDING'
+    }
+  }
+
+  const getLoanIcon = (type: string) => {
+    const iconProps = { size: 18, color: '#1f2937' } // dark gray
+    switch (type.toLowerCase()) {
+      case 'personal': return <User {...iconProps} />
+      case 'home': return <Home {...iconProps} />
+      case 'business': return <Briefcase {...iconProps} />
+      case 'vehicle': return <Car {...iconProps} />
+      case 'education': return <Book {...iconProps} />
+      default: return null
     }
   }
 
@@ -299,7 +321,7 @@ const ApplicationStatus = () => {
                   handleFilterChange={handleFilterChange}
                   activeFilterCount={Object.values(filters).filter(v => v && v !== 'all').length}
                   clearFilters={clearFilters}
-                  searchPlaceholder="Search by loan type, reference ID, status, or amount..."  // ADD THIS LINE
+                  searchPlaceholder="Search by Loan Type, Loan Application ID, Status, or Amount..."  // ADD THIS LINE
                 />
                 
               </header>
@@ -339,7 +361,7 @@ const ApplicationStatus = () => {
                       <div
                         key={app._id}
                         id={`app-${app._id}`}
-                        className={`group relative bg-white rounded-xl border shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5 overflow-hidden ${
+                        className={`group relative rounded-xl border shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5 overflow-hidden ${getStatusBg(app.status)} ${
                           highlightedAppId === app._id ? 'highlight-card' : 'border-gray-200'
                         }`}
                         style={{
@@ -356,16 +378,26 @@ const ApplicationStatus = () => {
                           {/* Header Row */}
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-3">
-                                <h3 className="font-semibold text-gray-900 text-xl tracking-tight">
-                                  {app.loanType}
-                                </h3>
-                                <span
-                                  className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm transition-all duration-300 hover:scale-105 ${getStatusColor(app.status)}`}
-                                >
-                                  {getStatusLabel(app.status)}
-                                </span>
-                              </div>
+                              {/* Header Row */}
+                                <div className="flex items-start justify-between mb-4">
+                                  {/* Left: Loan Type */}
+                                  <div className="space-y-1">
+                                    <span className="text-gray-500 text-xs">Loan Type</span>
+                                    <div className="flex items-center gap-2">
+                                      <span className="relative top-[3px]">{getLoanIcon(app.loanType)}</span>
+                                      <h3 className="font-semibold text-gray-900 text-xl tracking-tight">
+                                        {app.loanType}
+                                      </h3>
+                                    </div>
+                                  </div>
+
+                                  {/* Right: Status */}
+                                  <span
+                                    className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border shadow-sm ${getStatusColor(app.status)}`}
+                                  >
+                                    {getStatusLabel(app.status)}
+                                  </span>
+                                </div>
 
                               {/* Details Grid */}
                               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -380,7 +412,7 @@ const ApplicationStatus = () => {
                                   <div className="font-medium text-gray-700">{app.tenure} months</div>
                                 </div>
                                 <div className="space-y-1">
-                                  <span className="text-gray-500 text-xs">Reference ID</span>
+                                  <span className="text-gray-500 text-xs">Loan Application ID</span>
                                   <div className="font-mono text-xs text-gray-800">
                                     {formatApplicationId(app._id)}
                                   </div>
