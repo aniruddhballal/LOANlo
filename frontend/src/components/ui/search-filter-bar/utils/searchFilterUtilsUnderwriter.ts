@@ -9,7 +9,7 @@ export const searchInApplication = (app: LoanApplication, query: string): boolea
     app.userId?.email?.toLowerCase().includes(searchLower) ||
     app.userId?.phone?.toLowerCase().includes(searchLower) ||
     app.status?.toLowerCase().includes(searchLower) ||
-    formatCurrency(app.amount).toLowerCase().includes(searchLower) ||
+    formatCurrency(app.amount).replace(/,/g, '').toLowerCase().includes(searchLower.replace(/,/g, '')) ||
     formatDate(app.createdAt).toLowerCase().includes(searchLower)
   )
 }
