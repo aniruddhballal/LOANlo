@@ -105,7 +105,7 @@ export function ApplicationsTable({
                     className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-all duration-200 group"
                   >
                     <div className="flex items-center gap-2">
-                      Reference
+                      LOAN APPLICATION ID
                       <SortIcon columnKey="reference" sortConfig={sortConfig} />
                     </div>
                   </th>
@@ -114,19 +114,19 @@ export function ApplicationsTable({
                     className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-all duration-200 group"
                   >
                     <div className="flex items-center gap-2">
-                      Applicant
+                      Applicant Name
                       <SortIcon columnKey="applicant" sortConfig={sortConfig} />
                     </div>
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Contact
+                    Contact Details
                   </th>
                   <th 
                     onClick={() => handleSort('amount')}
                     className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-all duration-200 group"
                   >
                     <div className="flex items-center gap-2">
-                      Amount
+                      Amount Requested
                       <SortIcon columnKey="amount" sortConfig={sortConfig} />
                     </div>
                   </th>
@@ -135,7 +135,7 @@ export function ApplicationsTable({
                     className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-all duration-200 group"
                   >
                     <div className="flex items-center gap-2">
-                      Status
+                      Status of Loan
                       <SortIcon columnKey="status" sortConfig={sortConfig} />
                     </div>
                   </th>
@@ -144,7 +144,7 @@ export function ApplicationsTable({
                     className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-all duration-200 group"
                   >
                     <div className="flex items-center gap-2">
-                      Submitted
+                      Initiated
                       <SortIcon columnKey="submitted" sortConfig={sortConfig} />
                     </div>
                   </th>

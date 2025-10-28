@@ -406,7 +406,7 @@ export default function UnderwriterDashboard() {
               clearFilters={clearFilters}
               filters={filters}
               handleFilterChange={handleFilterChange}
-              searchPlaceholder="Search by reference, name, email, phone, status, or amount..."
+              searchPlaceholder="Search by Loan Application ID, Name, Contact Details, Amount or Status..."
             />
           </header>
           
