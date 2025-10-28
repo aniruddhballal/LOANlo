@@ -201,11 +201,29 @@ const PersonalDetails = () => {
     );
   }
 
+  const styles = `
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  `
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-8 px-4">
+      <style>{styles}</style>
+      
       <div className="max-w-4xl mx-auto relative">
         {/* Header Section */}
-        <div className="text-center mb-12 relative">
+        <div 
+          className="text-center mb-12 relative"
+          style={{ animation: 'fadeInUp 0.5s ease-out 0s both' }}
+        >
           <h1 className="text-4xl font-light text-gray-900 mb-3 tracking-wide">Personal Information</h1>
           <p className="text-lg text-gray-600 font-light tracking-wide">
             Complete your details to proceed with loan applications
@@ -214,7 +232,10 @@ const PersonalDetails = () => {
         </div>
 
         {/* Main Card */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 relative overflow-hidden">
+        <div 
+          className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 relative overflow-hidden"
+          style={{ animation: 'fadeInUp 0.5s ease-out 0.1s both' }}
+        >
           {/* Subtle corner accents */}
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gray-100 to-transparent rounded-bl-2xl opacity-40"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-gray-100 to-transparent rounded-tr-2xl opacity-40"></div>
@@ -430,7 +451,10 @@ const PersonalDetails = () => {
 
         {/* Call to Action - Dashboard style with original flair */}
         {isPersonalDetailsComplete && (
-          <div className="mt-12 text-center">
+          <div 
+            className="mt-12 text-center"
+            style={{ animation: 'fadeInUp 0.5s ease-out 0.2s both' }}
+          >
             <button 
               onClick={() => navigate('/dashboard/applicant')}
               className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-gray-900 to-black text-white rounded-xl font-light hover:from-black hover:to-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 group"
@@ -456,7 +480,10 @@ const PersonalDetails = () => {
         )}
 
         {/* Footer */}
-        <div className="text-center mt-8 text-gray-500">
+        <div 
+          className="text-center mt-8 text-gray-500"
+          style={{ animation: 'fadeInUp 0.5s ease-out 0.3s both' }}
+        >
           <p className="text-sm font-light tracking-wide">© 2025 LOANlo Financial Services. All rights reserved.</p>
           <p className="text-xs font-light mt-2">Secure • Professional • Confidential</p>
         </div>
