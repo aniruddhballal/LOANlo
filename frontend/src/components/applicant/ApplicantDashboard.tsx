@@ -112,7 +112,7 @@ const ApplicantDashboard = () => {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Link 
-              to="/loan-application" 
+              to="/apply-loan" 
               className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
             >
               <div className="flex items-start space-x-4">
@@ -134,7 +134,7 @@ const ApplicantDashboard = () => {
             </Link>
             
             <Link 
-              to="/application-status" 
+              to="/my-loans" 
               className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
             >
               <div className="flex items-start space-x-4">

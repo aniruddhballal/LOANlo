@@ -257,7 +257,7 @@ const ApplicationStatus = () => {
                 Start your journey by submitting your first loan application
               </p>
               <Link 
-                to="/loan-application" 
+                to="/apply-loan" 
                 className="inline-flex items-center px-8 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
               >
                 New Application
@@ -520,7 +520,7 @@ const ApplicationStatus = () => {
           </Link>
 
           <Link 
-            to="/loan-application" 
+            to="/apply-loan" 
             className="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
           >
             New Application

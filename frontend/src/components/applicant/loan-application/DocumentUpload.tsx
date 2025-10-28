@@ -216,7 +216,7 @@ const DocumentUpload = () => {
       })
 
       if (res.data.allRequiredDocsUploaded) {
-        navigate('/application-status', {
+        navigate('/my-loans', {
           state: { updatedApplicationId: applicationId }
         })
       }
@@ -274,7 +274,7 @@ const DocumentUpload = () => {
               </div>
               <div className="flex items-center bg-gray-50 border border-gray-200 px-4 py-2 rounded-md">
                 <div className="w-1 h-1 bg-gray-500 rounded-full mr-2"></div>
-                <span className="text-sm text-gray-700 font-mono tracking-wide">App ID: {applicationId}</span>
+                <span className="text-sm text-gray-700 font-mono tracking-wide">Loan Application ID: {applicationId}</span>
               </div>
             </div>
           </div>
@@ -385,7 +385,7 @@ const DocumentUpload = () => {
             </div>
             <div className="flex items-center bg-gray-50 border border-gray-200 px-4 py-2 rounded-md">
               <div className="w-1 h-1 bg-gray-500 rounded-full mr-2"></div>
-              <span className="text-sm text-gray-700 font-mono tracking-wide">App ID: {applicationId}</span>
+              <span className="text-sm text-gray-700 font-mono tracking-wide">Loan Application ID: {applicationId}</span>
             </div>
           </div>
         </div>

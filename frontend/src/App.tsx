@@ -148,7 +148,7 @@ function AppContent() {
         } />
         
         {/* Loan Application Routes */}
-        <Route path="/loan-application" element={
+        <Route path="/apply-loan" element={
           <RoleProtectedRoute allowedRoles={['applicant']}>
             <LoanApplication />
           </RoleProtectedRoute>
@@ -163,7 +163,7 @@ function AppContent() {
             <DocumentUpload />
           </RoleProtectedRoute>
         } />
-        <Route path="/application-status" element={
+        <Route path="/my-loans" element={
           <RoleProtectedRoute allowedRoles={['applicant']}>
             <ApplicationStatus />
           </RoleProtectedRoute>

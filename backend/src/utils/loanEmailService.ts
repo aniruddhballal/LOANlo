@@ -63,7 +63,7 @@ export const sendLoanApplicationSubmittedEmail = async (
 
   try {
     const frontendUrl = getFrontendUrl();
-    const applicationStatusLink = `${frontendUrl}/application-status`;
+    const applicationStatusLink = `${frontendUrl}/my-loans`;
 
     const emailData: LoanApplicationSubmittedData = {
       firstName,
@@ -108,7 +108,7 @@ export const sendLoanStatusUpdateEmail = async (
 ) => {
   try {
     const frontendUrl = getFrontendUrl();
-    const applicationStatusLink = `${frontendUrl}/application-status`;
+    const applicationStatusLink = `${frontendUrl}/my-loans`;
     
 
     const emailData: LoanStatusUpdateData = {
@@ -209,7 +209,7 @@ export const sendDocumentsRequestedEmail = async (
 ) => {
   try {
     const frontendUrl = getFrontendUrl();
-    const applicationStatusLink = `${frontendUrl}/application-status`;
+    const applicationStatusLink = `${frontendUrl}/my-loans`;
 
     const emailData: DocumentsRequestedData = {
     firstName,
@@ -540,7 +540,7 @@ export const sendApplicationRestoredEmail = async (
 ) => {
   try {
     const frontendUrl = getFrontendUrl();
-    const applicationStatusLink = `${frontendUrl}/application-status`;
+    const applicationStatusLink = `${frontendUrl}/my-loans`;
 
     const emailData: ApplicationRestoredData = {
       applicantName,
@@ -723,7 +723,7 @@ export const sendProfileRestoredEmail = async (
 ) => {
   try {
     const frontendUrl = getFrontendUrl();
-    const applicationStatusLink = `${frontendUrl}/application-status`;
+    const applicationStatusLink = `${frontendUrl}/my-loans`;
 
     // Extract first name from full name
     const firstName = applicantName.split(' ')[0] ?? '';
