@@ -6,8 +6,21 @@ import { PersonalDetailsRequired } from './PersonalDetailsRequired'
 import { LoanForm } from './LoanForm'
 import { ApplicationSummary } from './ApplicationSummary'
 
+interface LoanType {
+  _id: string
+  name: string
+  title: string
+  catchyPhrase: string
+  features: string[]
+  interestRateMin: number
+  interestRateMax: number
+  maxAmount: number
+  maxTenure: number
+  isActive: boolean
+}
+
 interface LoanData {
-  loanType: string
+  loanTypeId: string
   amount: string
   purpose: string
   tenure: string
@@ -39,28 +52,47 @@ const LoanApply = () => {
   const location = useLocation()
   const [focusedField, setFocusedField] = useState<string>('')
   const [loanData, setLoanData] = useState<LoanData>({
-    loanType: '',
+    loanTypeId: '',
     amount: '',
     purpose: '',
     tenure: ''
   })
+  const [selectedLoanType, setSelectedLoanType] = useState<LoanType | null>(null)
   const [personalDetails, setPersonalDetails] = useState<PersonalDetailsData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [isPersonalDetailsComplete, setIsPersonalDetailsComplete] = useState(false)
   const [checkingPersonalDetails, setCheckingPersonalDetails] = useState(true)
+  const [loadingLoanType, setLoadingLoanType] = useState(false)
 
-  // Check if user came from Personal Details page
   const cameFromPersonalDetails = location.state?.fromPersonalDetails === true
 
-  // Get selected loan type from navigation state
+  // Get selected loan type ID from navigation state and fetch full details
   useEffect(() => {
-    const selectedLoanType = location.state?.selectedLoanType
-    if (selectedLoanType) {
+    const loanTypeId = location.state?.selectedLoanType
+    
+    if (loanTypeId) {
       setLoanData(prev => ({
         ...prev,
-        loanType: selectedLoanType
+        loanTypeId: loanTypeId
       }))
+      
+      // Fetch full loan type details
+      const fetchLoanTypeDetails = async () => {
+        try {
+          setLoadingLoanType(true)
+          const response = await api.get(`/loan-types/${loanTypeId}`)
+          const loanTypeData = response.data.loanType || response.data
+          setSelectedLoanType(loanTypeData)
+        } catch (err) {
+          console.error('Error fetching loan type details:', err)
+          setError('Failed to load loan type details')
+        } finally {
+          setLoadingLoanType(false)
+        }
+      }
+      
+      fetchLoanTypeDetails()
     }
   }, [location.state])
 
@@ -158,30 +190,15 @@ const LoanApply = () => {
     navigate('/select-loan-type')
   }
 
-  // Get loan type display name
-  const getLoanTypeDisplay = (type: string) => {
-    const loanTypes: { [key: string]: string } = {
-      'personal': 'Personal Loan',
-      'home': 'Home Loan',
-      'education': 'Education Loan',
-      'business': 'Business Loan',
-      'vehicle': 'Vehicle Loan',
-      'gold': 'Gold Loan'
-    }
-    return loanTypes[type] || type
-  }
-
-  // Loading state while checking Personal Details Completion
-  if (checkingPersonalDetails) {
+  if (checkingPersonalDetails || loadingLoanType) {
     return (
       <LoadingState
-        title="Verifying Personal Details"
-        message="Please wait while we confirm your information..."
+        title="Loading Application"
+        message="Please wait while we prepare your loan application..."
       />
     )
   }
 
-  // Loading state while submitting application
   if (loading) {
     return (
       <LoadingState
@@ -191,7 +208,6 @@ const LoanApply = () => {
     )
   }
 
-  // If Personal Details is not complete, show message to complete Personal Details first
   if (!isPersonalDetailsComplete) {
     return (
       <PersonalDetailsRequired
@@ -219,7 +235,6 @@ const LoanApply = () => {
       <style>{styles}</style>
       
       <div className="max-w-7xl mx-auto relative">
-        {/* Header Section */}
         <div 
           className="text-center mb-12 relative"
           style={{ animation: 'fadeInUp 0.5s ease-out 0s both' }}
@@ -231,43 +246,20 @@ const LoanApply = () => {
           <div className="w-24 h-0.5 bg-gradient-to-r from-gray-900 to-gray-600 mx-auto mt-6"></div>
         </div>
 
-        {/* Personal Details Status Card */}
         {cameFromPersonalDetails && (
           <div style={{ animation: 'fadeInUp 0.5s ease-out 0.1s both' }}>
             <SuccessMessage />
           </div>
         )}
 
-        {/* Selected Loan Type Badge */}
-        {loanData.loanType && (
-          <div 
-            className="mb-6 flex justify-center"
-            style={{ animation: 'fadeInUp 0.5s ease-out 0.2s both' }}
-          >
-            <div className="inline-flex items-center bg-white border border-gray-200 rounded-xl px-6 py-3 shadow-sm">
-              <span className="text-sm text-gray-600 font-light mr-2">Selected Loan:</span>
-              <span className="text-base text-gray-900 font-medium mr-4">{getLoanTypeDisplay(loanData.loanType)}</span>
-              <button
-                onClick={handleChangeLoanType}
-                className="text-sm text-gray-600 hover:text-gray-900 underline font-light"
-              >
-                Change
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Main Card */}
         <div 
           id="loan-form"
           className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 relative overflow-hidden"
-          style={{ animation: 'fadeInUp 0.5s ease-out 0.3s both' }}
+          style={{ animation: 'fadeInUp 0.5s ease-out 0.2s both' }}
         >
-          {/* Subtle corner accents */}
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gray-100 to-transparent rounded-bl-2xl opacity-40"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-gray-100 to-transparent rounded-tr-2xl opacity-40"></div>
 
-          {/* Header section matching dashboard style */}
           <header className="px-8 py-6 border-b border-gray-100 bg-gray-50/50 relative z-10">
             <div className="flex justify-between items-center">
               <div>
@@ -285,11 +277,11 @@ const LoanApply = () => {
           </header>
 
           <div className="p-8 lg:p-12 relative z-10">
-            {/* Error Display */}
             {error && <ErrorMessage message={error} />}
 
-            {/* Form Content */}
+            {/* Pass loanTypeId and change handler to LoanForm */}
             <LoanForm
+              loanTypeId={loanData.loanTypeId}
               loanData={loanData}
               focusedField={focusedField}
               loading={loading}
@@ -298,22 +290,22 @@ const LoanApply = () => {
               onBlur={handleBlur}
               onChange={handleChange}
               onSubmit={handleSubmit}
+              onChangeLoanType={handleChangeLoanType}
             />
 
-            {/* Summary Section */}
-            {personalDetails && (
+            {personalDetails && selectedLoanType && (
               <ApplicationSummary
                 personalDetails={personalDetails}
                 loanData={loanData}
+                selectedLoanType={selectedLoanType}
               />
             )}
           </div>
         </div>
 
-        {/* Call to Action - Dashboard style with original flair */}
         <div 
           className="mt-12 text-center"
-          style={{ animation: 'fadeInUp 0.5s ease-out 0.4s both' }}
+          style={{ animation: 'fadeInUp 0.5s ease-out 0.3s both' }}
         >
           <button 
             onClick={() => navigate('/dashboard/applicant')}
@@ -338,10 +330,9 @@ const LoanApply = () => {
           </button>
         </div>
 
-        {/* Footer */}
         <div 
           className="text-center mt-8 text-gray-500"
-          style={{ animation: 'fadeInUp 0.5s ease-out 0.5s both' }}
+          style={{ animation: 'fadeInUp 0.5s ease-out 0.4s both' }}
         >
           <p className="text-sm font-light tracking-wide">© 2025 LOANlo Financial Services. All rights reserved.</p>
           <p className="text-xs font-light mt-2">Secure • Professional • Confidential</p>
