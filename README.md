@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (59)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (60)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (128)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (55)
+### ✅ Completed Initiatives (56)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -75,6 +75,7 @@
 | 183 | **Search & Filter Bar Extension for Deleted Users (System Admin Dashboard)** | Extended `SearchFilterBar` component with optional customization props (`showAmountFilters`, `statusLabel`, `statusOptions`) to support role-based filtering without amount fields. Created `searchFilterUtilsDeletedUsers.ts` utility file with dedicated functions for searching across user fields (name, email, phone, role, company, city) and filtering by role and deletion date range. Updated `useDeletedUsers.ts` hook to integrate utility functions for cleaner state management. Modified `DeletedUsersHeader.tsx` to pass custom props: disabled amount filters, changed label from "Status" to "Role", and provided role-specific dropdown options (All Roles, Applicant, Underwriter, System Admin). Ensured backward compatibility with existing Underwriter and Applicant dashboards while adding flexible third use case for system administrators. |
 | 185 | **Search & Filter Bar Integration for Deleted Loan Applications** | Refactored `DeletedLoanApplications.tsx` to use centralized `SearchFilterBar` component. Created `searchFilterUtilsRestoration.ts` with search/filter functions for restoration requests (applicant, underwriter, reference, reason, amount, status, dates). Updated `FilterState` to include `amountMin/amountMax` fields. Configured SearchFilterBar with custom props: enabled amount filters, "Request Status" label, and restoration-specific status options (Pending, Approved, Rejected). Removed legacy SearchFilterBar implementation while preserving all existing functionality. |
 | 186 | **Loan Amount Column for Restoration Requests** | Added sortable "Loan Amount" column to `RequestsTable.tsx` and amount display to `RequestsMobileView.tsx`. Implemented amount sorting case in `DeletedLoanApplications.tsx`. Displays formatted currency (₹) using Indian locale. Respects existing `amountMin/amountMax` filters via `applyFilters()` utility. Shows "N/A" for missing data. |
+| 188 | **Loan Type Cards Integration in Loan Apply Page** | Created new `LoanTypeCards.tsx` component with dynamic, responsive card UI for loan types. Updated `LoanApply.tsx` to integrate these cards, replacing old inline layout for cleaner structure and improved user interaction. |
 
 ### ⚡ In Progress (3)
 
@@ -231,6 +232,6 @@
 
 ---
 
-**Document Version:** 166
-**Last Updated:** 25th October 2025
+**Document Version:** 167
+**Last Updated:** 29th October 2025
 **Maintained By:** Aniruddh Ballal

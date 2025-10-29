@@ -5,6 +5,7 @@ import { LoadingState, ErrorMessage, SuccessMessage } from '../../ui/StatusMessa
 import { PersonalDetailsRequired } from './PersonalDetailsRequired'
 import { LoanForm } from './LoanForm'
 import { ApplicationSummary } from './ApplicationSummary'
+import { LoanCards } from '../../ui/LoanTypeCards'
 
 interface LoanData {
   loanType: string
@@ -143,6 +144,20 @@ const LoanApply = () => {
     navigate('/dashboard/applicant')
   }
 
+  const handleSelectLoan = (loanType: string) => {
+    setLoanData({
+      ...loanData,
+      loanType: loanType
+    })
+    // Scroll to form
+    setTimeout(() => {
+      document.getElementById('loan-form')?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      })
+    }, 100)
+  }
+
   // Loading state while checking Personal Details Completion
   if (checkingPersonalDetails) {
     return (
@@ -190,7 +205,7 @@ const LoanApply = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-8 px-4">
       <style>{styles}</style>
       
-      <div className="max-w-4xl mx-auto relative">
+      <div className="max-w-7xl mx-auto relative">
         {/* Header Section */}
         <div 
           className="text-center mb-12 relative"
@@ -210,10 +225,16 @@ const LoanApply = () => {
           </div>
         )}
 
+        {/* Loan Cards Section */}
+        <div style={{ animation: 'fadeInUp 0.5s ease-out 0.2s both' }}>
+          <LoanCards onSelectLoan={handleSelectLoan} />
+        </div>
+
         {/* Main Card */}
         <div 
+          id="loan-form"
           className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 relative overflow-hidden"
-          style={{ animation: 'fadeInUp 0.5s ease-out 0.2s both' }}
+          style={{ animation: 'fadeInUp 0.5s ease-out 0.3s both' }}
         >
           {/* Subtle corner accents */}
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gray-100 to-transparent rounded-bl-2xl opacity-40"></div>
@@ -265,7 +286,7 @@ const LoanApply = () => {
         {/* Call to Action - Dashboard style with original flair */}
         <div 
           className="mt-12 text-center"
-          style={{ animation: 'fadeInUp 0.5s ease-out 0.3s both' }}
+          style={{ animation: 'fadeInUp 0.5s ease-out 0.4s both' }}
         >
           <button 
             onClick={() => navigate('/dashboard/applicant')}
@@ -293,7 +314,7 @@ const LoanApply = () => {
         {/* Footer */}
         <div 
           className="text-center mt-8 text-gray-500"
-          style={{ animation: 'fadeInUp 0.5s ease-out 0.4s both' }}
+          style={{ animation: 'fadeInUp 0.5s ease-out 0.5s both' }}
         >
           <p className="text-sm font-light tracking-wide">© 2025 LOANlo Financial Services. All rights reserved.</p>
           <p className="text-xs font-light mt-2">Secure • Professional • Confidential</p>
