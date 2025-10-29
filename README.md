@@ -229,9 +229,10 @@
 | 168 | **Global Support Contact Link** | Add a "Contact Support" link on every page of the website and every mail that gets sent to all the users of the application for consistent user access to help and assistance. |
 | 176 | **Loan Email Service: Refactor & Modularization** | Refactoring the large `loanEmailService.ts` (~830 lines) into smaller, modular hooks/functions grouped by feature (application emails, restoration emails, profile emails, underwriter/admin notifications) to improve readability, maintainability, and testability. |
 | 177 | **Profile Restoration: Admin Reason & History Tracking** | Implemented system admin prompt for restoration reason when restoring a user profile, similar to loan application restoration. Added `ProfileHistory` model to track deletion timestamps, user-provided deletion reasons, and admin-provided restoration reasons for audit and record-keeping. |
+| 189 | **Backend Integration for Loan Type Logic** | Implementing backend logic to match frontend loan type data. Need to apply corresponding interest rates and enforce maximum loan amount checks for each loan type in backend validation and computation layers. |
 
 ---
 
-**Document Version:** 167
+**Document Version:** 168
 **Last Updated:** 29th October 2025
 **Maintained By:** Aniruddh Ballal
