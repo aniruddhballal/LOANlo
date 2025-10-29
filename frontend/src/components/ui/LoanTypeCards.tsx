@@ -3,81 +3,67 @@ import { useState } from 'react'
 interface LoanCard {
   id: string
   title: string
-  icon: string
   description: string
   features: string[]
   interestRate: string
   maxAmount: string
   tenure: string
-  gradient: string
 }
 
 const loanCards: LoanCard[] = [
   {
     id: 'personal',
     title: 'Personal Loan',
-    icon: '👤',
     description: 'Quick funds for any personal need',
     features: ['Minimal documentation', 'Quick approval', 'Flexible repayment'],
     interestRate: '10.5% - 18%',
     maxAmount: '₹25 Lakhs',
-    tenure: 'Up to 5 years',
-    gradient: 'from-blue-500 to-indigo-600'
+    tenure: 'Up to 5 years'
   },
   {
     id: 'home',
     title: 'Home Loan',
-    icon: '🏠',
     description: 'Finance your dream home',
     features: ['Low interest rates', 'Tax benefits', 'Long tenure'],
     interestRate: '8.5% - 12%',
     maxAmount: '₹2 Crores',
-    tenure: 'Up to 30 years',
-    gradient: 'from-green-500 to-emerald-600'
+    tenure: 'Up to 30 years'
   },
   {
     id: 'education',
     title: 'Education Loan',
-    icon: '🎓',
     description: 'Invest in your future',
     features: ['Deferred repayment', 'Cover all expenses', 'Tax deduction'],
     interestRate: '9% - 15%',
     maxAmount: '₹50 Lakhs',
-    tenure: 'Up to 15 years',
-    gradient: 'from-purple-500 to-pink-600'
+    tenure: 'Up to 15 years'
   },
   {
     id: 'business',
     title: 'Business Loan',
-    icon: '💼',
     description: 'Grow your business',
     features: ['Working capital', 'Equipment finance', 'Business expansion'],
     interestRate: '11% - 20%',
     maxAmount: '₹1 Crore',
-    tenure: 'Up to 7 years',
-    gradient: 'from-orange-500 to-red-600'
+    tenure: 'Up to 7 years'
   },
   {
     id: 'vehicle',
     title: 'Vehicle Loan',
-    icon: '🚗',
     description: 'Drive your dream car',
     features: ['New & used vehicles', 'Up to 100% funding', 'Fast processing'],
     interestRate: '8.75% - 14%',
     maxAmount: '₹50 Lakhs',
-    tenure: 'Up to 7 years',
-    gradient: 'from-cyan-500 to-blue-600'
+    tenure: 'Up to 7 years'
   },
   {
     id: 'gold',
     title: 'Gold Loan',
-    icon: '💰',
     description: 'Quick loan against gold',
     features: ['Instant approval', 'Keep your gold safe', 'Low interest'],
     interestRate: '7% - 12%',
     maxAmount: '₹1 Crore',
-    tenure: 'Up to 3 years',
-    gradient: 'from-yellow-500 to-orange-500'
+    tenure: 'Up to 3 years'
   }
 ]
 
@@ -90,16 +76,19 @@ export const LoanCards = ({ onSelectLoan }: LoanCardsProps) => {
 
   return (
     <div className="mb-12">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-light text-gray-900 mb-2">Choose Your Loan Type</h2>
+      <div className="text-center mb-10">
+        <h2 className="text-2xl font-light text-gray-900 mb-2 tracking-wide">Choose Your Loan Type</h2>
         <p className="text-gray-600 font-light">Select the loan that best fits your needs</p>
+        <div className="w-16 h-0.5 bg-gray-300 mx-auto mt-4"></div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loanCards.map((loan, index) => (
           <div
             key={loan.id}
-            className="relative bg-white rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer group"
+            className={`relative bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 cursor-pointer group ${
+              hoveredCard === loan.id ? 'shadow-xl -translate-y-1' : 'shadow-sm'
+            }`}
             style={{ 
               animation: `fadeInUp 0.5s ease-out ${0.1 * index}s both` 
             }}
@@ -107,73 +96,59 @@ export const LoanCards = ({ onSelectLoan }: LoanCardsProps) => {
             onMouseLeave={() => setHoveredCard(null)}
             onClick={() => onSelectLoan?.(loan.id)}
           >
-            {/* Gradient Header */}
-            <div className={`bg-gradient-to-r ${loan.gradient} p-6 text-white relative overflow-hidden`}>
-              <div className="absolute top-0 right-0 text-6xl opacity-10 transform translate-x-4 -translate-y-2">
-                {loan.icon}
-              </div>
-              <div className="relative z-10">
-                <div className="text-4xl mb-3">{loan.icon}</div>
-                <h3 className="text-2xl font-light mb-2">{loan.title}</h3>
-                <p className="text-white/90 text-sm font-light">{loan.description}</p>
-              </div>
-            </div>
+            {/* Subtle corner accent */}
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-gray-50 to-transparent rounded-bl-xl opacity-50"></div>
 
             {/* Card Content */}
-            <div className="p-6">
+            <div className="p-6 relative z-10">
+              {/* Title */}
+              <h3 className="text-xl font-light text-gray-900 mb-2 tracking-wide">{loan.title}</h3>
+              <p className="text-sm text-gray-600 font-light mb-6">{loan.description}</p>
+
+              {/* Divider */}
+              <div className="w-12 h-px bg-gray-300 mb-6"></div>
+
               {/* Key Details */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Interest Rate</p>
-                  <p className="text-sm font-medium text-gray-900">{loan.interestRate}</p>
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 font-light tracking-wide">Interest Rate</span>
+                  <span className="text-sm text-gray-900 font-light">{loan.interestRate}</span>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Max Amount</p>
-                  <p className="text-sm font-medium text-gray-900">{loan.maxAmount}</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 font-light tracking-wide">Max Amount</span>
+                  <span className="text-sm text-gray-900 font-light">{loan.maxAmount}</span>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Tenure</p>
-                  <p className="text-sm font-medium text-gray-900">{loan.tenure}</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 font-light tracking-wide">Tenure</span>
+                  <span className="text-sm text-gray-900 font-light">{loan.tenure}</span>
                 </div>
               </div>
 
               {/* Features */}
-              <div className="space-y-2 mb-6">
+              <div className="space-y-2 mb-6 pt-4 border-t border-gray-100">
                 {loan.features.map((feature, idx) => (
                   <div key={idx} className="flex items-start">
-                    <svg 
-                      className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth="2" 
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-sm text-gray-700 font-light">{feature}</span>
+                    <div className="w-1 h-1 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                    <span className="text-xs text-gray-600 font-light leading-relaxed">{feature}</span>
                   </div>
                 ))}
               </div>
 
-              {/* Apply Button */}
+              {/* Select Button */}
               <button
-                className={`w-full py-3 rounded-lg font-light transition-all duration-300 ${
+                className={`w-full py-3 rounded-lg font-light tracking-wide transition-all duration-300 ${
                   hoveredCard === loan.id
-                    ? `bg-gradient-to-r ${loan.gradient} text-white shadow-lg`
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-gray-900 to-black text-white shadow-md'
+                    : 'bg-gray-50 text-gray-700 border border-gray-200'
                 }`}
               >
-                Select {loan.title}
+                Select Loan
               </button>
             </div>
 
-            {/* Hover Indicator */}
+            {/* Bottom accent line */}
             <div 
-              className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${loan.gradient} transition-transform duration-300 ${
+              className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-gray-900 to-gray-600 transition-transform duration-300 ${
                 hoveredCard === loan.id ? 'scale-x-100' : 'scale-x-0'
               }`}
             ></div>
