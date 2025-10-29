@@ -20,6 +20,7 @@ import StaffProfile from './components/profile/StaffProfile'
 import ProfileHistory from './components/profile/ProfileHistory'
 import IpWhitelistSettings from './components/system-admin/IpWhitelistSettings';
 import AccountDeleted from './components/profile/AccountDeleted';
+import LoanTypeSelection from './components/applicant/loan-application/LoanTypeSelection'
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -151,6 +152,11 @@ function AppContent() {
         <Route path="/apply-loan" element={
           <RoleProtectedRoute allowedRoles={['applicant']}>
             <LoanApply />
+          </RoleProtectedRoute>
+        } />
+        <Route path="/select-loan-type" element={
+          <RoleProtectedRoute allowedRoles={['applicant']}>
+            <LoanTypeSelection />
           </RoleProtectedRoute>
         } />
         <Route path="/personal-details" element={

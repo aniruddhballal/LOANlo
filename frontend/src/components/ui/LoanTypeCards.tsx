@@ -1,7 +1,6 @@
-import { useState } from 'react'
 import { User, Home, GraduationCap, Briefcase, Car, Coins } from 'lucide-react'
 
-interface LoanCard {
+export interface LoanCard {
   id: string
   title: string
   description: string
@@ -13,7 +12,7 @@ interface LoanCard {
   accentColor: string
 }
 
-const loanCards: LoanCard[] = [
+export const loanCards: LoanCard[] = [
   {
     id: 'personal',
     title: 'Personal Loan',
@@ -81,103 +80,3 @@ const loanCards: LoanCard[] = [
     accentColor: 'from-amber-500/10 to-amber-600/5'
   }
 ]
-
-interface LoanCardsProps {
-  onSelectLoan?: (loanType: string) => void
-}
-
-export const LoanCards = ({ onSelectLoan }: LoanCardsProps) => {
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-
-  return (
-    <div className="mb-12">
-      <div className="text-center mb-10">
-        <h2 className="text-2xl font-light text-gray-900 mb-2 tracking-wide">Choose Your Loan Type</h2>
-        <p className="text-gray-600 font-light">Select the loan that best fits your needs</p>
-        <div className="w-16 h-0.5 bg-gray-300 mx-auto mt-4"></div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loanCards.map((loan, index) => {
-          const IconComponent = loan.icon
-          return (
-            <div
-              key={loan.id}
-              className={`relative bg-gradient-to-br ${loan.accentColor} rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 cursor-pointer group ${
-                hoveredCard === loan.id ? 'shadow-xl -translate-y-1' : 'shadow-sm'
-              }`}
-              style={{ 
-                animation: `fadeInUp 0.5s ease-out ${0.1 * index}s both` 
-              }}
-              onMouseEnter={() => setHoveredCard(loan.id)}
-              onMouseLeave={() => setHoveredCard(null)}
-              onClick={() => onSelectLoan?.(loan.id)}
-            >
-
-              {/* Card Content */}
-              <div className="p-6 relative z-10">
-                {/* Icon and Title */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-light text-gray-900 mb-2 tracking-wide">{loan.title}</h3>
-                    <p className="text-sm text-gray-600 font-light">{loan.description}</p>
-                  </div>
-                  <div className={`ml-4 p-3 bg-gradient-to-br ${loan.accentColor} rounded-lg`}>
-                    <IconComponent className="w-6 h-6 text-gray-700" strokeWidth={1.5} />
-                  </div>
-                </div>
-
-                {/* Divider */}
-                <div className="w-12 h-px bg-gray-300 mb-6"></div>
-
-                {/* Key Details */}
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500 font-light tracking-wide">Interest Rate</span>
-                    <span className="text-sm text-gray-900 font-light">{loan.interestRate}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500 font-light tracking-wide">Max Amount</span>
-                    <span className="text-sm text-gray-900 font-light">{loan.maxAmount}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500 font-light tracking-wide">Tenure</span>
-                    <span className="text-sm text-gray-900 font-light">{loan.tenure}</span>
-                  </div>
-                </div>
-
-                {/* Features */}
-                <div className="space-y-2 mb-6 pt-4 border-t border-gray-100">
-                  {loan.features.map((feature, idx) => (
-                    <div key={idx} className="flex items-start">
-                      <div className="w-1 h-1 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                      <span className="text-xs text-gray-600 font-light leading-relaxed">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Select Button */}
-                <button
-                  className={`w-full py-3 rounded-lg font-light tracking-wide transition-all duration-300 ${
-                    hoveredCard === loan.id
-                      ? 'bg-gradient-to-r from-gray-900 to-black text-white shadow-md'
-                      : 'bg-gray-50 text-gray-700 border border-gray-200'
-                  }`}
-                >
-                  Select Loan
-                </button>
-              </div>
-
-              {/* Bottom accent line */}
-              <div 
-                className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-gray-900 to-gray-600 transition-transform duration-300 ${
-                  hoveredCard === loan.id ? 'scale-x-100' : 'scale-x-0'
-                }`}
-              ></div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}

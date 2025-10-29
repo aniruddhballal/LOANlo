@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (60)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (128)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (130)
 
 ---
 
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (56)
+### ✅ Completed Initiatives (57)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -92,7 +92,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (110)
+### ✅ Completed Initiatives (111)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -206,8 +206,9 @@
 | 165 | **IP Whitelisting System** | Implemented backend IP whitelisting for system admin login security. **User Model (`backend/src/models/User.ts`):** Added `ipWhitelist` array (stores `ip`, `description`, `addedAt`, `addedBy`) and `allowIpRestriction` boolean to enable/disable IP checks per user. **Service Layer (`backend/src/services/ipWhitelistService.ts`):** Created functions to add/remove IPs with duplicate prevention, fetch user whitelists, toggle restrictions (requires minimum one IP), and validate IP formats. Enforces `system_admin` role for all operations. **Controller (`backend/src/controllers/ipWhitelistController.ts`):** Handles requests for getting current client IP, managing whitelist CRUD operations, and toggling restrictions. Returns appropriate HTTP status codes (400/403/500) and normalizes IPv4-mapped IPv6 addresses. **Middleware (`backend/src/middleware/ipWhitelist.ts`):** Created `checkIpWhitelist` to block unauthorized IPs when `allowIpRestriction` is enabled. Includes `getClientIP` (extracts real IP from proxies/headers) and `normalizeIP` (standardizes IPv6-mapped IPv4). Logs all access attempts and returns 403 for blocked IPs. **Routes (`backend/src/routes/ipWhitelist.ts`):** Established `/api/ip-whitelist` endpoints: GET `/current-ip`, GET `/` (whitelist), POST `/add`, DELETE `/:ipId`, PATCH `/toggle`. All require authentication via `authenticateToken`. **Server Integration (`backend/src/server.ts`):** Applied `checkIpWhitelist` middleware to protect all `/api/*` routes (loans, documents, profiles, profile-history) while keeping auth routes public. Updated CORS to support PATCH requests. Modified auth verify route (`backend/src/routes/auth.ts`) to include IP whitelist checks, ensuring token verification respects IP restrictions. This architecture allows system admins to control which IPs can access protected endpoints when restrictions are enabled, with automatic enforcement across all sensitive API routes. |
 | 184 | **Soft-Delete Handling & Restoration Requests Update** | Updated `LoanApplication` model to allow `userId` as `Types.ObjectId | IUser | null` for proper population handling. Fixed `/details/:applicationId` route in `loans.ts` to safely check `application.userId` before access validation. Refactored `/restoration-requests` route in `admin.ts` to exclude soft-deleted applications and users, ensuring only active applications and non-deleted users are returned, with proper null filtering and population logic. |
 | 187 | **Restoration Requests: Filter and Populate Active Users** | Updated `GET /restoration-requests` route to include only requests made by active (non-deleted) users and exclude those tied to deleted applicants, while still fetching applications regardless of deletion status for context. |
+| 190 | **Loan Type Selection - Separate Page Implementation** | Created new `LoanTypeSelection.tsx` page for loan type selection with card grid UI. Refactored `LoanApply.tsx` to remove inline loan cards and receive selected loan type via `location.state`, added selected loan badge with change option. Updated router to add `/select-loan-type` route and navigation links to redirect users to selection page before application form. |
 
-### ⚡ In Progress (18)
+### ⚡ In Progress (19)
 
 | ID | Initiative | Status |
 |----|-----------|--------|
@@ -233,6 +234,6 @@
 
 ---
 
-**Document Version:** 168
+**Document Version:** 169
 **Last Updated:** 29th October 2025
 **Maintained By:** Aniruddh Ballal

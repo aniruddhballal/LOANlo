@@ -5,7 +5,6 @@ import { LoadingState, ErrorMessage, SuccessMessage } from '../../ui/StatusMessa
 import { PersonalDetailsRequired } from './PersonalDetailsRequired'
 import { LoanForm } from './LoanForm'
 import { ApplicationSummary } from './ApplicationSummary'
-import { LoanCards } from '../../ui/LoanTypeCards'
 
 interface LoanData {
   loanType: string
@@ -53,6 +52,17 @@ const LoanApply = () => {
 
   // Check if user came from Personal Details page
   const cameFromPersonalDetails = location.state?.fromPersonalDetails === true
+
+  // Get selected loan type from navigation state
+  useEffect(() => {
+    const selectedLoanType = location.state?.selectedLoanType
+    if (selectedLoanType) {
+      setLoanData(prev => ({
+        ...prev,
+        loanType: selectedLoanType
+      }))
+    }
+  }, [location.state])
 
   // Check Personal Details completion on mount
   useEffect(() => {
@@ -144,18 +154,21 @@ const LoanApply = () => {
     navigate('/dashboard/applicant')
   }
 
-  const handleSelectLoan = (loanType: string) => {
-    setLoanData({
-      ...loanData,
-      loanType: loanType
-    })
-    // Scroll to form
-    setTimeout(() => {
-      document.getElementById('loan-form')?.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start' 
-      })
-    }, 100)
+  const handleChangeLoanType = () => {
+    navigate('/select-loan-type')
+  }
+
+  // Get loan type display name
+  const getLoanTypeDisplay = (type: string) => {
+    const loanTypes: { [key: string]: string } = {
+      'personal': 'Personal Loan',
+      'home': 'Home Loan',
+      'education': 'Education Loan',
+      'business': 'Business Loan',
+      'vehicle': 'Vehicle Loan',
+      'gold': 'Gold Loan'
+    }
+    return loanTypes[type] || type
   }
 
   // Loading state while checking Personal Details Completion
@@ -225,10 +238,24 @@ const LoanApply = () => {
           </div>
         )}
 
-        {/* Loan Cards Section */}
-        <div style={{ animation: 'fadeInUp 0.5s ease-out 0.2s both' }}>
-          <LoanCards onSelectLoan={handleSelectLoan} />
-        </div>
+        {/* Selected Loan Type Badge */}
+        {loanData.loanType && (
+          <div 
+            className="mb-6 flex justify-center"
+            style={{ animation: 'fadeInUp 0.5s ease-out 0.2s both' }}
+          >
+            <div className="inline-flex items-center bg-white border border-gray-200 rounded-xl px-6 py-3 shadow-sm">
+              <span className="text-sm text-gray-600 font-light mr-2">Selected Loan:</span>
+              <span className="text-base text-gray-900 font-medium mr-4">{getLoanTypeDisplay(loanData.loanType)}</span>
+              <button
+                onClick={handleChangeLoanType}
+                className="text-sm text-gray-600 hover:text-gray-900 underline font-light"
+              >
+                Change
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Main Card */}
         <div 
