@@ -1,94 +1,114 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Home, GraduationCap, Briefcase, Car, Coins } from 'lucide-react'
+import { User, Home, GraduationCap, Briefcase, Car, Coins, Wallet } from 'lucide-react'
+import api from '../../../api' // Adjust path based on your file structure
 
 interface LoanCard {
-  id: string
+  _id: string
+  name: string
   title: string
-  description: string
+  catchyPhrase: string
   features: string[]
-  interestRate: string
-  maxAmount: string
-  tenure: string
+  interestRateMin: number
+  interestRateMax: number
+  maxAmount: number
+  maxTenure: number
+  isActive: boolean
   icon: any
   accentColor: string
+  // Display fields
+  interestRate: string
+  maxAmountFormatted: string
+  tenure: string
+  description: string
 }
 
-const loanCards: LoanCard[] = [
-  {
-    id: 'personal',
-    title: 'Personal Loan',
-    description: 'Quick funds for any personal need',
-    features: ['Minimal documentation', 'Quick approval', 'Flexible repayment'],
-    interestRate: '10.5% - 18%',
-    maxAmount: '₹25 Lakhs',
-    tenure: 'Up to 5 years',
-    icon: User,
-    accentColor: 'from-blue-500/10 to-blue-600/5'
-  },
-  {
-    id: 'home',
-    title: 'Home Loan',
-    description: 'Finance your dream home',
-    features: ['Low interest rates', 'Tax benefits', 'Long tenure'],
-    interestRate: '8.5% - 12%',
-    maxAmount: '₹2 Crores',
-    tenure: 'Up to 30 years',
-    icon: Home,
-    accentColor: 'from-green-500/10 to-green-600/5'
-  },
-  {
-    id: 'education',
-    title: 'Education Loan',
-    description: 'Invest in your future',
-    features: ['Deferred repayment', 'Cover all expenses', 'Tax deduction'],
-    interestRate: '9% - 15%',
-    maxAmount: '₹50 Lakhs',
-    tenure: 'Up to 15 years',
-    icon: GraduationCap,
-    accentColor: 'from-purple-500/10 to-purple-600/5'
-  },
-  {
-    id: 'business',
-    title: 'Business Loan',
-    description: 'Grow your business',
-    features: ['Working capital', 'Equipment finance', 'Business expansion'],
-    interestRate: '11% - 20%',
-    maxAmount: '₹1 Crore',
-    tenure: 'Up to 7 years',
-    icon: Briefcase,
-    accentColor: 'from-orange-500/10 to-orange-600/5'
-  },
-  {
-    id: 'vehicle',
-    title: 'Vehicle Loan',
-    description: 'Drive your dream car',
-    features: ['New & used vehicles', 'Up to 100% funding', 'Fast processing'],
-    interestRate: '8.75% - 14%',
-    maxAmount: '₹50 Lakhs',
-    tenure: 'Up to 7 years',
-    icon: Car,
-    accentColor: 'from-cyan-500/10 to-cyan-600/5'
-  },
-  {
-    id: 'gold',
-    title: 'Gold Loan',
-    description: 'Quick loan against gold',
-    features: ['Instant approval', 'Keep your gold safe', 'Low interest'],
-    interestRate: '7% - 12%',
-    maxAmount: '₹1 Crore',
-    tenure: 'Up to 3 years',
-    icon: Coins,
-    accentColor: 'from-amber-500/10 to-amber-600/5'
-  }
-]
+// Icon mapping
+const getIconForLoanType = (name: string): any => {
+  const lowerName = name.toLowerCase()
+  if (lowerName.includes('personal')) return User
+  if (lowerName.includes('home') || lowerName.includes('house')) return Home
+  if (lowerName.includes('education') || lowerName.includes('student')) return GraduationCap
+  if (lowerName.includes('business') || lowerName.includes('startup')) return Briefcase
+  if (lowerName.includes('vehicle') || lowerName.includes('car') || lowerName.includes('auto')) return Car
+  if (lowerName.includes('gold')) return Coins
+  return Wallet
+}
+
+// Color mapping
+const getAccentColorForLoanType = (name: string): string => {
+  const lowerName = name.toLowerCase()
+  if (lowerName.includes('personal')) return 'from-blue-500/10 to-blue-600/5'
+  if (lowerName.includes('home')) return 'from-green-500/10 to-green-600/5'
+  if (lowerName.includes('education')) return 'from-purple-500/10 to-purple-600/5'
+  if (lowerName.includes('business')) return 'from-orange-500/10 to-orange-600/5'
+  if (lowerName.includes('vehicle') || lowerName.includes('car')) return 'from-cyan-500/10 to-cyan-600/5'
+  if (lowerName.includes('gold')) return 'from-amber-500/10 to-amber-600/5'
+  return 'from-gray-500/10 to-gray-600/5'
+}
+
+// Format currency
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
 
 const LoanTypeSelection = () => {
   const navigate = useNavigate()
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  const [loanCards, setLoanCards] = useState<LoanCard[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSelectLoan = (loanType: string) => {
-    navigate('/apply-loan', { state: { selectedLoanType: loanType } })
+  useEffect(() => {
+    const fetchLoanTypes = async () => {
+      try {
+        setLoading(true)
+        const response = await api.get('/loan-types')
+        
+        const loanTypesArray = response.data.loanTypes || response.data
+        
+        // Transform backend data
+        const transformedCards: LoanCard[] = loanTypesArray
+          .filter((loan: any) => loan.isActive)
+          .map((loan: any) => ({
+            _id: loan._id,
+            name: loan.name,
+            title: loan.title,
+            catchyPhrase: loan.catchyPhrase,
+            features: loan.features,
+            interestRateMin: loan.interestRateMin,
+            interestRateMax: loan.interestRateMax,
+            maxAmount: loan.maxAmount,
+            maxTenure: loan.maxTenure,
+            isActive: loan.isActive,
+            icon: getIconForLoanType(loan.name),
+            accentColor: getAccentColorForLoanType(loan.name),
+            // Display formatted fields
+            interestRate: `${loan.interestRateMin}% - ${loan.interestRateMax}%`,
+            maxAmountFormatted: formatCurrency(loan.maxAmount),
+            tenure: `Up to ${loan.maxTenure} year${loan.maxTenure > 1 ? 's' : ''}`,
+            description: loan.catchyPhrase
+          }))
+        
+        setLoanCards(transformedCards)
+        setError(null)
+      } catch (err: any) {
+        console.error('Error fetching loan types:', err)
+        setError(err.response?.data?.message || err.message || 'Failed to load loan types')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchLoanTypes()
+  }, [])
+
+  const handleSelectLoan = (loanId: string) => {
+    navigate('/apply-loan', { state: { selectedLoanType: loanId } })
   }
 
   const handleNavigateBack = () => {
@@ -107,6 +127,33 @@ const LoanTypeSelection = () => {
       }
     }
   `
+
+if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading loan types...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error: {error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-6 py-2 bg-gray-900 text-white rounded-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-8 px-4">
@@ -131,16 +178,16 @@ const LoanTypeSelection = () => {
             const IconComponent = loan.icon
             return (
               <div
-                key={loan.id}
+                key={loan._id}
                 className={`relative bg-gradient-to-br ${loan.accentColor} rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 cursor-pointer group ${
-                  hoveredCard === loan.id ? 'shadow-xl -translate-y-1' : 'shadow-sm'
+                  hoveredCard === loan._id ? 'shadow-xl -translate-y-1' : 'shadow-sm'
                 }`}
                 style={{ 
                   animation: `fadeInUp 0.5s ease-out ${0.1 * index}s both` 
                 }}
-                onMouseEnter={() => setHoveredCard(loan.id)}
+                onMouseEnter={() => setHoveredCard(loan._id)}
                 onMouseLeave={() => setHoveredCard(null)}
-                onClick={() => handleSelectLoan(loan.id)}
+                onClick={() => handleSelectLoan(loan._id)}
               >
                 {/* Card Content */}
                 <div className="p-6 relative z-10">
@@ -166,7 +213,7 @@ const LoanTypeSelection = () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-gray-500 font-light tracking-wide">Max Amount</span>
-                      <span className="text-sm text-gray-900 font-light">{loan.maxAmount}</span>
+                      <span className="text-sm text-gray-900 font-light">{loan.maxAmountFormatted}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-gray-500 font-light tracking-wide">Tenure</span>
@@ -187,7 +234,7 @@ const LoanTypeSelection = () => {
                   {/* Select Button */}
                   <button
                     className={`w-full py-3 rounded-lg font-light tracking-wide transition-all duration-300 ${
-                      hoveredCard === loan.id
+                      hoveredCard === loan._id
                         ? 'bg-gradient-to-r from-gray-900 to-black text-white shadow-md'
                         : 'bg-gray-50 text-gray-700 border border-gray-200'
                     }`}
@@ -199,7 +246,7 @@ const LoanTypeSelection = () => {
                 {/* Bottom accent line */}
                 <div 
                   className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-gray-900 to-gray-600 transition-transform duration-300 ${
-                    hoveredCard === loan.id ? 'scale-x-100' : 'scale-x-0'
+                    hoveredCard === loan._id ? 'scale-x-100' : 'scale-x-0'
                   }`}
                 ></div>
               </div>

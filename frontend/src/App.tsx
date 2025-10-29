@@ -22,6 +22,7 @@ import IpWhitelistSettings from './components/system-admin/IpWhitelistSettings';
 import AccountDeleted from './components/profile/AccountDeleted';
 import LoanTypeSelection from './components/applicant/loan-application/LoanTypeSelection'
 import LoanRequests from './components/underwriter/LoanApplications'
+import LoanTypeDetails from './components/underwriter/LoanTypeDetails'
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -125,6 +126,11 @@ function AppContent() {
         <Route path="/loan-applications" element={
           <RoleProtectedRoute allowedRoles={['underwriter']}>
             <LoanRequests />
+          </RoleProtectedRoute>
+        } />
+        <Route path="/loan-type-details" element={
+          <RoleProtectedRoute allowedRoles={['underwriter']}>
+            <LoanTypeDetails />
           </RoleProtectedRoute>
         } />
 

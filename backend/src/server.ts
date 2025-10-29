@@ -12,6 +12,7 @@ import profileRoutes from './routes/profile';
 import profileHistoryRoutes from './routes/profileHistory';
 import ipWhitelistRoutes from './routes/ipWhitelist';
 import { checkIpWhitelist } from './middleware/ipWhitelist';
+import loanTypeRoutes from './routes/loanTypes';
 
 const app: Application = express();
 
@@ -58,6 +59,7 @@ app.use('/api/loans', checkIpWhitelist, loanRoutes);
 app.use('/api/documents', checkIpWhitelist, documentRoutes);
 app.use('/api/profile', checkIpWhitelist, profileRoutes);
 app.use('/api/profile-history', checkIpWhitelist, profileHistoryRoutes);
+app.use('/api/loan-types', loanTypeRoutes);
 
 // IP whitelist management routes (allow access without restriction)
 app.use('/api/ip-whitelist', ipWhitelistRoutes);
