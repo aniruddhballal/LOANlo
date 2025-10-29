@@ -6,8 +6,8 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (61)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (131)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (63)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (130)
 
 ---
 
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (58)
+### ✅ Completed Initiatives (60)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -77,6 +77,8 @@
 | 186 | **Loan Amount Column for Restoration Requests** | Added sortable "Loan Amount" column to `RequestsTable.tsx` and amount display to `RequestsMobileView.tsx`. Implemented amount sorting case in `DeletedLoanApplications.tsx`. Displays formatted currency (₹) using Indian locale. Respects existing `amountMin/amountMax` filters via `applyFilters()` utility. Shows "N/A" for missing data. |
 | 188 | **Loan Type Cards Integration in Loan Apply Page** | Created new `LoanTypeCards.tsx` component with dynamic, responsive card UI for loan types. Updated `LoanApply.tsx` to integrate these cards, replacing old inline layout for cleaner structure and improved user interaction. |
 | 191 | **Underwriter Dashboard Refactored to Redirection Page** | Refactored `UnderwriterDashboard.tsx` into a service selection page with two navigation cards. Created new `LoanApplications.tsx` component containing all original loan application management functionality. Updated `App.tsx` routing to include `/loan-applications` route for underwriters. |
+| 192 | **Loan Application: Integrated LoanType Fetch by ID** | Replaced static loan type mapping with dynamic fetch. Added `LoanType` interface, `selectedLoanType` state, and `/loan-types/:id` API call. Updated `loanData` to store `loanTypeId`, passed new props to `LoanForm` and `ApplicationSummary`, and unified loading state for loan type and personal details checks. |
+| 193 | **Application Summary: Added selectedLoanType prop and dynamic loan type display** | Replaced static `loanType` with `loanTypeId`, introduced `LoanType` interface, added `selectedLoanType` prop, and updated UI to display loan type title dynamically from fetched data. |
 
 ### ⚡ In Progress (3)
 
@@ -93,7 +95,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (113)
+### ✅ Completed Initiatives (112)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -209,7 +211,6 @@
 | 187 | **Restoration Requests: Filter and Populate Active Users** | Updated `GET /restoration-requests` route to include only requests made by active (non-deleted) users and exclude those tied to deleted applicants, while still fetching applications regardless of deletion status for context. |
 | 189 | **Loan Type Management Module Added** | Implemented full loan type management system. Created `loanTypeModel.ts` schema with validation and timestamps. Added `loanTypeController.ts`, `loanTypeService.ts`, and `loanTypeRoutes.ts` for CRUD and toggle operations. Integrated new `LoanTypeCards.tsx` to fetch and display active types dynamically with icons and colors. Built `LoanTypeDetails.tsx` admin UI for creating, editing, and managing loan types with validations and backend sync. |
 | 190 | **Loan Type Selection - Separate Page Implementation** | Created new `LoanTypeSelection.tsx` page for loan type selection with card grid UI. Refactored `LoanApply.tsx` to remove inline loan cards and receive selected loan type via `location.state`, added selected loan badge with change option. Updated router to add `/select-loan-type` route and navigation links to redirect users to selection page before application form. |
-| 192 | **Loan Application: Integrated LoanType Fetch by ID** | Replaced static loan type mapping with dynamic fetch. Added `LoanType` interface, `selectedLoanType` state, and `/loan-types/:id` API call. Updated `loanData` to store `loanTypeId`, passed new props to `LoanForm` and `ApplicationSummary`, and unified loading state for loan type and personal details checks. |
 
 ### ⚡ In Progress (18)
 
@@ -236,6 +237,6 @@
 
 ---
 
-**Document Version:** 172
+**Document Version:** 173
 **Last Updated:** 29th October 2025
 **Maintained By:** Aniruddh Ballal

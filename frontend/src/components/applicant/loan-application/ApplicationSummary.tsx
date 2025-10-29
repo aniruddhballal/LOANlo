@@ -9,18 +9,30 @@ interface PersonalDetails {
 }
 
 interface LoanData {
-  loanType: string
+  loanTypeId: string  // Changed from loanType: string to loanTypeId
   amount: string
+}
+
+interface LoanType {
+  _id: string
+  title: string
+  name: string
+  maxAmount: number
+  maxTenure: number
+  interestRateMin: number
+  interestRateMax: number
 }
 
 interface ApplicationSummaryProps {
   personalDetails: PersonalDetails
   loanData: LoanData
+  selectedLoanType: LoanType  // Added selectedLoanType prop
 }
 
 export const ApplicationSummary: React.FC<ApplicationSummaryProps> = ({
   personalDetails,
-  loanData
+  loanData,
+  selectedLoanType  // Destructure the new prop
 }) => (
   <div className="mt-12 p-6 bg-gray-50 rounded-xl border border-gray-200">
     <h4 className="text-lg font-bold text-gray-900 mb-4">Application Summary</h4>
@@ -41,10 +53,10 @@ export const ApplicationSummary: React.FC<ApplicationSummaryProps> = ({
         <span className="font-semibold text-gray-700">Employment:</span>
         <span className="ml-2 text-gray-600">{personalDetails.employmentType}</span>
       </div>
-      {loanData.loanType && (
+      {selectedLoanType && (
         <div>
           <span className="font-semibold text-gray-700">Loan Type:</span>
-          <span className="ml-2 text-gray-600 capitalize">{loanData.loanType} Loan</span>
+          <span className="ml-2 text-gray-600">{selectedLoanType.title}</span>
         </div>
       )}
       {loanData.amount && (
