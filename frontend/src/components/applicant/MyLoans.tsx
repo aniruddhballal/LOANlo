@@ -12,9 +12,22 @@ import { SearchFilterBar } from '../ui/search-filter-bar/SearchFilterBar'
 
 import { formatCurrency, formatDate, formatApplicationId } from '../utils'
 
+interface LoanType {
+  _id: string
+  name: string
+  title: string
+  catchyPhrase: string
+  features: string[]
+  interestRateMin: number
+  interestRateMax: number
+  maxAmount: number
+  maxTenure: number
+  isActive: boolean
+}
+
 interface LoanApplication {
   _id: string
-  loanType: string
+  loanType: LoanType | null  // ← Allow null
   amount: number
   tenure: number
   status: 'pending' | 'under_review' | 'approved' | 'rejected'
@@ -137,9 +150,12 @@ const MyLoans = () => {
     }
   }
 
-  const getLoanIcon = (type: string) => {
-    const iconProps = { size: 18, color: '#1f2937' } // dark gray
-    switch (type.toLowerCase()) {
+  const getLoanIcon = (loanType: LoanType | undefined | null ) => {  // ← Allow undefined
+    if(!loanType) return null;
+    const iconProps = { size: 18, color: '#1f2937' }
+    const typeName = loanType.name?.toLowerCase() || ''  // ← Add optional chaining
+    
+    switch (typeName) {
       case 'personal': return <User {...iconProps} />
       case 'home': return <Home {...iconProps} />
       case 'business': return <Briefcase {...iconProps} />
@@ -381,16 +397,15 @@ const MyLoans = () => {
                               {/* Header Row */}
                                 <div className="flex items-start justify-between mb-4">
                                   {/* Left: Loan Type */}
-                                  <div className="space-y-1">
-                                    <span className="text-gray-500 text-xs">Loan Type</span>
-                                    <div className="flex items-center gap-2">
-                                      <span className="relative top-[3px]">{getLoanIcon(app.loanType)}</span>
-                                      <h3 className="font-semibold text-gray-900 text-xl tracking-tight">
-                                        {app.loanType}
-                                      </h3>
-                                    </div>
+                                <div className="space-y-1">
+                                  <span className="text-gray-500 text-xs">Loan Type</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="relative top-[3px]">{getLoanIcon(app.loanType)}</span>
+                                    <h3 className="font-semibold text-gray-900 text-xl tracking-tight">
+                                      {app.loanType?.title || app.loanType?.name || 'Unknown' }  {/* ← Changed from app.loanType */}
+                                    </h3>
                                   </div>
-
+                                </div>
                                   {/* Right: Status */}
                                   <span
                                     className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border shadow-sm ${getStatusColor(app.status)}`}

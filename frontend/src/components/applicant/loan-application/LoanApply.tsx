@@ -20,7 +20,7 @@ interface LoanType {
 }
 
 interface LoanData {
-  loanTypeId: string
+  loanType: string
   amount: string
   purpose: string
   tenure: string
@@ -52,7 +52,7 @@ const LoanApply = () => {
   const location = useLocation()
   const [focusedField, setFocusedField] = useState<string>('')
   const [loanData, setLoanData] = useState<LoanData>({
-    loanTypeId: '',
+    loanType: '',
     amount: '',
     purpose: '',
     tenure: ''
@@ -74,7 +74,7 @@ const LoanApply = () => {
     if (loanTypeId) {
       setLoanData(prev => ({
         ...prev,
-        loanTypeId: loanTypeId
+        loanType: loanTypeId
       }))
       
       // Fetch full loan type details
@@ -164,11 +164,20 @@ const LoanApply = () => {
       return;
     }
     
+    if (!selectedLoanType) {
+      setError('Selected loan type is invalid.');
+      return; // or show error to user
+    }
+    
     setError('')
     setLoading(true)
 
     try {
-      const applicationData = { ...personalDetails, ...loanData }
+      const applicationData = {
+        ...personalDetails,
+        ...loanData,
+        loanType: selectedLoanType._id, // reference LoanType by its ObjectId
+      }
       const { data } = await api.post('/loans/apply', applicationData)
       navigate("/upload-documents", { state: { applicationId: data.applicationId } })
     } catch (err: any) {
@@ -281,7 +290,7 @@ const LoanApply = () => {
 
             {/* Pass loanTypeId and change handler to LoanForm */}
             <LoanForm
-              loanTypeId={loanData.loanTypeId}
+              loanTypeId={loanData.loanType}
               loanData={loanData}
               focusedField={focusedField}
               loading={loading}

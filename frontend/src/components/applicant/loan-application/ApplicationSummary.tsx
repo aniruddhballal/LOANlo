@@ -9,7 +9,7 @@ interface PersonalDetails {
 }
 
 interface LoanData {
-  loanTypeId: string  // Changed from loanType: string to loanTypeId
+  loanType: string
   amount: string
 }
 

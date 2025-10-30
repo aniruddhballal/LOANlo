@@ -16,7 +16,7 @@ interface LoanType {
 }
 
 interface LoanData {
-  loanTypeId: string
+  loanType: string
   amount: string
   purpose: string
   tenure: string
@@ -160,7 +160,7 @@ export const LoanForm: React.FC<LoanFormProps> = ({
           
           <SelectField
             name="tenure"
-            label={`Repayment Tenure (Max: ${loanType?.maxTenure || '—'} months)`}
+            label={`Repayment Tenure (Max: ${loanType?.maxTenure || '—'} years)`}
             value={loanData.tenure}
             options={tenureOptions}
             focusedField={focusedField}

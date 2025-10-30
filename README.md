@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (63)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (64)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (132)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (60)
+### ✅ Completed Initiatives (61)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -79,6 +79,7 @@
 | 191 | **Underwriter Dashboard Refactored to Redirection Page** | Refactored `UnderwriterDashboard.tsx` into a service selection page with two navigation cards. Created new `LoanApplications.tsx` component containing all original loan application management functionality. Updated `App.tsx` routing to include `/loan-applications` route for underwriters. |
 | 192 | **Loan Application: Integrated LoanType Fetch by ID** | Replaced static loan type mapping with dynamic fetch. Added `LoanType` interface, `selectedLoanType` state, and `/loan-types/:id` API call. Updated `loanData` to store `loanTypeId`, passed new props to `LoanForm` and `ApplicationSummary`, and unified loading state for loan type and personal details checks. |
 | 193 | **Application Summary: Added selectedLoanType prop and dynamic loan type display** | Replaced static `loanType` with `loanTypeId`, introduced `LoanType` interface, added `selectedLoanType` prop, and updated UI to display loan type title dynamically from fetched data. |
+| 196 | **Frontend LoanType Refactor and Integration** | Replaced `loanTypeId` with `loanType` across applicant components (`ApplicationSummary`, `LoanApply`, `LoanForm`) and updated validation, payloads, and typings to reference `LoanType` ObjectIds. Enhanced search utilities to handle populated `LoanType` objects with name/title lookup. Ensures consistent LoanType usage and fixes undefined or mismatched type issues across the frontend loan application flow. |
 
 ### ⚡ In Progress (3)
 
@@ -239,6 +240,6 @@
 
 ---
 
-**Document Version:** 175
+**Document Version:** 176
 **Last Updated:** 30th October 2025
 **Maintained By:** Aniruddh Ballal

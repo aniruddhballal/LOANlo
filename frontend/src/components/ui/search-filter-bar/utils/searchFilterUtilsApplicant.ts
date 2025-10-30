@@ -1,8 +1,22 @@
 import { formatApplicationId, formatCurrency } from '../../../utils'
 
+// Add LoanType interface
+interface LoanType {
+  _id: string
+  name: string
+  title: string
+  catchyPhrase: string
+  features: string[]
+  interestRateMin: number
+  interestRateMax: number
+  maxAmount: number
+  maxTenure: number
+  isActive: boolean
+}
+
 interface LoanApplication {
   _id: string
-  loanType: string
+  loanType: LoanType | null  // ← Allow null // ← Changed from string to LoanType
   amount: number
   tenure: number
   status: 'pending' | 'under_review' | 'approved' | 'rejected'
@@ -20,8 +34,12 @@ interface FilterState {
 
 export const searchInApplication = (app: LoanApplication, query: string): boolean => {
   const searchLower = query.toLowerCase()
+  
+  // Extract loan type name from the object with null check
+  const loanTypeName = app.loanType?.name?.toLowerCase() || app.loanType?.title?.toLowerCase() || ''
+  
   return (
-    app.loanType.toLowerCase().includes(searchLower) ||
+    loanTypeName.includes(searchLower) ||
     formatApplicationId(app._id).toLowerCase().includes(searchLower) ||
     app._id.toLowerCase().includes(searchLower) ||
     app.status.toLowerCase().includes(searchLower) ||
