@@ -149,7 +149,7 @@ export function ApplicationsTable({
                     </div>
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {showDeleted ? 'Restoration Status' : 'Actions'}
+                    Actions
                   </th>
                 </tr>
               </thead>
