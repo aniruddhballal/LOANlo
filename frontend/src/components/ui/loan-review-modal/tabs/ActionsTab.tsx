@@ -1,27 +1,8 @@
 import { useState, useEffect } from 'react'
 import { CheckCircle, XCircle, AlertCircle, Upload } from 'lucide-react'
 
-// Mock types for demonstration
-interface Document {
-  type: string
-  name: string
-  required: boolean
-  uploaded: boolean
-}
-
-interface ApprovalData {
-  approvedAmount: number
-  interestRate: number
-  tenure: number
-  emi: number
-}
-
-interface LoanApplication {
-  amount: number
-  tenure: number
-  status: string
-  documents?: Document[]
-}
+import type { LoanApplication, ApprovalData } from '../types'
+import { getDocumentProgress, getProgressBarColor } from '../../../utils'
 
 interface ActionsTabProps {
   application: LoanApplication
@@ -29,24 +10,6 @@ interface ActionsTabProps {
   onRequestAdditionalDocuments: () => void
   error?: string | null
   actionLoading: string
-}
-
-// Mock utility functions
-const getDocumentProgress = (documents?: Document[]) => {
-  if (!documents) return { uploaded: 0, total: 0, percentage: 0 }
-  const required = documents.filter(d => d.required)
-  const uploaded = required.filter(d => d.uploaded).length
-  return {
-    uploaded,
-    total: required.length,
-    percentage: required.length > 0 ? (uploaded / required.length) * 100 : 0
-  }
-}
-
-const getProgressBarColor = (percentage: number) => {
-  if (percentage === 100) return 'bg-green-500'
-  if (percentage >= 50) return 'bg-blue-500'
-  return 'bg-amber-500'
 }
 
 export default function ActionsTab({ application, onStatusUpdate, onRequestAdditionalDocuments, error, actionLoading }: ActionsTabProps) {
