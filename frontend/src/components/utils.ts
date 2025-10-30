@@ -104,15 +104,19 @@ export const getStatusColor = (status: string) => {
   }
 }
 
-export const getLoanTypeLabel = (type: string) => {
-  const types = {
+export const getLoanTypeLabel = (type: any) => {
+  if (!type) return 'N/A'
+  if (typeof type === 'object') return type.title || type.name || 'N/A'
+
+  const types: Record<string, string> = {
     personal: 'Personal Loan',
     home: 'Home Loan',
     vehicle: 'Vehicle Loan',
     business: 'Business Loan',
     education: 'Education Loan'
   }
-  return types[type as keyof typeof types] || type
+
+  return types[type] || type
 }
 
 export const getDocumentProgress = (documents?: DocumentRequirement[]) => {
