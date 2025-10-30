@@ -217,12 +217,14 @@ router.post(
         req.user &&
         ['underwriter', 'system_admin', 'admin'].includes(req.user.role)
       ) {
-        application = await LoanApplication.findById(applicationId);
+        application = await LoanApplication.findById(applicationId)
+        .populate('loanType');
       } else {
         application = await LoanApplication.findOne({
           _id: applicationId,
           userId: req.user?.userId,
-        });
+        })
+        .populate('loanType');
       }
 
       if (!application) {
@@ -319,25 +321,27 @@ router.post(
             } else {
               const applicantName = `${applicant.firstName} ${applicant.lastName}`;
 
-            // 1. Notify underwriters
-            await sendNewApplicationNotificationToUnderwriters(
-              applicantName,
-              application._id.toString(),
-              application.loanType,
-              application.amount
-            );
+              const loanTypeDoc = application.loanType as any;
+              const loanTypeName = loanTypeDoc?.name || loanTypeDoc?.title || 'Unknown';
+              // 1. Notify underwriters
+              await sendNewApplicationNotificationToUnderwriters(
+                applicantName,
+                application._id.toString(),
+                loanTypeName,
+                application.amount
+              );
 
-            // 2. Notify applicant about status update
-            await sendLoanStatusUpdateEmail(
-              applicant.email,
-              applicant.firstName,
-              application._id.toString(),
-              application.loanType,
-              application.amount,
-              'under_review',
-              'All required documents uploaded, application is now under review'
-            );
-          }
+              // 2. Notify applicant about status update
+              await sendLoanStatusUpdateEmail(
+                applicant.email,
+                applicant.firstName,
+                application._id.toString(),
+                loanTypeName,
+                application.amount,
+                'under_review',
+                'All required documents uploaded, application is now under review'
+              );
+            }
 
             res.json({
               success: true,

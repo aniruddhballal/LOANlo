@@ -6,6 +6,7 @@ import DocumentModel from '../models/Document';
 import underwriterRoutes from './loans/underwriter';
 import adminRoutes from './loans/admin';
 import { buildDocumentRequirements } from './loans/shared';
+import LoanType from '../models/LoanTypes';
 
 import {
   sendLoanApplicationSubmittedEmail,
@@ -30,6 +31,15 @@ router.post(
         return res.status(400).json({ success: false, message: 'User not found.' });
       }
 
+      // ADD: Validate that loanType ObjectId exists in LoanTypes collection
+      const loanTypeDoc = await LoanType.findById(loanType);
+      if (!loanTypeDoc) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid loan type.' 
+        });
+      }
+
       if (!user.isProfileComplete) {
         return res.status(400).json({
           success: false,
@@ -39,7 +49,7 @@ router.post(
       }
 
       const loanApplication = new LoanApplication({
-        loanType,
+        loanType, // Now stores ObjectId instead of string
         amount,
         purpose,
         tenure,
@@ -57,11 +67,12 @@ router.post(
       await loanApplication.save();
 
       // Send confirmation email to applicant
+      // CHANGE: Email now needs loanType name/display value
       await sendLoanApplicationSubmittedEmail(
         user.email,
         user.firstName,
         loanApplication._id.toString(),
-        loanType,
+        loanTypeDoc.name, // ← Pass the actual name, not ObjectId
         amount
       );
 
@@ -85,6 +96,7 @@ router.get(
     try {
       const applications = await LoanApplication.find({ userId: req.user?.userId })
         .populate('userId', 'firstName lastName email phone')
+        .populate('loanType')
         .sort({ createdAt: -1 });
 
       res.json({
@@ -113,7 +125,8 @@ router.get(
         .populate(
           'userId',
           'firstName lastName email phone role dateOfBirth gender aadhaarNumber panNumber address city state pincode employmentType companyName monthlyIncome'
-        );
+        )
+        .populate('loanType');
 
       if (!application) {
         return res.status(404).json({
@@ -177,7 +190,8 @@ router.delete(
         _id: applicationId,
         userId: req.user?.userId,
         isDeleted: { $ne: true } // Explicitly check it's not already deleted
-      }).populate('userId'); // Populate user data for email notifications
+      }).populate('userId') // Populate user data for email notifications
+      .populate('loanType');
      
       if (!application) {
         return res.status(404).json({
@@ -194,6 +208,8 @@ router.delete(
      
       // Get user data for email notifications
       const user = application.userId as any; // Populated user object (IUser)
+      const loanTypeDoc = application.loanType as any;
+      const loanTypeName = loanTypeDoc?.name || 'Unknown';
       const applicantEmail = user.email;
       const applicantFirstName = user.firstName;
       const applicantFullName = `${user.firstName} ${user.lastName}`;
@@ -221,7 +237,7 @@ router.delete(
         applicantEmail,
         applicantFirstName,
         applicationId,
-        loanType,
+        loanTypeName,
         amount,
         deletionTime
       ).catch(err => console.error('Failed to send deletion email to applicant:', err));
@@ -231,7 +247,7 @@ router.delete(
         sendApplicationDeletedNotificationToUnderwriters(
           applicantFullName,
           applicationId,
-          loanType,
+          loanTypeName,
           amount,
           previousStatus,
           deletionTime

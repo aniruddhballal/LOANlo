@@ -53,6 +53,7 @@ router.get(
             isDeleted: { $in: [true, false] }
           })
           .populate('userId', 'firstName lastName email phone')
+          .populate('loanType')
           .lean();
           
           return {
@@ -120,7 +121,8 @@ router.post(
       const application = await LoanApplication.findOne({
         _id: request.applicationId,
         isDeleted: true
-      });
+      })
+      .populate('loanType');
 
       if (!application) {
         return res.status(404).json({
@@ -176,6 +178,9 @@ router.post(
 
       const applicationIdStr = application._id.toString();
 
+      const loanTypeDoc = application.loanType as any;
+      const loanTypeName = loanTypeDoc?.name || loanTypeDoc?.title || 'Unknown';
+
       // Send approval email to underwriter
       if (underwriterEmail) {
         try {
@@ -184,7 +189,7 @@ router.post(
             underwriterName,
             applicantName,
             applicationIdStr,
-            application.loanType,
+            loanTypeName,
             application.amount,
             request.reason,
             notes?.trim()
@@ -202,7 +207,7 @@ router.post(
             applicant.email,
             applicantName,
             applicationIdStr,
-            application.loanType,
+            loanTypeName,
             application.amount,
             request.reason,
             underwriterName
@@ -271,7 +276,8 @@ router.post(
       const application = await LoanApplication.findOne({
         _id: request.applicationId,
         isDeleted: true
-      });
+      })
+      .populate('loanType');
       
       // Update request status
       request.status = 'rejected';
@@ -294,6 +300,8 @@ router.post(
           ? `${applicant.firstName} ${applicant.lastName}`
           : 'Unknown Applicant';
         const applicationIdStr = application._id.toString();
+        const loanTypeDoc = application.loanType as any;
+        const loanTypeName = loanTypeDoc?.name || loanTypeDoc?.title || 'Unknown';
         // Send rejection email to underwriter
         try {
           await sendRestorationRejectedEmail(
@@ -301,7 +309,7 @@ router.post(
             underwriterName,
             applicantName,
             applicationIdStr,
-            application.loanType,
+            loanTypeName,
             application.amount,
             request.reason,
             notes.trim()

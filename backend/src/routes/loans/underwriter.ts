@@ -9,6 +9,7 @@ import {
   sendLoanStatusUpdateEmail,
   sendDocumentsRequestedEmail,
 } from '../../utils/loanEmailService';
+import { populate } from 'dotenv';
 
 const router = Router();
 router.use(authenticateToken);
@@ -22,6 +23,7 @@ router.get(
 
       const applications = await LoanApplication.find({})
         .populate('userId', 'firstName lastName email phone role')
+        .populate('loanType')
         .sort({ createdAt: -1 });
 
       res.json({
@@ -60,7 +62,8 @@ router.put(
       };
 
       const application = await LoanApplication.findById(applicationId)
-        .populate('userId', 'firstName lastName email phone');
+        .populate('userId', 'firstName lastName email phone')
+        .populate('loanType');
 
       if (!application) {
         return res.status(404).json({
@@ -100,16 +103,19 @@ router.put(
           $push: { statusHistory: historyEntry }
         },
         { new: true, runValidators: true }
-      ).populate('userId', 'firstName lastName email phone role');
+      ).populate('userId', 'firstName lastName email phone role')
+      .populate('loanType');
 
       // Send status update email to applicant
       if (updatedApplication && updatedApplication.userId) {
         const applicant = updatedApplication.userId as any;
+        const loanTypeDoc = updatedApplication.loanType as any;
+        const loanTypeName = loanTypeDoc?.name || loanTypeDoc?.title || 'Unknown';
         await sendLoanStatusUpdateEmail(
           applicant.email,
           applicant.firstName,
           updatedApplication._id.toString(),
-          updatedApplication.loanType,
+          loanTypeName,
           updatedApplication.amount,
           status,
           comment,
@@ -141,7 +147,9 @@ router.post(
       const { applicationId } = req.params as { applicationId: string };
       const { documentList, message } = req.body as { documentList: string[]; message?: string };
 
-      const application = await LoanApplication.findById(applicationId);
+      const application = await LoanApplication.findById(applicationId)
+      .populate('userId', 'firstName lastName email phone')
+      .populate('loanType');
 
       if (!application) {
         return res.status(404).json({
@@ -167,16 +175,21 @@ router.post(
           $push: { statusHistory: historyEntry }
         },
         { new: true }
-      ).populate('userId', 'firstName lastName email phone role');
+      ).populate('userId', 'firstName lastName email phone role')
+      .populate('loanType');
 
       // Send documents requested email to applicant
       if (updatedApplication && updatedApplication.userId) {
         const applicant = updatedApplication.userId as any;
+
+        const loanTypeDoc = updatedApplication.loanType as any;
+        const loanTypeName = loanTypeDoc?.name || loanTypeDoc?.title || 'Unknown';
+
         await sendDocumentsRequestedEmail(
           applicant.email,
           applicant.firstName,
           updatedApplication._id.toString(),
-          updatedApplication.loanType,
+          loanTypeName,
           message
         );
       }
@@ -212,6 +225,7 @@ router.get(
         userId: { $in: activeUserIds }
       })
         .populate('userId', 'firstName lastName email phone role')
+        .populate('loanType')
         .sort({ deletedAt: -1 });
       
       res.json({
@@ -256,7 +270,8 @@ router.post(
       const application = await LoanApplication.findOne({
         _id: applicationId,
         isDeleted: true
-      }).populate('userId', 'firstName lastName email');
+      }).populate('userId', 'firstName lastName email')
+      .populate('loanType');
 
       if (!application) {
         return res.status(404).json({
@@ -312,6 +327,9 @@ router.post(
       // Get deletedAt date, fallback to current date if not set
       const deletedDate = application.deletedAt || new Date();
 
+      const loanTypeDoc = application.loanType as any;
+      const loanTypeName = loanTypeDoc?.name || loanTypeDoc?.title || 'Unknown';
+
       // Send confirmation email to underwriter
       try {
         await sendUnderwriterRestorationRequestConfirmation(
@@ -319,7 +337,7 @@ router.post(
           underwriterName,
           applicantName,
           applicationIdStr,
-          application.loanType,
+          loanTypeName,
           application.amount,
           deletedDate,
           reason.trim()
@@ -336,7 +354,7 @@ router.post(
           underwriterEmail,
           applicantName,
           applicationIdStr,
-          application.loanType,
+          loanTypeName,
           application.amount,
           deletedDate,
           reason.trim()
