@@ -1,4 +1,4 @@
-import type { LoanApplication, FilterState, SortConfig } from '../../../dashboards/types'
+import type { LoanApplication, FilterState, SortConfig } from '../../../types'
 import { formatApplicationId, formatCurrency, formatDate } from '../../../utils'
 
 export const searchInApplication = (app: LoanApplication, query: string): boolean => {
@@ -6,8 +6,7 @@ export const searchInApplication = (app: LoanApplication, query: string): boolea
   return (
     formatApplicationId(app._id).toLowerCase().includes(searchLower) ||
     `${app.userId?.firstName} ${app.userId?.lastName}`.toLowerCase().includes(searchLower) ||
-    app.userId?.email?.toLowerCase().includes(searchLower) ||
-    app.userId?.phone?.toLowerCase().includes(searchLower) ||
+    app.loanType?.name?.toLowerCase().includes(searchLower) || // added
     app.status?.toLowerCase().includes(searchLower) ||
     formatCurrency(app.amount).replace(/,/g, '').toLowerCase().includes(searchLower.replace(/,/g, '')) ||
     formatDate(app.createdAt).toLowerCase().includes(searchLower)

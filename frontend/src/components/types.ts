@@ -10,6 +10,11 @@ export interface LoanApplication {
     phone: string
     role: string
   }
+  loanType?: {
+    _id: string
+    title: string
+    name: string
+  }
   restorationRequest?: {
     _id: string
     status: 'pending' | 'approved' | 'rejected'

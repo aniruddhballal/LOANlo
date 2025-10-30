@@ -1,5 +1,5 @@
 import { ArrowUpDown, ChevronDown, ChevronUp, Clock } from 'lucide-react'
-import type { LoanApplication, SortConfig } from '../dashboards/types'
+import type { LoanApplication, SortConfig } from '../types'
 import { StatusBadge } from '../dashboards/shared/StatusBadge'
 import { formatCurrency, formatDate, formatTime, formatApplicationId } from '../utils'
 
@@ -119,7 +119,7 @@ export function ApplicationsTable({
                     </div>
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Contact Details
+                    Loan Type
                   </th>
                   <th 
                     onClick={() => handleSort('amount')}
@@ -178,9 +178,8 @@ export function ApplicationsTable({
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm">
-                        <div className="text-gray-900 font-medium">{app.userId?.email}</div>
-                        <div className="text-gray-600 font-light">{app.userId?.phone}</div>
+                      <div className="text-sm font-semibold text-gray-900">
+                        {app.loanType?.name.toUpperCase() || '—'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

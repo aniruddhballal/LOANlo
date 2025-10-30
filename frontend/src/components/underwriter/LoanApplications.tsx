@@ -7,7 +7,7 @@ import LoanReviewModal from '../ui/loan-review-modal'
 import { SearchFilterBar } from '../ui/search-filter-bar/SearchFilterBar'
 import { ApplicationsTable } from './ApplicationsTable'
 import { RestorationRequestModal } from './RestorationRequestModal'
-import type { LoanApplication, FilterState, SortConfig} from '../dashboards/types'
+import type { LoanApplication, FilterState, SortConfig} from '../types'
 import { applyFiltersAndSort } from '../ui/search-filter-bar/utils/searchFilterUtilsUnderwriter'
 import api from '../../api'
 

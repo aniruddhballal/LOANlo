@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (64)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (65)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (132)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (61)
+### ✅ Completed Initiatives (62)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -80,6 +80,7 @@
 | 192 | **Loan Application: Integrated LoanType Fetch by ID** | Replaced static loan type mapping with dynamic fetch. Added `LoanType` interface, `selectedLoanType` state, and `/loan-types/:id` API call. Updated `loanData` to store `loanTypeId`, passed new props to `LoanForm` and `ApplicationSummary`, and unified loading state for loan type and personal details checks. |
 | 193 | **Application Summary: Added selectedLoanType prop and dynamic loan type display** | Replaced static `loanType` with `loanTypeId`, introduced `LoanType` interface, added `selectedLoanType` prop, and updated UI to display loan type title dynamically from fetched data. |
 | 196 | **Frontend LoanType Refactor and Integration** | Replaced `loanTypeId` with `loanType` across applicant components (`ApplicationSummary`, `LoanApply`, `LoanForm`) and updated validation, payloads, and typings to reference `LoanType` ObjectIds. Enhanced search utilities to handle populated `LoanType` objects with name/title lookup. Ensures consistent LoanType usage and fixes undefined or mismatched type issues across the frontend loan application flow. |
+| 197 | **Frontend LoanType Integration in Underwriter Dashboard** | Added `loanType` field to `LoanApplication` interface and updated `searchFilterUtilsUnderwriter.ts` to include loan type name in search results. Modified `ApplicationsTable.tsx` to display the loan type name instead of applicant contact details. Ensures populated loan type data is searchable and visible in the underwriter dashboard for better clarity and filtering. |
 
 ### ⚡ In Progress (3)
 
@@ -240,6 +241,6 @@
 
 ---
 
-**Document Version:** 176
+**Document Version:** 177
 **Last Updated:** 30th October 2025
 **Maintained By:** Aniruddh Ballal
