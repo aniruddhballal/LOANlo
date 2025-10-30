@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (63)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (130)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (131)
 
 ---
 
@@ -95,7 +95,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (112)
+### ✅ Completed Initiatives (113)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -211,6 +211,7 @@
 | 187 | **Restoration Requests: Filter and Populate Active Users** | Updated `GET /restoration-requests` route to include only requests made by active (non-deleted) users and exclude those tied to deleted applicants, while still fetching applications regardless of deletion status for context. |
 | 189 | **Loan Type Management Module Added** | Implemented full loan type management system. Created `loanTypeModel.ts` schema with validation and timestamps. Added `loanTypeController.ts`, `loanTypeService.ts`, and `loanTypeRoutes.ts` for CRUD and toggle operations. Integrated new `LoanTypeCards.tsx` to fetch and display active types dynamically with icons and colors. Built `LoanTypeDetails.tsx` admin UI for creating, editing, and managing loan types with validations and backend sync. |
 | 190 | **Loan Type Selection - Separate Page Implementation** | Created new `LoanTypeSelection.tsx` page for loan type selection with card grid UI. Refactored `LoanApply.tsx` to remove inline loan cards and receive selected loan type via `location.state`, added selected loan badge with change option. Updated router to add `/select-loan-type` route and navigation links to redirect users to selection page before application form. |
+| 194 | **Loan Type Reference Integration** | Updated `LoanApplication` schema to reference the `LoanType` model instead of using string enums, importing `ILoanType` and adjusting the `loanType` field to store an ObjectId with population support. |
 
 ### ⚡ In Progress (18)
 
@@ -237,6 +238,6 @@
 
 ---
 
-**Document Version:** 173
-**Last Updated:** 29th October 2025
+**Document Version:** 174
+**Last Updated:** 30th October 2025
 **Maintained By:** Aniruddh Ballal

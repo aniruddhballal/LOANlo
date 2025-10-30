@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
 import { IUser } from './User';
+import { ILoanType } from './LoanTypes'
 
 export interface IStatusHistory {
   status: string;
@@ -18,7 +19,7 @@ export interface IApprovalDetails {
 export interface ILoanApplication extends Document {
   userId: Types.ObjectId | IUser | null; // allow populated user or null
 
-  loanType: 'personal' | 'home' | 'vehicle' | 'business' | 'education';
+  loanType: Types.ObjectId | ILoanType | null
   amount: number;
   purpose: string;
   tenure: number;
@@ -40,14 +41,9 @@ export interface ILoanApplication extends Document {
 
 }
 
-const loanApplicationSchema: Schema<ILoanApplication> = new Schema({
+const loanApplicationSchema = new Schema<ILoanApplication>({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-
-  loanType: {
-    type: String,
-    enum: ['personal', 'home', 'vehicle', 'business', 'education'],
-    required: true
-  },
+  loanType: { type: Schema.Types.ObjectId, ref: 'LoanType', required: true }, // changed here
   amount: { type: Number, required: true },
   purpose: { type: String, required: true },
   tenure: { type: Number, required: true },
