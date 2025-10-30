@@ -278,7 +278,7 @@ const LoanTypeDetails: React.FC = () => {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                   placeholder="Personal Loan"
                 />
               </div>
@@ -291,7 +291,7 @@ const LoanTypeDetails: React.FC = () => {
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                   placeholder="Get instant personal loans"
                 />
               </div>
@@ -304,7 +304,7 @@ const LoanTypeDetails: React.FC = () => {
                   type="text"
                   value={formData.catchyPhrase}
                   onChange={(e) => setFormData({ ...formData, catchyPhrase: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                   placeholder="Quick funds for any personal need"
                 />
               </div>
@@ -318,7 +318,7 @@ const LoanTypeDetails: React.FC = () => {
                   step="0.1"
                   value={formData.interestRateMin}
                   onChange={(e) => setFormData({ ...formData, interestRateMin: parseFloat(e.target.value) || 0 })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 />
               </div>
 
@@ -331,7 +331,7 @@ const LoanTypeDetails: React.FC = () => {
                   step="0.1"
                   value={formData.interestRateMax}
                   onChange={(e) => setFormData({ ...formData, interestRateMax: parseFloat(e.target.value) || 0 })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 />
               </div>
 
@@ -343,7 +343,7 @@ const LoanTypeDetails: React.FC = () => {
                   type="number"
                   value={formData.maxAmount}
                   onChange={(e) => setFormData({ ...formData, maxAmount: parseInt(e.target.value) || 0 })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 />
               </div>
 
@@ -355,7 +355,7 @@ const LoanTypeDetails: React.FC = () => {
                   type="number"
                   value={formData.maxTenure}
                   onChange={(e) => setFormData({ ...formData, maxTenure: parseInt(e.target.value) || 1 })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 />
               </div>
 
@@ -369,7 +369,7 @@ const LoanTypeDetails: React.FC = () => {
                     type="text"
                     value={feature}
                     onChange={(e) => updateFeature(idx, e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                     placeholder={`Feature ${idx + 1}`}
                   />
                 ))}
