@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import LoanTypes, { ILoanType } from '../models/LoanTypes';
+import LoanType, { ILoanType } from '../models/LoanTypes';
 import { AuthenticatedRequest, authenticateToken } from '../middleware/auth';
 
 const router = Router();
@@ -18,7 +18,7 @@ router.get(
       // If includeInactive, get all loan types (for underwriters/admin)
       const query = includeInactive ? {} : { isActive: true };
       
-      const loanTypes = await LoanTypes.find(query).sort({ createdAt: -1 });
+      const loanTypes = await LoanType.find(query).sort({ createdAt: -1 });
       
       res.json({
         success: true,
@@ -43,7 +43,7 @@ router.get(
   '/:id',
   async (req: Request, res: Response) => {
     try {
-      const loanType = await LoanTypes.findById(req.params.id);
+      const loanType = await LoanType.findById(req.params.id);
       
       if (!loanType) {
         return res.status(404).json({ 
@@ -83,7 +83,7 @@ router.get(
   '/type/:loanTypeId',
   async (req: Request, res: Response) => {
     try {
-      const loanType = await LoanTypes.findOne({ 
+      const loanType = await LoanType.findOne({ 
         loanTypeId: req.params.loanTypeId,
         isActive: true 
       });
@@ -201,7 +201,7 @@ router.post(
       }
 
       // Create new loan type
-      const loanType = new LoanTypes({
+      const loanType = new LoanType({
         name,
         title,
         catchyPhrase,
@@ -270,7 +270,7 @@ router.put(
       } = req.body;
 
       // Check if loan type exists
-      const existingLoanType = await LoanTypes.findById(req.params.id);
+      const existingLoanType = await LoanType.findById(req.params.id);
       if (!existingLoanType) {
         return res.status(404).json({ 
           success: false,
@@ -345,7 +345,7 @@ router.put(
       if (isActive !== undefined) updateData.isActive = isActive;
 
       // Update loan type
-      const loanType = await LoanTypes.findByIdAndUpdate(
+      const loanType = await LoanType.findByIdAndUpdate(
         req.params.id,
         updateData,
         { 
@@ -404,7 +404,7 @@ router.patch(
         });
       }
 
-      const loanType = await LoanTypes.findById(req.params.id);
+      const loanType = await LoanType.findById(req.params.id);
       
       if (!loanType) {
         return res.status(404).json({ 
@@ -462,7 +462,7 @@ router.delete(
       
       if (hardDelete) {
         // Hard delete - permanently remove from database
-        const loanType = await LoanTypes.findByIdAndDelete(req.params.id);
+        const loanType = await LoanType.findByIdAndDelete(req.params.id);
         
         if (!loanType) {
           return res.status(404).json({ 
@@ -478,7 +478,7 @@ router.delete(
         });
       } else {
         // Soft delete - set isActive to false
-        const loanType = await LoanTypes.findByIdAndUpdate(
+        const loanType = await LoanType.findByIdAndUpdate(
           req.params.id,
           { 
             isActive: false, 
@@ -560,7 +560,7 @@ router.post(
         }
       }
       
-      const createdLoanTypes = await LoanTypes.insertMany(loanTypes);
+      const createdLoanTypes = await LoanType.insertMany(loanTypes);
       
       res.status(201).json({
         success: true,
