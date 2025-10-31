@@ -90,6 +90,10 @@
 | 151 | **System Admin Review Modal for Restoration Requests** | Implementing dedicated review modal for System Admin Dashboard restoration requests. Creating modal similar to `LoanReviewModal` that displays comprehensive loan applicant profile details and underwriter profile information before action execution. Consolidating three action buttons (Approve/Reject/Delete) from cluttered table "Actions" column into single "Review" button that opens modal. Modal contains tabbed or sectioned view showing applicant details, underwriter details, restoration reason, and action buttons with appropriate validation (rejection reason required, DELETE confirmation for permanent deletion). Improves UX by reducing table width and providing contextual information before decision-making. |
 | 162 | **Unifying "Back to Dashboard" Buttons** | Standardizing the placement and styling of all "Back to Dashboard" buttons across the app to ensure consistent UX and make it easy for users to locate navigation options. |
 | 175 | **Revamping the UI** | Making the whole website, all the pages in the website more micor-interactive, and stylish yet giving a classy corporate look - make use of shimmers, and other hover animations. |
+| 200 | **Applicant-Side UI: Display Support Contacts** | Add visible support contact details of either the assigned underwriter or system administrator in applicant-facing emails and relevant UI pages for better accessibility. |
+| 201 | **UI/UX Optimization: Reduce Empty Space and Add Microinteractions** | Address excessive white space across the app by introducing subtle animations and compacting or merging adjacent data fields and components to improve layout density. |
+| 202 | **Loan Details Display: Total Repayment Summary** | After loan approval, display total repayment amount (Principal + Interest). For other statuses (pending, under_review, documents_requested), show only principal, interest rate, and tenure. |
+| 203 | **Skeleton Loader Alignment: Underwriter Dashboard Table** | Adjust underwriter-side loading skeletons so that column headings and skeleton widths align perfectly with their corresponding loaded table columns. |
 
 ---
 
@@ -238,9 +242,11 @@
 | 168 | **Global Support Contact Link** | Add a "Contact Support" link on every page of the website and every mail that gets sent to all the users of the application for consistent user access to help and assistance. |
 | 176 | **Loan Email Service: Refactor & Modularization** | Refactoring the large `loanEmailService.ts` (~830 lines) into smaller, modular hooks/functions grouped by feature (application emails, restoration emails, profile emails, underwriter/admin notifications) to improve readability, maintainability, and testability. |
 | 177 | **Profile Restoration: Admin Reason & History Tracking** | Implemented system admin prompt for restoration reason when restoring a user profile, similar to loan application restoration. Added `ProfileHistory` model to track deletion timestamps, user-provided deletion reasons, and admin-provided restoration reasons for audit and record-keeping. |
+| 198 | **Profile Restoration: Custom Admin Message Support** | Allow system admins to enter a custom restoration message instead of the default “Profile restored by system administrator.” Determine the storage location (existing or new MongoDB field) for restoration messages to maintain audit consistency. |
+| 199 | **Loan Application: Monthly Income and Legal Document Review** | Evaluate replacing annual income with monthly income for loan applicants. Verify standard income data requirements and mandatory documents for Indian loan applications to ensure legal and practical alignment. |
 
 ---
 
-**Document Version:** 177
-**Last Updated:** 30th October 2025
+**Document Version:** 178
+**Last Updated:** 31st October 2025
 **Maintained By:** Aniruddh Ballal
