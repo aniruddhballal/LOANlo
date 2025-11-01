@@ -118,66 +118,94 @@ export const ServiceActionsSkeleton = () => (
   </SkeletonBase>
 );
 
-// Table Row Skeleton (for UnderwriterDashboard desktop table)
+// Table Row Skeleton (for UnderwriterDashboard desktop table) - UPDATED TO MATCH ACTUAL DIMENSIONS
 export const TableRowSkeleton = () => (
-  <tr className="hover:bg-gray-50/50">
+  <tr className="hover:bg-gray-50/70">
+    {/* Loan Application ID - matches font-mono text-xs with padding */}
     <td className="px-6 py-4 whitespace-nowrap">
-      <SkeletonBox className="w-20 h-6 rounded" />
+      <SkeletonBox className="w-32 h-6 rounded" />
     </td>
+    
+    {/* Applicant Name - Avatar + Name */}
     <td className="px-6 py-4">
       <div className="flex items-center space-x-3">
-        <SkeletonCircle className="w-8 h-8" />
+        <SkeletonCircle className="w-12 h-12" />
         <div>
-          <SkeletonText className="w-32 mb-1" />
-          <SkeletonText className="w-16 h-3" />
+          <SkeletonText className="w-44 h-5" />
         </div>
       </div>
     </td>
+    
+    {/* Loan Type - text-sm font-semibold uppercase */}
     <td className="px-6 py-4">
-      <SkeletonText className="w-40 mb-1" />
-      <SkeletonText className="w-28 h-3" />
+      <SkeletonText className="w-28 h-4" />
     </td>
+    
+    {/* Amount Requested - text-lg font-bold (currency) */}
     <td className="px-6 py-4 whitespace-nowrap">
-      <SkeletonText className="w-20 h-5" />
+      <SkeletonText className="w-28 h-6" />
     </td>
+    
+    {/* Status Badge - rounded badge */}
     <td className="px-6 py-4 whitespace-nowrap">
-      <SkeletonBox className="w-16 h-6 rounded-full" />
+      <SkeletonBox className="w-24 h-7 rounded-full" />
     </td>
+    
+    {/* Initiated - Date and Time (2 lines) */}
     <td className="px-6 py-4 whitespace-nowrap">
-      <SkeletonText className="w-20 mb-1" />
-      <SkeletonText className="w-16 h-3" />
+      <SkeletonText className="w-28 h-4 mb-1" />
+      <SkeletonText className="w-20 h-3" />
     </td>
+    
+    {/* Actions - Button (Review/Request/Awaiting) */}
     <td className="px-6 py-4 whitespace-nowrap">
-      <SkeletonBox className="w-16 h-7 rounded-lg" />
+      <SkeletonBox className="w-24 h-9 rounded-lg" />
     </td>
   </tr>
 );
 
-// Mobile Card Skeleton (for UnderwriterDashboard mobile view)
+// Mobile Card Skeleton (for UnderwriterDashboard mobile view) - UPDATED TO MATCH ACTUAL DIMENSIONS
 export const MobileCardSkeleton = () => (
-  <div className="border border-gray-200 rounded-xl p-6">
-    <div className="flex items-center justify-between mb-4">
+  <div className="border border-gray-200 rounded-2xl p-6 hover:bg-gray-50/70">
+    {/* Header: Avatar + Name + ID and Status Badge */}
+    <div className="flex items-center justify-between mb-5">
       <div className="flex items-center space-x-3">
-        <SkeletonCircle className="w-10 h-10" />
+        <SkeletonCircle className="w-12 h-12" />
         <div>
-          <SkeletonText className="w-32 mb-1" />
-          <SkeletonBox className="w-20 h-6 rounded" />
+          <SkeletonText className="w-36 h-5 mb-2" />
+          <SkeletonBox className="w-28 h-6 rounded" />
         </div>
       </div>
-      <SkeletonBox className="w-16 h-6 rounded-full" />
+      <SkeletonBox className="w-24 h-7 rounded-full" />
     </div>
 
-    <div className="space-y-3 mb-4">
-      {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="flex justify-between">
-          <SkeletonText className="w-16 h-3" />
-          <SkeletonText className="w-24 h-3" />
-        </div>
-      ))}
+    {/* Details Section - Amount, Email, Phone, Submitted */}
+    <div className="space-y-3 mb-5">
+      {/* Amount */}
+      <div className="flex justify-between items-center">
+        <SkeletonText className="w-16 h-4" />
+        <SkeletonText className="w-28 h-6" />
+      </div>
+      {/* Email */}
+      <div className="flex justify-between items-center">
+        <SkeletonText className="w-12 h-4" />
+        <SkeletonText className="w-40 h-4" />
+      </div>
+      {/* Phone */}
+      <div className="flex justify-between items-center">
+        <SkeletonText className="w-12 h-4" />
+        <SkeletonText className="w-32 h-4" />
+      </div>
+      {/* Submitted */}
+      <div className="flex justify-between items-center">
+        <SkeletonText className="w-20 h-4" />
+        <SkeletonText className="w-28 h-4" />
+      </div>
     </div>
 
-    <div className="flex items-center space-x-2 pt-4 border-t border-gray-100">
-      <SkeletonBox className="flex-1 h-8 rounded-lg" />
+    {/* Action Button */}
+    <div className="flex items-center space-x-2 pt-5 border-t border-gray-100">
+      <SkeletonBox className="flex-1 h-12 rounded-xl" />
     </div>
   </div>
 );
@@ -190,11 +218,11 @@ export const UnderwriterTableSkeleton = ({ rows = 5 }) => (
       <div className="hidden lg:block">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50/50 border-b border-gray-200">
+            <thead className="bg-gradient-to-r from-gray-50 to-gray-100/50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   <div className="flex items-center gap-2">
-                    Loan Application ID
+                    LOAN APPLICATION ID
                     <div className="w-4 h-4" />
                   </div>
                 </th>

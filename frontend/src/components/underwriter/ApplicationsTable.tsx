@@ -202,7 +202,7 @@ export function ApplicationsTable({
                           <div className="flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg pending-pulse">
                             <Clock className="w-4 h-4 text-yellow-600" />
                             <span className="text-xs font-semibold text-yellow-700">
-                              Awaiting Review
+                              Review
                             </span>
                           </div>
                         ) : (
@@ -210,7 +210,7 @@ export function ApplicationsTable({
                             onClick={() => handleRequestRestoration(app._id)}
                             className="shimmer-button px-4 py-2 text-xs font-semibold bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all duration-200"
                           >
-                            Request Admin
+                            Request
                           </button>
                         )
                       ) : (
@@ -279,7 +279,7 @@ export function ApplicationsTable({
                     <div className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-xl pending-pulse">
                       <Clock className="w-4 h-4 text-yellow-600" />
                       <span className="text-sm font-semibold text-yellow-700">
-                        Awaiting Review
+                        Review
                       </span>
                     </div>
                   ) : (
@@ -287,7 +287,7 @@ export function ApplicationsTable({
                       onClick={() => handleRequestRestoration(app._id)}
                       className="shimmer-button flex-1 px-5 py-3 text-sm font-semibold bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:shadow-lg hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                     >
-                      Request Admin
+                      Request
                     </button>
                   )
                 ) : (
