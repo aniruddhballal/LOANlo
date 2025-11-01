@@ -193,22 +193,37 @@ export const UnderwriterTableSkeleton = ({ rows = 5 }) => (
             <thead className="bg-gray-50/50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Loan Application ID
+                  <div className="flex items-center gap-2">
+                    Loan Application ID
+                    <div className="w-4 h-4" />
+                  </div>
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Applicant Name
+                  <div className="flex items-center gap-2">
+                    Applicant Name
+                    <div className="w-4 h-4" />
+                  </div>
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Loan Type
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Amount Requested
+                  <div className="flex items-center gap-2">
+                    Amount Requested
+                    <div className="w-4 h-4" />
+                  </div>
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Status Of Loan
+                  <div className="flex items-center gap-2">
+                    Status of Loan
+                    <div className="w-4 h-4" />
+                  </div>
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Initiated
+                  <div className="flex items-center gap-2">
+                    Initiated
+                    <div className="w-4 h-4" />
+                  </div>
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Actions
