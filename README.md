@@ -6,8 +6,8 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (65)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (132)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (69)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (134)
 
 ---
 
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (62)
+### ✅ Completed Initiatives (64)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -84,7 +84,7 @@
 | 197 | **Frontend LoanType Integration in Underwriter Dashboard** | Added `loanType` field to `LoanApplication` interface and updated `searchFilterUtilsUnderwriter.ts` to include loan type name in search results. Modified `ApplicationsTable.tsx` to display the loan type name instead of applicant contact details. Ensures populated loan type data is searchable and visible in the underwriter dashboard for better clarity and filtering. |
 | 203 | **Skeleton Loader Alignment: Underwriter Dashboard Table** | Adjust underwriter-side loading skeletons so that column headings and skeleton widths align perfectly with their corresponding loaded table columns. |
 
-### ⚡ In Progress (3)
+### ⚡ In Progress (5)
 
 | ID | Initiative | Status |
 |----|-----------|--------|
@@ -220,7 +220,7 @@
 | 194 | **Loan Type Reference Integration** | Updated `LoanApplication` schema to reference the `LoanType` model instead of using string enums, importing `ILoanType` and adjusting the `loanType` field to store an ObjectId with population support. |
 | 195 | **LoanType Integration Across Loan Workflows** | Populated and validated `loanType` in all major routes (upload (`documents.ts`), applicant (`loans.ts`), `admin.ts`, `underwriter.ts`) and email notifications. Replaced raw ObjectIds with populated `LoanType` data, ensuring correct `name/title` usage and fixing undefined loan type issues across loan creation, updates, restoration, and document workflows. |
 
-### ⚡ In Progress (18)
+### ⚡ In Progress (20)
 
 | ID | Initiative | Status |
 |----|-----------|--------|
@@ -247,6 +247,6 @@
 
 ---
 
-**Document Version:** 179
-**Last Updated:** 1st November 2025
+**Document Version:** 180
+**Last Updated:** 2nd November 2025
 **Maintained By:** Aniruddh Ballal
