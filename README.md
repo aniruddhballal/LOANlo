@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (72)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (73)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (135)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (67)
+### ✅ Completed Initiatives (68)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -86,6 +86,7 @@
 | 204 | **Table Skeleton: Made headings generic for reusability across different tables** | Replaced specific column heading text with generic skeleton boxes of varying widths, allowing the same `UnderwriterTableSkeleton` component to be reused for Underwriter, Applicant, and Admin tables without width mismatches. |
 | 205 | **Modal Flicker Fix: Eliminated background flash when opening LoanReviewModal** | Fixed by converting modal to React Portal, removing conflicting `transition-opacity` class from backdrop, adding `willChange` properties for optimized rendering, and adding `isolation: isolate` to `#root`. |
 | 206 | **Loan Application Refactor: Modularized components and added dynamic form handling** | Split main loan application logic into `LoanApply`, `LoanForm`, and `FormFields` components, implemented reusable field rendering with props, improved state management for form data and loan type selection, and enabled dynamic updates and validation across nested components. |
+| 208 | **ErrorMessage UI Simplification** | Refactored `ErrorMessage` component to match the visual style of `LoanForm`. Replaced bordered red container with a lightweight inline text layout using a red alert icon and concise typography for cleaner, more consistent form feedback. |
 
 ### ⚡ In Progress (5)
 
@@ -95,7 +96,7 @@
 | 151 | **System Admin Review Modal for Restoration Requests** | Implementing dedicated review modal for System Admin Dashboard restoration requests. Creating modal similar to `LoanReviewModal` that displays comprehensive loan applicant profile details and underwriter profile information before action execution. Consolidating three action buttons (Approve/Reject/Delete) from cluttered table "Actions" column into single "Review" button that opens modal. Modal contains tabbed or sectioned view showing applicant details, underwriter details, restoration reason, and action buttons with appropriate validation (rejection reason required, DELETE confirmation for permanent deletion). Improves UX by reducing table width and providing contextual information before decision-making. |
 | 162 | **Unifying "Back to Dashboard" Buttons** | Standardizing the placement and styling of all "Back to Dashboard" buttons across the app to ensure consistent UX and make it easy for users to locate navigation options. |
 | 200 | **Applicant-Side UI: Display Support Contacts** | Add visible support contact details of either the assigned underwriter or system administrator in applicant-facing emails and relevant UI pages for better accessibility. |
-| 201 | **UI/UX Optimization: Reduce Empty Space and Add Microinteractions, Modify Error Message Displays** | Address excessive white space across the app by introducing subtle animations and compacting or merging adjacent data fields and components to improve layout density. Modify the Personal Details page - error displays for invlid input formats|
+| 201 | **UI/UX Optimization: Reduce Empty Space and Add Microinteractions, Modify Error Message Displays** | Address excessive white space across the app by introducing subtle animations and compacting or merging adjacent data fields and components to improve layout density.
 | 202 | **Loan Details Display: Total Repayment Summary** | After loan approval, display total repayment amount (Principal + Interest). For other statuses (pending, under_review, documents_requested), show only principal, interest rate, and tenure. |
 
 ---
@@ -251,6 +252,6 @@
 
 ---
 
-**Document Version:** 184
+**Document Version:** 185
 **Last Updated:** 8th November 2025
 **Maintained By:** Aniruddh Ballal
