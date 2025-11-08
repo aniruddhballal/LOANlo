@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (72)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (134)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (135)
 
 ---
 
@@ -104,7 +104,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (114)
+### ✅ Completed Initiatives (115)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -222,6 +222,7 @@
 | 190 | **Loan Type Selection - Separate Page Implementation** | Created new `LoanTypeSelection.tsx` page for loan type selection with card grid UI. Refactored `LoanApply.tsx` to remove inline loan cards and receive selected loan type via `location.state`, added selected loan badge with change option. Updated router to add `/select-loan-type` route and navigation links to redirect users to selection page before application form. |
 | 194 | **Loan Type Reference Integration** | Updated `LoanApplication` schema to reference the `LoanType` model instead of using string enums, importing `ILoanType` and adjusting the `loanType` field to store an ObjectId with population support. |
 | 195 | **LoanType Integration Across Loan Workflows** | Populated and validated `loanType` in all major routes (upload (`documents.ts`), applicant (`loans.ts`), `admin.ts`, `underwriter.ts`) and email notifications. Replaced raw ObjectIds with populated `LoanType` data, ensuring correct `name/title` usage and fixing undefined loan type issues across loan creation, updates, restoration, and document workflows. |
+| 207 | **Backend Refactor & Feature: Centralized loan application validation middleware** | Introduced and integrated `validateLoanApplication` middleware to handle loan type existence, status, amount limits, tenure, and purpose validation; removed inline validation from `POST /apply`, improved request validation flow, and passed validated loan type via `req.validatedLoanType` for cleaner, reusable backend logic. |
 
 ### ⚡ In Progress (20)
 
@@ -250,6 +251,6 @@
 
 ---
 
-**Document Version:** 183
+**Document Version:** 184
 **Last Updated:** 8th November 2025
 **Maintained By:** Aniruddh Ballal

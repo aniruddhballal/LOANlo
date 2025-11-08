@@ -6,7 +6,6 @@ import DocumentModel from '../models/Document';
 import underwriterRoutes from './loans/underwriter';
 import adminRoutes from './loans/admin';
 import { buildDocumentRequirements } from './loans/shared';
-import LoanType from '../models/LoanTypes';
 
 import {
   sendLoanApplicationSubmittedEmail,
@@ -14,13 +13,20 @@ import {
 
 import { sendApplicationDeletedEmail, sendApplicationDeletedNotificationToUnderwriters } from '../utils/loanEmailService';
 
+// Import the validation middleware
+import { validateLoanApplication } from '../validators/loanApplicationValidator';
+
 const router = Router();
 
 router.post(
   '/apply',
   authenticateToken,
+  validateLoanApplication, // ← Now imported from separate file
   async (
-    req: Request<{}, {}, { loanType: string; amount: number; purpose: string; tenure: number }> & { user?: any }, 
+    req: Request<{}, {}, { loanType: string; amount: number; purpose: string; tenure: number }> & { 
+      user?: any; 
+      validatedLoanType?: any;
+    }, 
     res: Response
   ) => {
     try {
@@ -31,14 +37,7 @@ router.post(
         return res.status(400).json({ success: false, message: 'User not found.' });
       }
 
-      // ADD: Validate that loanType ObjectId exists in LoanTypes collection
-      const loanTypeDoc = await LoanType.findById(loanType);
-      if (!loanTypeDoc) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'Invalid loan type.' 
-        });
-      }
+      const loanTypeDoc = req.validatedLoanType;
 
       if (!user.isProfileComplete) {
         return res.status(400).json({
