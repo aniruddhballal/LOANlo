@@ -63,6 +63,104 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
 }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const handleFirstNameChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    if (!value.trim()) {
+      setErrors(prev => ({ ...prev, firstName: "First name is required" }));
+    } else if (value.trim().length < 2) {
+      setErrors(prev => ({ ...prev, firstName: "First name must be at least 2 characters" }));
+    } else {
+      setErrors(prev => {
+        const { firstName, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const handleLastNameChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    if (!value.trim()) {
+      setErrors(prev => ({ ...prev, lastName: "Last name is required" }));
+    } else if (value.trim().length < 2) {
+      setErrors(prev => ({ ...prev, lastName: "Last name must be at least 2 characters" }));
+    } else {
+      setErrors(prev => {
+        const { lastName, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const handleDateOfBirthChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    if (!value) {
+      setErrors(prev => ({ ...prev, dateOfBirth: "Date of birth is required" }));
+    } else {
+      const dob = new Date(value);
+      if (isNaN(dob.getTime())) {
+        setErrors(prev => ({ ...prev, dateOfBirth: "Please enter a valid date" }));
+      } else {
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
+        
+        if (age < 18) {
+          setErrors(prev => ({ ...prev, dateOfBirth: "You must be at least 18 years old to apply" }));
+        } else {
+          setErrors(prev => {
+            const { dateOfBirth, ...rest } = prev;
+            return rest;
+          });
+        }
+      }
+    }
+  };
+
+  const handleGenderChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    if (!value) {
+      setErrors(prev => ({ ...prev, gender: "Please select your gender" }));
+    } else {
+      setErrors(prev => {
+        const { gender, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const handleMaritalStatusChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    if (!value) {
+      setErrors(prev => ({ ...prev, maritalStatus: "Please select your marital status" }));
+    } else {
+      setErrors(prev => {
+        const { maritalStatus, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
   const handleAadhaarChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
   > = (e) => {
@@ -116,10 +214,11 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
             label="First Name"
             focusedField={focusedField}
             formData={formData}
-            onChange={onFieldChange}
+            onChange={handleFirstNameChange}
             onFocus={onFocus}
             onBlur={onBlur}
           />
+          {errors.firstName && <ErrorMessage message={errors.firstName} />}
         </div>
         <div>
           <InputField
@@ -127,10 +226,11 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
             label="Last Name"
             focusedField={focusedField}
             formData={formData}
-            onChange={onFieldChange}
+            onChange={handleLastNameChange}
             onFocus={onFocus}
             onBlur={onBlur}
           />
+          {errors.lastName && <ErrorMessage message={errors.lastName} />}
         </div>
         <div>
           <InputField
@@ -139,19 +239,11 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
             type="date"
             focusedField={focusedField}
             formData={formData}
-            onChange={onFieldChange}
+            onChange={handleDateOfBirthChange}
             onFocus={onFocus}
             onBlur={onBlur}
           />
-          {formData.dateOfBirth && (() => {
-            const dob = new Date(formData.dateOfBirth);
-            if (isNaN(dob.getTime())) return null;
-            const today = new Date();
-            let age = today.getFullYear() - dob.getFullYear();
-            const monthDiff = today.getMonth() - dob.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
-            return age < 18 ? <ErrorMessage message="You must be at least 18 years old to apply" /> : null;
-          })()}
+          {errors.dateOfBirth && <ErrorMessage message={errors.dateOfBirth} />}
         </div>
         <div>
           <SelectField
@@ -160,10 +252,11 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
             options={SELECT_OPTIONS.gender}
             focusedField={focusedField}
             formData={formData}
-            onChange={onFieldChange}
+            onChange={handleGenderChange}
             onFocus={onFocus}
             onBlur={onBlur}
           />
+          {errors.gender && <ErrorMessage message={errors.gender} />}
         </div>
         <div>
           <SelectField
@@ -172,10 +265,11 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
             options={SELECT_OPTIONS.maritalStatus}
             focusedField={focusedField}
             formData={formData}
-            onChange={onFieldChange}
+            onChange={handleMaritalStatusChange}
             onFocus={onFocus}
             onBlur={onBlur}
           />
+          {errors.maritalStatus && <ErrorMessage message={errors.maritalStatus} />}
         </div>
         <div className="lg:col-span-2">
           <InputField
