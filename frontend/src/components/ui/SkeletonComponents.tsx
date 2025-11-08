@@ -220,41 +220,26 @@ export const UnderwriterTableSkeleton = ({ rows = 5 }) => (
           <table className="w-full">
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100/50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  <div className="flex items-center gap-2">
-                    LOAN APPLICATION ID
-                    <div className="w-4 h-4" />
-                  </div>
+                <th className="px-6 py-4">
+                  <SkeletonText className="w-32 h-3" />
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  <div className="flex items-center gap-2">
-                    Applicant Name
-                    <div className="w-4 h-4" />
-                  </div>
+                <th className="px-6 py-4">
+                  <SkeletonText className="w-28 h-3" />
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Loan Type
+                <th className="px-6 py-4">
+                  <SkeletonText className="w-20 h-3" />
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  <div className="flex items-center gap-2">
-                    Amount Requested
-                    <div className="w-4 h-4" />
-                  </div>
+                <th className="px-6 py-4">
+                  <SkeletonText className="w-32 h-3" />
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  <div className="flex items-center gap-2">
-                    Status of Loan
-                    <div className="w-4 h-4" />
-                  </div>
+                <th className="px-6 py-4">
+                  <SkeletonText className="w-24 h-3" />
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  <div className="flex items-center gap-2">
-                    Initiated
-                    <div className="w-4 h-4" />
-                  </div>
+                <th className="px-6 py-4">
+                  <SkeletonText className="w-20 h-3" />
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Actions
+                <th className="px-6 py-4">
+                  <SkeletonText className="w-16 h-3" />
                 </th>
               </tr>
             </thead>

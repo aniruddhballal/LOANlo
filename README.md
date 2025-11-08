@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (69)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (70)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (134)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (64)
+### ✅ Completed Initiatives (65)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -83,6 +83,7 @@
 | 196 | **Frontend LoanType Refactor and Integration** | Replaced `loanTypeId` with `loanType` across applicant components (`ApplicationSummary`, `LoanApply`, `LoanForm`) and updated validation, payloads, and typings to reference `LoanType` ObjectIds. Enhanced search utilities to handle populated `LoanType` objects with name/title lookup. Ensures consistent LoanType usage and fixes undefined or mismatched type issues across the frontend loan application flow. |
 | 197 | **Frontend LoanType Integration in Underwriter Dashboard** | Added `loanType` field to `LoanApplication` interface and updated `searchFilterUtilsUnderwriter.ts` to include loan type name in search results. Modified `ApplicationsTable.tsx` to display the loan type name instead of applicant contact details. Ensures populated loan type data is searchable and visible in the underwriter dashboard for better clarity and filtering. |
 | 203 | **Skeleton Loader Alignment: Underwriter Dashboard Table** | Adjust underwriter-side loading skeletons so that column headings and skeleton widths align perfectly with their corresponding loaded table columns. |
+| 204 | **Table Skeleton: Made headings generic for reusability across different tables** | Replaced specific column heading text with generic skeleton boxes of varying widths, allowing the same `UnderwriterTableSkeleton` component to be reused for Underwriter, Applicant, and Admin tables without width mismatches. |
 
 ### ⚡ In Progress (5)
 
@@ -247,6 +248,6 @@
 
 ---
 
-**Document Version:** 180
-**Last Updated:** 2nd November 2025
+**Document Version:** 181
+**Last Updated:** 8th November 2025
 **Maintained By:** Aniruddh Ballal
