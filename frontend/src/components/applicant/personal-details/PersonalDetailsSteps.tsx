@@ -336,15 +336,16 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
   const handleEmailChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
   > = (e) => {
-    let value = '';
-    if (e.target instanceof HTMLInputElement) {
-      value = e.target.value;
-    }
+    const value = e.target.value;
     onFieldChange(e);
 
-    if (value && !isValidEmail(value)) {
+    // Always re-validate to clear or set errors
+    if (!value.trim()) {
+      setErrors(prev => ({ ...prev, email: "Email address is required" }));
+    } else if (!isValidEmail(value)) {
       setErrors(prev => ({ ...prev, email: "Please enter a valid email address" }));
     } else {
+      // Clear the error when valid
       setErrors(prev => {
         const { email, ...rest } = prev;
         return rest;
@@ -355,17 +356,68 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
   const handlePhoneChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
   > = (e) => {
-    let value = '';
-    if (e.target instanceof HTMLInputElement) {
-      value = e.target.value;
-    }
+    const value = e.target.value;
     onFieldChange(e);
 
-    if (value && !isValidPhone(value)) {
+    // Always re-validate to clear or set errors
+    if (!value.trim()) {
+      setErrors(prev => ({ ...prev, phone: "Phone number is required" }));
+    } else if (!isValidPhone(value)) {
       setErrors(prev => ({ ...prev, phone: "Phone number must be 10 digits starting with 6-9" }));
     } else {
+      // Clear the error when valid
       setErrors(prev => {
         const { phone, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const handleAddressChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    if (!value.trim()) {
+      setErrors(prev => ({ ...prev, address: "Address is required" }));
+    } else if (value.trim().length < 10) {
+      setErrors(prev => ({ ...prev, address: "Address must be at least 10 characters" }));
+    } else {
+      setErrors(prev => {
+        const { address, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const handleCityChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    if (!value.trim()) {
+      setErrors(prev => ({ ...prev, city: "City is required" }));
+    } else {
+      setErrors(prev => {
+        const { city, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const handleStateChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    if (!value.trim()) {
+      setErrors(prev => ({ ...prev, state: "State is required" }));
+    } else {
+      setErrors(prev => {
+        const { state, ...rest } = prev;
         return rest;
       });
     }
@@ -409,9 +461,23 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
             }
           } as React.ChangeEvent<HTMLInputElement>;
 
-          // Call onFieldChange for both fields
+          const validEvent = {
+            target: { 
+              name: 'pincodeValid', 
+              value: 'true',
+              type: 'text'
+            }
+          } as React.ChangeEvent<HTMLInputElement>;
+
           onFieldChange(cityEvent);
           onFieldChange(stateEvent);
+          onFieldChange(validEvent);
+          
+          // ADD THIS: Clear ALL errors including pincode error
+          setErrors(prev => {
+            const { city, state, pincode, ...rest } = prev;  // CHANGE: Also remove 'pincode' from errors
+            return rest;
+          });
           
           setPincodeSuccess(true);
           setTimeout(() => setPincodeSuccess(false), 3000);
@@ -421,13 +487,33 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
           ...prev, 
           pincode: "Invalid pincode or no data found" 
         }));
+        
+        // Set pincode as invalid
+        const errorEvent = {
+          target: { 
+            name: 'pincodeValid', 
+            value: 'false',
+            type: 'text'
+          }
+        } as React.ChangeEvent<HTMLInputElement>;
+        onFieldChange(errorEvent);
       }
     } catch (error) {
-      console.error('Pincode API Error:', error); // Debug log
+      console.error('Pincode API Error:', error);
       setErrors(prev => ({ 
         ...prev, 
         pincode: "Failed to fetch pincode details. Please try again." 
       }));
+      
+      // ADD THIS: Set pincode as invalid on API error too
+      const errorEvent = {
+        target: { 
+          name: 'pincodeValid', 
+          value: 'false',
+          type: 'text'
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      onFieldChange(errorEvent);
     } finally {
       setPincodeLoading(false);
     }
@@ -438,7 +524,6 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
   > = (e) => {
     let value = e.target.value.replace(/\D/g, '');
         
-    // Create a new event with the cleaned value
     const syntheticEvent = {
       ...e,
       target: {
@@ -450,15 +535,32 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
     
     onFieldChange(syntheticEvent);
 
-    if (value && !isValidPincode(value)) {
+    if (!value.trim()) {
+      setErrors(prev => ({ ...prev, pincode: "Pincode is required" }));
+      // Set as invalid
+      const invalidEvent = {
+        target: { name: 'pincodeValid', value: 'false', type: 'text' }
+      } as React.ChangeEvent<HTMLInputElement>;
+      onFieldChange(invalidEvent);
+    } else if (!isValidPincode(value)) {
       setErrors(prev => ({ ...prev, pincode: "Pincode must be 6 digits" }));
+      // Set as invalid
+      const invalidEvent = {
+        target: { name: 'pincodeValid', value: 'false', type: 'text' }
+      } as React.ChangeEvent<HTMLInputElement>;
+      onFieldChange(invalidEvent);
     } else {
       setErrors(prev => {
         const { pincode, ...rest } = prev;
         return rest;
       });
       
-      // Fetch pincode details when valid
+      // ADD THIS: Set as "pending" while API call is in progress
+      const pendingEvent = {
+        target: { name: 'pincodeValid', value: 'pending', type: 'text' }
+      } as React.ChangeEvent<HTMLInputElement>;
+      onFieldChange(pendingEvent);
+      
       if (value.length === 6) {
         fetchPincodeDetails(value);
       }
@@ -507,10 +609,11 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
             label="Residential Address"
             focusedField={focusedField}
             formData={formData}
-            onChange={onFieldChange}
+            onChange={handleAddressChange}
             onFocus={onFocus}
             onBlur={onBlur}
           />
+          {errors.address && <ErrorMessage message={errors.address} />}
         </div>
         <div className="lg:col-span-2">
           <div className="relative">
@@ -527,7 +630,7 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
               onBlur={onBlur}
             />
             {pincodeLoading && (
-              <div className="absolute right-3 top-9">
+              <div className="absolute right-3 top-10">
                 <svg className="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -544,10 +647,11 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
             label="City"
             focusedField={focusedField}
             formData={formData}
-            onChange={onFieldChange}
+            onChange={handleCityChange}
             onFocus={onFocus}
             onBlur={onBlur}
           />
+          {errors.city && <ErrorMessage message={errors.city} />}
         </div>
         <div>
           <InputField
@@ -555,10 +659,11 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
             label="State"
             focusedField={focusedField}
             formData={formData}
-            onChange={onFieldChange}
+            onChange={handleStateChange}
             onFocus={onFocus}
             onBlur={onBlur}
           />
+          {errors.state && <ErrorMessage message={errors.state} />}
         </div>
       </div>
     </div>

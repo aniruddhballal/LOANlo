@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (74)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (75)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (135)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (69)
+### ✅ Completed Initiatives (70)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -88,6 +88,7 @@
 | 206 | **Loan Application Refactor: Modularized components and added dynamic form handling** | Split main loan application logic into `LoanApply`, `LoanForm`, and `FormFields` components, implemented reusable field rendering with props, improved state management for form data and loan type selection, and enabled dynamic updates and validation across nested components. |
 | 208 | **ErrorMessage UI Simplification** | Refactored `ErrorMessage` component to match the visual style of `LoanForm`. Replaced bordered red container with a lightweight inline text layout using a red alert icon and concise typography for cleaner, more consistent form feedback. |
 | 209 | **PersonalInfoStep Validation Expansion** | Enhanced `PersonalInfoStep` in `PersonalDetailsSteps.tsx` with full inline validation for all fields. Added dedicated handlers for first name, last name, date of birth, gender, and marital status with specific error messages and age verification logic. Improved user feedback consistency using `ErrorMessage` for each input field. |
+| 210 | **ContactInfoStep Validation and Pincode State Sync** | Expanded `ContactInfoStep` in `PersonalDetailsSteps.tsx` with full field-level validation for email, phone, address, city, state, and pincode. Added inline error messages with consistent `ErrorMessage` usage. Enhanced pincode logic to manage validity states (`true`, `false`, `pending`) via `pincodeValid`, ensuring real-time syncing with API success/failure and automatic clearing of related errors upon valid lookup. |
 
 ### ⚡ In Progress (5)
 
@@ -253,6 +254,6 @@
 
 ---
 
-**Document Version:** 186
+**Document Version:** 187
 **Last Updated:** 8th November 2025
 **Maintained By:** Aniruddh Ballal
