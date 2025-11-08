@@ -1,32 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { InputField, SelectField, TextareaField, CurrencyField } from './FormComponents';
 import type { PersonalDetailsFormProps  } from './types';
 import { SELECT_OPTIONS, STEP_INFO } from './constants';
-import { useState } from 'react';
-
-// Validation functions
-const isValidEmail = (email: string) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-const isValidPAN = (pan: string) => {
-  const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-  return panRegex.test(pan);
-};
-
-const isValidAadhaar = (aadhaar: string) => {
-  return aadhaar.length === 12 && /^\d{12}$/.test(aadhaar);
-};
-
-const isValidPhone = (phone: string) => {
-  const phoneRegex = /^[6-9]\d{9}$/;
-  return phoneRegex.test(phone);
-};
-
-const isValidPincode = (pincode: string) => {
-  return pincode.length === 6 && /^\d{6}$/.test(pincode);
-};
+import { validateField } from './validationRules';
 
 // Error message component with consistent styling matching LoanForm
 const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
@@ -63,143 +39,39 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
 }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleFirstNameChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    if (!value.trim()) {
-      setErrors(prev => ({ ...prev, firstName: "First name is required" }));
-    } else if (value.trim().length < 2) {
-      setErrors(prev => ({ ...prev, firstName: "First name must be at least 2 characters" }));
-    } else {
-      setErrors(prev => {
-        const { firstName, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const handleLastNameChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    if (!value.trim()) {
-      setErrors(prev => ({ ...prev, lastName: "Last name is required" }));
-    } else if (value.trim().length < 2) {
-      setErrors(prev => ({ ...prev, lastName: "Last name must be at least 2 characters" }));
-    } else {
-      setErrors(prev => {
-        const { lastName, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const handleDateOfBirthChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    if (!value) {
-      setErrors(prev => ({ ...prev, dateOfBirth: "Date of birth is required" }));
-    } else {
-      const dob = new Date(value);
-      if (isNaN(dob.getTime())) {
-        setErrors(prev => ({ ...prev, dateOfBirth: "Please enter a valid date" }));
-      } else {
-        const today = new Date();
-        let age = today.getFullYear() - dob.getFullYear();
-        const monthDiff = today.getMonth() - dob.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
-        
-        if (age < 18) {
-          setErrors(prev => ({ ...prev, dateOfBirth: "You must be at least 18 years old to apply" }));
-        } else {
-          setErrors(prev => {
-            const { dateOfBirth, ...rest } = prev;
-            return rest;
-          });
-        }
+  // CHANGED: Generic handler using validateField from validationRules
+  const createFieldHandler = (fieldName: string, transform?: (value: string) => string) => {
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      let value = e.target.value;
+      
+      // Apply transformation if provided (e.g., toUpperCase for PAN)
+      if (transform && e.target instanceof HTMLInputElement) {
+        value = transform(value);
+        e.target.value = value;
       }
-    }
+      
+      onFieldChange(e);
+      
+      const error = validateField(fieldName, value);
+      if (error) {
+        setErrors(prev => ({ ...prev, [fieldName]: error }));
+      } else {
+        setErrors(prev => {
+          const { [fieldName]: _, ...rest } = prev;
+          return rest;
+        });
+      }
+    };
   };
 
-  const handleGenderChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    if (!value) {
-      setErrors(prev => ({ ...prev, gender: "Please select your gender" }));
-    } else {
-      setErrors(prev => {
-        const { gender, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const handleMaritalStatusChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    if (!value) {
-      setErrors(prev => ({ ...prev, maritalStatus: "Please select your marital status" }));
-    } else {
-      setErrors(prev => {
-        const { maritalStatus, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const handleAadhaarChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    let value = '';
-    if (e.target instanceof HTMLInputElement) {
-      value = e.target.value.replace(/\D/g, "");
-      e.target.value = value;
-    }
-    onFieldChange(e);
-
-    if (value && !isValidAadhaar(value)) {
-      setErrors(prev => ({ ...prev, aadhaarNumber: "Aadhaar number must be 12 digits" }));
-    } else {
-      setErrors(prev => {
-        const { aadhaarNumber, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const handlePANChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    let value = '';
-    if (e.target instanceof HTMLInputElement) {
-      value = e.target.value.toUpperCase();
-      e.target.value = value;
-    }
-    onFieldChange(e);
-
-    if (value && !isValidPAN(value)) {
-      setErrors(prev => ({ ...prev, panNumber: "PAN must be in format: ABCDE1234F" }));
-    } else {
-      setErrors(prev => {
-        const { panNumber, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
+  // CHANGED: Using the generic handler
+  const handleFirstNameChange = createFieldHandler('firstName');
+  const handleLastNameChange = createFieldHandler('lastName');
+  const handleDateOfBirthChange = createFieldHandler('dateOfBirth');
+  const handleGenderChange = createFieldHandler('gender');
+  const handleMaritalStatusChange = createFieldHandler('maritalStatus');
+  const handleAadhaarChange = createFieldHandler('aadhaarNumber', (value) => value.replace(/\D/g, ""));
+  const handlePANChange = createFieldHandler('panNumber', (value) => value.toUpperCase());
 
   return (
     <div className="space-y-8">
@@ -285,9 +157,6 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
             onBlur={onBlur}
           />
           {errors.aadhaarNumber && <ErrorMessage message={errors.aadhaarNumber} />}
-          {!errors.aadhaarNumber && formData.aadhaarNumber && formData.aadhaarNumber.length > 0 && formData.aadhaarNumber.length < 12 && (
-            <ErrorMessage message="Aadhaar number must be exactly 12 digits" />
-          )}
         </div>
         <div className="lg:col-span-2">
           <InputField
@@ -302,9 +171,7 @@ export const PersonalInfoStep: React.FC<PersonalDetailsFormProps> = ({
             inputMode="text"
             pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
           />
-          {(errors.panNumber || (formData.panNumber && !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(formData.panNumber))) && (
-            <ErrorMessage message="PAN must be 10 characters in format: ABCDE1234F" />
-          )}
+          {errors.panNumber && <ErrorMessage message={errors.panNumber} />}
         </div>
       </div>
     </div>
@@ -333,98 +200,33 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
   const [pincodeLoading, setPincodeLoading] = useState(false);
   const [pincodeSuccess, setPincodeSuccess] = useState(false);
 
-  const handleEmailChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    // Always re-validate to clear or set errors
-    if (!value.trim()) {
-      setErrors(prev => ({ ...prev, email: "Email address is required" }));
-    } else if (!isValidEmail(value)) {
-      setErrors(prev => ({ ...prev, email: "Please enter a valid email address" }));
-    } else {
-      // Clear the error when valid
-      setErrors(prev => {
-        const { email, ...rest } = prev;
-        return rest;
-      });
-    }
+  // CHANGED: Generic handler using validateField
+  const createFieldHandler = (fieldName: string) => {
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      const value = e.target.value;
+      onFieldChange(e);
+      
+      const error = validateField(fieldName, value);
+      if (error) {
+        setErrors(prev => ({ ...prev, [fieldName]: error }));
+      } else {
+        setErrors(prev => {
+          const { [fieldName]: _, ...rest } = prev;
+          return rest;
+        });
+      }
+    };
   };
 
-  const handlePhoneChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    // Always re-validate to clear or set errors
-    if (!value.trim()) {
-      setErrors(prev => ({ ...prev, phone: "Phone number is required" }));
-    } else if (!isValidPhone(value)) {
-      setErrors(prev => ({ ...prev, phone: "Phone number must be 10 digits starting with 6-9" }));
-    } else {
-      // Clear the error when valid
-      setErrors(prev => {
-        const { phone, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const handleAddressChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    if (!value.trim()) {
-      setErrors(prev => ({ ...prev, address: "Address is required" }));
-    } else if (value.trim().length < 10) {
-      setErrors(prev => ({ ...prev, address: "Address must be at least 10 characters" }));
-    } else {
-      setErrors(prev => {
-        const { address, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const handleCityChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    if (!value.trim()) {
-      setErrors(prev => ({ ...prev, city: "City is required" }));
-    } else {
-      setErrors(prev => {
-        const { city, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const handleStateChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    if (!value.trim()) {
-      setErrors(prev => ({ ...prev, state: "State is required" }));
-    } else {
-      setErrors(prev => {
-        const { state, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
+  const handleEmailChange = createFieldHandler('email');
+  const handlePhoneChange = createFieldHandler('phone');
+  const handleAddressChange = createFieldHandler('address');
+  const handleCityChange = createFieldHandler('city');
+  const handleStateChange = createFieldHandler('state');
 
   const fetchPincodeDetails = async (pincode: string) => {
-    if (!isValidPincode(pincode)) {
+    // Keep pincode validation check
+    if (pincode.length !== 6 || !/^\d{6}$/.test(pincode)) {
       return;
     }
 
@@ -442,9 +244,7 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
       if (data[0].Status === "Success" && data[0].PostOffice && data[0].PostOffice.length > 0) {
         const postOffice = data[0].PostOffice[0];
                 
-        // Use setTimeout to batch updates and prevent pincode field interference
         setTimeout(() => {
-          // Create synthetic events to trigger the form update
           const cityEvent = {
             target: { 
               name: 'city', 
@@ -473,9 +273,8 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
           onFieldChange(stateEvent);
           onFieldChange(validEvent);
           
-          // ADD THIS: Clear ALL errors including pincode error
           setErrors(prev => {
-            const { city, state, pincode, ...rest } = prev;  // CHANGE: Also remove 'pincode' from errors
+            const { city, state, pincode, ...rest } = prev;
             return rest;
           });
           
@@ -488,7 +287,6 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
           pincode: "Invalid pincode or no data found" 
         }));
         
-        // Set pincode as invalid
         const errorEvent = {
           target: { 
             name: 'pincodeValid', 
@@ -505,7 +303,6 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
         pincode: "Failed to fetch pincode details. Please try again." 
       }));
       
-      // ADD THIS: Set pincode as invalid on API error too
       const errorEvent = {
         target: { 
           name: 'pincodeValid', 
@@ -535,27 +332,20 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
     
     onFieldChange(syntheticEvent);
 
-    if (!value.trim()) {
-      setErrors(prev => ({ ...prev, pincode: "Pincode is required" }));
-      // Set as invalid
-      const invalidEvent = {
-        target: { name: 'pincodeValid', value: 'false', type: 'text' }
-      } as React.ChangeEvent<HTMLInputElement>;
-      onFieldChange(invalidEvent);
-    } else if (!isValidPincode(value)) {
-      setErrors(prev => ({ ...prev, pincode: "Pincode must be 6 digits" }));
-      // Set as invalid
+    // CHANGED: Use validateField instead of manual validation
+    const error = validateField('pincode', value);
+    if (error) {
+      setErrors(prev => ({ ...prev, pincode: error }));
       const invalidEvent = {
         target: { name: 'pincodeValid', value: 'false', type: 'text' }
       } as React.ChangeEvent<HTMLInputElement>;
       onFieldChange(invalidEvent);
     } else {
-      setErrors(prev => {
-        const { pincode, ...rest } = prev;
-        return rest;
-      });
+      // CHANGED: Don't clear pincode error here - wait for API validation to succeed
+      // The error will be cleared by fetchPincodeDetails when API returns success
+      // setErrors(prev => { const { pincode, ...rest } = prev; return rest; });
       
-      // ADD THIS: Set as "pending" while API call is in progress
+      // Set as pending while waiting for API validation
       const pendingEvent = {
         target: { name: 'pincodeValid', value: 'pending', type: 'text' }
       } as React.ChangeEvent<HTMLInputElement>;
@@ -679,93 +469,29 @@ export const EmploymentInfoStep: React.FC<PersonalDetailsFormProps> = ({
 }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleEmploymentTypeChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    if (!value) {
-      setErrors(prev => ({ ...prev, employmentType: "Please select employment type" }));
-    } else {
-      setErrors(prev => {
-        const { employmentType, ...rest } = prev;
-        return rest;
-      });
-    }
+  // CHANGED: Generic handler using validateField
+  const createFieldHandler = (fieldName: string) => {
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      const value = e.target.value;
+      onFieldChange(e);
+      
+      const error = validateField(fieldName, value);
+      if (error) {
+        setErrors(prev => ({ ...prev, [fieldName]: error }));
+      } else {
+        setErrors(prev => {
+          const { [fieldName]: _, ...rest } = prev;
+          return rest;
+        });
+      }
+    };
   };
 
-  const handleCompanyNameChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    if (!value.trim()) {
-      setErrors(prev => ({ ...prev, companyName: "Company name is required" }));
-    } else {
-      setErrors(prev => {
-        const { companyName, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const handleDesignationChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    if (!value.trim()) {
-      setErrors(prev => ({ ...prev, designation: "Designation is required" }));
-    } else {
-      setErrors(prev => {
-        const { designation, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const handleWorkExperienceChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    const years = Number(value);
-    if (!value) {
-      setErrors(prev => ({ ...prev, workExperience: "Work experience is required" }));
-    } else if (isNaN(years) || years < 0) {
-      setErrors(prev => ({ ...prev, workExperience: "Please enter a valid number of years" }));
-    } else {
-      setErrors(prev => {
-        const { workExperience, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const handleMonthlyIncomeChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  > = (e) => {
-    const value = e.target.value;
-    onFieldChange(e);
-
-    const income = Number(value);
-    if (!value) {
-      setErrors(prev => ({ ...prev, monthlyIncome: "Monthly income is required" }));
-    } else if (isNaN(income) || income < 1000) {
-      setErrors(prev => ({ ...prev, monthlyIncome: "Monthly income must be at least ₹1,000" }));
-    } else if (income > 10000000) {
-      setErrors(prev => ({ ...prev, monthlyIncome: "Monthly income cannot exceed ₹1,00,00,000" }));
-    } else {
-      setErrors(prev => {
-        const { monthlyIncome, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
+  const handleEmploymentTypeChange = createFieldHandler('employmentType');
+  const handleCompanyNameChange = createFieldHandler('companyName');
+  const handleDesignationChange = createFieldHandler('designation');
+  const handleWorkExperienceChange = createFieldHandler('workExperience');
+  const handleMonthlyIncomeChange = createFieldHandler('monthlyIncome');
 
   return (
     <div className="space-y-8">
@@ -843,75 +569,31 @@ export const EmploymentInfoStep: React.FC<PersonalDetailsFormProps> = ({
   );
 };
 
-// Export validation functions for use in parent component
+// CHANGED: Export validation function that uses VALIDATION_RULES
 export const validateStep = (
   step: number,
   formData: any,
   requiredFieldsByStep: { [key: number]: (keyof any)[] }
 ): boolean => {
-  // 1. Required fields check
-  const requiredFieldsValid = requiredFieldsByStep[step]?.every((field) => {
+  const requiredFields = requiredFieldsByStep[step] || [];
+  
+  const fieldsValid = requiredFields.every((field) => {
     const value = formData[field];
-    return value !== null && value !== undefined && value.toString().trim() !== '';
-  }) || false;
-
-  if (!requiredFieldsValid) return false;
-
-  // 2. Step-specific validations
-  switch (step) {
-    case 1:
-      // Personal info + ID validations
-      return (
-        formData.firstName?.trim() &&
-        formData.firstName?.trim().length >= 2 &&
-        formData.lastName?.trim() &&
-        formData.lastName?.trim().length >= 2 &&
-        formData.dateOfBirth?.trim() &&
-        formData.gender?.trim() &&
-        formData.maritalStatus?.trim() &&
-        // Age check: 18+
-        (() => {
-          const dob = new Date(formData.dateOfBirth);
-          if (isNaN(dob.getTime())) return false;
-          const today = new Date();
-          let age = today.getFullYear() - dob.getFullYear();
-          const monthDiff = today.getMonth() - dob.getMonth();
-          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
-          return age >= 18;
-        })() &&
-        // Aadhaar & PAN
-        /^\d{12}$/.test(formData.aadhaarNumber || '') &&
-        /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.panNumber || '')
-      );
-
-    case 2:
-      // Contact + address validations
-      return (
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email || '') &&
-        /^[6-9]\d{9}$/.test(formData.phone || '') &&
-        formData.address?.trim() &&
-        formData.address?.trim().length >= 10 &&
-        formData.city?.trim() &&
-        formData.state?.trim() &&
-        /^\d{6}$/.test(formData.pincode || '') &&
-        formData.pincodeValid === 'true'  // CHANGE: Only allow 'true', not 'pending' -> waits for postal api response
-      );
-
-    case 3:
-      // Employment + numeric validations
-      const workExp = Number(formData.workExperience);
-      const monthlyIncome = Number(formData.monthlyIncome);
-      return (
-        formData.employmentType?.trim() &&
-        formData.companyName?.trim() &&
-        formData.designation?.trim() &&
-        !isNaN(workExp) &&
-        workExp >= 0 &&
-        !isNaN(monthlyIncome) &&
-        monthlyIncome >= 1000 && monthlyIncome <= 10000000
-      );
-
-    default:
+    
+    // Must have a value
+    if (value === null || value === undefined || value.toString().trim() === '') {
       return false;
+    }
+    
+    // Must pass validation rule
+    const error = validateField(field as string, value);
+    return error === null;
+  });
+
+  // SPECIAL CASE: For step 2 (Contact Info), also check if pincode API validation succeeded
+  if (step === 2) {
+    return fieldsValid && formData.pincodeValid === 'true';
   }
+
+  return fieldsValid;
 };
