@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (75)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (76)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (135)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (70)
+### ✅ Completed Initiatives (71)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -89,6 +89,7 @@
 | 208 | **ErrorMessage UI Simplification** | Refactored `ErrorMessage` component to match the visual style of `LoanForm`. Replaced bordered red container with a lightweight inline text layout using a red alert icon and concise typography for cleaner, more consistent form feedback. |
 | 209 | **PersonalInfoStep Validation Expansion** | Enhanced `PersonalInfoStep` in `PersonalDetailsSteps.tsx` with full inline validation for all fields. Added dedicated handlers for first name, last name, date of birth, gender, and marital status with specific error messages and age verification logic. Improved user feedback consistency using `ErrorMessage` for each input field. |
 | 210 | **ContactInfoStep Validation and Pincode State Sync** | Expanded `ContactInfoStep` in `PersonalDetailsSteps.tsx` with full field-level validation for email, phone, address, city, state, and pincode. Added inline error messages with consistent `ErrorMessage` usage. Enhanced pincode logic to manage validity states (`true`, `false`, `pending`) via `pincodeValid`, ensuring real-time syncing with API success/failure and automatic clearing of related errors upon valid lookup. |
+| 211 | **EmploymentInfoStep Validation Enhancement** | Upgraded `EmploymentInfoStep` in `PersonalDetailsSteps.tsx` with comprehensive inline validation for all employment-related fields. Added dedicated change handlers for `employmentType`, `companyName`, `designation`, `workExperience`, and `monthlyIncome`, each with contextual error messaging. Implemented numeric and range checks for work experience and income, ensuring realistic input validation and consistent `ErrorMessage` rendering across all fields. |
 
 ### ⚡ In Progress (5)
 
@@ -254,6 +255,6 @@
 
 ---
 
-**Document Version:** 187
+**Document Version:** 188
 **Last Updated:** 8th November 2025
 **Maintained By:** Aniruddh Ballal

@@ -676,67 +676,172 @@ export const EmploymentInfoStep: React.FC<PersonalDetailsFormProps> = ({
   onFieldChange,
   onFocus,
   onBlur
-}) => (
-  <div className="space-y-8">
-    <div className="text-center border-b pb-6">
-      <h3 className="text-2xl font-bold text-gray-900 mb-2 tracking-wide">{STEP_INFO[3].title}</h3>
-      <p className="text-gray-600 font-medium">{STEP_INFO[3].description}</p>
-    </div>
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <SelectField
-        name="employmentType"
-        label="Employment Type"
-        options={SELECT_OPTIONS.employmentType}
-        focusedField={focusedField}
-        formData={formData}
-        onChange={onFieldChange}
-        onFocus={onFocus}
-        onBlur={onBlur}
-      />
-      <InputField
-        name="companyName"
-        label="Company/Organization Name"
-        focusedField={focusedField}
-        formData={formData}
-        onChange={onFieldChange}
-        onFocus={onFocus}
-        onBlur={onBlur}
-      />
-      <InputField
-        name="designation"
-        label="Job Title/Designation"
-        focusedField={focusedField}
-        formData={formData}
-        onChange={onFieldChange}
-        onFocus={onFocus}
-        onBlur={onBlur}
-      />
-      <InputField
-        name="workExperience"
-        label="Work Experience (Years)"
-        type="number"
-        min="0"
-        focusedField={focusedField}
-        formData={formData}
-        onChange={onFieldChange}
-        onFocus={onFocus}
-        onBlur={onBlur}
-      />
-      <div className="lg:col-span-2">
-        <CurrencyField
-          name="monthlyIncome"
-          label="Monthly Income"
-          min="0"
-          focusedField={focusedField}
-          formData={formData}
-          onChange={onFieldChange}
-          onFocus={onFocus}
-          onBlur={onBlur}
-        />
+}) => {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleEmploymentTypeChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    if (!value) {
+      setErrors(prev => ({ ...prev, employmentType: "Please select employment type" }));
+    } else {
+      setErrors(prev => {
+        const { employmentType, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const handleCompanyNameChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    if (!value.trim()) {
+      setErrors(prev => ({ ...prev, companyName: "Company name is required" }));
+    } else {
+      setErrors(prev => {
+        const { companyName, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const handleDesignationChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    if (!value.trim()) {
+      setErrors(prev => ({ ...prev, designation: "Designation is required" }));
+    } else {
+      setErrors(prev => {
+        const { designation, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const handleWorkExperienceChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    const years = Number(value);
+    if (!value) {
+      setErrors(prev => ({ ...prev, workExperience: "Work experience is required" }));
+    } else if (isNaN(years) || years < 0) {
+      setErrors(prev => ({ ...prev, workExperience: "Please enter a valid number of years" }));
+    } else {
+      setErrors(prev => {
+        const { workExperience, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const handleMonthlyIncomeChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  > = (e) => {
+    const value = e.target.value;
+    onFieldChange(e);
+
+    const income = Number(value);
+    if (!value) {
+      setErrors(prev => ({ ...prev, monthlyIncome: "Monthly income is required" }));
+    } else if (isNaN(income) || income < 1000) {
+      setErrors(prev => ({ ...prev, monthlyIncome: "Monthly income must be at least ₹1,000" }));
+    } else if (income > 10000000) {
+      setErrors(prev => ({ ...prev, monthlyIncome: "Monthly income cannot exceed ₹1,00,00,000" }));
+    } else {
+      setErrors(prev => {
+        const { monthlyIncome, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="text-center border-b pb-6">
+        <h3 className="text-2xl font-bold text-gray-900 mb-2 tracking-wide">{STEP_INFO[3].title}</h3>
+        <p className="text-gray-600 font-medium">{STEP_INFO[3].description}</p>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <SelectField
+            name="employmentType"
+            label="Employment Type"
+            options={SELECT_OPTIONS.employmentType}
+            focusedField={focusedField}
+            formData={formData}
+            onChange={handleEmploymentTypeChange}
+            onFocus={onFocus}
+            onBlur={onBlur}
+          />
+          {errors.employmentType && <ErrorMessage message={errors.employmentType} />}
+        </div>
+        <div>
+          <InputField
+            name="companyName"
+            label="Company/Organization Name"
+            focusedField={focusedField}
+            formData={formData}
+            onChange={handleCompanyNameChange}
+            onFocus={onFocus}
+            onBlur={onBlur}
+          />
+          {errors.companyName && <ErrorMessage message={errors.companyName} />}
+        </div>
+        <div>
+          <InputField
+            name="designation"
+            label="Job Title/Designation"
+            focusedField={focusedField}
+            formData={formData}
+            onChange={handleDesignationChange}
+            onFocus={onFocus}
+            onBlur={onBlur}
+          />
+          {errors.designation && <ErrorMessage message={errors.designation} />}
+        </div>
+        <div>
+          <InputField
+            name="workExperience"
+            label="Work Experience (Years)"
+            type="number"
+            min="0"
+            focusedField={focusedField}
+            formData={formData}
+            onChange={handleWorkExperienceChange}
+            onFocus={onFocus}
+            onBlur={onBlur}
+          />
+          {errors.workExperience && <ErrorMessage message={errors.workExperience} />}
+        </div>
+        <div className="lg:col-span-2">
+          <CurrencyField
+            name="monthlyIncome"
+            label="Monthly Income"
+            min="0"
+            focusedField={focusedField}
+            formData={formData}
+            onChange={handleMonthlyIncomeChange}
+            onFocus={onFocus}
+            onBlur={onBlur}
+          />
+          {errors.monthlyIncome && <ErrorMessage message={errors.monthlyIncome} />}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Export validation functions for use in parent component
 export const validateStep = (
