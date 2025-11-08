@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (76)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (77)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (135)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (71)
+### ✅ Completed Initiatives (72)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -90,6 +90,7 @@
 | 209 | **PersonalInfoStep Validation Expansion** | Enhanced `PersonalInfoStep` in `PersonalDetailsSteps.tsx` with full inline validation for all fields. Added dedicated handlers for first name, last name, date of birth, gender, and marital status with specific error messages and age verification logic. Improved user feedback consistency using `ErrorMessage` for each input field. |
 | 210 | **ContactInfoStep Validation and Pincode State Sync** | Expanded `ContactInfoStep` in `PersonalDetailsSteps.tsx` with full field-level validation for email, phone, address, city, state, and pincode. Added inline error messages with consistent `ErrorMessage` usage. Enhanced pincode logic to manage validity states (`true`, `false`, `pending`) via `pincodeValid`, ensuring real-time syncing with API success/failure and automatic clearing of related errors upon valid lookup. |
 | 211 | **EmploymentInfoStep Validation Enhancement** | Upgraded `EmploymentInfoStep` in `PersonalDetailsSteps.tsx` with comprehensive inline validation for all employment-related fields. Added dedicated change handlers for `employmentType`, `companyName`, `designation`, `workExperience`, and `monthlyIncome`, each with contextual error messaging. Implemented numeric and range checks for work experience and income, ensuring realistic input validation and consistent `ErrorMessage` rendering across all fields. |
+| 212 | **validateStep Logic Alignment with New Validation Rules** | Updated `validateStep` to align with new inline validation logic across all personal detail steps. Reinforced field completeness checks, ensured Aadhaar and PAN patterns remain strict, and synchronized step 3’s numeric constraints with `EmploymentInfoStep` limits (₹1,000–₹1,00,00,000 and non-negative work experience). Maintained `pincodeValid === 'true'` enforcement for verified postal lookups. |
 
 ### ⚡ In Progress (5)
 
@@ -255,6 +256,6 @@
 
 ---
 
-**Document Version:** 188
+**Document Version:** 189
 **Last Updated:** 8th November 2025
 **Maintained By:** Aniruddh Ballal

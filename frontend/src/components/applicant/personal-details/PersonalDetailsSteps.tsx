@@ -863,7 +863,9 @@ export const validateStep = (
       // Personal info + ID validations
       return (
         formData.firstName?.trim() &&
+        formData.firstName?.trim().length >= 2 &&
         formData.lastName?.trim() &&
+        formData.lastName?.trim().length >= 2 &&
         formData.dateOfBirth?.trim() &&
         formData.gender?.trim() &&
         formData.maritalStatus?.trim() &&
@@ -888,9 +890,11 @@ export const validateStep = (
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email || '') &&
         /^[6-9]\d{9}$/.test(formData.phone || '') &&
         formData.address?.trim() &&
+        formData.address?.trim().length >= 10 &&
         formData.city?.trim() &&
         formData.state?.trim() &&
-        /^\d{6}$/.test(formData.pincode || '')
+        /^\d{6}$/.test(formData.pincode || '') &&
+        formData.pincodeValid === 'true'  // CHANGE: Only allow 'true', not 'pending' -> waits for postal api response
       );
 
     case 3:
