@@ -154,16 +154,22 @@ export default function LoanReviewModal({
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop with animation */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
-        style={{ animation: 'fadeIn 0.3s ease-out' }}
+        style={{ 
+          animation: 'fadeIn 0.3s ease-out',
+          willChange: 'opacity'
+        }}
       />
       
       {/* Modal */}
       <div className="relative flex items-center justify-center min-h-screen p-4">
         <div 
           className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-gray-200 relative"
-          style={{ animation: 'slideUpScale 0.4s ease-out' }}
+          style={{ 
+            animation: 'slideUpScale 0.4s ease-out',
+            willChange: 'transform, opacity'
+          }}
         >
           {/* Subtle gradient overlay at top */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-purple-500 to-blue-600"></div>

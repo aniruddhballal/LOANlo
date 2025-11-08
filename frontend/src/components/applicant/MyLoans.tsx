@@ -9,8 +9,9 @@ import { useAuth } from '../../context/AuthContext'
 import { MyLoansSkeleton } from '../ui/SkeletonComponents'
 import { applyFilters } from '../ui/search-filter-bar/utils/searchFilterUtilsApplicant'
 import { SearchFilterBar } from '../ui/search-filter-bar/SearchFilterBar'
-
 import { formatCurrency, formatDate, formatApplicationId } from '../utils'
+
+import { createPortal } from 'react-dom'
 
 interface LoanType {
   _id: string
@@ -542,12 +543,15 @@ const MyLoans = () => {
               </div>
             </section>
 
+            {selectedApplication && createPortal(
             <LoanReviewModal
               isOpen={!!selectedApplication}
               onClose={() => setSelectedApplication(null)}
               applicationId={selectedApplication?._id || ''}
               onApplicationUpdated={handleApplicationUpdated}
-            />
+            />,
+            document.body
+          )}
           </div>
         )}
 
