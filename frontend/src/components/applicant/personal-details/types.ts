@@ -12,6 +12,7 @@ export interface PersonalDetailsData {
   city: string;
   state: string;
   pincode: string;
+  pincodeValid?: string; // ADD THIS LINE - optional because it's set programmatically
   employmentType: string;
   companyName: string;
   designation: string;

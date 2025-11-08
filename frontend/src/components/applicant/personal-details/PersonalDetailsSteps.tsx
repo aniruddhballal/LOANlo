@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import { InputField, SelectField, TextareaField, CurrencyField } from './FormComponents';
 import type { PersonalDetailsFormProps  } from './types';
 import { SELECT_OPTIONS, STEP_INFO } from './constants';
@@ -197,6 +197,17 @@ export const ContactInfoStep: React.FC<PersonalDetailsFormProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pincodeLoading, setPincodeLoading] = useState(false);
   const [pincodeSuccess, setPincodeSuccess] = useState(false);
+
+  useEffect(() => {
+    const existingPincode = formData.pincode;
+    if (existingPincode && existingPincode.length === 6 && /^\d{6}$/.test(existingPincode)) {
+      // Trust that database pincode is valid, set flag without API call
+      const validEvent = {
+        target: { name: 'pincodeValid', value: 'true', type: 'text' }
+      } as React.ChangeEvent<HTMLInputElement>;
+      onFieldChange(validEvent);
+    }
+  }, []);
 
   // CHANGED: Generic handler using validateField
   const createFieldHandler = (fieldName: string) => {
