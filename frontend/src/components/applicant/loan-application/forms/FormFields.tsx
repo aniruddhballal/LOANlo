@@ -2,11 +2,11 @@ import React from 'react'
 
 interface BaseFieldProps {
   name: string
-  label: string
+  label?: string
   required?: boolean
   focusedField: string
   onFocus: (fieldName: string) => void
-  onBlur: () => void
+  onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void
 }
 
 interface SelectFieldProps extends BaseFieldProps {
@@ -18,12 +18,14 @@ interface SelectFieldProps extends BaseFieldProps {
 interface TextareaFieldProps extends BaseFieldProps {
   value: string
   rows?: number
+  maxLength?: number
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
 }
 
 interface CurrencyFieldProps extends BaseFieldProps {
   value: string
   min?: string
+  max?: string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
 }
@@ -40,9 +42,11 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   onChange
 }) => (
   <div className="relative group">
-    <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
-      {label}
-    </label>
+    {label && (
+      <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
+        {label}
+      </label>
+    )}
     <div className={`relative transition-all duration-300 ${focusedField === name ? 'transform scale-[1.02]' : ''}`}>
       <select
         name={name}
@@ -57,7 +61,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         }`}
         required={required}
       >
-        <option value="" className="text-gray-400">Select {label}</option>
+        <option value="" className="text-gray-400">Select {label || 'an option'}</option>
         {options.map((option) => (
           <option key={option.value} value={option.value} className="text-gray-800">
             {option.label}
@@ -79,15 +83,18 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
   value,
   required = true,
   rows = 4,
+  maxLength,
   focusedField,
   onFocus,
   onBlur,
   onChange
 }) => (
   <div className="relative group">
-    <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
-      {label}
-    </label>
+    {label && (
+      <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
+        {label}
+      </label>
+    )}
     <div className={`relative transition-all duration-300 ${focusedField === name ? 'transform scale-[1.02]' : ''}`}>
       <textarea
         name={name}
@@ -96,13 +103,14 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
         onFocus={() => onFocus(name)}
         onBlur={onBlur}
         rows={rows}
+        maxLength={maxLength}
         className={`w-full px-4 py-3 bg-white border-2 rounded-lg font-medium text-gray-800 placeholder-gray-400 resize-none transition-all duration-300 focus:outline-none hover:border-gray-400 ${
           focusedField === name 
             ? 'border-gray-800 shadow-lg transform scale-[1.01]' 
             : 'border-gray-200 shadow-sm'
         }`}
         required={required}
-        placeholder={`Enter ${label.toLowerCase()}`}
+        placeholder={`Enter ${label?.toLowerCase() || 'text'}`}
       />
     </div>
   </div>
@@ -114,6 +122,7 @@ export const CurrencyField: React.FC<CurrencyFieldProps> = ({
   value,
   required = true,
   min,
+  max,
   focusedField,
   onFocus,
   onBlur,
@@ -121,9 +130,11 @@ export const CurrencyField: React.FC<CurrencyFieldProps> = ({
   onKeyDown
 }) => (
   <div className="relative group">
-    <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
-      {label}
-    </label>
+    {label && (
+      <label className={`block text-sm font-semibold text-gray-800 mb-2 tracking-wide ${required ? "after:content-['*'] after:ml-1 after:text-red-500" : ''}`}>
+        {label}
+      </label>
+    )}
     <div className={`relative transition-all duration-300 ${focusedField === name ? 'transform scale-[1.02]' : ''}`}>
       <div className={`flex items-center bg-white border-2 rounded-lg transition-all duration-300 focus-within:outline-none hover:border-gray-400 ${
         focusedField === name 
@@ -138,10 +149,11 @@ export const CurrencyField: React.FC<CurrencyFieldProps> = ({
           onChange={onChange}
           onFocus={() => onFocus(name)}
           onBlur={onBlur}
-          onKeyDown={onKeyDown}       // <--- forward the prop here
+          onKeyDown={onKeyDown}
           className="flex-1 px-4 py-3 bg-transparent font-medium text-gray-800 placeholder-gray-400 focus:outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
           required={required}
           min={min}
+          max={max}
           placeholder="0"
         />
       </div>

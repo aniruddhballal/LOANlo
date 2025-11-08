@@ -22,29 +22,26 @@ interface LoanData {
   tenure: string
 }
 
+interface ValidationErrors {
+  amount?: string
+  tenure?: string
+  purpose?: string
+}
+
 interface LoanFormProps {
   loanTypeId: string
   loanData: LoanData
   focusedField: string
   loading: boolean
   isFormValid: boolean
+  validationErrors: ValidationErrors
+  selectedLoanType: LoanType | null
   onFocus: (fieldName: string) => void
-  onBlur: () => void
+  onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => Promise<void>
   onChangeLoanType: () => void
 }
-
-const tenureOptions = [
-  { value: '6', label: '6 Months' },
-  { value: '12', label: '12 Months' },
-  { value: '24', label: '24 Months' },
-  { value: '36', label: '36 Months' },
-  { value: '48', label: '48 Months' },
-  { value: '60', label: '60 Months' },
-  { value: '84', label: '84 Months' },
-  { value: '120', label: '120 Months' }
-]
 
 export const LoanForm: React.FC<LoanFormProps> = ({
   loanTypeId,
@@ -52,19 +49,28 @@ export const LoanForm: React.FC<LoanFormProps> = ({
   focusedField,
   loading,
   isFormValid,
+  validationErrors,
+  selectedLoanType,
   onFocus,
   onBlur,
   onChange,
   onSubmit,
   onChangeLoanType
 }) => {
-  const [loanType, setLoanType] = useState<LoanType | null>(null)
+  const [loanType, setLoanType] = useState<LoanType | null>(selectedLoanType)
   const [loadingLoanType, setLoadingLoanType] = useState(false)
   const [error, setError] = useState('')
 
+  // Sync with selectedLoanType prop
+  useEffect(() => {
+    if (selectedLoanType) {
+      setLoanType(selectedLoanType)
+    }
+  }, [selectedLoanType])
+
   // Fetch loan type details when loanTypeId changes
   useEffect(() => {
-    if (!loanTypeId) return
+    if (!loanTypeId || selectedLoanType) return
 
     const fetchLoanType = async () => {
       try {
@@ -82,7 +88,34 @@ export const LoanForm: React.FC<LoanFormProps> = ({
     }
 
     fetchLoanType()
-  }, [loanTypeId])
+  }, [loanTypeId, selectedLoanType])
+
+  // Generate tenure options based on maxTenure
+  const generateTenureOptions = () => {
+    if (!loanType) return []
+    
+    const maxTenureMonths = loanType.maxTenure * 12
+    const options = []
+    
+    // Add common tenure options up to max
+    const commonTenures = [6, 12, 24, 36, 48, 60, 84, 120, 180, 240, 300, 360]
+    
+    for (const months of commonTenures) {
+      if (months <= maxTenureMonths) {
+        const years = months / 12
+        const label = years < 1 
+          ? `${months} Months` 
+          : years === 1 
+            ? '1 Year' 
+            : `${years} Years`
+        options.push({ value: months.toString(), label })
+      }
+    }
+    
+    return options
+  }
+
+  const tenureOptions = generateTenureOptions()
 
   if (loadingLoanType) {
     return (
@@ -134,51 +167,104 @@ export const LoanForm: React.FC<LoanFormProps> = ({
             )}
           </div>
           
-          <CurrencyField
-            name="amount"
-            label={`Loan Amount Required (Max: ₹${loanType?.maxAmount?.toLocaleString() || '—'})`}
-            value={loanData.amount}
-            min="1000"
-            focusedField={focusedField}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            onChange={onChange}
-            onKeyDown={(e) => {
-              // Allow digits, backspace, delete, arrows, tab
-              if (
-                !/[0-9]/.test(e.key) &&
-                e.key !== 'Backspace' &&
-                e.key !== 'Delete' &&
-                e.key !== 'ArrowLeft' &&
-                e.key !== 'ArrowRight' &&
-                e.key !== 'Tab'
-              ) {
-                e.preventDefault()
-              }
-            }}
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Loan Amount Required
+              {loanType?.maxAmount && (
+                <span className="text-gray-500 font-normal ml-2">
+                  (Max: ₹{loanType.maxAmount.toLocaleString('en-IN')})
+                </span>
+              )}
+            </label>
+            <CurrencyField
+              name="amount"
+              value={loanData.amount}
+              min="10000"
+              max={loanType?.maxAmount?.toString()}
+              focusedField={focusedField}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              onChange={onChange}
+              onKeyDown={(e) => {
+                // Allow digits, backspace, delete, arrows, tab
+                if (
+                  !/[0-9]/.test(e.key) &&
+                  e.key !== 'Backspace' &&
+                  e.key !== 'Delete' &&
+                  e.key !== 'ArrowLeft' &&
+                  e.key !== 'ArrowRight' &&
+                  e.key !== 'Tab'
+                ) {
+                  e.preventDefault()
+                }
+              }}
+            />
+            {validationErrors.amount && (
+              <p className="text-red-600 text-sm mt-1 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {validationErrors.amount}
+              </p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">Minimum: ₹10,000</p>
+          </div>
           
-          <SelectField
-            name="tenure"
-            label={`Repayment Tenure (Max: ${loanType?.maxTenure || '—'} years)`}
-            value={loanData.tenure}
-            options={tenureOptions}
-            focusedField={focusedField}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            onChange={onChange}
-          />
-          
-          <div className="lg:col-span-2">
-            <TextareaField
-              name="purpose"
-              label="Purpose of Loan"
-              value={loanData.purpose}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Repayment Tenure
+              {loanType?.maxTenure && (
+                <span className="text-gray-500 font-normal ml-2">
+                  (Max: {loanType.maxTenure} {loanType.maxTenure === 1 ? 'year' : 'years'})
+                </span>
+              )}
+            </label>
+            <SelectField
+              name="tenure"
+              value={loanData.tenure}
+              options={tenureOptions}
               focusedField={focusedField}
               onFocus={onFocus}
               onBlur={onBlur}
               onChange={onChange}
             />
+            {validationErrors.tenure && (
+              <p className="text-red-600 text-sm mt-1 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {validationErrors.tenure}
+              </p>
+            )}
+          </div>
+          
+          <div className="lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Purpose of Loan
+              <span className="text-gray-500 font-normal ml-2">
+                (10-500 characters)
+              </span>
+            </label>
+            <TextareaField
+              name="purpose"
+              value={loanData.purpose}
+              focusedField={focusedField}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              onChange={onChange}
+              maxLength={500}
+            />
+            {validationErrors.purpose && (
+              <p className="text-red-600 text-sm mt-1 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {validationErrors.purpose}
+              </p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              {loanData.purpose.length}/500 characters
+            </p>
           </div>
         </div>
       </div>

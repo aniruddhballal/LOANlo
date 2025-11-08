@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (71)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (72)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (134)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (66)
+### ✅ Completed Initiatives (67)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -85,6 +85,7 @@
 | 203 | **Skeleton Loader Alignment: Underwriter Dashboard Table** | Adjust underwriter-side loading skeletons so that column headings and skeleton widths align perfectly with their corresponding loaded table columns. |
 | 204 | **Table Skeleton: Made headings generic for reusability across different tables** | Replaced specific column heading text with generic skeleton boxes of varying widths, allowing the same `UnderwriterTableSkeleton` component to be reused for Underwriter, Applicant, and Admin tables without width mismatches. |
 | 205 | **Modal Flicker Fix: Eliminated background flash when opening LoanReviewModal** | Fixed by converting modal to React Portal, removing conflicting `transition-opacity` class from backdrop, adding `willChange` properties for optimized rendering, and adding `isolation: isolate` to `#root`. |
+| 206 | **Loan Application Refactor: Modularized components and added dynamic form handling** | Split main loan application logic into `LoanApply`, `LoanForm`, and `FormFields` components, implemented reusable field rendering with props, improved state management for form data and loan type selection, and enabled dynamic updates and validation across nested components. |
 
 ### ⚡ In Progress (5)
 
@@ -249,6 +250,6 @@
 
 ---
 
-**Document Version:** 182
+**Document Version:** 183
 **Last Updated:** 8th November 2025
 **Maintained By:** Aniruddh Ballal

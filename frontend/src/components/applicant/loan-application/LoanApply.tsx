@@ -47,6 +47,12 @@ interface PersonalDetailsData {
   monthlyIncome: string
 }
 
+interface ValidationErrors {
+  amount?: string
+  tenure?: string
+  purpose?: string
+}
+
 const LoanApply = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -61,6 +67,7 @@ const LoanApply = () => {
   const [personalDetails, setPersonalDetails] = useState<PersonalDetailsData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
   const [isPersonalDetailsComplete, setIsPersonalDetailsComplete] = useState(false)
   const [checkingPersonalDetails, setCheckingPersonalDetails] = useState(true)
   const [loadingLoanType, setLoadingLoanType] = useState(false)
@@ -135,38 +142,149 @@ const LoanApply = () => {
     checkPersonalDetailsCompletion()
   }, [])
 
+  // Validate individual field
+  const validateField = (name: string, value: string): string | undefined => {
+    if (!selectedLoanType) return undefined
+
+    switch (name) {
+      case 'amount':
+        const amount = parseFloat(value)
+        if (isNaN(amount) || amount <= 0) {
+          return 'Please enter a valid loan amount'
+        }
+        if (amount > selectedLoanType.maxAmount) {
+          return `Maximum loan amount is ₹${selectedLoanType.maxAmount.toLocaleString('en-IN')}`
+        }
+        if (amount < 10000) {
+          return 'Minimum loan amount is ₹10,000'
+        }
+        break
+
+      case 'tenure':
+        const tenure = parseFloat(value)
+        if (isNaN(tenure) || tenure <= 0) {
+          return 'Please enter a valid tenure'
+        }
+        if (tenure > selectedLoanType.maxTenure) {
+          return `Maximum tenure is ${selectedLoanType.maxTenure} year${selectedLoanType.maxTenure > 1 ? 's' : ''}`
+        }
+        if (tenure < 1) {
+          return 'Minimum tenure is 1 year'
+        }
+        break
+
+      case 'purpose':
+        if (!value || value.trim().length < 10) {
+          return 'Purpose must be at least 10 characters'
+        }
+        if (value.trim().length > 500) {
+          return 'Purpose must not exceed 500 characters'
+        }
+        break
+    }
+
+    return undefined
+  }
+
+  // Validate all fields
+  const validateAllFields = (): boolean => {
+    const errors: ValidationErrors = {}
+    
+    const amountError = validateField('amount', loanData.amount)
+    const tenureError = validateField('tenure', loanData.tenure)
+    const purposeError = validateField('purpose', loanData.purpose)
+
+    if (amountError) errors.amount = amountError
+    if (tenureError) errors.tenure = tenureError
+    if (purposeError) errors.purpose = purposeError
+
+    setValidationErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const isFormValid = (): boolean => {
-    return Object.values(loanData).every(value => 
+    // Check if all fields are filled
+    const allFieldsFilled = Object.values(loanData).every(value => 
       value !== null && value !== undefined && value.toString().trim() !== ''
     )
+    
+    // Check if there are no validation errors
+    const noValidationErrors = Object.keys(validationErrors).length === 0
+    
+    // Check if fields meet minimum requirements (even if not blurred yet)
+    if (!selectedLoanType) return false
+    
+    const amount = parseFloat(loanData.amount)
+    const tenure = parseFloat(loanData.tenure)
+    const purpose = loanData.purpose.trim()
+    
+    const meetsRequirements = 
+      !isNaN(amount) && 
+      amount >= 10000 && 
+      amount <= selectedLoanType.maxAmount &&
+      !isNaN(tenure) && 
+      tenure >= 6 && 
+      tenure <= (selectedLoanType.maxTenure * 12) &&
+      purpose.length >= 10 &&
+      purpose.length <= 500
+    
+    return allFieldsFilled && noValidationErrors && meetsRequirements
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+
     setLoanData({
       ...loanData,
-      [e.target.name]: e.target.value
+      [name]: value
     })
+
+    // Clear validation error for this field
+    if (validationErrors[name as keyof ValidationErrors]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[name as keyof ValidationErrors]
+        return newErrors
+      })
+    }
   }
 
   const handleFocus = (fieldName: string) => {
     setFocusedField(fieldName)
   }
 
-  const handleBlur = () => {
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFocusedField('')
+    
+    // Validate field on blur
+    const { name, value } = e.target
+    const error = validateField(name, value)
+    
+    if (error) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: error
+      }))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
+    // Validate all fields
+    if (!validateAllFields()) {
+      setError('Please fix all validation errors before submitting')
+      return
+    }
+    
     if (!isFormValid()) {
-      setError('Please fill in all required fields before submitting.');
-      return;
+      setError('Please fill in all required fields before submitting')
+      return
     }
     
     if (!selectedLoanType) {
-      setError('Selected loan type is invalid.');
-      return; // or show error to user
+      setError('Selected loan type is invalid')
+      return
     }
     
     setError('')
@@ -176,7 +294,7 @@ const LoanApply = () => {
       const applicationData = {
         ...personalDetails,
         ...loanData,
-        loanType: selectedLoanType._id, // reference LoanType by its ObjectId
+        loanType: selectedLoanType._id,
       }
       const { data } = await api.post('/loans/apply', applicationData)
       navigate("/upload-documents", { state: { applicationId: data.applicationId } })
@@ -288,13 +406,15 @@ const LoanApply = () => {
           <div className="p-8 lg:p-12 relative z-10">
             {error && <ErrorMessage message={error} />}
 
-            {/* Pass loanTypeId and change handler to LoanForm */}
+            {/* Pass validation errors to LoanForm */}
             <LoanForm
               loanTypeId={loanData.loanType}
               loanData={loanData}
               focusedField={focusedField}
               loading={loading}
               isFormValid={isFormValid()}
+              validationErrors={validationErrors}
+              selectedLoanType={selectedLoanType}
               onFocus={handleFocus}
               onBlur={handleBlur}
               onChange={handleChange}
