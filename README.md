@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (79)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (135)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (136)
 
 ---
 
@@ -111,7 +111,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (115)
+### ✅ Completed Initiatives (116)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -230,6 +230,7 @@
 | 194 | **Loan Type Reference Integration** | Updated `LoanApplication` schema to reference the `LoanType` model instead of using string enums, importing `ILoanType` and adjusting the `loanType` field to store an ObjectId with population support. |
 | 195 | **LoanType Integration Across Loan Workflows** | Populated and validated `loanType` in all major routes (upload (`documents.ts`), applicant (`loans.ts`), `admin.ts`, `underwriter.ts`) and email notifications. Replaced raw ObjectIds with populated `LoanType` data, ensuring correct `name/title` usage and fixing undefined loan type issues across loan creation, updates, restoration, and document workflows. |
 | 207 | **Backend Refactor & Feature: Centralized loan application validation middleware** | Introduced and integrated `validateLoanApplication` middleware to handle loan type existence, status, amount limits, tenure, and purpose validation; removed inline validation from `POST /apply`, improved request validation flow, and passed validated loan type via `req.validatedLoanType` for cleaner, reusable backend logic. |
+| 215 | **Backend Validation: Alignment with Frontend Rules** | Updated backend `validation.ts` to match frontend's stricter validation rules, ensuring the backend acts as the final security gate. Added age ≥18 verification, minimum length checks for names (2 chars), address (10 chars), and company fields, income range validation (₹1,000–₹1,00,00,000), and consistent trimming of all string fields before regex pattern testing to prevent whitespace bypasses. |
 
 ### ⚡ In Progress (20)
 
@@ -258,6 +259,6 @@
 
 ---
 
-**Document Version:** 191
-**Last Updated:** 8th November 2025
+**Document Version:** 192
+**Last Updated:** 9th November 2025
 **Maintained By:** Aniruddh Ballal
