@@ -37,6 +37,8 @@ export const InputField: React.FC<InputFieldProps> = ({
   onFocus,
   onBlur,
 }) => {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
   // Add Aadhaar & PAN restrictions automatically
   const getFieldProps = () => {
     if (name === "aadhaarNumber") {
@@ -55,6 +57,13 @@ export const InputField: React.FC<InputFieldProps> = ({
     return {};
   };
 
+  // Handler to open date picker when clicking anywhere on the container
+  const handleContainerClick = () => {
+    if (type === "date" && inputRef.current) {
+      inputRef.current.showPicker?.();
+    }
+  };
+
   return (
     <div className="relative group">
       <label
@@ -69,9 +78,11 @@ export const InputField: React.FC<InputFieldProps> = ({
       <div
         className={`relative transition-all duration-300 ${
           focusedField === name ? "transform scale-[1.02]" : ""
-        }`}
+        } ${type === "date" ? "cursor-pointer" : ""}`}
+        onClick={handleContainerClick}
       >
         <input
+          ref={inputRef}
           type={type}
           name={name}
           value={formData[name] || ""}
@@ -95,6 +106,8 @@ export const InputField: React.FC<InputFieldProps> = ({
             type === "number"
               ? "[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               : ""
+          } ${
+            type === "date" ? "cursor-pointer" : ""
           } ${
             focusedField === name
               ? "border-gray-800 shadow-lg transform scale-[1.01]"
