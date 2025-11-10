@@ -165,7 +165,7 @@ const LoanApply = () => {
         if (isNaN(tenure) || tenure <= 0) {
           return 'Please enter a valid tenure'
         }
-        if (tenure > selectedLoanType.maxTenure) {
+        if (tenure/12 > selectedLoanType.maxTenure) {
           return `Maximum tenure is ${selectedLoanType.maxTenure} year${selectedLoanType.maxTenure > 1 ? 's' : ''}`
         }
         if (tenure < 1) {
