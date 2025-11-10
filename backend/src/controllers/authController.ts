@@ -140,25 +140,22 @@ export const loginController = async (req: Request, res: Response) => {
 
     // Enforce IP restriction for system_admin
     if (user.role === 'system_admin' && user.allowIpRestriction) {
-  const clientIP = normalizeIP(getClientIP(req));
+      const clientIP = normalizeIP(getClientIP(req));
 
-  console.log('Client IP:', clientIP);
-  console.log('IP Whitelist:', user.ipWhitelist.map((item: any) => normalizeIP(item.ip)));
+      const isAllowed = user.ipWhitelist.some(
+        (item: any) => normalizeIP(item.ip) === clientIP
+      );
 
-  const isAllowed = user.ipWhitelist.some(
-    (item: any) => normalizeIP(item.ip) === clientIP
-  );
-
-  if (!isAllowed) {
-    console.warn(`IP whitelist violation: User ${user.email} attempted login from ${clientIP}`);
-    return res.status(401).json({
-      success: false,
-      message: 'Access denied: You are not authorized to login from this network',
-      currentIp: clientIP,
-      code: 'IP_NOT_WHITELISTED',
-    });
-  }
-}
+      if (!isAllowed) {
+        console.warn(`IP whitelist violation: User ${user.email} attempted login from ${clientIP}`);
+        return res.status(401).json({
+          success: false,
+          message: 'Access denied: You are not authorized to login from this network',
+          currentIp: clientIP,
+          code: 'IP_NOT_WHITELISTED',
+        });
+      }
+    }
 
     res.json({
       success: true,
