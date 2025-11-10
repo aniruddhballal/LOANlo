@@ -74,7 +74,7 @@ const Register = () => {
         navigate('/email-verification-required')
       }
     } catch (err: any) {
-      setError(err.message || 'Account registration failed. Please try again.')
+setError(err.response?.data?.message || 'Account registration failed. Please try again.')
     } finally {
       setLoading(false)
     }
