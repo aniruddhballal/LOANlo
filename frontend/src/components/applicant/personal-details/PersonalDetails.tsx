@@ -132,7 +132,7 @@ const PersonalDetails = () => {
   };
 
   const handleNavigateToLoan = () => {
-    navigate('apply-loan', { state: { fromProfileSetup: true } });
+    navigate('/apply-loan', { state: { fromProfileSetup: true } });
   };
 
   const renderCurrentStep = () => {
