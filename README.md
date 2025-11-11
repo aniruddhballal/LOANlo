@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (79)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (80)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (136)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (74)
+### ✅ Completed Initiatives (75)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -93,6 +93,7 @@
 | 212 | **validateStep Logic Alignment with New Validation Rules** | Updated `validateStep` to align with new inline validation logic across all personal detail steps. Reinforced field completeness checks, ensured Aadhaar and PAN patterns remain strict, and synchronized step 3’s numeric constraints with `EmploymentInfoStep` limits (₹1,000–₹1,00,00,000 and non-negative work experience). Maintained `pincodeValid === 'true'` enforcement for verified postal lookups. |
 | 213 | **Refactor `PersonalDetailsStep` to Use Centralized Validation Rules** | Replaced inline field validation logic in `PersonalDetailsStep.tsx` with imports from the new `validationRules.ts`. Integrated `validateField` and `isFieldValid` utilities for consistent checks across personal, contact, and employment sections. Removed redundant regex and manual error handling, ensuring standardized error messages and age, Aadhaar, PAN, and income constraints align with centralized validation logic. |
 | 214 | **Pincode Validation State on Mount** | Added `pincodeValid` optional field to `PersonalDetailsData` interface in types.ts and implemented `useEffect` in `ContactInfoStep` to automatically set `pincodeValid: 'true'` for existing database pincodes on component mount, eliminating redundant API calls and enabling navigation buttons immediately when landing on the contact info step. |
+| 216 | **Error Message Scroll Enhancement** | Added `errorRef` using `useRef<HTMLDivElement `|` null>(null)` and implemented `useEffect` hook to automatically scroll error messages into view with smooth behavior after a 100ms delay when `error` state changes, improving UX by ensuring validation errors are always visible to users. Also refactored error display from inline animated div to use `ErrorMessage` component from StatusMessages. |
 
 ### ⚡ In Progress (5)
 
@@ -259,6 +260,6 @@
 
 ---
 
-**Document Version:** 192
-**Last Updated:** 9th November 2025
+**Document Version:** 193
+**Last Updated:** 11th November 2025
 **Maintained By:** Aniruddh Ballal

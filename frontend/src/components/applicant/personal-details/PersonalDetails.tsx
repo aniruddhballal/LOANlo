@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../api';
 
@@ -9,7 +9,7 @@ import { REQUIRED_FIELDS_BY_STEP, INITIAL_PERSONAL_DETAILS_DATA } from './consta
 // Import components
 import ProgressBar from './ProgressBar';
 import { PersonalInfoStep, ContactInfoStep, EmploymentInfoStep, validateStep } from './PersonalDetailsSteps';
-import { LoadingState, ApplicationSuccess } from '../../ui/StatusMessages';
+import { LoadingState, ApplicationSuccess, ErrorMessage } from '../../ui/StatusMessages';
 
 import { isProfileComplete } from '../../../../../backend/src/shared/validation';
 
@@ -24,6 +24,7 @@ const PersonalDetails = () => {
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [isEmailVerified, setIsEmailVerified] = useState<boolean | null>(null);
+  const errorRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchPersonalDetails = async () => {
@@ -48,7 +49,15 @@ const PersonalDetails = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentStep, error]);
+  }, [currentStep]);
+
+  useEffect(() => {
+    if (error && errorRef.current) {
+      setTimeout(() => {
+        errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [error]);
 
   // Enhanced validation function using the new validateStep function
   const isStepValid = (step: number): boolean => {
@@ -261,21 +270,13 @@ const PersonalDetails = () => {
             {/* Progress Section */}
             <ProgressBar currentStep={currentStep} />
 
-          {/* Error Display */}
+            {/* Error Display */}
             {error && (
-              <div className="mb-8 p-6 bg-red-50/30 border-2 border-red-400 rounded-xl animate-pulse">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-light text-red-800">{error}</p>
-                  </div>
-                </div>
+              <div
+                ref={errorRef}
+                className="bg-red-50 border border-red-400 text-red-800 rounded-xl px-6 py-4 my-6 shadow-sm"
+              >
+                <ErrorMessage message={error} />
               </div>
             )}
 
