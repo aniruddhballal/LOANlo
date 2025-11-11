@@ -62,22 +62,17 @@ const loanTypeSchema: Schema<ILoanType> = new Schema({
   isActive: {
     type: Boolean,
     default: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
+  // REMOVE createdAt and updatedAt fields
+}, {
+  timestamps: true  // ADD THIS
 });
 
-// Automatically update `updatedAt` before save
-loanTypeSchema.pre<ILoanType>('save', function (next) {
-  this.updatedAt = new Date();
-  next();
-});
+// REMOVE this pre-save hook:
+// loanTypeSchema.pre<ILoanType>('save', function (next) {
+//   this.updatedAt = new Date();
+//   next();
+// });
 
 // // Only return active loan types by default
 // loanTypeSchema.pre(/^find/, function (next) {

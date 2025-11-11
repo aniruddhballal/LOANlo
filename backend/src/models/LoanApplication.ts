@@ -43,11 +43,10 @@ export interface ILoanApplication extends Document {
 
 const loanApplicationSchema = new Schema<ILoanApplication>({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  loanType: { type: Schema.Types.ObjectId, ref: 'LoanType', required: true }, // changed here
+  loanType: { type: Schema.Types.ObjectId, ref: 'LoanType', required: true },
   amount: { type: Number, required: true },
   purpose: { type: String, required: true },
   tenure: { type: Number, required: true },
-
   status: {
     type: String,
     enum: ['pending', 'under_review', 'approved', 'rejected', 'documents_requested'],
@@ -55,7 +54,6 @@ const loanApplicationSchema = new Schema<ILoanApplication>({
   },
   documentsUploaded: { type: Boolean, default: false },
   additionalDocumentsRequested: { type: Boolean, default: false },
-
   statusHistory: [
     {
       status: String,
@@ -64,7 +62,6 @@ const loanApplicationSchema = new Schema<ILoanApplication>({
       updatedBy: String
     }
   ],
-
   rejectionReason: String,
   approvalDetails: {
     approvedAmount: Number,
@@ -72,20 +69,21 @@ const loanApplicationSchema = new Schema<ILoanApplication>({
     tenure: Number,
     emi: Number
   },
-
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-
+  // ❌ REMOVE THESE TWO LINES:
+  // createdAt: { type: Date, default: Date.now },
+  // updatedAt: { type: Date, default: Date.now },
+  
   isDeleted: { type: Boolean, default: false },
   deletedAt: { type: Date, default: undefined }
-
+}, {
+  timestamps: true  // ADD THIS
 });
 
-// Automatically update `updatedAt` before save
-loanApplicationSchema.pre<ILoanApplication>('save', function (next) {
-  this.updatedAt = new Date();
-  next();
-});
+// REMOVE THIS PRE-SAVE HOOK (timestamps handles it automatically):
+// loanApplicationSchema.pre<ILoanApplication>('save', function (next) {
+//   this.updatedAt = new Date();
+//   next();
+// });
 
 // Automatically exclude soft-deleted documents from queries (unless explicitly included)
 loanApplicationSchema.pre(/^find/, function (next) {

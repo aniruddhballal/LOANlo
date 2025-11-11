@@ -23,6 +23,7 @@ export interface IUser extends Document {
   workExperience?: string;
   monthlyIncome?: string;
   createdAt: Date;
+  updatedAt: Date;  // ADD THIS
  
   // Email verification fields
   isEmailVerified: boolean;
@@ -35,8 +36,8 @@ export interface IUser extends Document {
   
   // Soft delete fields
   isDeleted: boolean;
-  deletedAt?: Date | undefined; // Changed to explicitly allow undefined
-
+  deletedAt?: Date | undefined;
+  
   // New fields
   ipWhitelist: {
     ip: string;
@@ -72,7 +73,7 @@ const userSchema: Schema<IUser> = new Schema({
   designation: String,
   workExperience: String,
   monthlyIncome: String,
-  createdAt: { type: Date, default: Date.now },
+  // REMOVE: createdAt: { type: Date, default: Date.now },
  
   // Email verification fields
   isEmailVerified: { type: Boolean, default: false },
@@ -85,7 +86,7 @@ const userSchema: Schema<IUser> = new Schema({
   // Soft delete fields
   isDeleted: { type: Boolean, default: false },
   deletedAt: { type: Date },
-
+  
   // New IP restriction fields
   ipWhitelist: [{
     ip: { type: String, required: true },
@@ -94,6 +95,8 @@ const userSchema: Schema<IUser> = new Schema({
     addedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
   }],
   allowIpRestriction: { type: Boolean, default: false },
+}, {
+  timestamps: true  // ADD THIS - automatically creates createdAt and updatedAt
 });
 
 // Add method to calculate profile completion
