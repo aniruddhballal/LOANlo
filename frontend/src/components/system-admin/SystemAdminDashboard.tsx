@@ -73,6 +73,25 @@ export default function SystemAdminDashboard() {
               </div>
             </div>
           </Link>
+
+          <Link
+            to="/admin/all-users"
+            className="group bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
+          >
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                <Users className="w-6 h-6 text-gray-700" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-black transition-colors">
+                  All User Profiles
+                </h3>
+                <p className="text-gray-600 text-sm font-light leading-relaxed">
+                  View and manage all user accounts in the system. Access comprehensive user profiles, account details, and activity information.
+                </p>
+              </div>
+            </div>
+          </Link>
         </div>
       </section>
     </DashboardLayout>

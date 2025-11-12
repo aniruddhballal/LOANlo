@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (80)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (137)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (138)
 
 ---
 
@@ -112,7 +112,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (117)
+### ✅ Completed Initiatives (118)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -233,6 +233,7 @@
 | 207 | **Backend Refactor & Feature: Centralized loan application validation middleware** | Introduced and integrated `validateLoanApplication` middleware to handle loan type existence, status, amount limits, tenure, and purpose validation; removed inline validation from `POST /apply`, improved request validation flow, and passed validated loan type via `req.validatedLoanType` for cleaner, reusable backend logic. |
 | 215 | **Backend Validation: Alignment with Frontend Rules** | Updated backend `validation.ts` to match frontend's stricter validation rules, ensuring the backend acts as the final security gate. Added age ≥18 verification, minimum length checks for names (2 chars), address (10 chars), and company fields, income range validation (₹1,000–₹1,00,00,000), and consistent trimming of all string fields before regex pattern testing to prevent whitespace bypasses. |
 | 217 | **Backend Refactor: Migrated User and LoanApplication models to Mongoose timestamps** | Replaced manual `createdAt`/`updatedAt` field definitions with Mongoose's built-in `timestamps: true` option in User, LoanApplication, and LoanType schemas; removed redundant `pre('save')` hooks for `updatedAt`; ensures automatic and consistent timestamp management across all database operations (save, update, findOneAndUpdate) without requiring frontend or API route changes. |
+| 218 | **System Admin Feature: Added All Applicants View and Route Integration** | Implemented new backend and frontend functionality for system admins to view all undeleted applicant accounts. Added `applicants.ts` backend route (`/api/applicants/all`) restricted to `system_admin` via authentication and role middleware; created minimal `AllApplicants` React component to fetch and display applicants in a simple table; updated `SystemAdminDashboard.tsx` with a new “All User Profiles” card linking to `/admin/all-users`; integrated frontend route in `App.tsx` using `RoleProtectedRoute`; registered backend route in `server.ts`. |
 
 ### ⚡ In Progress (20)
 
@@ -261,6 +262,6 @@
 
 ---
 
-**Document Version:** 194
-**Last Updated:** 11th November 2025
+**Document Version:** 195
+**Last Updated:** 13th November 2025
 **Maintained By:** Aniruddh Ballal

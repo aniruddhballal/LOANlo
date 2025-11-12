@@ -23,6 +23,7 @@ import AccountDeleted from './components/profile/AccountDeleted';
 import LoanTypeSelection from './components/applicant/loan-application/LoanTypeSelection'
 import LoanRequests from './components/underwriter/LoanApplications'
 import LoanTypeDetails from './components/underwriter/LoanTypeDetails'
+import AllApplicants from './components/system-admin/AllApplicants'
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -144,6 +145,12 @@ function AppContent() {
         <Route path="/admin/deleted-applications" element={
           <RoleProtectedRoute allowedRoles={['system_admin']}>
             <DeletedLoanApplications />
+          </RoleProtectedRoute>
+        } />
+
+        <Route path="/admin/all-users" element={
+          <RoleProtectedRoute allowedRoles={['system_admin']}>
+            <AllApplicants />
           </RoleProtectedRoute>
         } />
 
