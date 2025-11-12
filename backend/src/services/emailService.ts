@@ -1,15 +1,19 @@
-import sgMail from '@sendgrid/mail';
+import nodemailer from 'nodemailer';
 import { verificationEmailTemplate, welcomeEmailTemplate, VerificationEmailData, WelcomeEmailData } from '../utils/emailTemplates';
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_FROM,        // your Gmail address
+    pass: process.env.GMAIL_APP_PASSWORD // your Gmail App Password
+  },
+});
 
 const getFrontendUrl = () => {
   const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim());
-  // In production, don't use localhost
   if (process.env.NODE_ENV === 'production') {
     return allowedOrigins.find(origin => !origin.includes('localhost')) || allowedOrigins[0];
   }
-  // In development, prefer localhost
   return allowedOrigins.find(origin => origin.includes('localhost')) || allowedOrigins[0];
 };
 
@@ -19,15 +23,13 @@ export const sendVerificationEmail = async (email: string, firstName: string, ve
     const verificationLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
     const emailData: VerificationEmailData = { firstName, verificationLink };
 
-    const msg = {
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
       to: email,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
       subject: 'Verify Your Email Address - LOANLO',
       html: verificationEmailTemplate(emailData),
       text: `Dear ${firstName},\n\nPlease verify your email: ${verificationLink}\n\nLOANLO Team`,
-    };
-
-    await sgMail.send(msg);
+    });
   } catch (error) {
     console.error('❌ Error sending verification email:', error);
     throw new Error('Failed to send verification email');
@@ -37,14 +39,13 @@ export const sendVerificationEmail = async (email: string, firstName: string, ve
 export const sendWelcomeEmail = async (email: string, firstName: string) => {
   try {
     const emailData: WelcomeEmailData = { firstName, email };
-    const msg = {
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
       to: email,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
       subject: 'Welcome to LOANLO - Account Verified',
       html: welcomeEmailTemplate(emailData),
       text: `Dear ${firstName},\n\nYour account ${email} is now verified.\n\nLOANLO Team`,
-    };
-    await sgMail.send(msg);
+    });
   } catch (error) {
     console.error('❌ Error sending welcome email:', error);
   }
