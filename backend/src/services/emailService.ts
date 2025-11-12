@@ -1,14 +1,19 @@
+import express, { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
-import { verificationEmailTemplate, welcomeEmailTemplate, VerificationEmailData, WelcomeEmailData } from '../utils/emailTemplates';
+import { verificationEmailTemplate, VerificationEmailData } from '../utils/emailTemplates';
 
+const router = express.Router();
+
+// Setup Nodemailer with Gmail App Password
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_FROM,        // your Gmail address
-    pass: process.env.GMAIL_APP_PASSWORD // your Gmail App Password
+    user: process.env.EMAIL_FROM,
+    pass: process.env.GMAIL_APP_PASSWORD,
   },
 });
 
+// Utility to get frontend URL
 const getFrontendUrl = () => {
   const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim());
   if (process.env.NODE_ENV === 'production') {
@@ -17,11 +22,23 @@ const getFrontendUrl = () => {
   return allowedOrigins.find(origin => origin.includes('localhost')) || allowedOrigins[0];
 };
 
-export const sendVerificationEmail = async (email: string, firstName: string, verificationToken: string) => {
+// Resend verification email endpoint
+router.post('/resend-verification', async (req: Request, res: Response) => {
+  console.log('🔥 Resend verification request received:', req.body);
+
+  const { email, firstName, verificationToken } = req.body;
+
+  if (!email || !firstName || !verificationToken) {
+    console.warn('⚠️ Missing required fields');
+    return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
+
   try {
     const frontendUrl = getFrontendUrl();
     const verificationLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
     const emailData: VerificationEmailData = { firstName, verificationLink };
+
+    console.log(`✉️ Sending verification email to ${email}`);
 
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,
@@ -30,28 +47,13 @@ export const sendVerificationEmail = async (email: string, firstName: string, ve
       html: verificationEmailTemplate(emailData),
       text: `Dear ${firstName},\n\nPlease verify your email: ${verificationLink}\n\nLOANLO Team`,
     });
+
+    console.log(`✅ Email sent successfully to ${email}`);
+    res.status(200).json({ success: true, message: 'Verification email sent' });
   } catch (error) {
-    console.error('❌ Error sending verification email:', error);
-    throw new Error('Failed to send verification email');
+    console.error('❌ Failed to send verification email:', error);
+    res.status(500).json({ success: false, message: 'Failed to send verification email', error: String(error) });
   }
-};
+});
 
-export const sendWelcomeEmail = async (email: string, firstName: string) => {
-  try {
-    const emailData: WelcomeEmailData = { firstName, email };
-    await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to: email,
-      subject: 'Welcome to LOANLO - Account Verified',
-      html: welcomeEmailTemplate(emailData),
-      text: `Dear ${firstName},\n\nYour account ${email} is now verified.\n\nLOANLO Team`,
-    });
-  } catch (error) {
-    console.error('❌ Error sending welcome email:', error);
-  }
-};
-
-export const resendVerificationEmail = async (email: string, firstName: string, verificationToken: string) =>
-  sendVerificationEmail(email, firstName, verificationToken);
-
-export default { sendVerificationEmail, sendWelcomeEmail, resendVerificationEmail };
+export default router;
