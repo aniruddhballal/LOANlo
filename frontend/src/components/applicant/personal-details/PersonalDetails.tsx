@@ -141,7 +141,7 @@ const PersonalDetails = () => {
   };
 
   const handleNavigateToLoan = () => {
-    navigate('/apply-loan', { state: { fromProfileSetup: true } });
+    navigate('/select-loan-type', { state: { fromProfileSetup: true } });
   };
 
   const renderCurrentStep = () => {
