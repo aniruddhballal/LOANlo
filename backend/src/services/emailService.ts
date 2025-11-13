@@ -1,15 +1,32 @@
 import nodemailer from 'nodemailer';
+import { google } from 'googleapis';
 import { verificationEmailTemplate, welcomeEmailTemplate, VerificationEmailData, WelcomeEmailData } from '../utils/emailTemplates';
+
+const CLIENT_ID = process.env.GMAIL_OAUTH_CLIENT_ID!;
+const CLIENT_SECRET = process.env.GMAIL_OAUTH_CLIENT_SECRET!;
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+const REFRESH_TOKEN = process.env.GMAIL_OAUTH_REFRESH_TOKEN!;
+const SENDER_EMAIL = process.env.EMAIL_FROM!; // your Gmail
+
+const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
   secure: true, // must be true for 465
   auth: {
-    user: process.env.EMAIL_FROM,
-    pass: process.env.GMAIL_APP_PASSWORD,
+    type: 'OAuth2',
+    user: SENDER_EMAIL,
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    refreshToken: REFRESH_TOKEN,
+    accessToken: async () => {
+      const { token } = await oAuth2Client.getAccessToken();
+      return token || '';
+    },
   },
-});
+} as nodemailer.TransportOptions);
 
 const getFrontendUrl = () => {
   const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim());
@@ -22,22 +39,13 @@ const getFrontendUrl = () => {
 export const sendVerificationEmail = async (email: string, firstName: string, verificationToken: string) => {
   console.log('🔥 sendVerificationEmail called with:', { email, firstName, verificationToken: verificationToken?.slice(0, 6) + '...' });
 
-  if (!email || !firstName || !verificationToken) {
-    console.warn('⚠️ Missing required fields for verification email');
-    throw new Error('Missing required fields for verification email');
-  }
+  const frontendUrl = getFrontendUrl();
+  const verificationLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
+  const emailData: VerificationEmailData = { firstName, verificationLink };
 
   try {
-    const frontendUrl = getFrontendUrl();
-    console.log('🌐 Frontend URL resolved to:', frontendUrl);
-
-    const verificationLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
-    const emailData: VerificationEmailData = { firstName, verificationLink };
-
-    console.log(`✉️ Sending verification email to ${email} with link ${verificationLink}`);
-
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
+      from: SENDER_EMAIL,
       to: email,
       subject: 'Verify Your Email Address - LOANLO',
       html: verificationEmailTemplate(emailData),
@@ -54,15 +62,11 @@ export const sendVerificationEmail = async (email: string, firstName: string, ve
 export const sendWelcomeEmail = async (email: string, firstName: string) => {
   console.log('🔥 sendWelcomeEmail called with:', { email, firstName });
 
-  if (!email || !firstName) {
-    console.warn('⚠️ Missing required fields for welcome email');
-    return;
-  }
+  const emailData: WelcomeEmailData = { firstName, email };
 
   try {
-    const emailData: WelcomeEmailData = { firstName, email };
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
+      from: SENDER_EMAIL,
       to: email,
       subject: 'Welcome to LOANLO - Account Verified',
       html: welcomeEmailTemplate(emailData),
