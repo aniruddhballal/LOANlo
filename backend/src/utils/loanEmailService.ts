@@ -395,7 +395,7 @@ export const sendUnderwriterRestorationRequestToAdmin = async (
     }
 
     const frontendUrl = getFrontendUrl();
-    const adminDashboardLink = `${frontendUrl}/dashboard/admin`;
+    const adminDashboardLink = `${frontendUrl}/admin/deleted-applications`;
 
     // Extract admin name from email (basic implementation)
     const adminName = (adminEmail.split('@')[0] || 'Admin')
@@ -643,7 +643,7 @@ export const sendProfileDeletedNotificationToAdmin = async (
     }
 
     const frontendUrl = getFrontendUrl();
-    const adminDashboardLink = `${frontendUrl}/dashboard/admin`;
+    const adminDashboardLink = `${frontendUrl}/admin/deleted-users`;
 
     // Extract admin name from email (basic implementation)
     const adminName = (adminEmail.split('@')[0] || 'Admin')
