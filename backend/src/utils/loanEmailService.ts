@@ -420,7 +420,12 @@ export const sendUnderwriterRestorationRequestToAdmin = async (
     const html = underwriterRestorationRequestAdminTemplate(emailData);
     const text = `Dear ${adminName},\n\nACTION REQUIRED: An underwriter has requested restoration of a deleted loan application.\n\nRequested by: ${underwriterName} (${underwriterEmail})\nApplicant: ${applicantName}\nApplication ID: ${applicationId}\nLoan Type: ${loanType}\nDeleted on: ${deletedAt.toLocaleString()}\n\nRestoration Reason:\n${restorationReason}\n\nPlease review and approve/reject this request from your admin dashboard: ${adminDashboardLink}\n\nLOANLO Team`;
 
-    await sendGmailAPIEmail(adminEmail, `⚠️ Action Required: Application Restoration Request - ${applicationId}`, html, text);
+    const subject = `⚠️ Action Required: Application Restoration Request - ${applicationId}`;
+    const encodedSubject = `=?UTF-8?B?${Buffer.from(subject).toString('base64')}?=`;
+
+    // then use encodedSubject in your message
+    await sendGmailAPIEmail(adminEmail, encodedSubject, html, text);
+
   } catch (error) {
     console.error('❌ Error sending restoration request notification to admin:', error);
   }
