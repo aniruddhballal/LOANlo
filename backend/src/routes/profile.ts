@@ -7,6 +7,17 @@ import { isProfileComplete, UserProfile } from '../shared/validation';
 import { logProfileChange, getProfileHistory } from '../middleware/profileAudit';
 import LoanApplication from '../models/LoanApplication';
 import { sendProfileDeletedEmail, sendProfileDeletedNotificationToUnderwriters, sendProfileDeletedNotificationToAdmin, sendProfileRestoredEmail, sendProfileRestoredNotificationToUnderwriters } from '../utils/loanEmailService';
+import xss from 'xss';
+
+const sanitizeText = (text: string): string => {
+  if (!text) return '';
+  const cleaned = xss(text, {
+    whiteList: {},
+    stripIgnoreTag: true,
+    stripIgnoreTagBody: ['script']
+  });
+  return cleaned.trim().substring(0, 500);
+};
 
 const router = Router();
 
@@ -43,6 +54,7 @@ const profileUpdateLimiter = rateLimit({
 });
 
 // Rate limiting for profile fetch (more lenient)
+
 const profileFetchLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 60, // 60 requests per minute for profile fetching
@@ -176,8 +188,8 @@ router.post('/save', profileUpdateLimiter, validateProfileInput, authenticateTok
 
     // Input sanitization + numeric coercion
     const sanitizedData: UserProfile = {
-      firstName: validator.escape(firstName?.trim() || ''),
-      lastName: validator.escape(lastName?.trim() || ''),
+      firstName: sanitizeText(firstName || ''),
+      lastName: sanitizeText(lastName || ''),
       dateOfBirth: dateOfBirth?.trim() || '',
       gender: validator.escape(gender?.trim() || ''),
       maritalStatus: validator.escape(maritalStatus?.trim() || ''),
@@ -185,13 +197,13 @@ router.post('/save', profileUpdateLimiter, validateProfileInput, authenticateTok
       panNumber: panNumber?.trim() || '',
       email: validator.normalizeEmail(email?.trim() || '') || '',
       phone: phone?.trim() || '',
-      address: validator.escape(address?.trim() || ''),
-      city: validator.escape(city?.trim() || ''),
-      state: validator.escape(state?.trim() || ''),
+      address: sanitizeText(address || ''),
+      city: sanitizeText(city || ''),
+      state: sanitizeText(state || ''),
       pincode: pincode?.trim() || '',
       employmentType: validator.escape(employmentType?.trim() || ''),
-      companyName: validator.escape(companyName?.trim() || ''),
-      designation: validator.escape(designation?.trim() || ''),
+      companyName: sanitizeText(companyName || ''),
+      designation: sanitizeText(designation || ''),
       // to ensure that the numeric fields are actually numbers
       workExperience: isNaN(Number(workExperience)) ? undefined : Number(workExperience),
       monthlyIncome: isNaN(Number(monthlyIncome)) ? undefined : Number(monthlyIncome),

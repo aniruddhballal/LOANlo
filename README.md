@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (81)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (141)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (142)
 
 ---
 
@@ -113,7 +113,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (121)
+### ✅ Completed Initiatives (122)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -238,6 +238,7 @@
 | 219 | **Backend Enhancement: Migrated email service from App Password to OAuth2 authentication** | Replaced Gmail App Password with OAuth2 using Google APIs and dynamic access token generation; improves security and reliability by eliminating static password storage; requires new environment variables (GMAIL_OAUTH_CLIENT_ID, GMAIL_OAUTH_CLIENT_SECRET, GMAIL_OAUTH_REFRESH_TOKEN) and removal of GMAIL_APP_PASSWORD. |
 | 220 | **Backend Enhancement: Migrated loan email service from SendGrid to Gmail API with OAuth2** | Replaced SendGrid email delivery with Gmail API using OAuth2 authentication for loan-related notifications; converted all 15 email functions (application submissions, status updates, underwriter notifications, restoration requests, profile management) to use `sendGmailAPIEmail` helper function with base64 encoding; maintains all existing functionality while improving security and eliminating SendGrid dependency; uses existing OAuth2 environment variables (GMAIL_OAUTH_CLIENT_ID, GMAIL_OAUTH_CLIENT_SECRET, GMAIL_OAUTH_REFRESH_TOKEN) already configured in emailService.ts. |
 | 221 | **Email Enhancement: Added Restoration Contact Options for Deleted Applications and Profiles** | Added "Deleted by mistake?" contact sections to applicant emails for both application deletion and profile deletion scenarios; application deletion emails now include a "Contact Underwriter" button with pre-filled mailto link for restoration requests; profile deletion emails now include a "Contact Support" button linking to system admin email; both buttons use prominent warning-styled boxes with URL-encoded mailto parameters (subject, body) for seamless user experience when requesting restoration assistance. |
+| 223 | **Input Sanitization: Replace HTML Entity Encoding with XSS Protection** | Replaced `validator.escape()` with `xss` library sanitization for text fields (firstName, lastName, address, city, state, companyName, designation) to prevent special characters like `/`, `'`, `&` from being stored as HTML entities while maintaining protection against XSS and injection attacks. |
 
 ### ⚡ In Progress (20)
 
@@ -266,6 +267,6 @@
 
 ---
 
-**Document Version:** 199
+**Document Version:** 200
 **Last Updated:** 13th November 2025
 **Maintained By:** Aniruddh Ballal
