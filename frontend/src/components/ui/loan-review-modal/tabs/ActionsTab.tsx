@@ -23,9 +23,15 @@ export default function ActionsTab({ application, onStatusUpdate, onRequestAddit
   })
 
   useEffect(() => {
+    // Calculate average interest rate from loan type
+    const averageInterestRate = 
+      typeof application.loanType === 'object' && application.loanType?.interestRateMin && application.loanType?.interestRateMax
+        ? (application.loanType.interestRateMin + application.loanType.interestRateMax) / 2
+        : 12; // fallback to 12 if loan type not populated
+
     setApprovalData({
       approvedAmount: application.amount,
-      interestRate: 12,
+      interestRate: averageInterestRate,
       tenure: application.tenure,
       emi: 0
     })

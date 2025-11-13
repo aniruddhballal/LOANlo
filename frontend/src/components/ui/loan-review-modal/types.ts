@@ -17,7 +17,18 @@ export interface LoanApplication {
     phone: string
     role: string
   }
-  loanType: 'personal' | 'home' | 'vehicle' | 'business' | 'education'
+  loanType: {
+    _id: string
+    name: string
+    interestRateMin: number
+    interestRateMax: number
+    maxAmount: number
+    maxTenure: number
+    title: string
+    catchyPhrase: string
+    features: string[]
+    isActive: boolean
+  } | 'personal' | 'home' | 'vehicle' | 'business' | 'education'
   amount: number
   purpose: string
   tenure: number
