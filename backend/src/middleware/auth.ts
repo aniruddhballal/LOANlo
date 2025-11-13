@@ -8,6 +8,8 @@ import User from '../models/User';
 export interface UserPayload extends JwtPayload {
   userId: string;
   role: 'underwriter' | 'system_admin' | 'admin' | 'reviewer' | 'applicant';
+  firstName?: string;  // this
+  lastName?: string;   // this
 }
 
 // Extend Express Request with a strongly-typed user
