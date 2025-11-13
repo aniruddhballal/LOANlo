@@ -7,6 +7,7 @@ import ApplicationDetailsTab from './tabs/ApplicationDetailsTab'
 import DocumentsTab from './tabs/DocumentsTab'
 import StatusHistoryTab from './tabs/StatusHistoryTab'
 import ActionsTab from './tabs/ActionsTab'
+import AICreditRiskTab from './tabs/AICreditRiskTab'
 import { useAuth } from '../../../context/AuthContext'
 
 interface LoanReviewModalProps {
@@ -271,6 +272,7 @@ export default function LoanReviewModal({
                     { id: 'details', label: 'Application Details', icon: FileText },
                     { id: 'documents', label: 'Document Upload Status', icon: FileUp },
                     { id: 'history', label: 'Status History', icon: Clock },
+                    { id: 'ai-risk', label: 'AI Credit Risk', icon: AlertCircle },
                     ...(canShowActionsTab ? [{ id: 'actions', label: 'Actions', icon: MessageSquare }] : [])
                   ].map((tab) => {
                     const Icon = tab.icon
@@ -333,6 +335,10 @@ export default function LoanReviewModal({
 
                     {activeTab === 'history' && (
                       <StatusHistoryTab application={application} />
+                    )}
+
+                    {activeTab === 'ai-risk' && (
+                      <AICreditRiskTab application={application} />
                     )}
 
                     {activeTab === 'actions' && canShowActionsTab && (

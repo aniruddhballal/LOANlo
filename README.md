@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (82)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (83)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (142)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (77)
+### ✅ Completed Initiatives (78)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -96,6 +96,7 @@
 | 216 | **Error Message Scroll Enhancement** | Added `errorRef` using `useRef<HTMLDivElement `|` null>(null)` and implemented `useEffect` hook to automatically scroll error messages into view with smooth behavior after a 100ms delay when `error` state changes, improving UX by ensuring validation errors are always visible to users. Also refactored error display from inline animated div to use `ErrorMessage` component from StatusMessages. |
 | 222 | **Register Form Validation Integration** | Integrated `validationRules.ts` validation by importing `validateField` and adding `fieldErrors`/`touchedFields` state management. Implemented `handleBlur` for on-blur validation and modified `handleChange` for real-time validation of touched fields. Added conditional error styling (red borders) to firstName, lastName, email, and phone inputs with `ErrorMessage` component from `StatusMessages` for error display. Created `isFormValid` function to disable submit button when form is invalid. Implemented `handlePhoneChange` with digit-only restriction (`maxLength={10}`) treating phone as optional field. |
 | 224 | **Backend Interest Rate Integration for Loan Approval** | Modified `LoanApplication` interface in types file to support populated `loanType` as object with `interestRateMin`, `interestRateMax`, and other loan type properties alongside existing string enum values. Updated `ActionsTab.tsx` useEffect to dynamically calculate average interest rate from backend loan type data using `(interestRateMin + interestRateMax) / 2` when `loanType` is populated as object, with fallback to 12% for backward compatibility, eliminating hardcoded interest rates and ensuring approval details reflect accurate loan type configurations. |
+| 225 | **AI Credit Risk Tab Integration** | Added `AICreditRiskTab` component to embed the deployed Streamlit credit risk model (`https://credit-risk-predictor-dedh.onrender.com/`) inside the MERN app. Replaced placeholder content with an iframe that renders the AI credit risk assessment UI, styled with responsive height, rounded borders, and shadow to integrate seamlessly with the existing loan application dashboard. |
 
 ### ⚡ In Progress (5)
 
@@ -268,6 +269,6 @@
 
 ---
 
-**Document Version:** 201
+**Document Version:** 202
 **Last Updated:** 13th November 2025
 **Maintained By:** Aniruddh Ballal
