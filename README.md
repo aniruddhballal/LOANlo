@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (80)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (140)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (141)
 
 ---
 
@@ -112,7 +112,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (120)
+### ✅ Completed Initiatives (121)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -236,6 +236,7 @@
 | 218 | **System Admin Feature: Added All Applicants View and Route Integration** | Implemented new backend and frontend functionality for system admins to view all undeleted applicant accounts. Added `applicants.ts` backend route (`/api/applicants/all`) restricted to `system_admin` via authentication and role middleware; created minimal `AllApplicants` React component to fetch and display applicants in a simple table; updated `SystemAdminDashboard.tsx` with a new “All User Profiles” card linking to `/admin/all-users`; integrated frontend route in `App.tsx` using `RoleProtectedRoute`; registered backend route in `server.ts`. |
 | 219 | **Backend Enhancement: Migrated email service from App Password to OAuth2 authentication** | Replaced Gmail App Password with OAuth2 using Google APIs and dynamic access token generation; improves security and reliability by eliminating static password storage; requires new environment variables (GMAIL_OAUTH_CLIENT_ID, GMAIL_OAUTH_CLIENT_SECRET, GMAIL_OAUTH_REFRESH_TOKEN) and removal of GMAIL_APP_PASSWORD. |
 | 220 | **Backend Enhancement: Migrated loan email service from SendGrid to Gmail API with OAuth2** | Replaced SendGrid email delivery with Gmail API using OAuth2 authentication for loan-related notifications; converted all 15 email functions (application submissions, status updates, underwriter notifications, restoration requests, profile management) to use `sendGmailAPIEmail` helper function with base64 encoding; maintains all existing functionality while improving security and eliminating SendGrid dependency; uses existing OAuth2 environment variables (GMAIL_OAUTH_CLIENT_ID, GMAIL_OAUTH_CLIENT_SECRET, GMAIL_OAUTH_REFRESH_TOKEN) already configured in emailService.ts. |
+| 221 | **Email Enhancement: Added Restoration Contact Options for Deleted Applications and Profiles** | Added "Deleted by mistake?" contact sections to applicant emails for both application deletion and profile deletion scenarios; application deletion emails now include a "Contact Underwriter" button with pre-filled mailto link for restoration requests; profile deletion emails now include a "Contact Support" button linking to system admin email; both buttons use prominent warning-styled boxes with URL-encoded mailto parameters (subject, body) for seamless user experience when requesting restoration assistance. |
 
 ### ⚡ In Progress (20)
 
@@ -264,6 +265,6 @@
 
 ---
 
-**Document Version:** 197
+**Document Version:** 198
 **Last Updated:** 13th November 2025
 **Maintained By:** Aniruddh Ballal

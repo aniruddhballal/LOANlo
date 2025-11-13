@@ -143,10 +143,24 @@ export const profileDeletedApplicantTemplate = (data: ProfileDeletedApplicantDat
                     </p>
                   </div>
                   
-                  <div style="padding: 20px; background-color: #eff6ff; border-radius: 12px;">
-                    <p style="margin: 0; color: #1e40af; font-size: 13px; line-height: 1.5;">
-                      <strong>Need to restore your account?</strong> If you deleted your account by mistake or wish to restore it, please contact our system administrator at ${data.supportEmail} as soon as possible.
+                  <!-- Restore Contact Box -->
+                  <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; border-radius: 12px;">
+                    <p style="margin: 0 0 10px 0; color: #92400e; font-size: 14px; font-weight: 600;">
+                      Deleted by mistake?
                     </p>
+                    <p style="margin: 0 0 16px 0; color: #92400e; font-size: 13px; line-height: 1.5;">
+                      If you did not delete your profile or wish to restore it, please contact our support team:
+                    </p>
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td align="center">
+                          <a href="mailto:${data.supportEmail}?subject=Restore%20My%20LOANLO%20Profile&body=Dear%20Support%20Team,%0D%0A%0D%0AI%20would%20like%20to%20restore%20my%20LOANLO%20profile%20(${data.email}).%0D%0A%0D%0AThank%20you." 
+                             style="display: inline-block; padding: 12px 24px; background-color: #ffc107; color: #000000; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 500;">
+                            Contact Support
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
                   </div>
                 </td>
               </tr>

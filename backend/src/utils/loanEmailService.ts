@@ -263,11 +263,11 @@ export const sendApplicationDeletedEmail = async (
       amount,
       deletedAt: deletedAt.toISOString(),
       dashboardLink,
+      underwriterEmail: process.env.UNDERWRITER_EMAILS?.split(',')[0]?.trim() || 'support@loanlo.com',
     };
 
     const html = applicationDeletedTemplate(emailData);
-    const text = `Dear ${firstName},\n\nYour loan application (ID: ${applicationId}) has been successfully deleted.\n\nDeleted on: ${deletedAt.toLocaleString()}\n\nYou can submit a new application anytime from your dashboard: ${dashboardLink}\n\nLOANLO Team`;
-
+    const text = `Dear ${firstName},\n\nYour loan application (ID: ${applicationId}) has been successfully deleted.\n\nDeleted on: ${deletedAt.toLocaleString()}\n\nIf you deleted this by mistake or wish to restore it, please contact the underwriter at: ${emailData.underwriterEmail}\n\nYou can submit a new application anytime from your dashboard: ${dashboardLink}\n\nLOANLO Team`;
     await sendGmailAPIEmail(email, `Application Deleted - ${applicationId}`, html, text);
   } catch (error) {
     console.error('❌ Error sending application deleted email:', error);
@@ -562,7 +562,7 @@ export const sendProfileDeletedEmail = async (
     };
 
     const html = profileDeletedApplicantTemplate(emailData);
-    const text = `Dear ${firstName},\n\nYour LOANLO account has been successfully deleted.\n\nDeleted on: ${deletedAt.toLocaleString()}\nApplications removed: ${applicationsCount}\n\nIf you need to restore your account, contact us at ${supportEmail}\n\nLOANLO Team`;
+    const text = `Dear ${firstName},\n\nYour LOANLO account has been successfully deleted.\n\nDeleted on: ${deletedAt.toLocaleString()}\nApplications removed: ${applicationsCount}\n\nIf you deleted this by mistake or need to restore your account, please contact our support team at: ${supportEmail}\n\nLOANLO Team`;
 
     await sendGmailAPIEmail(email, `Profile Deleted - LOANLO`, html, text);
   } catch (error) {

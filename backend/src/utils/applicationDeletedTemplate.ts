@@ -9,6 +9,7 @@ export interface ApplicationDeletedData {
   amount: number;
   deletedAt: string;
   dashboardLink: string;
+  underwriterEmail: string;
 }
 
 const formatCurrency = (amount: number): string => {
@@ -145,6 +146,26 @@ export const applicationDeletedTemplate = (data: ApplicationDeletedData): string
                     <p style="margin: 0; color: #6b7280; font-size: 13px; line-height: 1.5;">
                       Your application data has been removed from our active system. If you wish to apply for a loan in the future, you can submit a new application through your dashboard.
                     </p>
+                  </div>
+
+                  <!-- Restore Contact Box -->
+                  <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; border-radius: 12px; margin-bottom: 32px;">
+                    <p style="margin: 0 0 10px 0; color: #92400e; font-size: 14px; font-weight: 600;">
+                      Deleted by mistake?
+                    </p>
+                    <p style="margin: 0 0 16px 0; color: #92400e; font-size: 13px; line-height: 1.5;">
+                      If you did not delete this application or wish to restore it, please contact our underwriter:
+                    </p>
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td align="center">
+                          <a href="mailto:${data.underwriterEmail}?subject=Restore%20Application%20${data.applicationId}&body=Dear%20Underwriter,%0D%0A%0D%0AI%20would%20like%20to%20restore%20my%20loan%20application%20(ID:%20${data.applicationId}).%0D%0A%0D%0AThank%20you." 
+                             style="display: inline-block; padding: 12px 24px; background-color: #ffc107; color: #000000; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 500;">
+                            Contact Underwriter
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
                   </div>
                   
                   <!-- CTA Button -->
