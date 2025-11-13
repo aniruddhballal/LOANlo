@@ -1,4 +1,4 @@
-import sgMail from '@sendgrid/mail';
+import { google } from 'googleapis';
 import { loanApplicationSubmittedTemplate, LoanApplicationSubmittedData } from './LoanApplicationSubmittedData';
 import { loanStatusUpdateTemplate, LoanStatusUpdateData } from './loanStatusUpdateTemplate';
 import { newApplicationNotificationTemplate, NewApplicationNotificationData } from './newApplicationNotificationTemplate';
@@ -40,7 +40,16 @@ import {
   ProfileRestoredUnderwriterData
 } from './profileRestoredTemplate';
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
+const CLIENT_ID = process.env.GMAIL_OAUTH_CLIENT_ID!;
+const CLIENT_SECRET = process.env.GMAIL_OAUTH_CLIENT_SECRET!;
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+const REFRESH_TOKEN = process.env.GMAIL_OAUTH_REFRESH_TOKEN!;
+const SENDER_EMAIL = process.env.EMAIL_FROM || 'noreply@loanlo.com';
+
+const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+
+const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
 
 const getFrontendUrl = () => {
   const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim());
@@ -49,6 +58,27 @@ const getFrontendUrl = () => {
   }
   return allowedOrigins.find(origin => origin.includes('localhost')) || allowedOrigins[0];
 };
+
+async function sendGmailAPIEmail(to: string, subject: string, html: string, text: string) {
+  const messageParts = [
+    `From: LOANLO <${SENDER_EMAIL}>`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    'MIME-Version: 1.0',
+    'Content-Type: text/html; charset=UTF-8',
+    '',
+    html,
+  ];
+  const encodedMessage = Buffer.from(messageParts.join('\n'))
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+  await gmail.users.messages.send({
+    userId: 'me',
+    requestBody: { raw: encodedMessage },
+  });
+}
 
 /**
  * Send email to applicant when they submit a new loan application
@@ -60,7 +90,6 @@ export const sendLoanApplicationSubmittedEmail = async (
   loanType: string,
   amount: number,
 ) => {
-
   try {
     const frontendUrl = getFrontendUrl();
     const applicationStatusLink = `${frontendUrl}/my-loans`;
@@ -73,15 +102,10 @@ export const sendLoanApplicationSubmittedEmail = async (
       applicationStatusLink: applicationStatusLink,
     };
 
-    const msg = {
-      to: email,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      subject: `Loan Application Received - ${applicationId}`,
-      html: loanApplicationSubmittedTemplate(emailData),
-      text: `Dear ${firstName},\n\nYour loan application (ID: ${applicationId}) has been received successfully. You can track its status in your dashboard: ${applicationStatusLink}\n\nLOANLO Team`,
-    };
+    const html = loanApplicationSubmittedTemplate(emailData);
+    const text = `Dear ${firstName},\n\nYour loan application (ID: ${applicationId}) has been received successfully. You can track its status in your dashboard: ${applicationStatusLink}\n\nLOANLO Team`;
 
-    await sgMail.send(msg);
+    await sendGmailAPIEmail(email, `Loan Application Received - ${applicationId}`, html, text);
   } catch (error) {
     console.error('❌ Error sending application submitted email:', error);
     // Don't throw - we don't want email failures to break the application flow
@@ -110,7 +134,6 @@ export const sendLoanStatusUpdateEmail = async (
     const frontendUrl = getFrontendUrl();
     const applicationStatusLink = `${frontendUrl}/my-loans`;
     
-
     const emailData: LoanStatusUpdateData = {
       firstName,
       applicationId,
@@ -125,15 +148,10 @@ export const sendLoanStatusUpdateEmail = async (
 
     const statusText = status.replace(/_/g, ' ').toUpperCase();
     
-    const msg = {
-      to: email,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      subject: `Loan Application ${statusText} - ${applicationId}`,
-      html: loanStatusUpdateTemplate(emailData),
-      text: `Dear ${firstName},\n\nYour loan application status has been updated to: ${statusText}\n\nApplication ID: ${applicationId}\nView details: ${applicationStatusLink}\n\nLOANLO Team`,
-    };
+    const html = loanStatusUpdateTemplate(emailData);
+    const text = `Dear ${firstName},\n\nYour loan application status has been updated to: ${statusText}\n\nApplication ID: ${applicationId}\nView details: ${applicationStatusLink}\n\nLOANLO Team`;
 
-    await sgMail.send(msg);
+    await sendGmailAPIEmail(email, `Loan Application ${statusText} - ${applicationId}`, html, text);
   } catch (error) {
     console.error('❌ Error sending status update email:', error);
   }
@@ -180,15 +198,10 @@ export const sendNewApplicationNotificationToUnderwriters = async (
         underwriterDashboardLink: underwriterDashboardLink,
       };
 
-      const msg = {
-        to: underwriterEmail,
-        from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-        subject: `New Loan Application for Review - ${applicationId}`,
-        html: newApplicationNotificationTemplate(emailData),
-        text: `Dear ${underwriterName},\n\nA new loan application has been submitted for review.\n\nApplicant: ${applicantName}\nApplication ID: ${applicationId}\nLoan Type: ${loanType}\n\nReview now: ${underwriterDashboardLink}\n\nLOANLO Team`,
-      };
+      const html = newApplicationNotificationTemplate(emailData);
+      const text = `Dear ${underwriterName},\n\nA new loan application has been submitted for review.\n\nApplicant: ${applicantName}\nApplication ID: ${applicationId}\nLoan Type: ${loanType}\n\nReview now: ${underwriterDashboardLink}\n\nLOANLO Team`;
 
-      return sgMail.send(msg);
+      return sendGmailAPIEmail(underwriterEmail, `New Loan Application for Review - ${applicationId}`, html, text);
     });
 
     await Promise.all(emailPromises);
@@ -212,22 +225,17 @@ export const sendDocumentsRequestedEmail = async (
     const applicationStatusLink = `${frontendUrl}/my-loans`;
 
     const emailData: DocumentsRequestedData = {
-    firstName,
-    applicationId,
-    loanType,
-    ...(comment !== undefined && { comment }),
-    applicationStatusLink: applicationStatusLink,
+      firstName,
+      applicationId,
+      loanType,
+      ...(comment !== undefined && { comment }),
+      applicationStatusLink: applicationStatusLink,
     };
 
-    const msg = {
-      to: email,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      subject: `Additional Documents Required - ${applicationId}`,
-      html: documentsRequestedTemplate(emailData),
-      text: `Dear ${firstName},\n\nAdditional documents are required for your loan application (ID: ${applicationId}).\n\n${comment ? `Note: ${comment}\n\n` : ''}Please upload the documents in your dashboard: ${applicationStatusLink}\n\nLOANLO Team`,
-    };
+    const html = documentsRequestedTemplate(emailData);
+    const text = `Dear ${firstName},\n\nAdditional documents are required for your loan application (ID: ${applicationId}).\n\n${comment ? `Note: ${comment}\n\n` : ''}Please upload the documents in your dashboard: ${applicationStatusLink}\n\nLOANLO Team`;
 
-    await sgMail.send(msg);
+    await sendGmailAPIEmail(email, `Additional Documents Required - ${applicationId}`, html, text);
   } catch (error) {
     console.error('❌ Error sending documents requested email:', error);
   }
@@ -257,15 +265,10 @@ export const sendApplicationDeletedEmail = async (
       dashboardLink,
     };
 
-    const msg = {
-      to: email,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      subject: `Application Deleted - ${applicationId}`,
-      html: applicationDeletedTemplate(emailData),
-      text: `Dear ${firstName},\n\nYour loan application (ID: ${applicationId}) has been successfully deleted.\n\nDeleted on: ${deletedAt.toLocaleString()}\n\nYou can submit a new application anytime from your dashboard: ${dashboardLink}\n\nLOANLO Team`,
-    };
+    const html = applicationDeletedTemplate(emailData);
+    const text = `Dear ${firstName},\n\nYour loan application (ID: ${applicationId}) has been successfully deleted.\n\nDeleted on: ${deletedAt.toLocaleString()}\n\nYou can submit a new application anytime from your dashboard: ${dashboardLink}\n\nLOANLO Team`;
 
-    await sgMail.send(msg);
+    await sendGmailAPIEmail(email, `Application Deleted - ${applicationId}`, html, text);
   } catch (error) {
     console.error('❌ Error sending application deleted email:', error);
     // Don't throw - we don't want email failures to break the application flow
@@ -317,15 +320,10 @@ export const sendApplicationDeletedNotificationToUnderwriters = async (
         underwriterDashboardLink,
       };
 
-      const msg = {
-        to: underwriterEmail,
-        from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-        subject: `Application Deleted by Applicant - ${applicationId}`,
-        html: applicationDeletedUnderwriterTemplate(emailData),
-        text: `Dear ${underwriterName},\n\nAn application has been deleted by the applicant.\n\nApplicant: ${applicantName}\nApplication ID: ${applicationId}\nLoan Type: ${loanType}\nPrevious Status: ${previousStatus}\nDeleted on: ${deletedAt.toLocaleString()}\n\nNo action required. View dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`,
-      };
+      const html = applicationDeletedUnderwriterTemplate(emailData);
+      const text = `Dear ${underwriterName},\n\nAn application has been deleted by the applicant.\n\nApplicant: ${applicantName}\nApplication ID: ${applicationId}\nLoan Type: ${loanType}\nPrevious Status: ${previousStatus}\nDeleted on: ${deletedAt.toLocaleString()}\n\nNo action required. View dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`;
 
-      return sgMail.send(msg);
+      return sendGmailAPIEmail(underwriterEmail, `Application Deleted by Applicant - ${applicationId}`, html, text);
     });
 
     await Promise.all(emailPromises);
@@ -364,15 +362,10 @@ export const sendUnderwriterRestorationRequestConfirmation = async (
       underwriterDashboardLink,
     };
 
-    const msg = {
-      to: underwriterEmail,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      subject: `Restoration Request Submitted - ${applicationId}`,
-      html: underwriterRestorationRequestConfirmationTemplate(emailData),
-      text: `Dear ${underwriterName},\n\nYour request to restore the deleted loan application (ID: ${applicationId}) has been submitted successfully.\n\nApplicant: ${applicantName}\nDeleted on: ${deletedAt.toLocaleString()}\n\nReason: ${restorationReason}\n\nThe system administrator will review your request and get back to you shortly.\n\nView dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`,
-    };
+    const html = underwriterRestorationRequestConfirmationTemplate(emailData);
+    const text = `Dear ${underwriterName},\n\nYour request to restore the deleted loan application (ID: ${applicationId}) has been submitted successfully.\n\nApplicant: ${applicantName}\nDeleted on: ${deletedAt.toLocaleString()}\n\nReason: ${restorationReason}\n\nThe system administrator will review your request and get back to you shortly.\n\nView dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`;
 
-    await sgMail.send(msg);
+    await sendGmailAPIEmail(underwriterEmail, `Restoration Request Submitted - ${applicationId}`, html, text);
   } catch (error) {
     console.error('❌ Error sending underwriter restoration request confirmation email:', error);
     // Don't throw - we don't want email failures to break the application flow
@@ -424,15 +417,10 @@ export const sendUnderwriterRestorationRequestToAdmin = async (
       adminDashboardLink,
     };
 
-    const msg = {
-      to: adminEmail,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      subject: `⚠️ Action Required: Application Restoration Request - ${applicationId}`,
-      html: underwriterRestorationRequestAdminTemplate(emailData),
-      text: `Dear ${adminName},\n\nACTION REQUIRED: An underwriter has requested restoration of a deleted loan application.\n\nRequested by: ${underwriterName} (${underwriterEmail})\nApplicant: ${applicantName}\nApplication ID: ${applicationId}\nLoan Type: ${loanType}\nDeleted on: ${deletedAt.toLocaleString()}\n\nRestoration Reason:\n${restorationReason}\n\nPlease review and approve/reject this request from your admin dashboard: ${adminDashboardLink}\n\nLOANLO Team`,
-    };
+    const html = underwriterRestorationRequestAdminTemplate(emailData);
+    const text = `Dear ${adminName},\n\nACTION REQUIRED: An underwriter has requested restoration of a deleted loan application.\n\nRequested by: ${underwriterName} (${underwriterEmail})\nApplicant: ${applicantName}\nApplication ID: ${applicationId}\nLoan Type: ${loanType}\nDeleted on: ${deletedAt.toLocaleString()}\n\nRestoration Reason:\n${restorationReason}\n\nPlease review and approve/reject this request from your admin dashboard: ${adminDashboardLink}\n\nLOANLO Team`;
 
-    await sgMail.send(msg);
+    await sendGmailAPIEmail(adminEmail, `⚠️ Action Required: Application Restoration Request - ${applicationId}`, html, text);
   } catch (error) {
     console.error('❌ Error sending restoration request notification to admin:', error);
   }
@@ -467,15 +455,10 @@ export const sendRestorationApprovedEmail = async (
       underwriterDashboardLink,
     };
 
-    const msg = {
-      to: underwriterEmail,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      subject: `✓ Restoration Request Approved - ${applicationId}`,
-      html: restorationApprovedTemplate(emailData),
-      text: `Dear ${underwriterName},\n\nGood news! Your restoration request has been approved.\n\nApplication ID: ${applicationId}\nApplicant: ${applicantName}\n\nThe application has been successfully restored and is now available in your dashboard.\n\n${adminNotes ? `Admin Notes: ${adminNotes}\n\n` : ''}View dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`,
-    };
+    const html = restorationApprovedTemplate(emailData);
+    const text = `Dear ${underwriterName},\n\nGood news! Your restoration request has been approved.\n\nApplication ID: ${applicationId}\nApplicant: ${applicantName}\n\nThe application has been successfully restored and is now available in your dashboard.\n\n${adminNotes ? `Admin Notes: ${adminNotes}\n\n` : ''}View dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`;
 
-    await sgMail.send(msg);
+    await sendGmailAPIEmail(underwriterEmail, `✓ Restoration Request Approved - ${applicationId}`, html, text);
   } catch (error) {
     console.error('❌ Error sending restoration approved email:', error);
     // Don't throw - we don't want email failures to break the application flow
@@ -511,15 +494,10 @@ export const sendRestorationRejectedEmail = async (
       underwriterDashboardLink,
     };
 
-    const msg = {
-      to: underwriterEmail,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      subject: `Restoration Request Rejected - ${applicationId}`,
-      html: restorationRejectedTemplate(emailData),
-      text: `Dear ${underwriterName},\n\nYour restoration request has been rejected by the system administrator.\n\nApplication ID: ${applicationId}\nApplicant: ${applicantName}\n\nRejection Reason:\n${rejectionNotes}\n\nIf you believe this decision requires further review, please contact the system administrator.\n\nView dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`,
-    };
+    const html = restorationRejectedTemplate(emailData);
+    const text = `Dear ${underwriterName},\n\nYour restoration request has been rejected by the system administrator.\n\nApplication ID: ${applicationId}\nApplicant: ${applicantName}\n\nRejection Reason:\n${rejectionNotes}\n\nIf you believe this decision requires further review, please contact the system administrator.\n\nView dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`;
 
-    await sgMail.send(msg);
+    await sendGmailAPIEmail(underwriterEmail, `Restoration Request Rejected - ${applicationId}`, html, text);
   } catch (error) {
     console.error('❌ Error sending restoration rejected email:', error);
     // Don't throw - we don't want email failures to break the application flow
@@ -553,15 +531,10 @@ export const sendApplicationRestoredEmail = async (
       applicationStatusLink,
     };
 
-    const msg = {
-      to: applicantEmail,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      subject: `Application Restored - ${applicationId}`,
-      html: applicationRestoredTemplate(emailData),
-      text: `Dear ${applicantName},\n\nYour previously deleted loan application (ID: ${applicationId}) has been restored by the system administrator on request of ${underwriterName}.\n\nReason: ${restorationReason}\n\nYou can now view and track your application in your dashboard: ${applicationStatusLink}\n\nLOANLO Team`,
-    };
+    const html = applicationRestoredTemplate(emailData);
+    const text = `Dear ${applicantName},\n\nYour previously deleted loan application (ID: ${applicationId}) has been restored by the system administrator on request of ${underwriterName}.\n\nReason: ${restorationReason}\n\nYou can now view and track your application in your dashboard: ${applicationStatusLink}\n\nLOANLO Team`;
 
-    await sgMail.send(msg);
+    await sendGmailAPIEmail(applicantEmail, `Application Restored - ${applicationId}`, html, text);
   } catch (error) {
     console.error('❌ Error sending application restored email to applicant:', error);
     // Don't throw - we don't want email failures to break the application flow
@@ -588,15 +561,10 @@ export const sendProfileDeletedEmail = async (
       supportEmail,
     };
 
-    const msg = {
-      to: email,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      subject: `Profile Deleted - LOANLO`,
-      html: profileDeletedApplicantTemplate(emailData),
-      text: `Dear ${firstName},\n\nYour LOANLO account has been successfully deleted.\n\nDeleted on: ${deletedAt.toLocaleString()}\nApplications removed: ${applicationsCount}\n\nIf you need to restore your account, contact us at ${supportEmail}\n\nLOANLO Team`,
-    };
+    const html = profileDeletedApplicantTemplate(emailData);
+    const text = `Dear ${firstName},\n\nYour LOANLO account has been successfully deleted.\n\nDeleted on: ${deletedAt.toLocaleString()}\nApplications removed: ${applicationsCount}\n\nIf you need to restore your account, contact us at ${supportEmail}\n\nLOANLO Team`;
 
-    await sgMail.send(msg);
+    await sendGmailAPIEmail(email, `Profile Deleted - LOANLO`, html, text);
   } catch (error) {
     console.error('❌ Error sending profile deleted email:', error);
     // Don't throw - we don't want email failures to break the application flow
@@ -644,15 +612,10 @@ export const sendProfileDeletedNotificationToUnderwriters = async (
         underwriterDashboardLink,
       };
 
-      const msg = {
-        to: underwriterEmail,
-        from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-        subject: `Applicant Profile Deleted - ${applicantName}`,
-        html: profileDeletedUnderwriterTemplate(emailData),
-        text: `Dear ${underwriterName},\n\nAn applicant has deleted their profile.\n\nApplicant: ${applicantName} (${applicantEmail})\nApplications removed: ${applicationsCount}\nDeleted on: ${deletedAt.toLocaleString()}\n\nNo action required. View dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`,
-      };
+      const html = profileDeletedUnderwriterTemplate(emailData);
+      const text = `Dear ${underwriterName},\n\nAn applicant has deleted their profile.\n\nApplicant: ${applicantName} (${applicantEmail})\nApplications removed: ${applicationsCount}\nDeleted on: ${deletedAt.toLocaleString()}\n\nNo action required. View dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`;
 
-      return sgMail.send(msg);
+      return sendGmailAPIEmail(underwriterEmail, `Applicant Profile Deleted - ${applicantName}`, html, text);
     });
 
     await Promise.all(emailPromises);
@@ -697,15 +660,10 @@ export const sendProfileDeletedNotificationToAdmin = async (
       adminDashboardLink,
     };
 
-    const msg = {
-      to: adminEmail,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      subject: `🔔 Applicant Profile Deleted - ${applicantName}`,
-      html: profileDeletedAdminTemplate(emailData),
-      text: `Dear ${adminName},\n\nAn applicant has deleted their profile. This profile can be restored if needed.\n\nApplicant: ${applicantName} (${applicantEmail})\nApplications affected: ${applicationsCount}\nDeleted on: ${deletedAt.toLocaleString()}\n\nYou can restore this profile from your admin dashboard if the applicant requests it.\n\nView dashboard: ${adminDashboardLink}\n\nLOANLO Team`,
-    };
+    const html = profileDeletedAdminTemplate(emailData);
+    const text = `Dear ${adminName},\n\nAn applicant has deleted their profile. This profile can be restored if needed.\n\nApplicant: ${applicantName} (${applicantEmail})\nApplications affected: ${applicationsCount}\nDeleted on: ${deletedAt.toLocaleString()}\n\nYou can restore this profile from your admin dashboard if the applicant requests it.\n\nView dashboard: ${adminDashboardLink}\n\nLOANLO Team`;
 
-    await sgMail.send(msg);
+    await sendGmailAPIEmail(adminEmail, `🔔 Applicant Profile Deleted - ${applicantName}`, html, text);
   } catch (error) {
     console.error('❌ Error sending profile deleted notification to admin:', error);
   }
@@ -737,15 +695,10 @@ export const sendProfileRestoredEmail = async (
       applicationStatusLink,
     };
 
-    const msg = {
-      to: applicantEmail,
-      from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-      subject: `✓ Profile Restored - Welcome Back to LOANLO`,
-      html: profileRestoredApplicantTemplate(emailData),
-      text: `Dear ${firstName},\n\nGreat news! Your LOANLO account has been successfully restored.\n\nRestored on: ${restoredAt.toLocaleString()}\nApplications restored: ${applicationsCount}\n\nReason: ${restorationReason}\n\nYou can now access your applications: ${applicationStatusLink}\n\nLOANLO Team`,
-    };
+    const html = profileRestoredApplicantTemplate(emailData);
+    const text = `Dear ${firstName},\n\nGreat news! Your LOANLO account has been successfully restored.\n\nRestored on: ${restoredAt.toLocaleString()}\nApplications restored: ${applicationsCount}\n\nReason: ${restorationReason}\n\nYou can now access your applications: ${applicationStatusLink}\n\nLOANLO Team`;
 
-    await sgMail.send(msg);
+    await sendGmailAPIEmail(applicantEmail, `✓ Profile Restored - Welcome Back to LOANLO`, html, text);
   } catch (error) {
     console.error('❌ Error sending profile restored email to applicant:', error);
     // Don't throw - we don't want email failures to break the application flow
@@ -795,15 +748,10 @@ export const sendProfileRestoredNotificationToUnderwriters = async (
         underwriterDashboardLink,
       };
 
-      const msg = {
-        to: underwriterEmail,
-        from: process.env.EMAIL_FROM || 'noreply@loanlo.com',
-        subject: `Applicant Profile Restored - ${applicantName}`,
-        html: profileRestoredUnderwriterTemplate(emailData),
-        text: `Dear ${underwriterName},\n\nAn applicant profile has been restored.\n\nApplicant: ${applicantName} (${applicantEmail})\nApplications restored: ${applicationsCount}\nRestored on: ${restoredAt.toLocaleString()}\n\nReason: ${restorationReason}\n\nView dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`,
-      };
+      const html = profileRestoredUnderwriterTemplate(emailData);
+      const text = `Dear ${underwriterName},\n\nAn applicant profile has been restored.\n\nApplicant: ${applicantName} (${applicantEmail})\nApplications restored: ${applicationsCount}\nRestored on: ${restoredAt.toLocaleString()}\n\nReason: ${restorationReason}\n\nView dashboard: ${underwriterDashboardLink}\n\nLOANLO Team`;
 
-      return sgMail.send(msg);
+      return sendGmailAPIEmail(underwriterEmail, `Applicant Profile Restored - ${applicantName}`, html, text);
     });
 
     await Promise.all(emailPromises);
