@@ -34,6 +34,7 @@ const LoanTypeDetails: React.FC = () => {
     features: ['', '', ''],
     isActive: true,
   });
+  const formRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchLoanTypes();
@@ -192,6 +193,11 @@ const LoanTypeDetails: React.FC = () => {
     });
     setIsCreating(false);
     setError(null);
+    
+    // Scroll to form with smooth animation
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const resetForm = () => {
@@ -227,6 +233,15 @@ const LoanTypeDetails: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      <style>{`
+        @keyframes highlight {
+          0%, 100% { background-color: white; }
+          50% { background-color: #dbeafe; }
+        }
+        .animate-highlight {
+          animation: highlight 1s ease-in-out;
+        }
+      `}</style>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex justify-between items-center">
           <div>
@@ -238,6 +253,9 @@ const LoanTypeDetails: React.FC = () => {
               setIsCreating(true);
               setEditingId(null);
               setError(null);
+              setTimeout(() => {
+                formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }, 100);
             }}
             disabled={loading}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -264,9 +282,12 @@ const LoanTypeDetails: React.FC = () => {
         )}
 
         {(isCreating || editingId) && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6 border-2 border-blue-200">
+          <div 
+            ref={formRef}
+            className="bg-white rounded-lg shadow-md p-6 mb-6 border-2 border-blue-200 scroll-mt-6 animate-highlight"
+          >
             <h2 className="text-xl font-semibold mb-4">
-              {isCreating ? 'Create New Loan Type' : 'Edit Loan Type'}
+              {isCreating ? 'Create New Loan Type' : `Edit Loan Type: ${formData.name}`}
             </h2>
             
             <div className="grid grid-cols-2 gap-4 mb-4">
@@ -280,6 +301,7 @@ const LoanTypeDetails: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                   placeholder="Personal Loan"
+                  disabled={!isCreating}
                 />
               </div>
 
@@ -417,7 +439,9 @@ const LoanTypeDetails: React.FC = () => {
             {loanTypes.map((loanType) => (
               <div
                 key={loanType._id}
-                className={`bg-white rounded-lg shadow-md p-6 ${!loanType.isActive ? 'opacity-60' : ''}`}
+                className={`bg-white rounded-lg shadow-md p-6 transition-all ${
+                  !loanType.isActive ? 'opacity-60' : ''
+                } ${editingId === loanType._id ? 'ring-2 ring-blue-400 ring-offset-2' : ''}`}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -430,6 +454,11 @@ const LoanTypeDetails: React.FC = () => {
                       ) : (
                         <span className="text-xs font-semibold px-2 py-1 rounded bg-gray-100 text-gray-800">
                           Inactive
+                        </span>
+                      )}
+                      {editingId === loanType._id && (
+                        <span className="text-xs font-semibold px-2 py-1 rounded bg-blue-100 text-blue-800 animate-pulse">
+                          Currently Editing
                         </span>
                       )}
                     </div>
@@ -512,6 +541,9 @@ const LoanTypeDetails: React.FC = () => {
               onClick={() => {
                 setIsCreating(true);
                 setError(null);
+                setTimeout(() => {
+                  formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
               }}
               className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
             >
