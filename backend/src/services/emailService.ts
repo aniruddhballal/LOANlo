@@ -49,11 +49,6 @@ async function sendGmailAPIEmail(to: string, subject: string, html: string, text
 }
 
 export const sendVerificationEmail = async (email: string, firstName: string, verificationToken: string) => {
-  console.log('🔥 sendVerificationEmail called with:', {
-    email,
-    firstName,
-    verificationToken: verificationToken?.slice(0, 6) + '...',
-  });
 
   const frontendUrl = getFrontendUrl();
   const verificationLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
@@ -64,15 +59,12 @@ export const sendVerificationEmail = async (email: string, firstName: string, ve
 
   try {
     await sendGmailAPIEmail(email, 'Verify Your Email Address - LOANLO', html, text);
-    console.log('✅ Verification email sent via Gmail API');
   } catch (error) {
-    console.error('❌ Error sending verification email via Gmail API:', error);
     throw new Error('Failed to send verification email');
   }
 };
 
 export const sendWelcomeEmail = async (email: string, firstName: string) => {
-  console.log('🔥 sendWelcomeEmail called with:', { email, firstName });
 
   const emailData: WelcomeEmailData = { firstName, email };
   const html = welcomeEmailTemplate(emailData);
@@ -80,14 +72,12 @@ export const sendWelcomeEmail = async (email: string, firstName: string) => {
 
   try {
     await sendGmailAPIEmail(email, 'Welcome to LOANLO - Account Verified', html, text);
-    console.log('✅ Welcome email sent via Gmail API');
   } catch (error) {
-    console.error('❌ Error sending welcome email via Gmail API:', error);
+      throw new Error('Failed to send welcome email');
   }
 };
 
 export const resendVerificationEmail = async (email: string, firstName: string, verificationToken: string) => {
-  console.log('🔥 resendVerificationEmail called');
   return sendVerificationEmail(email, firstName, verificationToken);
 };
 
