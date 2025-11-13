@@ -44,6 +44,20 @@ export const sendVerificationEmail = async (email: string, firstName: string, ve
   const emailData: VerificationEmailData = { firstName, verificationLink };
 
   try {
+    const accessToken = await oAuth2Client.getAccessToken();
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        type: 'OAuth2',
+        user: SENDER_EMAIL,
+        clientId: CLIENT_ID,
+        clientSecret: CLIENT_SECRET,
+        refreshToken: REFRESH_TOKEN,
+        accessToken: accessToken?.token,
+      },
+    } as any);
+
     const info = await transporter.sendMail({
       from: SENDER_EMAIL,
       to: email,
