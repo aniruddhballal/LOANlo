@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle, Shield, CheckCircle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import CaptchaModal from './CaptchaModal'
+import ForgotPasswordModal from './ForgotPasswordModal'
 import axios from "axios"
 
 const Login = () => {
@@ -21,6 +22,8 @@ const Login = () => {
   const [showCaptcha, setShowCaptcha] = useState(false)
   const [captchaVerified, setCaptchaVerified] = useState(false)
   const [pendingFormData, setPendingFormData] = useState<{email: string, password: string} | null>(null)
+
+const [showForgotPassword, setShowForgotPassword] = useState(false)
 
   const { login, completeLogin, user } = useAuth()
   const navigate = useNavigate()
@@ -275,6 +278,17 @@ const Login = () => {
                   </div>
                 </div>
 
+               {/* Forgot Password Link */}
+                <div className="text-right">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors duration-300 focus:outline-none"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+
                 {/* Submit Button */}
                 <div className="pt-4">
                   <button
@@ -366,6 +380,12 @@ const Login = () => {
         onFail={handleCaptchaFail}
         title="Security Verification"
         description="Please solve this simple math problem to verify you're human"
+      />
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
       />
 
       <style>{`

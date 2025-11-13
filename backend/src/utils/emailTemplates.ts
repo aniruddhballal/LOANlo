@@ -8,6 +8,11 @@ export interface WelcomeEmailData {
   email: string;
 }
 
+export interface PasswordResetEmailData {
+  firstName: string;
+  resetLink: string;
+}
+
 /**
  * Email verification template
  */
@@ -236,6 +241,137 @@ export const welcomeEmailTemplate = (data: WelcomeEmailData): string => {
                   
                   <p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
                     Thank you for choosing LOANLO for your financial needs.
+                  </p>
+                </td>
+              </tr>
+              
+              <!-- Footer -->
+              <tr>
+                <td style="background-color: #f9fafb; padding: 32px 40px; border-top: 1px solid #e5e7eb;">
+                  <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td align="center">
+                        <p style="margin: 0 0 16px 0; color: #6b7280; font-size: 12px; letter-spacing: 0.5px;">
+                          SECURE • ENCRYPTED • COMPLIANT
+                        </p>
+                        <p style="margin: 0 0 8px 0; color: #9ca3af; font-size: 11px;">
+                          © 2025 LOANLO. All rights reserved.
+                        </p>
+                        <p style="margin: 0; color: #9ca3af; font-size: 11px;">
+                          Professional Loan Origination Platform
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+};
+
+/**
+ * Password reset email template
+ */
+export const passwordResetEmailTemplate = (data: PasswordResetEmailData): string => {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Reset Your Password - LOANLO</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f9fafb;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; padding: 40px 20px;">
+        <tr>
+          <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+              
+              <!-- Header -->
+              <tr>
+                <td style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%); padding: 48px 40px; text-align: center;">
+                  <div style="width: 64px; height: 64px; background-color: #ffffff; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2">
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path d="M12 1v6m0 6v6m8.66-10.66l-5.196 5.196m-2.928 2.928l-5.196 5.196m13.856 0l-5.196-5.196m-2.928-2.928l-5.196-5.196"></path>
+                    </svg>
+                  </div>
+                  <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 300; letter-spacing: 0.5px;">
+                    LOAN<span style="font-weight: 600;">LO</span>
+                  </h1>
+                  <div style="width: 80px; height: 1px; background-color: rgba(255, 255, 255, 0.3); margin: 16px auto;"></div>
+                  <p style="margin: 0; color: rgba(255, 255, 255, 0.8); font-size: 14px; letter-spacing: 1px;">
+                    PROFESSIONAL LOAN ORIGINATION PLATFORM
+                  </p>
+                </td>
+              </tr>
+              
+              <!-- Body -->
+              <tr>
+                <td style="padding: 48px 40px;">
+                  <h2 style="margin: 0 0 24px 0; color: #111827; font-size: 24px; font-weight: 300; letter-spacing: 0.5px;">
+                    Password Reset Request
+                  </h2>
+                  
+                  <p style="margin: 0 0 24px 0; color: #6b7280; font-size: 15px; line-height: 1.6;">
+                    Dear ${data.firstName},
+                  </p>
+                  
+                  <p style="margin: 0 0 24px 0; color: #6b7280; font-size: 15px; line-height: 1.6;">
+                    We received a request to reset the password for your LOANLO account. If you made this request, click the button below to set a new password.
+                  </p>
+                  
+                  <!-- CTA Button -->
+                  <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td align="center" style="padding: 0 0 32px 0;">
+                        <a href="${data.resetLink}" 
+                           style="display: inline-block; padding: 16px 48px; background-color: #111827; color: #ffffff; text-decoration: none; border-radius: 16px; font-size: 14px; font-weight: 500; letter-spacing: 1px;">
+                          RESET PASSWORD
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                  
+                  <!-- Alternative Link -->
+                  <div style="padding: 24px; background-color: #f9fafb; border-radius: 12px; margin-bottom: 24px;">
+                    <p style="margin: 0 0 12px 0; color: #6b7280; font-size: 13px; font-weight: 500;">
+                      Alternative reset link:
+                    </p>
+                    <p style="margin: 0; word-break: break-all;">
+                      <a href="${data.resetLink}" style="color: #111827; font-size: 12px; text-decoration: none;">
+                        ${data.resetLink}
+                      </a>
+                    </p>
+                  </div>
+                  
+                  <!-- Security Warning -->
+                  <div style="padding: 20px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; margin-bottom: 24px;">
+                    <p style="margin: 0 0 12px 0; color: #92400e; font-size: 13px; line-height: 1.5;">
+                      <strong>Security Notice:</strong>
+                    </p>
+                    <ul style="margin: 0; padding-left: 20px; color: #92400e; font-size: 13px; line-height: 1.5;">
+                      <li>This password reset link will expire in 30 minutes</li>
+                      <li>If you didn't request this reset, please ignore this email</li>
+                      <li>Your password will remain unchanged unless you click the link above</li>
+                    </ul>
+                  </div>
+                  
+                  <!-- Didn't Request -->
+                  <div style="padding: 20px; background-color: #f3f4f6; border-radius: 12px; margin-bottom: 24px;">
+                    <p style="margin: 0; color: #4b5563; font-size: 13px; line-height: 1.5;">
+                      If you didn't request a password reset, you can safely ignore this email. Your account security is our priority. If you're concerned about unauthorized access, please contact our support team immediately.
+                    </p>
+                  </div>
+                  
+                  <p style="margin: 0; color: #9ca3af; font-size: 13px; line-height: 1.6;">
+                    If you're having trouble with the button above, copy and paste the alternative link into your web browser.
                   </p>
                 </td>
               </tr>

@@ -29,6 +29,10 @@ export interface IUser extends Document {
   isEmailVerified: boolean;
   verificationToken?: string | undefined;
   verificationTokenExpiry?: Date | undefined;
+
+  // Password reset fields
+  resetPasswordToken?: string | undefined;
+  resetPasswordTokenExpiry?: Date | undefined;
  
   // Profile completion
   isProfileComplete: boolean;
@@ -79,6 +83,10 @@ const userSchema: Schema<IUser> = new Schema({
   isEmailVerified: { type: Boolean, default: false },
   verificationToken: { type: String },
   verificationTokenExpiry: { type: Date },
+
+  // Password reset fields
+  resetPasswordToken: { type: String },
+  resetPasswordTokenExpiry: { type: Date },
  
   // Profile completion
   isProfileComplete: { type: Boolean, default: false },

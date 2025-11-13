@@ -24,6 +24,7 @@ import LoanTypeSelection from './components/applicant/loan-application/LoanTypeS
 import LoanRequests from './components/underwriter/LoanApplications'
 import LoanTypeDetails from './components/underwriter/LoanTypeDetails'
 import AllApplicants from './components/system-admin/AllApplicants'
+import ResetPassword from './components/auth/ResetPassword'
 
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -80,7 +81,8 @@ function AppContent() {
         } />
         <Route path="/verify-email" element={<EmailVerification />} />
         <Route path="/email-verification-required" element={<EmailVerification />} />
-        
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+
         {/* Applicant Profile Routes */}
         <Route path="/applicant-profile" element={
           <RoleProtectedRoute allowedRoles={['applicant']}>

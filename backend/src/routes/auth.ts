@@ -18,6 +18,8 @@ import {
   verifyTokenController,
 } from '../controllers/authController';
 
+import { forgotPassword, resetPassword, verifyResetToken } from '../controllers/passwordResetController';
+
 const router = express.Router();
 
 // Captcha routes
@@ -30,5 +32,9 @@ router.post('/login', authLimiter, loginController);
 router.get('/verify-email', verifyEmailController);
 router.post('/resend-verification', resendVerificationLimiter, resendVerificationController);
 router.get('/verify', verifyLimiter, authenticateToken, checkIpWhitelist, verifyTokenController); // <-- ADDED checkIpWhitelist HERE
+
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
+router.get('/verify-reset-token/:token', verifyResetToken);
 
 export default router;

@@ -4,6 +4,8 @@ import {
   welcomeEmailTemplate,
   VerificationEmailData,
   WelcomeEmailData,
+  passwordResetEmailTemplate,
+  PasswordResetEmailData
 } from '../utils/emailTemplates';
 
 const CLIENT_ID = process.env.GMAIL_OAUTH_CLIENT_ID!;
@@ -81,4 +83,34 @@ export const resendVerificationEmail = async (email: string, firstName: string, 
   return sendVerificationEmail(email, firstName, verificationToken);
 };
 
-export default { sendVerificationEmail, sendWelcomeEmail, resendVerificationEmail };
+export const sendPasswordResetEmail = async (
+  email: string, 
+  firstName: string, 
+  resetToken: string
+) => {
+  const frontendUrl = getFrontendUrl();
+  const resetLink = `${frontendUrl}/reset-password/${resetToken}`;
+  
+  const emailData: PasswordResetEmailData = { firstName, resetLink };
+  const html = passwordResetEmailTemplate(emailData);
+  const text = `Dear ${firstName},\n\nReset your password: ${resetLink}\n\nThis link expires in 30 minutes.\n\nLOANLO Team`;
+  
+  try {
+    await sendGmailAPIEmail(
+      email, 
+      'Reset Your Password - LOANLO', 
+      html, 
+      text
+    );
+  } catch (error) {
+    console.error('Failed to send password reset email:', error);
+    throw new Error('Failed to send password reset email');
+  }
+};
+
+export default {
+  sendVerificationEmail,
+  sendWelcomeEmail,
+  resendVerificationEmail,
+  sendPasswordResetEmail
+};
