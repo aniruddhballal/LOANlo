@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (80)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (81)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (141)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (75)
+### ✅ Completed Initiatives (76)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -94,6 +94,7 @@
 | 213 | **Refactor `PersonalDetailsStep` to Use Centralized Validation Rules** | Replaced inline field validation logic in `PersonalDetailsStep.tsx` with imports from the new `validationRules.ts`. Integrated `validateField` and `isFieldValid` utilities for consistent checks across personal, contact, and employment sections. Removed redundant regex and manual error handling, ensuring standardized error messages and age, Aadhaar, PAN, and income constraints align with centralized validation logic. |
 | 214 | **Pincode Validation State on Mount** | Added `pincodeValid` optional field to `PersonalDetailsData` interface in types.ts and implemented `useEffect` in `ContactInfoStep` to automatically set `pincodeValid: 'true'` for existing database pincodes on component mount, eliminating redundant API calls and enabling navigation buttons immediately when landing on the contact info step. |
 | 216 | **Error Message Scroll Enhancement** | Added `errorRef` using `useRef<HTMLDivElement `|` null>(null)` and implemented `useEffect` hook to automatically scroll error messages into view with smooth behavior after a 100ms delay when `error` state changes, improving UX by ensuring validation errors are always visible to users. Also refactored error display from inline animated div to use `ErrorMessage` component from StatusMessages. |
+| 222 | **Register Form Validation Integration** | Integrated `validationRules.ts` validation by importing `validateField` and adding `fieldErrors`/`touchedFields` state management. Implemented `handleBlur` for on-blur validation and modified `handleChange` for real-time validation of touched fields. Added conditional error styling (red borders) to firstName, lastName, email, and phone inputs with `ErrorMessage` component from `StatusMessages` for error display. Created `isFormValid` function to disable submit button when form is invalid. Implemented `handlePhoneChange` with digit-only restriction (`maxLength={10}`) treating phone as optional field. |
 
 ### ⚡ In Progress (5)
 
@@ -265,6 +266,6 @@
 
 ---
 
-**Document Version:** 198
+**Document Version:** 199
 **Last Updated:** 13th November 2025
 **Maintained By:** Aniruddh Ballal

@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, AlertCircle, Check, X, Shield } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { validateField } from '../applicant/personal-details/validationRules'
+import { ErrorMessage } from '../ui/StatusMessages'
 
 const Register = () => {
   const navigate = useNavigate()
@@ -19,7 +21,8 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState(0)
   const [focusedField, setFocusedField] = useState('')
-  
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string | null>>({})
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({})
   const { register } = useAuth()
   
   const calculatePasswordStrength = (password: string): number => {
@@ -38,26 +41,129 @@ const Register = () => {
       ...formData,
       [name]: value
     })
-  
+
+    // Validate field if it has been touched
+    if (touchedFields[name]) {
+      const validationError = validateField(name, value)
+      setFieldErrors(prev => ({
+        ...prev,
+        [name]: validationError
+      }))
+    }
+
     if (name === 'password') {
       setPasswordStrength(calculatePasswordStrength(value))
+      // Also validate confirmPassword if it exists
+      if (formData.confirmPassword && touchedFields.confirmPassword) {
+        const match = value === formData.confirmPassword
+        setFieldErrors(prev => ({
+          ...prev,
+          confirmPassword: match ? null : 'Passwords do not match'
+        }))
+      }
     }
-  
+
     if (error) setError('')
+  }
+
+  const handleBlur = (fieldName: string) => {
+    setTouchedFields(prev => ({ ...prev, [fieldName]: true }))
+    const validationError = validateField(fieldName, formData[fieldName as keyof typeof formData])
+    setFieldErrors(prev => ({
+      ...prev,
+      [fieldName]: validationError
+    }))
+  }
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    // Only allow digits and limit to 10 characters
+    if (value === '' || (/^\d+$/.test(value) && value.length <= 10)) {
+      setFormData({
+        ...formData,
+        phone: value
+      })
+      
+      // Validate field if it has been touched
+      if (touchedFields.phone && value) {
+        const validationError = validateField('phone', value)
+        setFieldErrors(prev => ({
+          ...prev,
+          phone: validationError
+        }))
+      }
+      
+      if (error) setError('')
+    }
+  }
+
+  const isFormValid = () => {
+    // Check if all required fields are filled
+    if (!formData.firstName?.trim() || 
+        !formData.lastName?.trim() || 
+        !formData.email?.trim() || 
+        !formData.password || 
+        !formData.confirmPassword) {
+      return false
+    }
+    
+    // Check if there are any validation errors
+    if (fieldErrors.firstName || 
+        fieldErrors.lastName || 
+        fieldErrors.email || 
+        (formData.phone && fieldErrors.phone)) {  // Only check phone error if phone is filled
+      return false
+    }
+    
+    // Check password requirements
+    if (formData.password.length < 6) {
+      return false
+    }
+    
+    // Check if passwords match
+    if (formData.password !== formData.confirmPassword) {
+      return false
+    }
+    
+    return true
   }
 
   const handleSubmit = async () => {
     setError('')
-  
+    
+    // Validate all fields
+    const errors: Record<string, string | null> = {}
+    errors.firstName = validateField('firstName', formData.firstName)
+    errors.lastName = validateField('lastName', formData.lastName)
+    errors.email = validateField('email', formData.email)
+    errors.phone = formData.phone ? validateField('phone', formData.phone) : null
+    
+    // Password validation
+    if (!formData.password || formData.password.length < 6) {
+      errors.password = 'Password must contain at least 6 characters for security compliance.'
+    }
+    
     if (formData.password !== formData.confirmPassword) {
-      setError('Password confirmation does not match. Please verify both entries.')
+      errors.confirmPassword = 'Password confirmation does not match. Please verify both entries.'
+    }
+    
+    // Check if any errors exist
+    const hasErrors = Object.values(errors).some(error => error !== null)
+    
+    if (hasErrors) {
+      setFieldErrors(errors)
+      setTouchedFields({
+        firstName: true,
+        lastName: true,
+        email: true,
+        phone: true,
+        password: true,
+        confirmPassword: true
+      })
+      setError('Please correct the errors in the form before submitting.')
       return
     }
-    if (formData.password.length < 6) {
-      setError('Password must contain at least 6 characters for security compliance.')
-      return
-    }
-  
+
     setLoading(true)
     try {
       const result = await register({
@@ -171,16 +277,23 @@ const Register = () => {
                           value={formData.firstName}
                           onChange={handleChange}
                           onFocus={() => setFocusedField('firstName')}
-                          onBlur={() => setFocusedField('')}
+                          onBlur={() => { setFocusedField(''); handleBlur('firstName'); }}
                           onKeyPress={handleKeyPress}
-                          className="block w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl 
-                                  focus:ring-0 focus:border-gray-400 focus:outline-none 
+                          className={`block w-full pl-12 pr-4 py-4 border rounded-2xl 
+                                  focus:ring-0 focus:outline-none 
                                   bg-white text-gray-900 placeholder-gray-400 
                                   transition-all duration-200 font-medium text-sm tracking-wide
-                                  hover:border-gray-300"
+                                  hover:border-gray-300 ${
+                            touchedFields.firstName && fieldErrors.firstName 
+                              ? 'border-red-300 focus:border-red-400' 
+                              : 'border-gray-200 focus:border-gray-400'
+                          }`}
                           placeholder="Enter your first name"
                           required
                         />
+                        {touchedFields.firstName && fieldErrors.firstName && (
+                          <ErrorMessage message={fieldErrors.firstName} />
+                        )}
                       </div>
                     </div>
 
@@ -201,16 +314,23 @@ const Register = () => {
                           value={formData.lastName}
                           onChange={handleChange}
                           onFocus={() => setFocusedField('lastName')}
-                          onBlur={() => setFocusedField('')}
+                          onBlur={() => { setFocusedField(''); handleBlur('lastName'); }}
                           onKeyPress={handleKeyPress}
-                          className="block w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl 
-                                  focus:ring-0 focus:border-gray-400 focus:outline-none 
+                          className={`block w-full pl-12 pr-4 py-4 border rounded-2xl 
+                                  focus:ring-0 focus:outline-none 
                                   bg-white text-gray-900 placeholder-gray-400 
                                   transition-all duration-200 font-medium text-sm tracking-wide
-                                  hover:border-gray-300"
+                                  hover:border-gray-300 ${
+                            touchedFields.lastName && fieldErrors.lastName 
+                              ? 'border-red-300 focus:border-red-400' 
+                              : 'border-gray-200 focus:border-gray-400'
+                          }`}
                           placeholder="Enter your last name"
                           required
                         />
+                        {touchedFields.lastName && fieldErrors.lastName && (
+                          <ErrorMessage message={fieldErrors.lastName} />
+                        )}
                       </div>
                     </div>
                   </div>
@@ -241,16 +361,23 @@ const Register = () => {
                         value={formData.email}
                         onChange={handleChange}
                         onFocus={() => setFocusedField('email')}
-                        onBlur={() => setFocusedField('')}
+                        onBlur={() => { setFocusedField(''); handleBlur('email'); }}
                         onKeyPress={handleKeyPress}
-                        className="block w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl 
-                                focus:ring-0 focus:border-gray-400 focus:outline-none 
+                        className={`block w-full pl-12 pr-4 py-4 border rounded-2xl 
+                                focus:ring-0 focus:outline-none 
                                 bg-white text-gray-900 placeholder-gray-400 
                                 transition-all duration-200 font-medium text-sm tracking-wide
-                                hover:border-gray-300"
+                                hover:border-gray-300 ${
+                          touchedFields.email && fieldErrors.email 
+                            ? 'border-red-300 focus:border-red-400' 
+                            : 'border-gray-200 focus:border-gray-400'
+                        }`}
                         placeholder="Enter your professional email address"
                         required
                       />
+                      {touchedFields.email && fieldErrors.email && (
+                        <ErrorMessage message={fieldErrors.email} />
+                      )}
                     </div>
                   </div>
 
@@ -270,17 +397,25 @@ const Register = () => {
                         id="phone"
                         name="phone"
                         value={formData.phone}
-                        onChange={handleChange}
+                        onChange={handlePhoneChange}
                         onFocus={() => setFocusedField('phone')}
-                        onBlur={() => setFocusedField('')}
+                        maxLength={10}
+                        onBlur={() => { setFocusedField(''); handleBlur('phone'); }}
                         onKeyPress={handleKeyPress}
-                        className="block w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl 
-                                focus:ring-0 focus:border-gray-400 focus:outline-none 
+                        className={`block w-full pl-12 pr-4 py-4 border rounded-2xl 
+                                focus:ring-0 focus:outline-none 
                                 bg-white text-gray-900 placeholder-gray-400 
                                 transition-all duration-200 font-medium text-sm tracking-wide
-                                hover:border-gray-300"
+                                hover:border-gray-300 ${
+                          touchedFields.phone && fieldErrors.phone 
+                            ? 'border-red-300 focus:border-red-400' 
+                            : 'border-gray-200 focus:border-gray-400'
+                        }`}
                         placeholder="Enter your contact number"
                       />
+                      {touchedFields.phone && formData.phone && fieldErrors.phone && (
+                        <ErrorMessage message={fieldErrors.phone} />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -439,7 +574,7 @@ const Register = () => {
                 <div className="pt-6">
                   <button 
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || !isFormValid()}
                     onClick={handleButtonClick}
                     className="relative w-full flex items-center justify-center py-4 px-6 
                             border border-gray-900 rounded-2xl text-white bg-gray-900 
