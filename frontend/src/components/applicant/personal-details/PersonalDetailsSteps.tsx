@@ -3,16 +3,7 @@ import { InputField, SelectField, TextareaField, CurrencyField } from './FormCom
 import type { PersonalDetailsFormProps  } from './types';
 import { SELECT_OPTIONS, STEP_INFO } from './constants';
 import { validateField } from './validationRules';
-
-// Error message component with consistent styling matching LoanForm
-const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
-  <p className="text-red-600 text-sm mt-1 flex items-center">
-    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-    </svg>
-    {message}
-  </p>
-);
+import { ErrorMessage } from '../../ui/StatusMessages';
 
 // Success message component
 const SuccessMessage: React.FC<{ message: string }> = ({ message }) => (
