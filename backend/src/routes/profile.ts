@@ -402,9 +402,9 @@ router.get('/:userId', profileFetchLimiter, authenticateToken, async (req: AuthR
     const requestingUserId = req.user?.userId;
     const requestingUserRole = req.user?.role;
 
-    // Only allow underwriters to view other users' profiles
+    // Allow underwriters and system_admins to view other users' profiles
     // Users can always view their own profile via /me endpoint
-    if (requestingUserRole !== 'underwriter' && requestingUserId !== userId) {
+    if (requestingUserRole !== 'underwriter' && requestingUserRole !== 'system_admin' && requestingUserId !== userId) {
       return res.status(403).json({
         success: false,
         message: 'Unauthorized. Only underwriters can view other users\' profiles.'

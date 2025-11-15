@@ -37,7 +37,7 @@ router.get('/:userId', historyFetchLimiter, authenticateToken, async (req: AuthR
     const requestingUserRole = req.user?.role;
 
     // Authorization: Only underwriters can view others' history, users can view their own
-    if (requestingUserRole !== 'underwriter' && requestingUserId !== userId) {
+    if (requestingUserRole !== 'underwriter' && requestingUserRole !== 'system_admin' && requestingUserId !== userId) {
       return res.status(403).json({
         success: false,
         message: 'Unauthorized. You can only view your own profile history.'

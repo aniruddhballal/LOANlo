@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (85)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (86)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (143)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (80)
+### ✅ Completed Initiatives (81)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -99,6 +99,7 @@
 | 225 | **AI Credit Risk Tab Integration** | Added `AICreditRiskTab` component to embed the deployed Streamlit credit risk model (`https://credit-risk-predictor-dedh.onrender.com/`) inside the MERN app. Replaced placeholder content with an iframe that renders the AI credit risk assessment UI, styled with responsive height, rounded borders, and shadow to integrate seamlessly with the existing loan application dashboard. |
 | 227 | **Loan Type Management UX & Edit Enhancements** | Added smooth scroll to form on creating or editing a loan type using formRef and `scrollIntoView({ behavior: 'smooth' })`. Implemented highlight animation (`animate-highlight`) on form container for visual focus. Disabled Loan Name input during edit to prevent changes to identifier. Added “Currently Editing” badge and blue ring (`ring-2 ring-blue-400`) on the loan card being edited. Refined card transitions with `transition-all` and improved consistency in animations for editing and highlighting. |
 | 228 | **Reset Password - Password Strength & Match Validation** | Added 5-level password strength indicator with color-coded bars (red/yellow/green). Implemented real-time password match validation with Check/X icons and colored borders. Enhanced visual design with corporate branding, animated states, gradient backgrounds, and security badges footer. |
+| 229 | **All Applicants Page - Card Grid Redesign** | Replaced table with responsive card grid showing 2-3 key fields per applicant. Added "Visit Profile" button navigating to `/applicant-profile/:userId`. Implemented corporate header with avatar badge, staggered fadeInUp animations (0.05s delays), shimmer hover effects, and gradient overlays matching Login/Profile styling. Updated backend to allow `system_admin` role for profile viewing. |
 
 ### ⚡ In Progress (5)
 
@@ -272,6 +273,6 @@
 
 ---
 
-**Document Version:** 205
+**Document Version:** 206
 **Last Updated:** 15th November 2025
 **Maintained By:** Aniruddh Ballal
