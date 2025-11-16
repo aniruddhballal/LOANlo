@@ -16,6 +16,9 @@ export interface LoanApplication {
     email: string
     phone: string
     role: string
+    dateOfBirth?: string
+    monthlyIncome?: number
+    workExperience?: number
   }
   loanType: {
     _id: string
