@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (87)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (145)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (148)
 
 ---
 
@@ -249,7 +249,7 @@
 | 230 | **Standalone ML Service Setup for Credit Risk Predictions** | Added a dedicated `credit-risk-ml` directory containing serialized model files (`.pkl`), `main.py` for prediction execution, and a clean `requirements.txt` for isolated Python dependencies. Structured the ML folder for independent deployment, ensured compatibility with the Node backend’s `/predict` endpoint, and included all necessary artifacts for seamless integration between services. |
 | 231 | **Credit Risk Prediction Route Integration with External ML Service** | Added new `creditRisk.ts` Express route for forwarding prediction requests to the FastAPI ML microservice with environment-based URL switching. Updated `server.ts` to register the `/api/credit-risk` endpoint, ensuring CORS consistency, protected routing flow, and seamless communication with the deployed Python model. Included environment-variable support for production ML endpoint while maintaining localhost fallback for development. |
 
-### ⚡ In Progress (20)
+### ⚡ In Progress (23)
 
 | ID | Initiative | Status |
 |----|-----------|--------|
@@ -273,9 +273,12 @@
 | 177 | **Profile Restoration: Admin Reason & History Tracking** | Implemented system admin prompt for restoration reason when restoring a user profile, similar to loan application restoration. Added `ProfileHistory` model to track deletion timestamps, user-provided deletion reasons, and admin-provided restoration reasons for audit and record-keeping. |
 | 198 | **Profile Restoration: Custom Admin Message Support** | Allow system admins to enter a custom restoration message instead of the default “Profile restored by system administrator.” Determine the storage location (existing or new MongoDB field) for restoration messages to maintain audit consistency. |
 | 199 | **Loan Application: Monthly Income and Legal Document Review** | Evaluate replacing annual income with monthly income for loan applicants. Verify standard income data requirements and mandatory documents for Indian loan applications to ensure legal and practical alignment. |
+| 233 | **Backend User Model Refactor for Numeric Fields** | Updated `User` model to store `monthlySalary` and `workExperience` as numbers instead of strings. Modified all relevant backend endpoints and validation logic to handle numeric input, including creating/updating users. Ensured backward compatibility with existing string data by adding conversion fallback during data fetch and updates. |
+| 234 | **Login Audit Collection & System Admin Dashboard** | Created new `LoginAudit` MongoDB collection to store IP addresses, login timestamp, session duration, and pages visited. Implemented backend endpoints to log login/logout events and user activity. Added frontend dashboard for `system_admin` to view audit records with filters and pagination, while restricting visibility for underwriters. |
+| 235 | **Auto-Logout & Remote Session Management** | Implemented auto-logout after 10–20 minutes of inactivity with configurable timer. Added system admin capability to remotely log out any user from any device, either manually or following a password reset. Integrated password reset flow to invalidate all active sessions for the user. Updated frontend and backend session handling to reflect real-time logout and session termination events. |
 
 ---
 
-**Document Version:** 209
+**Document Version:** 210
 **Last Updated:** 17th November 2025
 **Maintained By:** Aniruddh Ballal
