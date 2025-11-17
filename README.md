@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (86)
+- [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (87)
 - [Backend Development, Security & Architecture](#backend-development-security--architecture) (145)
 
 ---
@@ -15,7 +15,7 @@
 
 **Domain Focus:** Visual design, interactive components, user interface refinement, and accessibility improvements to deliver an exceptional user experience aligned with modern corporate standards.
 
-### ✅ Completed Initiatives (81)
+### ✅ Completed Initiatives (82)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -100,6 +100,7 @@
 | 227 | **Loan Type Management UX & Edit Enhancements** | Added smooth scroll to form on creating or editing a loan type using formRef and `scrollIntoView({ behavior: 'smooth' })`. Implemented highlight animation (`animate-highlight`) on form container for visual focus. Disabled Loan Name input during edit to prevent changes to identifier. Added “Currently Editing” badge and blue ring (`ring-2 ring-blue-400`) on the loan card being edited. Refined card transitions with `transition-all` and improved consistency in animations for editing and highlighting. |
 | 228 | **Reset Password - Password Strength & Match Validation** | Added 5-level password strength indicator with color-coded bars (red/yellow/green). Implemented real-time password match validation with Check/X icons and colored borders. Enhanced visual design with corporate branding, animated states, gradient backgrounds, and security badges footer. |
 | 229 | **All Applicants Page - Card Grid Redesign** | Replaced table with responsive card grid showing 2-3 key fields per applicant. Added "Visit Profile" button navigating to `/applicant-profile/:userId`. Implemented corporate header with avatar badge, staggered fadeInUp animations (0.05s delays), shimmer hover effects, and gradient overlays matching Login/Profile styling. Updated backend to allow `system_admin` role for profile viewing. |
+| 232 | **AICreditRiskTab Refactor to Direct ML Prediction Workflow** | Replaced the old Streamlit iframe integration with a fully native prediction flow powered by the backend `/credit-risk/predict` API. Implemented local feature extraction from `LoanApplication` data (age, income, approval details, ratios), constructed a clean ML payload, and added request handling with loading states and displayed results. Introduced enhanced UI/UX with animations, hover effects, dynamic result rendering, and error handling, ensuring seamless interaction with the newly deployed FastAPI credit-risk microservice. Updated tab order in `LoanReviewModal.tsx` to conditionally place the AI Risk tab only when actions are available. |
 
 ### ⚡ In Progress (5)
 
@@ -275,6 +276,6 @@
 
 ---
 
-**Document Version:** 208
+**Document Version:** 209
 **Last Updated:** 17th November 2025
 **Maintained By:** Aniruddh Ballal

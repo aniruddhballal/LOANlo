@@ -272,7 +272,7 @@ export default function LoanReviewModal({
                     { id: 'details', label: 'Application Details', icon: FileText },
                     { id: 'documents', label: 'Document Upload Status', icon: FileUp },
                     { id: 'history', label: 'Status History', icon: Clock },
-                    { id: 'ai-risk', label: 'AI Credit Risk', icon: AlertCircle },
+                    ...(canShowActionsTab ? [{ id: 'ai-risk', label: 'AI Credit Risk', icon: AlertCircle }] : []),
                     ...(canShowActionsTab ? [{ id: 'actions', label: 'Actions', icon: MessageSquare }] : [])
                   ].map((tab) => {
                     const Icon = tab.icon
