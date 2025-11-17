@@ -2,8 +2,6 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 import pandas as pd
-import uvicorn
-import os
 
 # Load model and helpers
 model = joblib.load("best_credit_model.pkl")
@@ -58,7 +56,3 @@ def predict_credit_risk(data: CreditInput):
             "low"
         )
     }
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    uvicorn.run(app, host="0.0.0.0", port=port)
