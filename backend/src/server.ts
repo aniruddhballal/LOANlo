@@ -14,6 +14,7 @@ import ipWhitelistRoutes from './routes/ipWhitelist';
 import { checkIpWhitelist } from './middleware/ipWhitelist';
 import loanTypeRoutes from './routes/loanTypes';
 import applicantRoutes from './routes/applicants'
+import creditRiskRoutes from './routes/creditRisk';
 
 const app: Application = express();
 
@@ -65,6 +66,8 @@ app.use('/api/loan-types', loanTypeRoutes);
 // IP whitelist management routes (allow access without restriction)
 app.use('/api/ip-whitelist', ipWhitelistRoutes);
 app.use('/api/applicants', applicantRoutes);
+
+app.use('/api/credit-risk', creditRiskRoutes);
 
 // Connect to MongoDB and start server
 connectDB()
