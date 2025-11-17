@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (86)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (143)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (144)
 
 ---
 
@@ -118,7 +118,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (123)
+### ✅ Completed Initiatives (124)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -245,6 +245,7 @@
 | 221 | **Email Enhancement: Added Restoration Contact Options for Deleted Applications and Profiles** | Added "Deleted by mistake?" contact sections to applicant emails for both application deletion and profile deletion scenarios; application deletion emails now include a "Contact Underwriter" button with pre-filled mailto link for restoration requests; profile deletion emails now include a "Contact Support" button linking to system admin email; both buttons use prominent warning-styled boxes with URL-encoded mailto parameters (subject, body) for seamless user experience when requesting restoration assistance. |
 | 223 | **Input Sanitization: Replace HTML Entity Encoding with XSS Protection** | Replaced `validator.escape()` with `xss` library sanitization for text fields (firstName, lastName, address, city, state, companyName, designation) to prevent special characters like `/`, `'`, `&` from being stored as HTML entities while maintaining protection against XSS and injection attacks. |
 | 226 | **Password Reset: Implement Complete Forgot Password Flow** | Created `passwordResetController.ts` with token-based reset endpoints, `ForgotPasswordModal.tsx` for email submission, `ResetPassword.tsx` for password update page, added `passwordResetEmailTemplate` to `emailTemplates.ts`, `sendPasswordResetEmail` to `emailService.ts`, `resetPasswordToken` and `resetPasswordTokenExpiry` fields to User model, three new auth routes (`/forgot-password`, `/reset-password/:token`, `/verify-reset-token/:token`), and integrated "Forgot Password?" link in Login page with 30-minute token expiry and email verification |
+| 230 | **Standalone ML Service Setup for Credit Risk Predictions** | Added a dedicated `credit-risk-ml` directory containing serialized model files (`.pkl`), `main.py` for prediction execution, and a clean `requirements.txt` for isolated Python dependencies. Structured the ML folder for independent deployment, ensured compatibility with the Node backend’s `/predict` endpoint, and included all necessary artifacts for seamless integration between services. |
 
 ### ⚡ In Progress (20)
 
@@ -273,6 +274,6 @@
 
 ---
 
-**Document Version:** 206
-**Last Updated:** 15th November 2025
+**Document Version:** 207
+**Last Updated:** 17th November 2025
 **Maintained By:** Aniruddh Ballal

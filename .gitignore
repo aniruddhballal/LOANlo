@@ -51,3 +51,7 @@ loanprocessappa.txt
 critical security validation gaps.md
 Frontend Considerations.md
 structure.txt
+
+__pycache__/
+*.pyc
+*.pyo
