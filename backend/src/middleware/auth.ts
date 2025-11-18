@@ -4,6 +4,9 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import User from '../models/User';
 
+// Auto-logout after 15 minutes of inactivity (in milliseconds)
+const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 minutes
+
 // Define the shape of your JWT payload
 export interface UserPayload extends JwtPayload {
   userId: string;
@@ -44,7 +47,7 @@ export const authenticateToken = async (
     const user = await User.findOne({ 
       _id: decoded.userId,
       isDeleted: { $ne: true }
-    }).select('_id role isDeleted');
+    }).select('_id role isDeleted lastActivity');
 
     if (!user) {
       res.status(401).json({ 
@@ -53,6 +56,26 @@ export const authenticateToken = async (
       });
       return;
     }
+
+    // Check for inactivity timeout
+    const now = new Date();
+    const lastActivity = user.lastActivity || new Date(0); // Default to epoch if not set
+    const inactiveDuration = now.getTime() - lastActivity.getTime();
+
+    if (inactiveDuration > INACTIVITY_TIMEOUT) {
+      res.status(401).json({ 
+        success: false,
+        message: 'Session expired due to inactivity. Please log in again.',
+        code: 'SESSION_EXPIRED'
+      });
+      return;
+    }
+
+    // Update last activity timestamp
+    await User.updateOne(
+      { _id: decoded.userId },
+      { $set: { lastActivity: now } }
+    );
 
     // Attach user info to request
     req.user = decoded;

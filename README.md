@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (87)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (148)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (149)
 
 ---
 
@@ -119,7 +119,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (125)
+### ✅ Completed Initiatives (126)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -248,6 +248,7 @@
 | 226 | **Password Reset: Implement Complete Forgot Password Flow** | Created `passwordResetController.ts` with token-based reset endpoints, `ForgotPasswordModal.tsx` for email submission, `ResetPassword.tsx` for password update page, added `passwordResetEmailTemplate` to `emailTemplates.ts`, `sendPasswordResetEmail` to `emailService.ts`, `resetPasswordToken` and `resetPasswordTokenExpiry` fields to User model, three new auth routes (`/forgot-password`, `/reset-password/:token`, `/verify-reset-token/:token`), and integrated "Forgot Password?" link in Login page with 30-minute token expiry and email verification |
 | 230 | **Standalone ML Service Setup for Credit Risk Predictions** | Added a dedicated `credit-risk-ml` directory containing serialized model files (`.pkl`), `main.py` for prediction execution, and a clean `requirements.txt` for isolated Python dependencies. Structured the ML folder for independent deployment, ensured compatibility with the Node backend’s `/predict` endpoint, and included all necessary artifacts for seamless integration between services. |
 | 231 | **Credit Risk Prediction Route Integration with External ML Service** | Added new `creditRisk.ts` Express route for forwarding prediction requests to the FastAPI ML microservice with environment-based URL switching. Updated `server.ts` to register the `/api/credit-risk` endpoint, ensuring CORS consistency, protected routing flow, and seamless communication with the deployed Python model. Included environment-variable support for production ML endpoint while maintaining localhost fallback for development. |
+| 236 | **Auto-Logout Implementation for Inactive Sessions** | Added 15-minute inactivity timeout by introducing `lastActivity` field to User model and updating authentication middleware to track activity on each request. Modified `auth.ts` to check inactivity duration and return 401 with `SESSION_EXPIRED` code when threshold exceeded, while automatically updating timestamp for active sessions. Updated `User.ts` schema with `lastActivity` field, enabling automatic session expiration across all authenticated routes. |
 
 ### ⚡ In Progress (23)
 
@@ -279,6 +280,6 @@
 
 ---
 
-**Document Version:** 210
-**Last Updated:** 17th November 2025
+**Document Version:** 211
+**Last Updated:** 18th November 2025
 **Maintained By:** Aniruddh Ballal

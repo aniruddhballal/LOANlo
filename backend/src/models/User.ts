@@ -23,7 +23,8 @@ export interface IUser extends Document {
   workExperience?: string;
   monthlyIncome?: string;
   createdAt: Date;
-  updatedAt: Date;  // ADD THIS
+  updatedAt: Date;
+  lastActivity?: Date; // Track user activity for auto-logout
  
   // Email verification fields
   isEmailVerified: boolean;
@@ -103,6 +104,8 @@ const userSchema: Schema<IUser> = new Schema({
     addedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
   }],
   allowIpRestriction: { type: Boolean, default: false },
+  // Activity tracking for auto-logout
+  lastActivity: { type: Date, default: Date.now },
 }, {
   timestamps: true  // ADD THIS - automatically creates createdAt and updatedAt
 });
