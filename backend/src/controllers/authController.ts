@@ -9,6 +9,8 @@ import {
 } from '../services/authService';
 import { getClientIP, normalizeIP } from '../middleware/ipWhitelist';
 import User from '../models/User';
+import Session from '../models/Session';
+import { parseDeviceInfo } from '../controllers/sessionController';
 
 // Define interface for authenticated request
 interface AuthenticatedRequest extends Request {
@@ -157,12 +159,31 @@ export const loginController = async (req: Request, res: Response) => {
       }
     }
 
+    // CREATE SESSION RECORD - NEW CODE STARTS HERE
+    const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+    const userAgent = req.headers['user-agent'] || '';
+    
+    const sessionDoc = await Session.create({
+      userId: user._id,
+      sessionToken: result.token, // Store the JWT token
+      ipAddress: clientIP,
+      deviceInfo: parseDeviceInfo(userAgent),
+      loginTime: new Date(),
+      lastActivity: new Date(),
+      isActive: true,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+    });
+
+    console.log(`New session created for user ${user.email} from IP ${clientIP}, Session ID: ${sessionDoc._id}`);
+    // NEW CODE ENDS HERE
+
     res.json({
       success: true,
       message: result.message,
       token: result.token,
       user: result.user,
       requiresVerification: result.requiresVerification,
+      sessionId: sessionDoc._id.toString(), // Include session ID in response
     });
   } catch (error: any) {
     if (error.message === 'Invalid credentials') {

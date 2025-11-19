@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Frontend Design, UI/UX & Feature Enhancements](#frontend-design-uiux--feature-enhancements) (87)
-- [Backend Development, Security & Architecture](#backend-development-security--architecture) (149)
+- [Backend Development, Security & Architecture](#backend-development-security--architecture) (150)
 
 ---
 
@@ -119,7 +119,7 @@
 
 **Domain Focus:** Infrastructure development, security implementation, architectural optimization, and system scalability to ensure robust, maintainable, and enterprise-grade application foundation.
 
-### ✅ Completed Initiatives (126)
+### ✅ Completed Initiatives (127)
 
 | ID | Initiative | Description |
 |----|-----------|-------------|
@@ -249,6 +249,7 @@
 | 230 | **Standalone ML Service Setup for Credit Risk Predictions** | Added a dedicated `credit-risk-ml` directory containing serialized model files (`.pkl`), `main.py` for prediction execution, and a clean `requirements.txt` for isolated Python dependencies. Structured the ML folder for independent deployment, ensured compatibility with the Node backend’s `/predict` endpoint, and included all necessary artifacts for seamless integration between services. |
 | 231 | **Credit Risk Prediction Route Integration with External ML Service** | Added new `creditRisk.ts` Express route for forwarding prediction requests to the FastAPI ML microservice with environment-based URL switching. Updated `server.ts` to register the `/api/credit-risk` endpoint, ensuring CORS consistency, protected routing flow, and seamless communication with the deployed Python model. Included environment-variable support for production ML endpoint while maintaining localhost fallback for development. |
 | 236 | **Auto-Logout Implementation for Inactive Sessions** | Added 15-minute inactivity timeout by introducing `lastActivity` field to User model and updating authentication middleware to track activity on each request. Modified `auth.ts` to check inactivity duration and return 401 with `SESSION_EXPIRED` code when threshold exceeded, while automatically updating timestamp for active sessions. Updated `User.ts` schema with `lastActivity` field, enabling automatic session expiration across all authenticated routes. |
+| 237 | **Session Management System for Remote Logout** | Created `models/Session.ts` to track all user login sessions with device info, IP address, and activity timestamps. Added `controllers/sessionController.ts` with endpoints for viewing and terminating sessions (individual or bulk). Updated `middleware/auth.ts` to validate active sessions on each request and handle inactivity timeouts. Modified `controllers/authController.ts` to create session records on login with parsed device/browser info. Extended `routes/auth.ts` with session management routes for users and system_admin role. Implemented complete audit trail tracking who terminated which sessions and why (user logout, admin action, timeout, or security). |
 
 ### ⚡ In Progress (23)
 
@@ -280,6 +281,6 @@
 
 ---
 
-**Document Version:** 211
-**Last Updated:** 18th November 2025
+**Document Version:** 212
+**Last Updated:** 19th November 2025
 **Maintained By:** Aniruddh Ballal

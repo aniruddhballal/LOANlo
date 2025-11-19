@@ -1,21 +1,20 @@
-// backend/src/middleware/auth.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import User from '../models/User';
+import Session from '../models/Session';
 
 // Auto-logout after 15 minutes of inactivity (in milliseconds)
 const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
-// Define the shape of your JWT payload
 export interface UserPayload extends JwtPayload {
   userId: string;
   role: 'underwriter' | 'system_admin' | 'admin' | 'reviewer' | 'applicant';
-  firstName?: string;  // this
-  lastName?: string;   // this
+  firstName?: string;
+  lastName?: string;
+  sessionId?: string; // to track which session this token belongs to
 }
 
-// Extend Express Request with a strongly-typed user
 export interface AuthenticatedRequest extends Request {
   user?: UserPayload;
 }
@@ -26,7 +25,6 @@ export const authenticateToken = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  // Allow preflight requests
   if (req.method === 'OPTIONS') {
     return next();
   }
@@ -57,27 +55,59 @@ export const authenticateToken = async (
       return;
     }
 
-    // Check for inactivity timeout
-    const now = new Date();
-    const lastActivity = user.lastActivity || new Date(0); // Default to epoch if not set
-    const inactiveDuration = now.getTime() - lastActivity.getTime();
-
-    if (inactiveDuration > INACTIVITY_TIMEOUT) {
-      res.status(401).json({ 
-        success: false,
-        message: 'Session expired due to inactivity. Please log in again.',
-        code: 'SESSION_EXPIRED'
+    // NEW: Check if session is still active
+    if (decoded.sessionId) {
+      const session = await Session.findOne({
+        _id: decoded.sessionId,
+        userId: decoded.userId,
+        isActive: true
       });
-      return;
+
+      if (!session) {
+        res.status(401).json({ 
+          success: false,
+          message: 'Session has been terminated. Please log in again.',
+          code: 'SESSION_TERMINATED'
+        });
+        return;
+      }
+
+      // Check for inactivity timeout
+      const now = new Date();
+      const inactiveDuration = now.getTime() - session.lastActivity.getTime();
+      
+      if (inactiveDuration > INACTIVITY_TIMEOUT) {
+        // Mark session as inactive
+        await Session.updateOne(
+          { _id: session._id },
+          { 
+            isActive: false,
+            logoutTime: now,
+            logoutReason: 'timeout'
+          }
+        );
+
+        res.status(401).json({ 
+          success: false,
+          message: 'Session expired due to inactivity. Please log in again.',
+          code: 'SESSION_EXPIRED'
+        });
+        return;
+      }
+
+      // Update last activity in session
+      await Session.updateOne(
+        { _id: session._id },
+        { $set: { lastActivity: now } }
+      );
     }
 
-    // Update last activity timestamp
+    // Also update user's last activity
     await User.updateOne(
       { _id: decoded.userId },
-      { $set: { lastActivity: now } }
+      { $set: { lastActivity: new Date() } }
     );
 
-    // Attach user info to request
     req.user = decoded;
     next();
   } catch (err) {
